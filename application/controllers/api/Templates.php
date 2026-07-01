@@ -525,7 +525,12 @@ class Templates extends MY_REST_Controller
 				throw new Exception("Missing parameter for `UID`");
 			}
 
-			$result=$this->Editor_template_model->get_template_revision_history($uid);	
+			$pagination = $this->get_pagination_params(15, 100);
+			$result=$this->Editor_template_model->get_template_revision_history(
+				$uid,
+				$pagination['offset'],
+				$pagination['limit']
+			);	
 			array_walk($result['history'], 'unix_date_to_gmt',array('created'));
 			
 			$response=array(

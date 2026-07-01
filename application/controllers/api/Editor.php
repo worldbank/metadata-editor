@@ -480,7 +480,6 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
-			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='patch', $metadata=$options['patches'], $user_id);
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -1533,18 +1532,26 @@ class Editor extends MY_REST_Controller
 			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 
-			$result=$this->Audit_log_model->get_history(
-				array(
-					'obj_type'=>'project',
-					'obj_id'=>$sid
-				)
-				,$limit=10, $offset=0);
-			//array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
-				
+			$pagination = $this->get_pagination_params(15, 100);
+			$limit = $pagination['limit'];
+			$offset = $pagination['offset'];
+
+			$filter = array(
+				'obj_type' => 'project',
+				'obj_id' => $sid,
+			);
+
+			$result = $this->Audit_log_model->get_history($filter, $limit, $offset);
+			$total = $this->Audit_log_model->get_total_count($filter);
+
 			$response=array(
 				'status'=>'success',
-				'history'=>$result
-			);			
+				'history'=>$result,
+				'limit'=>$limit,
+				'offset'=>$offset,
+				'total'=>$total,
+				'found'=>count($result),
+			);
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){

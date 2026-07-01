@@ -2153,6 +2153,50 @@ paths:
       responses:
         "200":
           description: successful operation
+  "/editor/history/{id}":
+    get:
+      tags:
+        - Projects
+      summary: Get project metadata change history
+      description: >
+        Paginated audit log of metadata changes for a project (study metadata saves
+        and JSON patch operations). Each entry may include a v1 change record with
+        `version`, `scope`, `summary`, and `patch` (list of path-level add/remove/replace
+        operations with old/new values).
+      operationId: getProjectHistory
+      parameters:
+        - name: id
+          in: path
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size (maximum 100)
+          schema:
+            type: integer
+            default: 15
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Number of entries to skip
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectHistoryResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
   /collections:
     get:
       tags:
@@ -3222,6 +3266,54 @@ paths:
                     example: Missing parameter for `UID`
       security:
         - ApiKeyAuth: []
+  "/templates/revisions/{uid}":
+    get:
+      tags:
+        - Templates
+      summary: Get template revision history
+      description: >
+        Paginated edit history for a form template. Each entry may include a v1 change
+        record (`version`, `scope`, `summary`, `patch`) describing template JSON changes.
+      operationId: getTemplateRevisions
+      parameters:
+        - in: path
+          name: uid
+          description: Template UID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Page size (maximum 100)
+          schema:
+            type: integer
+            default: 15
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: offset
+          description: Number of entries to skip
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: "#/components/schemas/TemplateRevisionHistoryResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
   "/editor/options/{id}":
     post:
       tags:
@@ -3440,8 +3532,11 @@ paths:
     get:
       tags:
         - Admin metadata
-      summary: Get edit history
-      description: Get edit history of admin metadata for a project
+      summary: Get admin metadata edit history
+      description: >
+        Paginated audit log of admin metadata changes for a project and admin metadata
+        template. Each entry may include a v1 change record with `version`, `scope`,
+        `summary`, and `patch`.
       operationId: getAdminMetadataHistory
       parameters:
         - in: path
@@ -3456,9 +3551,30 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: limit
+          description: Page size (maximum 100)
+          schema:
+            type: integer
+            default: 15
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: offset
+          description: Number of entries to skip
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
       responses:
         "200":
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMetadataHistoryResponse"
+        "400":
+          description: Bad request
       security:
         - ApiKeyAuth: []
   /publish/catalog_connections:
@@ -5810,6 +5926,187 @@ components:
       name: X-API-Key
       description: API key for authentication
   schemas:
+    MetadataChangePatchItem:
+      type: object
+      description: Single metadata change at a JSON Pointer path
+      properties:
+        op:
+          type: string
+          enum:
+            - add
+            - remove
+            - replace
+        path:
+          type: string
+          description: JSON Pointer path (RFC 6901)
+          example: /series_description/ref_country/1
+        old:
+          description: Value before the change (null for add)
+          nullable: true
+        new:
+          description: Value after the change (null for remove)
+          nullable: true
+    MetadataChangeSummary:
+      type: object
+      properties:
+        added:
+          type: integer
+        removed:
+          type: integer
+        replaced:
+          type: integer
+    MetadataChangeRecordV1:
+      type: object
+      description: >
+        Metadata change payload stored in audit log entries for saves that produced
+        a diff. When diff computation fails, `status` is `diff_failed` and `before`/`after`
+        contain normalized snapshots.
+      properties:
+        version:
+          type: integer
+          example: 1
+        scope:
+          type: string
+          enum:
+            - study_metadata
+            - admin_metadata
+            - template
+        summary:
+          $ref: "#/components/schemas/MetadataChangeSummary"
+        patch:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetadataChangePatchItem"
+        status:
+          type: string
+          enum:
+            - diff_failed
+        error:
+          type: string
+        before:
+          type: object
+          additionalProperties: true
+        after:
+          type: object
+          additionalProperties: true
+    AuditLogHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        obj_type:
+          type: string
+          example: project
+        obj_id:
+          type: integer
+        user_id:
+          type: integer
+        action_type:
+          type: string
+          description: Audit action (e.g. update, patch)
+          example: update
+        created:
+          type: string
+          format: date-time
+        obj_ref_id:
+          type: integer
+          nullable: true
+        metadata:
+          description: Change record or other audit payload
+          oneOf:
+            - $ref: "#/components/schemas/MetadataChangeRecordV1"
+            - type: object
+              additionalProperties: true
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+    PaginatedHistoryMeta:
+      type: object
+      properties:
+        limit:
+          type: integer
+          example: 15
+        offset:
+          type: integer
+          example: 0
+        total:
+          type: integer
+          description: Total matching entries
+        found:
+          type: integer
+          description: Number of entries returned in this page
+    ProjectHistoryResponse:
+      allOf:
+        - type: object
+          properties:
+            status:
+              type: string
+              example: success
+            history:
+              type: array
+              items:
+                $ref: "#/components/schemas/AuditLogHistoryEntry"
+        - $ref: "#/components/schemas/PaginatedHistoryMeta"
+    AdminMetadataHistoryResponse:
+      allOf:
+        - type: object
+          properties:
+            status:
+              type: string
+              example: success
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/AuditLogHistoryEntry"
+        - $ref: "#/components/schemas/PaginatedHistoryMeta"
+    TemplateRevisionHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        obj_type:
+          type: string
+          example: template
+        obj_id:
+          type: integer
+        user_id:
+          type: integer
+        action_type:
+          type: string
+          description: Audit action (e.g. update, patch)
+        created:
+          type: string
+          format: date-time
+        metadata:
+          oneOf:
+            - $ref: "#/components/schemas/MetadataChangeRecordV1"
+            - type: object
+              additionalProperties: true
+          nullable: true
+        username:
+          type: string
+          nullable: true
+    TemplateRevisionHistoryResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+          example: 15
+        offset:
+          type: integer
+          example: 0
+        found:
+          type: integer
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateRevisionHistoryEntry"
     CreateProjectOverwrite:
       type: object
       properties:

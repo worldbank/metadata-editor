@@ -20,7 +20,9 @@ use Swaggest\JsonDiff\JsonMergePatch;
 class Editor_model extends CI_Model {
 
 	private $storage_path='datafiles/editor';
-	private $tmp_storage_path='datafiles/editor';	
+	private $tmp_storage_path='datafiles/editor';
+	/** @var string|null Cached absolute storage root */
+	private $resolved_storage_path = null;
 	private $schema_registry_cache = null;
 	private $schema_list_cache = null;
 
@@ -57,6 +59,7 @@ class Editor_model extends CI_Model {
 		$this->load->helper("Array");
 		$this->load->library("form_validation");
 		$this->load->library("Audit_log");
+		$this->load->library("Metadata_change_log");
 		$this->load->library("Metadata_helper");
 		$this->load->model("Editor_variable_model");
 		$this->load->model("Editor_datafile_model");		
@@ -69,26 +72,96 @@ class Editor_model extends CI_Model {
 
 
 	/**
-	 * 
-	 * Editor projects storage path
-	 * 
+	 * Editor projects storage path (absolute, canonical when the directory exists).
 	 */
 	function get_storage_path()
 	{
-		return $this->storage_path;
+		if ($this->resolved_storage_path !== null) {
+			return $this->resolved_storage_path;
+		}
+
+		$this->resolved_storage_path = $this->resolve_configured_path($this->storage_path);
+
+		return $this->resolved_storage_path;
 	}
 
 	function get_temp_storage_path()
 	{
-		return $this->tmp_storage_path;
+		return $this->resolve_configured_path($this->tmp_storage_path);
 	}
 
+	/**
+	 * Resolve a configured path to an absolute path (relative paths are anchored to FCPATH).
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	function resolve_configured_path($path)
+	{
+		$path = trim(str_replace('\\', '/', (string) $path));
+		if ($path === '') {
+			return $path;
+		}
+
+		if ($path[0] !== '/') {
+			$path = rtrim(str_replace('\\', '/', FCPATH), '/') . '/' . ltrim($path, '/');
+		}
+
+		$resolved = realpath($path);
+
+		return $resolved !== false ? $resolved : $path;
+	}
+
+	/**
+	 * Canonical absolute path for a file (works when the file itself does not exist yet).
+	 *
+	 * @param string $file_path
+	 * @return string|null
+	 */
+	function resolve_absolute_file_path($file_path)
+	{
+		$file_path = trim(str_replace('\\', '/', (string) $file_path));
+		if ($file_path === '') {
+			return null;
+		}
+
+		$resolved = realpath($file_path);
+		if ($resolved !== false) {
+			return $resolved;
+		}
+
+		$dir = dirname($file_path);
+		$base = basename($file_path);
+		$resolved_dir = realpath($dir);
+		if ($resolved_dir !== false) {
+			return $resolved_dir . '/' . $base;
+		}
+
+		return $this->resolve_configured_path($file_path);
+	}
+
+	/**
+	 * Absolute path to a file under a project folder (may not exist yet).
+	 *
+	 * @param int|string $sid
+	 * @param string $relative_path e.g. data/indicator_data.csv
+	 * @return string|null
+	 */
+	function resolve_project_file_path($sid, $relative_path)
+	{
+		$folder = $this->get_project_folder($sid);
+		if (!$folder) {
+			return null;
+		}
+
+		return $this->resolve_absolute_file_path($folder . '/' . ltrim($relative_path, '/'));
+	}
 
 	function get_project_folder($sid)
 	{
 		$path = $this->get_project_dirpath($sid);
 		if ($path !== false && $path !== '') {
-			return $this->get_storage_path() . '/' . $path;
+			return $this->resolve_absolute_file_path($this->get_storage_path() . '/' . $path);
 		}
 		return false;
 	}
@@ -527,9 +600,7 @@ class Editor_model extends CI_Model {
 			$this->validate_schema($type,$options);
 		}
 
-		//generate/log diff
-		$diff=$this->get_metadata_diff($this->get_metadata($id),$options, $ignore_errors=true);
-		$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff, isset($options['changed_by']) ? $options['changed_by'] : null);
+		$metadata_before = $this->get_metadata($id);
 
 		//partial update metadata
 		if (isset($options['partial_update'])){
@@ -584,6 +655,14 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$id);
 		$this->db->update('editor_projects',$options);
+
+		$this->metadata_change_log->record_project_metadata_change(
+			$id,
+			$metadata_before,
+			$metadata_only,
+			'update',
+			isset($original_options['changed_by']) ? $original_options['changed_by'] : null
+		);
 	}
 
 	/**
@@ -669,7 +748,8 @@ class Editor_model extends CI_Model {
 			throw new Exception("PROJECT_NOT_FOUND: ".$id);
 		}
 
-		$metadata=$project['metadata'];
+		$metadata_before = $project['metadata'];
+		$metadata=$metadata_before;
 
 		if (!is_object($metadata)){
 			$metadata=json_decode(json_encode($metadata));
@@ -705,6 +785,14 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$id);
 		$this->db->update('editor_projects',$db_options);
+
+		$this->metadata_change_log->record_project_metadata_change(
+			$id,
+			$metadata_before,
+			$metadata_only,
+			'patch',
+			isset($options['changed_by']) ? $options['changed_by'] : null
+		);
 	}
 
 	function update_project_template($sid,$type,$template_uid)
@@ -2154,58 +2242,26 @@ class Editor_model extends CI_Model {
 	 * Return patch for metadata diff
 	 * 
 	 */
-	function get_metadata_diff($metadata_original, $metadata_updated, $ignore_errors=false)
+	/**
+	 * @deprecated Use Metadata_change_log::build_change_record_safe() instead.
+	 */
+	function get_metadata_diff($metadata_original, $metadata_updated, $ignore_errors=false, $scope=Metadata_change_log::SCOPE_STUDY)
 	{
-		try{
-			//remove fields that are not needed for diff
-			$fields_to_remove=[
-				'schema',
-				'schema_version',
-				'type',				
-				'created_by',
-				'created',
-				'changed'
-			];
+		$record = Metadata_change_log::build_change_record_safe(
+			$metadata_original,
+			$metadata_updated,
+			$scope
+		);
 
-			foreach($fields_to_remove as $field){
-				if (isset($metadata_original[$field])){
-					unset($metadata_original[$field]);
-				}
-				if (isset($metadata_updated[$field])){
-					unset($metadata_updated[$field]);
-				}
-			}
-
-			$diff = new JsonDiff($metadata_original, $metadata_updated, JsonDiff::TOLERATE_ASSOCIATIVE_ARRAYS);
-
-			$patch=$diff->getPatch();
-
-			$json_patch=[				
-				//'added'=>$diff->getAdded(),
-				//'changed'=>$diff->getModifiedNew(),
-				'removed'=>$diff->getRemoved(),
-				'patch'=>$patch,
-			];
-
-			$json_patch= array_filter($json_patch, function($value) {
-				return !empty($value);
-			});
-
-			if (empty($json_patch)){
-				return false; //no changes
-			}
-
-			//encode
-			$json_patch=json_decode(json_encode($json_patch),true);
-
-			return $json_patch;
-		} catch (Exception $e) {
-			if ($ignore_errors==true){
-				return false;
-			}
-			throw new Exception("Metadata diff failed: ".$e->getMessage());
+		if ($record === null) {
+			return false;
 		}
-		
+
+		if ($ignore_errors && isset($record['status']) && $record['status'] === 'diff_failed') {
+			return false;
+		}
+
+		return $record;
 	}
 
 

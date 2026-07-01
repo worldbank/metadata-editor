@@ -327,4 +327,35 @@ abstract class MY_REST_Controller extends REST_Controller {
 		}
 	}
 
+	/**
+	 * Parse limit/offset query params for paginated list endpoints.
+	 *
+	 * @param int $default_limit
+	 * @param int $max_limit
+	 * @return array{limit:int,offset:int}
+	 */
+	protected function get_pagination_params($default_limit = 15, $max_limit = 100)
+	{
+		$limit_param = $this->input->get('limit');
+		$limit = ($limit_param !== null && $limit_param !== '') ? (int) $limit_param : $default_limit;
+
+		$offset_param = $this->input->get('offset');
+		$offset = ($offset_param !== null && $offset_param !== '') ? (int) $offset_param : 0;
+
+		if ($limit > $max_limit) {
+			$limit = $max_limit;
+		}
+		if ($limit < 1) {
+			$limit = $default_limit;
+		}
+		if ($offset < 0) {
+			$offset = 0;
+		}
+
+		return array(
+			'limit' => $limit,
+			'offset' => $offset,
+		);
+	}
+
 }

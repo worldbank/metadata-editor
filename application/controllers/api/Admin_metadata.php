@@ -19,6 +19,7 @@ class Admin_metadata extends MY_REST_Controller
         $this->load->model('Admin_metadata_acl_model');
         $this->load->model('Admin_metadata_model');
         $this->load->model('Admin_metadata_projects_model');
+        $this->load->model('Audit_log_model');
 
 		$this->load->library("Editor_acl");		
 		$this->is_authenticated_or_die();
@@ -766,16 +767,40 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Template not found: " . $admin_template_uid);
             }
 
-            $offset=(int)$this->input->get('offset') ? (int)$this->input->get('offset') : 0;
-            $limit=(int)$this->input->get('limit') ? (int)$this->input->get('limit') : 50;
+            $pagination = $this->get_pagination_params(15, 100);
+            $offset = $pagination['offset'];
+            $limit = $pagination['limit'];
 
             $this->editor_acl->user_has_admin_metadata_access($template_id,$permission='view',$this->api_user);
-            $result=$this->Admin_metadata_model->history($template_id,$project_id, $limit, $offset); 
+
+            $filter = array(
+                'obj_type' => 'admin-metadata',
+                'obj_id' => $this->Admin_metadata_model->get_project_id_by_template($template_id, $project_id),
+                'obj_ref_id' => $project_id,
+            );
+
+            if (empty($filter['obj_id'])) {
+                $response = array(
+                    'status' => 'success',
+                    'offset' => $offset,
+                    'limit' => $limit,
+                    'total' => 0,
+                    'found' => 0,
+                    'data' => array(),
+                );
+                $this->set_response($response, REST_Controller::HTTP_OK);
+                return;
+            }
+
+            $result = $this->Audit_log_model->get_history($filter, $limit, $offset);
+            $total = $this->Audit_log_model->get_total_count($filter);
 
             $response=array(
                 'status'=>'success',
                 'offset'=>$offset,
-                'limit'=>$limit,                
+                'limit'=>$limit,
+                'total'=>$total,
+                'found'=>count($result),
                 'data'=>$result
             );
 
