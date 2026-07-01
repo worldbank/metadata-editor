@@ -42,6 +42,9 @@ Vue.component('vue-jobs-component', {
             this.loadUsers();
         }
         this.loadJobs();
+        if (this.highlight_uuid) {
+            this.openJobDetail(this.highlight_uuid);
+        }
         this.startPolling();
     },
 
@@ -113,7 +116,8 @@ Vue.component('vue-jobs-component', {
             return [
                 { value: null, text: this.$t('all_history') || 'All finished' },
                 { value: 'completed', text: this.$t('completed') || 'Completed' },
-                { value: 'failed', text: this.$t('failed') || 'Failed' }
+                { value: 'failed', text: this.$t('failed') || 'Failed' },
+                { value: 'cancelled', text: this.$t('cancelled') || 'Cancelled' }
             ];
         },
 
@@ -170,7 +174,7 @@ Vue.component('vue-jobs-component', {
 
         selected_terminal_count: function () {
             return this.selected.filter(function (j) {
-                return j.status === 'completed' || j.status === 'failed';
+                return j.status === 'completed' || j.status === 'failed' || j.status === 'cancelled';
             }).length;
         },
 
@@ -224,7 +228,8 @@ Vue.component('vue-jobs-component', {
 
         can_delete_selected_job: function () {
             return this.isAdmin && this.selected_job &&
-                (this.selected_job.status === 'completed' || this.selected_job.status === 'failed');
+                (this.selected_job.status === 'completed' || this.selected_job.status === 'failed' ||
+                 this.selected_job.status === 'cancelled');
         },
 
         stale_filter_options: function () {
@@ -278,6 +283,15 @@ Vue.component('vue-jobs-component', {
             }
 
             return chips;
+        },
+
+        dashboardStatCards: function () {
+            return [
+                { key: 'pending', label: this.$t('pending') || 'Pending', color: 'grey' },
+                { key: 'processing', label: this.$t('processing') || 'Processing', color: 'primary' },
+                { key: 'held', label: this.$t('held') || 'Held', color: 'deep-orange' },
+                { key: 'stale', label: this.$t('stale_jobs') || 'Stale', color: 'warning', value: this.stale_count }
+            ];
         }
     },
 
@@ -321,7 +335,7 @@ Vue.component('vue-jobs-component', {
                 } else {
                     params.append('active', '1');
                 }
-            } else if (vm.filters.status === 'completed' || vm.filters.status === 'failed') {
+            } else if (vm.filters.status === 'completed' || vm.filters.status === 'failed' || vm.filters.status === 'cancelled') {
                 params.append('status', vm.filters.status);
             } else {
                 params.append('history', '1');
@@ -345,15 +359,6 @@ Vue.component('vue-jobs-component', {
                     vm.pagination.total = data.total != null ? data.total : vm.jobs.length;
                     if (data.stale_config) {
                         vm.stale_config = data.stale_config;
-                    }
-
-                    if (vm.highlight_uuid) {
-                        var match = vm.jobs.find(function (job) {
-                            return job.uuid === vm.highlight_uuid;
-                        });
-                        if (match) {
-                            vm.openJobDetail(match.uuid);
-                        }
                     }
                 } else {
                     vm.error_message = data.message || (vm.$t('error_loading_jobs') || 'Failed to load jobs');
@@ -509,6 +514,66 @@ Vue.component('vue-jobs-component', {
             this.loadJobs();
         },
 
+        isDashboardStatActive: function (key) {
+            if (!this.isActiveTab) {
+                return false;
+            }
+            if (key === 'stale') {
+                return this.filters.stale_only === true;
+            }
+            return this.filters.status === key;
+        },
+
+        dashboardStatCount: function (item) {
+            if (item.value != null) {
+                return item.value;
+            }
+            return (this.queue_stats && this.queue_stats[item.key]) || 0;
+        },
+
+        applyDashboardFilter: function (key) {
+            var vm = this;
+            var toggleOff = vm.isDashboardStatActive(key);
+            var switchTab = vm.view_tab !== 0;
+
+            if (switchTab) {
+                vm.view_tab = 0;
+            }
+
+            var apply = function () {
+                if (toggleOff && vm.view_tab === 0) {
+                    vm.filters.status = null;
+                    vm.filters.stale_only = null;
+                } else if (key === 'stale') {
+                    vm.filters.stale_only = true;
+                    vm.filters.status = null;
+                } else {
+                    vm.filters.status = key;
+                    vm.filters.stale_only = null;
+                }
+                vm.clearSelection();
+                vm.applyFilters();
+                vm.startPolling();
+            };
+
+            if (switchTab) {
+                vm.$nextTick(apply);
+            } else {
+                apply();
+            }
+        },
+
+        onRowClick: function (item, slot) {
+            var event = (slot && slot.nativeEvent) || window.event;
+            if (event && event.target && event.target.closest('.v-input--selection-controls, .v-data-table__checkbox, .v-simple-checkbox')) {
+                return;
+            }
+            if (!item || !item.uuid) {
+                return;
+            }
+            this.openJobDetail(item.uuid);
+        },
+
         openJobDetail: function (uuid) {
             var vm = this;
             if (!uuid) {
@@ -554,15 +619,16 @@ Vue.component('vue-jobs-component', {
         },
 
         jobTypeLabel: function (jobType) {
-            var labels = {
-                generate_pdf: 'PDF generation',
-                pdf_generation: 'PDF generation',
-                publish_project: 'Publish to NADA',
-                import_microdata: 'Microdata import',
-                import_indicator_data: 'Indicator data import',
-                hello_world: 'Hello world'
-            };
-            return labels[jobType] || jobType;
+            if (!jobType) {
+                return '';
+            }
+            var match = this.job_types.find(function (item) {
+                return item.job_type === jobType;
+            });
+            if (match && match.description) {
+                return match.description;
+            }
+            return jobType.replace(/_/g, ' ');
         },
 
         statusColor: function (status) {
@@ -571,7 +637,8 @@ Vue.component('vue-jobs-component', {
                 held: 'deep-orange',
                 processing: 'primary',
                 completed: 'success',
-                failed: 'error'
+                failed: 'error',
+                cancelled: 'blue-grey'
             };
             return colors[status] || 'grey';
         },
@@ -1104,16 +1171,6 @@ Vue.component('vue-jobs-component', {
                     </div>
 
                     <v-alert
-                        v-if="isActiveTab && stale_count > 0"
-                        dense
-                        outlined
-                        type="warning"
-                        class="mb-4"
-                    >
-                        {{ ($t('stale_jobs_notice') || '{n} job(s) need attention').replace('{n}', stale_count) }}
-                    </v-alert>
-
-                    <v-alert
                         v-if="isAdmin && worker_banner"
                         dense
                         outlined
@@ -1149,19 +1206,17 @@ Vue.component('vue-jobs-component', {
                     </v-row>
 
                     <v-row v-if="isAdmin && queue_stats" class="mb-4">
-                        <v-col cols="6" sm="4" md="2" v-for="item in [
-                            { key: 'pending', label: $t('pending') || 'Pending', color: 'grey' },
-                            { key: 'held', label: $t('held') || 'Held', color: 'deep-orange' },
-                            { key: 'processing', label: $t('processing') || 'Processing', color: 'primary' },
-                            { key: 'completed', label: $t('completed') || 'Completed', color: 'success' },
-                            { key: 'failed', label: $t('failed') || 'Failed', color: 'error' },
-                            { key: 'stale', label: $t('stale_jobs') || 'Stale', color: 'warning', value: stale_count }
-                        ]" :key="item.key">
-                            <v-card outlined>
+                        <v-col cols="6" sm="3" v-for="item in dashboardStatCards" :key="item.key">
+                            <v-card
+                                outlined
+                                class="jobs-stat-card"
+                                :class="{ 'jobs-stat-card--active': isDashboardStatActive(item.key) }"
+                                @click="applyDashboardFilter(item.key)"
+                            >
                                 <v-card-text class="py-3 text-center">
                                     <div class="text-caption grey--text">{{ item.label }}</div>
                                     <div class="text-h5 font-weight-bold" :class="item.color + '--text'">
-                                        {{ item.value != null ? item.value : (queue_stats[item.key] || 0) }}
+                                        {{ dashboardStatCount(item) }}
                                     </div>
                                 </v-card-text>
                             </v-card>
@@ -1278,7 +1333,7 @@ Vue.component('vue-jobs-component', {
                             show-select
                             dense
                             class="jobs-table table-jobs elevation-0"
-                            @click:row="function(item) { openJobDetail(item.uuid); }"
+                            @click:row="onRowClick"
                         >
                         <template v-slot:item.status="{ item }">
                             <div class="d-flex align-center flex-wrap" style="gap: 4px;">

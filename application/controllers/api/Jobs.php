@@ -211,7 +211,9 @@ class Jobs extends MY_REST_Controller
 			$job_response['is_stale'] = $stale_info['is_stale'];
 			$job_response['stale_reason'] = $stale_info['stale_reason'];
 			$job_response['stale_level'] = $stale_info['stale_level'];
-			$worker_status_response = $this->_get_worker_status_response();
+			$worker_status_response = $this->is_admin()
+				? $this->_get_worker_status_response()
+				: null;
 			
 			// Return full job details
 			$response = array(
@@ -295,12 +297,18 @@ class Jobs extends MY_REST_Controller
 				$available_types = $this->Job_queue_model->get_job_types();
 				throw new Exception("Invalid job_type: {$job_type}. Available types: " . implode(', ', $available_types));
 			}
+
+			if ($job_type === 'metadata_assessment_result' && !$this->is_admin()) {
+				throw new Exception('Admin access required to create metadata assessment jobs');
+			}
 			
 			// Validate payload using the job handler
 			$handler = JobRegistry::getHandler($job_type);
 			if ($handler) {
 				$handler->validatePayload($payload);
 			}
+
+			$payload = $this->enforce_enqueue_project_access($job_type, $payload);
 			
 			// Enqueue the job
 			$job_id = $this->Job_queue_model->enqueue(
@@ -412,6 +420,8 @@ class Jobs extends MY_REST_Controller
 			if ($handler) {
 				$handler->validatePayload($payload);
 			}
+
+			$payload = $this->enforce_enqueue_project_access($job_type, $payload);
 			
 			// Enqueue the job
 			$job_id = $this->Job_queue_model->enqueue(
@@ -924,8 +934,7 @@ class Jobs extends MY_REST_Controller
 				&& is_array($job['payload'])
 				&& !empty($job['payload']['fastapi_job_id'])
 			) {
-				$this->load->library('DataUtils');
-				$fastapi_cancel = $this->datautils->cancel_job($job['payload']['fastapi_job_id']);
+				$fastapi_cancel = $this->cancel_fastapi_assessment_job($job['payload']['fastapi_job_id']);
 			}
 
 			$updated = $this->Job_queue_model->mark_cancelled($job['id'], 'Cancelled by user');
@@ -1041,19 +1050,32 @@ class Jobs extends MY_REST_Controller
 				$user_id_filter = $this->user_id;
 			}
 			
-			// Get overall statistics
-			$stats = $this->Job_queue_model->get_stats();
+			if ($is_admin) {
+				$stats = $this->Job_queue_model->get_stats();
+			} else {
+				$user_filter = array('user_id' => $user_id_filter);
+				$stats = array(
+					'pending' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'pending'))),
+					'held' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'held'))),
+					'processing' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'processing'))),
+					'completed' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'completed'))),
+					'failed' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'failed'))),
+					'cancelled' => $this->Job_queue_model->count_jobs(array_merge($user_filter, array('status' => 'cancelled'))),
+				);
+				$stats['total'] = array_sum($stats);
+			}
 			$stale_count = $this->Job_queue_model->count_stale_jobs($user_id_filter);
 			
-			// If user_id filter is provided, get user-specific stats
+			// If user_id filter is provided, get user-specific stats (admin drill-down)
 			$user_stats = null;
-			if ($user_id_filter) {
+			if ($is_admin && $user_id_filter) {
 				$user_stats = array(
-					'pending' => count($this->Job_queue_model->get_by_user($user_id_filter, 'pending', 1000, 0)),
-					'held' => count($this->Job_queue_model->get_by_user($user_id_filter, 'held', 1000, 0)),
-					'processing' => count($this->Job_queue_model->get_by_user($user_id_filter, 'processing', 1000, 0)),
-					'completed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'completed', 1000, 0)),
-					'failed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'failed', 1000, 0))
+					'pending' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'pending')),
+					'held' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'held')),
+					'processing' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'processing')),
+					'completed' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'completed')),
+					'failed' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'failed')),
+					'cancelled' => $this->Job_queue_model->count_jobs(array('user_id' => $user_id_filter, 'status' => 'cancelled')),
 				);
 				$user_stats['total'] = array_sum($user_stats);
 			}
@@ -1093,6 +1115,8 @@ class Jobs extends MY_REST_Controller
 	function worker_status_get()
 	{
 		try {
+			$this->is_admin_or_die();
+
 			$worker_status = $this->_get_worker_status();
 			
 			$response = array(
@@ -1248,8 +1272,8 @@ class Jobs extends MY_REST_Controller
 				return;
 			}
 
-			if (!in_array($job['status'], array('completed', 'failed'), true)) {
-				throw new Exception('Only completed or failed jobs can be deleted');
+			if (!in_array($job['status'], array('completed', 'failed', 'cancelled'), true)) {
+				throw new Exception('Only completed, failed, or cancelled jobs can be deleted');
 			}
 
 			if (!$this->Job_queue_model->delete_job($job['id'])) {
@@ -1564,11 +1588,18 @@ class Jobs extends MY_REST_Controller
 					}
 
 					if ($action === 'cancel') {
-						if ($job['status'] !== 'pending') {
-							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only pending jobs can be cancelled');
+						if (!in_array($job['status'], array('pending', 'processing'), true)) {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only pending or processing jobs can be cancelled');
 							continue;
 						}
-						if (!$this->Job_queue_model->cancel_job($job['id'])) {
+						if (
+							$job['job_type'] === 'metadata_assessment_result'
+							&& is_array($job['payload'])
+							&& !empty($job['payload']['fastapi_job_id'])
+						) {
+							$this->cancel_fastapi_assessment_job($job['payload']['fastapi_job_id']);
+						}
+						if (!$this->Job_queue_model->mark_cancelled($job['id'], 'Cancelled by user')) {
 							$errors[] = array('uuid' => $uuid, 'message' => 'Cancel failed');
 							continue;
 						}
@@ -1585,8 +1616,8 @@ class Jobs extends MY_REST_Controller
 							'uuid' => isset($new_job['uuid']) ? $new_job['uuid'] : null,
 						);
 					} elseif ($action === 'delete') {
-						if (!in_array($job['status'], array('completed', 'failed'), true)) {
-							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only completed or failed jobs can be deleted');
+						if (!in_array($job['status'], array('completed', 'failed', 'cancelled'), true)) {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only completed, failed, or cancelled jobs can be deleted');
 							continue;
 						}
 						if (!$this->Job_queue_model->delete_job($job['id'])) {
@@ -1637,6 +1668,39 @@ class Jobs extends MY_REST_Controller
 		} catch (Exception $e) {
 			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * Enforce project access when enqueueing jobs that reference a project.
+	 *
+	 * @param string $job_type
+	 * @param array $payload
+	 * @return array Payload with resolved numeric project_id when applicable
+	 */
+	private function enforce_enqueue_project_access($job_type, $payload)
+	{
+		if (empty($payload['project_id'])) {
+			return $payload;
+		}
+
+		$resolved_sid = $this->get_sid((string) $payload['project_id']);
+		$permission = ($job_type === 'metadata_assessment_result') ? 'view' : 'edit';
+		$this->editor_acl->user_has_project_access($resolved_sid, $permission, $this->api_user);
+		$payload['project_id'] = (int) $resolved_sid;
+
+		return $payload;
+	}
+
+	/**
+	 * Cancel a FastAPI metadata assessment job when the local job is cancelled.
+	 *
+	 * @param string $fastapi_job_id
+	 * @return mixed|null
+	 */
+	private function cancel_fastapi_assessment_job($fastapi_job_id)
+	{
+		$this->load->library('DataUtils');
+		return $this->datautils->cancel_job($fastapi_job_id);
 	}
 
 	/**

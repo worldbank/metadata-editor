@@ -11,6 +11,7 @@
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <style>
+    [v-cloak] { display: none; }
     table th {
       white-space: nowrap;
     }
@@ -60,6 +61,18 @@
       word-break: break-word;
       max-height: 320px;
       overflow-y: auto;
+    }
+    .jobs-page .jobs-stat-card {
+      cursor: pointer;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .jobs-page .jobs-stat-card:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+    .jobs-page .jobs-stat-card--active {
+      border-color: #526bc7 !important;
+      border-width: 2px;
+      box-shadow: 0 2px 8px rgba(82, 107, 199, 0.25);
     }
   </style>
 </head>

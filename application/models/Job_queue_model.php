@@ -96,10 +96,10 @@ class Job_queue_model extends CI_Model {
 			// Only perform idempotency check if job_hash is not null
 			if (!empty($job_hash)) {
 				// Use row-level locking to prevent race conditions
-				// Only check for pending or processing jobs (active jobs)
+				// Only check for pending, held, or processing jobs (active jobs)
 				$sql = "SELECT * FROM job_queue 
 						WHERE job_hash = ? 
-						AND status IN ('pending', 'processing')
+						AND status IN ('pending', 'held', 'processing')
 						ORDER BY created_at DESC
 						LIMIT 1
 						FOR UPDATE";
@@ -155,7 +155,7 @@ class Job_queue_model extends CI_Model {
 					// This means there's still a UNIQUE constraint on job_hash
 					// Try to get the existing job that was inserted by another process
 					$this->db->where('job_hash', $job_hash);
-					$this->db->where_in('status', array('pending', 'processing'));
+					$this->db->where_in('status', array('pending', 'held', 'processing'));
 					$this->db->order_by('id', 'DESC');
 					$race_job = $this->db->get('job_queue')->row_array();
 					
@@ -568,7 +568,7 @@ class Job_queue_model extends CI_Model {
 		} elseif ($active_only) {
 			$this->db->where_in('status', array('pending', 'held', 'processing'));
 		} elseif ($history_only) {
-			$this->db->where_in('status', array('completed', 'failed'));
+			$this->db->where_in('status', array('completed', 'failed', 'cancelled'));
 		} elseif ($status !== null) {
 			$this->db->where('status', $status);
 		}
@@ -640,7 +640,7 @@ class Job_queue_model extends CI_Model {
 		} elseif ($active_only) {
 			$this->db->where_in('status', array('pending', 'held', 'processing'));
 		} elseif ($history_only) {
-			$this->db->where_in('status', array('completed', 'failed'));
+			$this->db->where_in('status', array('completed', 'failed', 'cancelled'));
 		} elseif ($status !== null && $status !== '') {
 			$this->db->where('status', $status);
 		}
@@ -1058,7 +1058,7 @@ class Job_queue_model extends CI_Model {
 	function delete_job($job_id)
 	{
 		$this->db->where('id', $job_id);
-		$this->db->where_in('status', array('completed', 'failed'));
+		$this->db->where_in('status', array('completed', 'failed', 'cancelled'));
 		$this->db->delete('job_queue');
 
 		return $this->db->affected_rows() > 0;
