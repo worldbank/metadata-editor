@@ -714,9 +714,7 @@
                                     store.state.metadata_idno=response.data.project.study_idno;
                                 }
                                 
-                                if (response.data.project.is_locked){
-                                    store.state.project_is_locked=response.data.project.is_locked;
-                                }
+                                store.state.project_is_locked = parseInt(response.data.project.is_locked, 10) === 1;
 
                                 store.state.project_version_info={
                                     version_number:response.data.project.version_number,

@@ -291,24 +291,27 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Missing parameter: projects");
 			}
 
+			// Normalize to array (allows single collection/project id as string/number)
+			$collections = (array) $options['collections'];
+
 			// Check user has edit access to all collections being modified
-			foreach($options['collections'] as $collection_id){
+			foreach ($collections as $collection_id) {
 				$this->editor_acl->user_has_collection_acl_access($collection_id, 'edit', $this->api_user);
 			}
 
+			$sid_arr = array();
 			if (isset($options['id_format']) && $options['id_format']=='idno'){
-				
-				$sid_arr=array();
 				foreach((array)$options['projects'] as $idno){
 					$sid=$this->get_sid($idno);
 					$sid_arr[]=$sid;
 				}
-				$options['projects']=$sid_arr;
+			} else {
+				$sid_arr = (array) $options['projects'];
 			}
 
 			//check permissions for each project
 			$access_errors=array();			
-			foreach($options['projects'] as $sid){
+			foreach($sid_arr as $sid){
 				try{
 					$this->editor_acl->user_has_project_access($sid,$permission='admin',$this->api_user);
 				}
@@ -331,10 +334,10 @@ class Collections extends MY_REST_Controller
 			}
 			
 			
-			$result=$this->Collection_model->add_batch_projects($options['collections'], $options['projects']);
+			$result=$this->Collection_model->add_batch_projects($collections, $sid_arr);
 
-			foreach($options['collections'] as $collection_id){			
-				foreach($options['projects'] as $sid){
+			foreach($collections as $collection_id){			
+				foreach($sid_arr as $sid){
 					$this->audit_log->log_event(
 						$obj_type='collection',
 						$obj_id=$collection_id,

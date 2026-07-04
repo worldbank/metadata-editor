@@ -697,6 +697,51 @@ class Editor extends MY_REST_Controller
 	}
 
 
+	/**
+	 * Duplicate project as a new independent main project (content only; no versions or DuckDB data).
+	 *
+	 * POST /api/editor/duplicate/{sid}
+	 */
+	function duplicate_post($sid=null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$user_id = $this->get_api_user_id();
+			$this->editor_acl->user_has_project_access($sid, $permission='edit', $this->api_user());
+
+			$this->load->library('Project_duplicate');
+			$result = $this->project_duplicate->duplicate($sid, $user_id);
+
+			$this->audit_log->log_event(
+				$obj_type='project',
+				$obj_id=$sid,
+				$action='duplicate',
+				$metadata=array(
+					'source_id' => (int) $sid,
+					'new_id' => (int) $result['id'],
+					'new_idno' => $result['idno'],
+				),
+				$user_id=$user_id,
+				$obj_ref_id=(int) $result['id']
+			);
+
+			$response = array(
+				'status' => 'success',
+				'result' => $result,
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$error_output = array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
 
 	/**
 	 * 
