@@ -896,6 +896,50 @@ paths:
       responses:
         "200":
           description: successful operation
+      security:
+        - ApiKeyAuth: []
+  "/editor/duplicate/{id}":
+    post:
+      tags:
+        - Projects
+      summary: Duplicate project
+      description: >
+        Create a new editable copy of a project as an independent main project.
+        Copies metadata, data files (including indicator CSV in the project folder),
+        variables, variable groups, external resources, thumbnail, and indicator DSD
+        binding (without DuckDB publish state). Does not copy version history,
+        collaborators, collections, tags, or published DuckDB timeseries data.
+        The new project receives a generated UUID idno and a title with the suffix
+        " (copy)".
+      operationId: duplicateProject
+      parameters:
+        - name: id
+          in: path
+          description: Source project ID or IDNO
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project duplicated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DuplicateProjectResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: failed
+                  message:
+                    type: string
+      security:
+        - ApiKeyAuth: []
   "/editor/{id}/data_files":
     get:
       tags:
@@ -6627,6 +6671,50 @@ components:
           description: Notes describing the version
       xml:
         name: CreateProjectVersion
+    DuplicateProjectResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        result:
+          $ref: "#/components/schemas/DuplicateProjectResult"
+    DuplicateProjectResult:
+      type: object
+      properties:
+        source_id:
+          type: integer
+          description: ID of the source project
+        id:
+          type: integer
+          description: ID of the new duplicated project
+        idno:
+          type: string
+          description: Generated UUID idno for the new project
+        title:
+          type: string
+          description: Title of the new project (source title with " (copy)" suffix)
+        type:
+          type: string
+          description: Project type (same as source)
+        template_uid:
+          type: string
+          description: Template UID (same as source)
+        project_folder:
+          type: string
+          description: Relative storage path for the new project folder
+        project_dsd:
+          type: object
+          nullable: true
+          description: Indicator DSD binding copy result, or null if not applicable
+          properties:
+            data_structure_id:
+              type: integer
+            has_published_data:
+              type: integer
+              description: Always 0 for duplicates (DuckDB not copied)
+      xml:
+        name: DuplicateProjectResult
     DeleteProjectVersion:
       type: object
       required:

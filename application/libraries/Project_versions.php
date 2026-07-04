@@ -228,34 +228,77 @@ class Project_versions
 		);
 		
 		try {
-			
-			//create project folder and update project table
-			$output['project_folder'] = $this->ci->Editor_model->create_project_folder($new_sid);
-
-			//copy data files
-			$output['data_files'] = $this->copy_project_data_files($source_sid, $new_sid);
-
-			//copy variables
-			$output['variables'] = $this->copy_project_variables($source_sid, $new_sid);
-
-			//copy variable groups
-			$output['variable_groups'] = $this->copy_project_variable_groups($source_sid, $new_sid);
-
-			//copy external resources (database records)
-			$output['external_resources'] = $this->copy_external_resources($source_sid, $new_sid);
-
-			//copy project files (thumbnails, data files, external resource files)
-			$output['files'] = $this->copy_project_files($source_sid, $new_sid);
+			$output = array_merge($output, $this->copy_project_content($source_sid, $new_sid));
 
 			//lock project
 			$this->ci->Editor_model->lock_project($new_sid);
 
 		} catch (Exception $e) {
-			$this->cleanup_failed_version($new_sid);
+			$this->cleanup_failed_copy($new_sid);
 			throw new Exception("FAILED_TO_COPY_PROJECT_DATA: " . $e->getMessage());
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Copy project content from source to an existing target project row.
+	 *
+	 * @param int $source_sid
+	 * @param int $target_sid
+	 * @return array
+	 */
+	function copy_project_content($source_sid, $target_sid)
+	{
+		$output = array();
+
+		$output['project_folder'] = $this->ci->Editor_model->create_project_folder($target_sid);
+		$output['data_files'] = $this->copy_project_data_files($source_sid, $target_sid);
+		$output['variables'] = $this->copy_project_variables($source_sid, $target_sid);
+		$output['variable_groups'] = $this->copy_project_variable_groups($source_sid, $target_sid);
+		$output['external_resources'] = $this->copy_external_resources($source_sid, $target_sid);
+		$output['files'] = $this->copy_project_files($source_sid, $target_sid);
+
+		return $output;
+	}
+
+	/**
+	 * Copy indicator DSD binding without DuckDB publish state.
+	 *
+	 * @param int $source_sid
+	 * @param int $target_sid
+	 * @return array|null
+	 */
+	function copy_project_dsd_binding($source_sid, $target_sid)
+	{
+		if (!$this->ci->db->table_exists('editor_project_dsd')) {
+			return null;
+		}
+
+		$this->ci->load->model('Editor_project_dsd_model');
+		$binding = $this->ci->Editor_project_dsd_model->get_by_sid((int) $source_sid);
+		if (!$binding || empty($binding['data_structure_id'])) {
+			return null;
+		}
+
+		$indicator_id_value = isset($binding['indicator_id_value']) ? $binding['indicator_id_value'] : null;
+		$this->ci->Editor_project_dsd_model->bind(
+			(int) $target_sid,
+			(int) $binding['data_structure_id'],
+			$indicator_id_value
+		);
+
+		if (isset($binding['implied_freq_code']) && trim((string) $binding['implied_freq_code']) !== '') {
+			$this->ci->Editor_project_dsd_model->update_implied_freq_code(
+				(int) $target_sid,
+				(string) $binding['implied_freq_code']
+			);
+		}
+
+		return array(
+			'data_structure_id' => (int) $binding['data_structure_id'],
+			'has_published_data' => 0,
+		);
 	}
 
 	/**
@@ -267,31 +310,49 @@ class Project_versions
 	 */
 	function cleanup_failed_version($sid)
 	{
+		$this->cleanup_failed_copy($sid);
+	}
+
+	/**
+	 * Remove a partially created project copy from database and disk.
+	 *
+	 * @param int $sid
+	 */
+	function cleanup_failed_copy($sid)
+	{
 		try {
-			// Delete project folder if it exists
 			$project_folder = $this->ci->Editor_model->get_project_folder($sid);
 			if ($project_folder && file_exists($project_folder)) {
 				$this->recursive_delete_directory($project_folder);
 			}
-			
-			// Delete from database tables
+
+			if ($this->ci->db->table_exists('editor_resource_data_files')) {
+				$this->ci->db->where('sid', $sid);
+				$this->ci->db->delete('editor_resource_data_files');
+			}
+
+			if ($this->ci->db->table_exists('editor_project_dsd')) {
+				$this->ci->db->where('sid', $sid);
+				$this->ci->db->delete('editor_project_dsd');
+			}
+
 			$this->ci->db->where('sid', $sid);
 			$this->ci->db->delete('editor_data_files');
-			
+
 			$this->ci->db->where('sid', $sid);
 			$this->ci->db->delete('editor_variables');
-			
+
 			$this->ci->db->where('sid', $sid);
 			$this->ci->db->delete('editor_variable_groups');
-			
+
 			$this->ci->db->where('sid', $sid);
 			$this->ci->db->delete('editor_resources');
-			
+
 			$this->ci->db->where('id', $sid);
 			$this->ci->db->delete('editor_projects');
-			
+
 		} catch (Exception $e) {
-			log_message('error', 'Failed to cleanup failed version ' . $sid . ': ' . $e->getMessage());
+			log_message('error', 'Failed to cleanup failed project copy ' . $sid . ': ' . $e->getMessage());
 		}
 	}
 
