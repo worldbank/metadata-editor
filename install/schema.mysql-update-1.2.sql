@@ -1,4 +1,16 @@
-CREATE TABLE `metadata_schemas` (
+-- Metadata Editor v1.1.x -> v1.2.0 database upgrade
+--
+-- Back up your database before running this script.
+--
+-- Preferred: Admin > Database Migrations (20260224000001_upgrade_v1_2_0)
+-- Manual: mysql ... < install/schema.mysql-update-1.2.sql
+--
+-- Safe to re-run: uses IF NOT EXISTS, INSERT IGNORE, DROP IF EXISTS, and
+-- guarded deletes. Duplicate column/table/key/entry errors are skipped by
+-- the migration runner when statements were already applied.
+
+
+CREATE TABLE IF NOT EXISTS `metadata_schemas` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `uid` varchar(100) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
@@ -21,7 +33,7 @@ CREATE TABLE `metadata_schemas` (
 
 
 
-INSERT INTO metadata_schemas
+INSERT IGNORE INTO metadata_schemas
   (uid,title,agency,description,is_core,status,storage_path,filename,
    schema_files,metadata_options,alias,created)
 VALUES
@@ -99,7 +111,7 @@ UPDATE `editor_projects` SET `type` = 'indicator' WHERE `type` = 'timeseries';
 UPDATE `editor_projects` SET `type` = 'indicator-db' WHERE `type` = 'timeseries-db';
 
 -- geospatial features
-CREATE TABLE `geospatial_features` (
+CREATE TABLE IF NOT EXISTS `geospatial_features` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
   `code` varchar(100) DEFAULT NULL,
@@ -127,7 +139,7 @@ CREATE TABLE `geospatial_features` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
-CREATE TABLE `geospatial_feature_chars` (
+CREATE TABLE IF NOT EXISTS `geospatial_feature_chars` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
   `feature_id` int NOT NULL,
@@ -146,10 +158,8 @@ CREATE TABLE `geospatial_feature_chars` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
-CREATE INDEX idx_feature_chars_feature_id ON geospatial_feature_chars(feature_id);
-
 -- analytics
-CREATE TABLE `api_logs_daily` (
+CREATE TABLE IF NOT EXISTS `api_logs_daily` (
   `stat_date` date NOT NULL,
   `uri` varchar(255) NOT NULL,
   `method` varchar(10) NOT NULL,
@@ -161,7 +171,7 @@ CREATE TABLE `api_logs_daily` (
   PRIMARY KEY (`stat_date`,`uri`,`method`)
 ) DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `api_logs_user_daily` (
+CREATE TABLE IF NOT EXISTS `api_logs_user_daily` (
   `stat_date` date NOT NULL,
   `user_id` int NOT NULL DEFAULT 0,
   `api_key` varchar(40) NOT NULL DEFAULT '',
@@ -223,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `analytics_daily` (
 
 
 -- job queue
-CREATE TABLE `job_queue` (
+CREATE TABLE IF NOT EXISTS `job_queue` (
   `id` int NOT NULL AUTO_INCREMENT,
   `uuid` char(36) NOT NULL,
   `job_type` varchar(50) NOT NULL,
@@ -270,13 +280,13 @@ WHERE NOT EXISTS (
 );
 
 
--- drop old tags table
-DROP TABLE `editor_tags`;
-DROP TABLE `tags`;
-DROP TABLE `editor_project_tags`;
+-- Legacy tag tables (pre-v1.2). Do not drop the new `tags` table on re-run;
+-- legacy `tags` is dropped in PHP when project_tags does not exist yet.
+DROP TABLE IF EXISTS `editor_tags`;
+DROP TABLE IF EXISTS `editor_project_tags`;
 
 -- create tags and project_tags
-CREATE TABLE `tags` (
+CREATE TABLE IF NOT EXISTS `tags` (
   `id` int NOT NULL AUTO_INCREMENT,
   `tag` varchar(50) NOT NULL,
   `is_core` tinyint(1) NOT NULL DEFAULT '0',
@@ -286,7 +296,7 @@ CREATE TABLE `tags` (
 ) DEFAULT CHARSET=utf8mb4;
 
 
-CREATE TABLE `project_tags` (
+CREATE TABLE IF NOT EXISTS `project_tags` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
   `tag_id` int NOT NULL,
@@ -297,29 +307,25 @@ CREATE TABLE `project_tags` (
 
 
 -- seed supported languages configuration
-INSERT INTO `configurations` VALUES ('supported_languages','[{"folder":"english","code":"en","display":"English","direction":"ltr"}]','Supported languages in JSON format',NULL,NULL);
+INSERT IGNORE INTO `configurations` VALUES ('supported_languages','[{"folder":"english","code":"en","display":"English","direction":"ltr"}]','Supported languages in JSON format',NULL,NULL);
 
 
 -- add unqiue key to roles table
 ALTER TABLE `roles` ADD UNIQUE KEY `name_UNIQUE` (`name`);
 
 -- Add user role - Editor if not exists
-insert into roles(name,description, weight, is_admin, is_locked) values 
+INSERT IGNORE INTO roles(name,description, weight, is_admin, is_locked) VALUES
 ('Editor','General role required for projects management', 0,0,1);
 
--- Editor role permissions
+-- Editor role permissions (delete-then-insert is idempotent on re-run)
 
--- delete existing Editor role permissions
-delete from role_permissions where role_id = (select id from roles where name = 'Editor');
+DELETE FROM role_permissions WHERE role_id = (SELECT id FROM roles WHERE name = 'Editor' LIMIT 1);
 
--- Editor role access to view own projects
-insert into role_permissions(role_id,resource,permissions) values
-((select id from roles where name = 'Editor'),'editor','admin');
+INSERT INTO role_permissions(role_id,resource,permissions)
+SELECT id,'editor','admin' FROM roles WHERE name = 'Editor' LIMIT 1;
 
--- Editor role access for collections
-insert into role_permissions(role_id,resource,permissions) values
-((select id from roles where name = 'Editor'),'collection','view');
+INSERT INTO role_permissions(role_id,resource,permissions)
+SELECT id,'collection','view' FROM roles WHERE name = 'Editor' LIMIT 1;
 
--- Editor role access for templates
-insert into role_permissions(role_id,resource,permissions) values
-((select id from roles where name = 'Editor'),'template_manager','view');
+INSERT INTO role_permissions(role_id,resource,permissions)
+SELECT id,'template_manager','view' FROM roles WHERE name = 'Editor' LIMIT 1;

@@ -245,6 +245,7 @@ class MY_Migration extends CI_Migration {
                 1051,  // Unknown table (DROP TABLE on non-existent table)
                 1060,  // Duplicate column name
                 1061,  // Duplicate key name
+                1062,  // Duplicate entry (INSERT on existing unique key)
                 1068,  // Multiple primary keys
                 1091,  // Can't DROP - doesn't exist
                 1146,  // Table doesn't exist
