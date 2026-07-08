@@ -14,6 +14,9 @@ class Data extends MY_REST_Controller
 	//Data API base url
 	private $DataApiUrl; //'http://localhost:8000';
 
+	/** Internal chunk size when streaming dictionary import from cache file. */
+	private const SUMMARY_STATS_IMPORT_CHUNK_SIZE = 500;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -410,7 +413,6 @@ class Data extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 
-			//get the output of the job
 			$api_response=$this->datautils->get_job_status($job_id);
 
 			$api_http_status=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
@@ -445,28 +447,25 @@ class Data extends MY_REST_Controller
 				return;
 			}
 
-			$variable_import_result=[];
-
-			if (isset($api_response['response']['data']['rows'])){
-				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
-				$this->Editor_datafile_model->update($datafile['id'],array('case_count'=>$api_response['response']['data']['rows']));
+			if ($job_status !== 'done' && $job_status !== 'completed') {
+				$this->set_response(array(
+					'status' => 'success',
+					'variables_imported' => 0,
+					'job_status' => $job_status,
+				), REST_Controller::HTTP_OK);
+				return;
 			}
 
-			if (isset($api_response['response']['data']['variables'])){
-				$variable_import_result=$this->Editor_variable_model->bulk_upsert_dictionary($sid,$file_id,$api_response['response']['data']['variables']);
-			}
+			$variables_imported = $this->_import_summary_stats_dictionary($sid, $file_id, $job_id, $upstream);
 
-			$output=array(
-				'status'=>'success',
-				//'result'=>realpath($datafile_path),
-				'variables_imported'=>count($variable_import_result),
-				'job_status'=>$job_status				
-				#'variables'=>$response['variables']
-			);
-						
-			$this->set_response($output, REST_Controller::HTTP_OK);			
+			$this->set_response(array(
+				'status' => 'success',
+				'variables_imported' => $variables_imported,
+				'job_status' => 'done',
+			), REST_Controller::HTTP_OK);
 		}
-		catch(Exception $e){
+		catch(Throwable $e){
+			$this->_summary_stats_import_cache_delete($job_id);
 			$response=array(
 				'status'=>'failed',
 				'message'=>$e->getMessage()
@@ -1187,6 +1186,132 @@ class Data extends MY_REST_Controller
 				)
 			);
 			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Import dictionary variables in one request (internal chunked reads + batch DB writes).
+	 */
+	private function _import_summary_stats_dictionary($sid, $file_id, $job_id, array $upstream)
+	{
+		$this->_begin_summary_stats_import_limits();
+
+		if (isset($upstream['data']['rows'])) {
+			$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $file_id);
+			if ($datafile) {
+				$this->Editor_datafile_model->update($datafile['id'], array('case_count' => $upstream['data']['rows']));
+			}
+		}
+
+		$cache_path = $this->_summary_stats_import_cache_path($job_id);
+
+		if (isset($upstream['data']['variables']) && is_array($upstream['data']['variables']) && !empty($upstream['data']['variables'])) {
+			$this->_summary_stats_import_cache_write($job_id, $upstream['data']['variables']);
+			unset($upstream['data']['variables']);
+		}
+
+		if (!is_file($cache_path)) {
+			$this->_summary_stats_import_cache_delete($job_id);
+			return 0;
+		}
+
+		try {
+			$imported = $this->Editor_variable_model->import_dictionary_from_ndjson(
+				$sid,
+				$file_id,
+				$cache_path,
+				self::SUMMARY_STATS_IMPORT_CHUNK_SIZE
+			);
+		} finally {
+			$this->_summary_stats_import_cache_delete($job_id);
+		}
+
+		return $imported;
+	}
+
+	/**
+	 * Raise PHP limits for large summary-stats dictionary imports.
+	 */
+	private function _begin_summary_stats_import_limits()
+	{
+		ini_set('max_execution_time', '0');
+
+		$current = ini_get('memory_limit');
+		if ($current === '-1') {
+			return;
+		}
+
+		$bytes = 0;
+		if (preg_match('/^(\d+)([KMG])?$/i', trim((string)$current), $m)) {
+			$bytes = (int)$m[1];
+			$unit = isset($m[2]) ? strtoupper($m[2]) : '';
+			if ($unit === 'K') {
+				$bytes *= 1024;
+			} elseif ($unit === 'M') {
+				$bytes *= 1024 * 1024;
+			} elseif ($unit === 'G') {
+				$bytes *= 1024 * 1024 * 1024;
+			}
+		}
+
+		if ($bytes > 0 && $bytes < 512 * 1024 * 1024) {
+			ini_set('memory_limit', '512M');
+		}
+	}
+
+	private function _summary_stats_import_cache_dir()
+	{
+		$dir = rtrim($this->Editor_model->get_temp_storage_path(), '/') . '/summary_stats_import';
+		if (!is_dir($dir)) {
+			mkdir($dir, 0755, true);
+		}
+		return $dir;
+	}
+
+	private function _summary_stats_import_cache_path($job_id)
+	{
+		$safe_id = preg_replace('/[^a-zA-Z0-9._-]/', '_', (string)$job_id);
+		return $this->_summary_stats_import_cache_dir() . '/' . $safe_id . '.ndjson';
+	}
+
+	private function _summary_stats_import_cache_meta_path($job_id)
+	{
+		return $this->_summary_stats_import_cache_path($job_id) . '.meta';
+	}
+
+	private function _summary_stats_import_cache_write($job_id, array $variables)
+	{
+		$path = $this->_summary_stats_import_cache_path($job_id);
+		$fp = fopen($path, 'w');
+		if ($fp === false) {
+			throw new Exception('Failed to create summary stats import cache');
+		}
+
+		foreach ($variables as $variable) {
+			$line = json_encode($variable);
+			if ($line === false) {
+				fclose($fp);
+				throw new Exception('Failed to encode variable for import cache');
+			}
+			fwrite($fp, $line . "\n");
+		}
+		fclose($fp);
+
+		file_put_contents(
+			$this->_summary_stats_import_cache_meta_path($job_id),
+			(string)count($variables)
+		);
+	}
+
+	private function _summary_stats_import_cache_delete($job_id)
+	{
+		$path = $this->_summary_stats_import_cache_path($job_id);
+		if (is_file($path)) {
+			unlink($path);
+		}
+		$meta_path = $this->_summary_stats_import_cache_meta_path($job_id);
+		if (is_file($meta_path)) {
+			unlink($meta_path);
 		}
 	}
 

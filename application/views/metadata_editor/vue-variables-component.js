@@ -877,7 +877,7 @@ Vue.component('variables', {
             }catch(e){
                 console.log("failed",e);
                 this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_error=this.$t("failed") + ": " + e.response.data.message;
+                this.summaryStatsDialog.message_error=this.$t("failed") + ": " + (e.response && e.response.data && e.response.data.message ? e.response.data.message : e.message);
             }
         },
         reloadDataFileVariables: async function(){

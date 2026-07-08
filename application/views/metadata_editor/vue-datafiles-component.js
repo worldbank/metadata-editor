@@ -418,7 +418,7 @@ Vue.component('datafiles', {
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
-                this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+                this.dialog.message_error="Failed to import summary statistics: "+(e.response && e.response.data && e.response.data.message ? e.response.data.message : e.message);
             }
         },
         reloadDataFileVariables: async function(file_id){
