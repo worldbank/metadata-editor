@@ -685,6 +685,11 @@ class Indicator_dsd extends MY_REST_Controller
 			$series_idno = $this->data_structure_util->resolve_series_idno($sid);
 			$indicator_id_column = $this->Indicator_dsd_model->get_column_name_by_type($sid, 'indicator_id');
 
+			if ($binding && empty($binding['has_published_data'])) {
+				$this->Indicator_dsd_model->sync_published_data_tracking_from_duckdb($sid);
+				$binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+			}
+
 			$has_published_data = $binding && !empty($binding['has_published_data']);
 			$published_row_count = ($binding && isset($binding['published_row_count']))
 				? $binding['published_row_count']
@@ -973,7 +978,10 @@ class Indicator_dsd extends MY_REST_Controller
 
 				$user_id = $this->get_api_user_id();
 				$row_count = $this->Indicator_dsd_model->extract_row_count_from_import_job($poll);
-				$this->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
+				$finalize = $this->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
+				if (!empty($finalize['export_warning'])) {
+					$result['export_warning'] = $finalize['export_warning'];
+				}
 				$result['message'] = 'Timeseries data imported successfully';
 			} else {
 				$result['message'] = 'Replace-from-csv queued; poll GET /api/indicator_dsd/job/{sid}?job_id=';
@@ -1179,17 +1187,15 @@ class Indicator_dsd extends MY_REST_Controller
 		}
 
 		$this->Editor_model->create_project_folder($sid);
-		$folder = $this->Editor_model->get_project_folder($sid);
-		if (!$folder) {
+		$dest = $this->Editor_model->resolve_project_file_path($sid, 'data/indicator_staging_upload.csv');
+		if (!$dest) {
 			throw new Exception('Project folder not available');
 		}
 
-		$data_dir = $folder . '/data';
+		$data_dir = dirname($dest);
 		if (!is_dir($data_dir)) {
 			@mkdir($data_dir, 0777, true);
 		}
-
-		$dest = $data_dir . '/indicator_staging_upload.csv';
 
 		if ($upload_id !== '') {
 			$this->load->library('Resumable_upload', null, 'uploader');
@@ -1217,8 +1223,8 @@ class Indicator_dsd extends MY_REST_Controller
 			throw new Exception('CSV file is required');
 		}
 
-		$real_path = realpath($dest);
-		if ($real_path === false) {
+		$real_path = $this->Editor_model->resolve_absolute_file_path($dest);
+		if ($real_path === null || $real_path === '') {
 			throw new Exception('Could not resolve CSV path');
 		}
 
@@ -1234,16 +1240,11 @@ class Indicator_dsd extends MY_REST_Controller
 	protected function indicator_staging_upload_realpath($sid)
 	{
 		$this->Editor_model->create_project_folder($sid);
-		$folder = $this->Editor_model->get_project_folder($sid);
-		if (! $folder) {
+		$dest = $this->Editor_model->resolve_project_file_path($sid, 'data/indicator_staging_upload.csv');
+		if (!$dest || !is_file($dest) || !is_readable($dest)) {
 			return null;
 		}
-		$dest = $folder . '/data/indicator_staging_upload.csv';
-		if (! is_file($dest) || ! is_readable($dest)) {
-			return null;
-		}
-		$r = realpath($dest);
 
-		return $r ? $r : null;
+		return $this->Editor_model->resolve_absolute_file_path($dest);
 	}
 }

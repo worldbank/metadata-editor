@@ -1195,19 +1195,22 @@ Vue.component('data-structure-csv-bootstrap', {
                         <v-stepper-items>
                             <v-stepper-content step="1" class="pa-6">
                                 <p class="text-body-2 grey--text text--darken-1 mb-3">
-                                    Choose a CSV file. Only the header and first {{ previewRowLimit }} data row(s) are read locally for column mapping hints.
-                                    The full file will be uploaded after you confirm mappings (server step — not yet implemented).
+                                    This step defines your <strong>data structure</strong> (columns and codelists) from a sample CSV — it is
+                                    <strong>not</strong> the same as importing indicator observation data into a project.
+                                    Choose a representative file in long format. The header and first {{ previewRowLimit }} row(s) are read here
+                                    in your browser to suggest column mappings. When you confirm, the full file is uploaded to create structure
+                                    components and to build codelists from code/label pairs found in the file.
                                 </p>
-                                <v-row dense align="center">
+                                <v-row dense align="center" class="ds-csv-file-row">
                                     <v-col cols="12" sm="8">
                                         <v-file-input
                                             :value="file"
                                             accept=".csv,text/csv"
-                                            label="CSV file"
-                                            prepend-icon="mdi-paperclip"
+                                            placeholder="Choose CSV file"
+                                            prepend-inner-icon="mdi-paperclip"
                                             show-size clearable
                                             dense outlined hide-details
-                                            class="ds-csv-step-control"
+                                            class="ds-csv-step-control ds-csv-file-row-control"
                                             :loading="parsing"
                                             @change="onFileSelected"
                                         ></v-file-input>
@@ -1217,9 +1220,8 @@ Vue.component('data-structure-csv-bootstrap', {
                                             v-model="delimiter"
                                             :items="delimiterItems"
                                             item-value="value" item-text="text"
-                                            label="Delimiter"
                                             dense outlined hide-details
-                                            class="ds-csv-step-control"
+                                            class="ds-csv-step-control ds-csv-file-row-control"
                                         ></v-select>
                                     </v-col>
                                 </v-row>

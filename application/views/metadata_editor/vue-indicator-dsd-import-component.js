@@ -460,7 +460,11 @@ Vue.component('indicator-dsd-import', {
                     vm.importProgress = 100;
                     vm.importStatus = 'Import complete.';
                     if (typeof EventBus !== 'undefined') {
-                        EventBus.$emit('onSuccess', 'Indicator data imported successfully');
+                        var successMsg = 'Indicator data imported successfully';
+                        if (d.export_warning) {
+                            successMsg += ' (archive CSV export: ' + d.export_warning + ')';
+                        }
+                        EventBus.$emit('onSuccess', successMsg);
                     }
                     vm.onImportComplete();
                 })
@@ -524,12 +528,12 @@ Vue.component('indicator-dsd-import', {
                     <p class="caption grey--text mb-3">
                         {{ $t('dsd_series_freq_import_help') || 'This structure has no FREQ column. Choose the frequency code for TIME_PERIOD values in this CSV (e.g. A = annual, M = monthly), then validate the CSV.' }}
                     </p>
+                    <div class="caption font-weight-medium grey--text text--darken-2 mb-1">FREQ</div>
                     <v-select
                         v-model="impliedFreqCode"
                         :items="freqCodes"
                         item-text="label"
                         item-value="code"
-                        label="FREQ"
                         outlined
                         dense
                         hide-details="auto"
@@ -557,7 +561,7 @@ Vue.component('indicator-dsd-import', {
                         <v-col cols="12" sm class="py-0 pl-0 pr-sm-3">
                             <v-file-input
                                 accept=".csv,text/csv"
-                                :label="$t('select_csv_file') || 'Select CSV file'"
+                                :placeholder="$t('select_csv_file') || 'Select CSV file'"
                                 outlined
                                 dense
                                 clearable

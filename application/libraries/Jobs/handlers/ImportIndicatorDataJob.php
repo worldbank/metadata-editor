@@ -85,17 +85,15 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         $this->ci->load->library('indicator_duckdb_service');
 
         $this->ci->Editor_model->create_project_folder($sid);
-        $folder = $this->ci->Editor_model->get_project_folder($sid);
-        if (!$folder) {
+        $dest = $this->ci->Editor_model->resolve_project_file_path($sid, 'data/indicator_staging_upload.csv');
+        if (!$dest) {
             throw new Exception('Project folder not available for project ' . $sid);
         }
 
-        $data_dir = $folder . '/data';
+        $data_dir = dirname($dest);
         if (!is_dir($data_dir)) {
             @mkdir($data_dir, 0777, true);
         }
-
-        $dest = $data_dir . '/indicator_staging_upload.csv';
 
         $this->ci->load->library('Resumable_upload', null, 'uploader');
         $completed = $this->ci->uploader->get_completed_upload($upload_id);
@@ -114,8 +112,8 @@ class ImportIndicatorDataJob implements JobHandlerInterface
 
         $this->ci->uploader->delete_upload($upload_id);
 
-        $real_path = realpath($dest);
-        if ($real_path === false) {
+        $real_path = $this->ci->Editor_model->resolve_absolute_file_path($dest);
+        if ($real_path === null || $real_path === '') {
             throw new Exception('Could not resolve CSV path after copy');
         }
 
@@ -189,12 +187,17 @@ class ImportIndicatorDataJob implements JobHandlerInterface
 
         $user_id = isset($job['user_id']) ? (int) $job['user_id'] : null;
         $row_count = $this->ci->Indicator_dsd_model->extract_row_count_from_import_job($poll);
-        $this->ci->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
+        $finalize = $this->ci->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
 
-        return array(
+        $result = array(
             'status' => 'success',
             'indicator_value' => $indicator_value,
             'job_id' => $queue['job_id'],
         );
+        if (!empty($finalize['export_warning'])) {
+            $result['export_warning'] = $finalize['export_warning'];
+        }
+
+        return $result;
     }
 }

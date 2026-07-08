@@ -96,6 +96,7 @@ Vue.component('publish-options', {
         this.loadCatalogConnections();
         this.getProjectBasicInfo();
         this.loadMicrodataStatus();
+        this.refreshIndicatorPublishLocal();
         var vm = this;
         this.$nextTick(function () {
             vm.panels = vm.getDefaultExpandedPanels();
@@ -978,6 +979,35 @@ Vue.component('publish-options', {
         applyIndicatorPublishDefaults: function()
         {
             this.applyPublishOptionDefaults();
+        },
+        refreshIndicatorPublishLocal: function() {
+            var vm = this;
+            if (vm.ProjectType !== 'indicator' && vm.ProjectType !== 'timeseries') {
+                return Promise.resolve();
+            }
+            var url = CI.base_url + '/api/indicator_dsd/binding/' + vm.ProjectID;
+            return axios.get(url)
+                .then(function(res) {
+                    var data = res.data || {};
+                    if (!vm.indicator_publish) {
+                        vm.indicator_publish = { local: {}, nada_dsd: null, nada_data: null };
+                    }
+                    if (!vm.indicator_publish.local) {
+                        vm.indicator_publish.local = {};
+                    }
+                    vm.indicator_publish.local.bound = !!data.bound;
+                    vm.indicator_publish.local.has_published_data = !!data.has_published_data;
+                    vm.indicator_publish.local.published_row_count = data.published_row_count != null
+                        ? data.published_row_count
+                        : null;
+                    if (data.data_structure_reference) {
+                        vm.indicator_publish.local.data_structure_reference = data.data_structure_reference;
+                    }
+                    vm.applyPublishOptionDefaults();
+                })
+                .catch(function(err) {
+                    console.log('failed to refresh indicator publish state', err);
+                });
         },
         async prepareProjectExport()
         {

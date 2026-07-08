@@ -367,6 +367,11 @@ class Indicator_dsd_model extends CI_Model {
      */
     public function resolve_csv_path_for_fastapi_import($staging_csv_path, array $expected_column_names, $keep_extra_columns = false)
     {
+        $staging_csv_path = $this->Editor_model->resolve_absolute_file_path($staging_csv_path);
+        if (!$staging_csv_path) {
+            throw new Exception('Could not resolve staging CSV path');
+        }
+
         if ($keep_extra_columns) {
             return array('path' => $staging_csv_path);
         }
@@ -379,7 +384,9 @@ class Indicator_dsd_model extends CI_Model {
 
         $this->trim_csv_to_dsd_columns($import_csv, $expected_column_names);
 
-        return array('path' => $import_csv);
+        $import_path = $this->Editor_model->resolve_absolute_file_path($import_csv);
+
+        return array('path' => $import_path ?: $import_csv);
     }
 
     /**
@@ -718,6 +725,40 @@ class Indicator_dsd_model extends CI_Model {
         }
 
         return $this->Editor_project_dsd_model->mark_published_data($sid, $row_count);
+    }
+
+    /**
+     * When DuckDB has timeseries rows but MySQL tracking is unset, backfill editor_project_dsd.
+     *
+     * @param int $sid
+     * @return bool
+     */
+    public function sync_published_data_tracking_from_duckdb($sid)
+    {
+        $this->load->model('Editor_project_dsd_model');
+        $binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+        if (!$binding) {
+            return false;
+        }
+        if (!empty($binding['has_published_data'])) {
+            return true;
+        }
+
+        $this->load->library('indicator_duckdb_service');
+        $page = $this->indicator_duckdb_service->timeseries_page($sid, 0, 1);
+        if (!is_array($page) || !empty($page['error'])) {
+            return false;
+        }
+
+        $total = isset($page['total_row_count']) ? (int) $page['total_row_count'] : 0;
+        $has_rows = $total > 0 || (!empty($page['rows']) && is_array($page['rows']));
+        if (!$has_rows) {
+            return false;
+        }
+
+        $this->Editor_project_dsd_model->mark_published_data($sid, $total > 0 ? $total : null);
+
+        return true;
     }
 
     /**
@@ -1427,12 +1468,11 @@ class Indicator_dsd_model extends CI_Model {
     public function resolve_indicator_data_csv_absolute_path($sid)
     {
         $this->Editor_model->create_project_folder($sid);
-        $project_folder = $this->Editor_model->get_project_folder($sid);
-        if (!$project_folder) {
-            return null;
-        }
 
-        return $project_folder . '/data/' . $this->INDICATOR_DATA_FILENAME;
+        return $this->Editor_model->resolve_project_file_path(
+            $sid,
+            'data/' . $this->INDICATOR_DATA_FILENAME
+        );
     }
 
     /**
@@ -1581,13 +1621,28 @@ class Indicator_dsd_model extends CI_Model {
      */
     public function finalize_indicator_data_import($sid, $user_id = null, $row_count = null)
     {
-        $export = $this->regenerate_indicator_csv_from_duckdb($sid, $user_id);
-        if ($row_count === null && isset($export['row_count'])) {
-            $row_count = $export['row_count'];
-        }
+        // DuckDB is the source of truth; record publish state before CSV archive export.
         $this->record_published_data_import($sid, $row_count);
 
-        return $export;
+        try {
+            $export = $this->regenerate_indicator_csv_from_duckdb($sid, $user_id);
+            if ($row_count === null && isset($export['row_count'])) {
+                $this->record_published_data_import($sid, $export['row_count']);
+            }
+
+            return $export;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                'Indicator CSV archive export failed after DuckDB import sid=' . (int) $sid . ': ' . $e->getMessage()
+            );
+
+            return array(
+                'path' => null,
+                'row_count' => $row_count,
+                'export_warning' => $e->getMessage(),
+            );
+        }
     }
 
     /**

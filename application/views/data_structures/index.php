@@ -492,13 +492,13 @@
         .ds-csv-bootstrap .ds-csv-map-control.v-text-field--outlined:not(.v-textarea) .v-input__control,
         .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__control,
         .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__control,
-        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea) .v-input__control,
-        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__control {
+        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea):not(.ds-csv-file-row-control) .v-input__control,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined:not(.ds-csv-file-row-control) .v-input__control {
             min-height: 26px !important;
             height: 26px !important;
         }
         .ds-csv-bootstrap .ds-csv-map-control:not(.v-textarea) .v-input__slot,
-        .ds-csv-bootstrap .ds-csv-step-control:not(.v-textarea) .v-input__slot {
+        .ds-csv-bootstrap .ds-csv-step-control:not(.v-textarea):not(.ds-csv-file-row-control) .v-input__slot {
             min-height: 26px !important;
             height: 26px !important;
             font-size: 0.75rem;
@@ -506,15 +506,15 @@
         .ds-csv-bootstrap .ds-csv-map-control.v-text-field--outlined:not(.v-textarea) .v-input__slot,
         .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__slot,
         .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__slot,
-        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea) .v-input__slot,
-        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__slot {
+        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea):not(.ds-csv-file-row-control) .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined:not(.ds-csv-file-row-control) .v-input__slot {
             min-height: 26px !important;
             height: 26px !important;
             padding: 0 4px 0 6px !important;
         }
         .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__slot,
         .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__slot,
-        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__slot {
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined:not(.ds-csv-file-row-control) .v-input__slot {
             padding: 0 2px 0 6px !important;
         }
         .ds-csv-bootstrap .ds-csv-map-control input,
@@ -527,7 +527,7 @@
         }
         .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selections,
         .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete .v-select__selections,
-        .ds-csv-bootstrap .ds-csv-step-control.v-select .v-select__selections {
+        .ds-csv-bootstrap .ds-csv-step-control.v-select:not(.ds-csv-file-row-control) .v-select__selections {
             min-height: 26px !important;
             max-height: 26px !important;
             height: 26px !important;
@@ -536,7 +536,7 @@
         }
         .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selection,
         .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selection--comma,
-        .ds-csv-bootstrap .ds-csv-step-control.v-select .v-select__selection {
+        .ds-csv-bootstrap .ds-csv-step-control.v-select:not(.ds-csv-file-row-control) .v-select__selection {
             line-height: 26px !important;
             max-height: 26px !important;
             margin: 0 !important;
@@ -560,10 +560,57 @@
         .ds-csv-bootstrap .ds-csv-step-control .v-label {
             font-size: 0.75rem;
         }
-        .ds-csv-bootstrap .ds-csv-step-control.v-file-input .v-input__control,
-        .ds-csv-bootstrap .ds-csv-step-control.v-file-input:not(.v-textarea) .v-input__slot {
-            min-height: 36px !important;
-            height: auto !important;
+        .ds-csv-bootstrap .ds-csv-file-row > .col {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-input {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-text-field--outlined .v-input__control,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-select--outlined .v-input__control {
+            min-height: 40px !important;
+            height: 40px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-text-field--outlined:not(.v-textarea) .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-select--outlined .v-input__slot {
+            min-height: 40px !important;
+            height: 40px !important;
+            padding: 0 8px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-select .v-select__selections {
+            min-height: 40px !important;
+            max-height: 40px !important;
+            height: 40px !important;
+            padding: 0 !important;
+            align-items: center;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-select .v-select__selection,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control.v-select .v-select__selection--comma {
+            line-height: 40px !important;
+            max-height: 40px !important;
+            margin: 0 !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control .v-input__prepend-inner,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control .v-input__append-inner {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            align-self: center;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control .v-input__prepend-inner .v-icon,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control .v-input__append-inner .v-icon {
+            font-size: 18px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control fieldset {
+            top: 0 !important;
+        }
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control input,
+        .ds-csv-bootstrap .ds-csv-file-row .ds-csv-file-row-control .v-select__selection {
+            font-size: 0.8125rem;
+            line-height: 1.25;
         }
         .ds-csv-payload-preview {
             font-size: 0.7rem;
