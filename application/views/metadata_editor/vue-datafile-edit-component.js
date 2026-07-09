@@ -4,7 +4,9 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
         return {
             form_local: {},
             is_dirty: false,
-            is_loading: true
+            is_loading: true,
+            save_error: '',
+            is_saving: false
         }
     },
     mounted: function () {
@@ -50,6 +52,20 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
         saveForm: function (){    
             this.saveFile();
         },
+        saveErrorMessage: function(error){
+            if (error && error.response && error.response.data) {
+                if (error.response.data.message) {
+                    return error.response.data.message;
+                }
+                if (error.response.data.status === 'failed' && typeof error.response.data === 'object') {
+                    return JSON.stringify(error.response.data);
+                }
+            }
+            if (error && error.message) {
+                return error.message;
+            }
+            return this.$t('failed') || 'Save failed';
+        },
         cancelForm: function (){
             if (this.is_dirty){
                 if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
@@ -75,21 +91,148 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
         },
         saveFile: function(){
             vm=this;
+            vm.save_error='';
+            vm.is_saving=true;
             let url=CI.base_url + '/api/datafiles/'+ this.ProjectID;
-            axios.post( url,
-                this.form_local
-            ).then(function(response){
+            let payload=Object.assign({}, this.form_local);
+            delete payload.file_info;
+            axios.post( url, payload)
+            .then(function(response){
+                vm.is_saving=false;
+                if (response.data && response.data.status === 'failed') {
+                    vm.save_error = response.data.message || vm.$t('failed');
+                    return;
+                }
                 vm.$store.dispatch('loadDataFiles',{dataset_id:vm.ProjectID});
                 vm.is_dirty=false;
                 router.push('/datafiles/');
             })
-            .catch(function(response){
-                if (response.response && response.response.data && response.response.data.message) {
-                    alert('Error: ' + response.response.data.message);
-                } else {
-                    vm.errors=response;
-                }
+            .catch(function(error){
+                vm.is_saving=false;
+                vm.save_error = vm.saveErrorMessage(error);
             });
+        },
+        displayDash: function(){
+            return '—';
+        },
+        stataReleaseToVersion: function(release){
+            const map = {
+                104: 8, 105: 9, 108: 10, 114: 11, 115: 12,
+                117: 13, 118: 14, 119: 15, 120: 16, 121: 17, 122: 18, 123: 19
+            };
+            const n = parseInt(release, 10);
+            if (isNaN(n)) {
+                return null;
+            }
+            if (n <= 30) {
+                return String(n);
+            }
+            if (map[n]) {
+                return String(map[n]);
+            }
+            return null;
+        },
+        sourceFormatDisplay: function(){
+            const fmt = this.resolveSourceFormat();
+            if (fmt === 'dta') {
+                return 'Stata';
+            }
+            if (fmt === 'sav') {
+                return 'SPSS';
+            }
+            if (fmt === 'csv') {
+                return 'CSV';
+            }
+            return null;
+        },
+        resolveSourceFormat: function(){
+            const fmt = (this.form_local.source_format || '').toLowerCase();
+            if (fmt) {
+                return fmt;
+            }
+            const physical = (this.form_local.file_physical_name || '').toLowerCase();
+            if (physical.endsWith('.dta')) {
+                return 'dta';
+            }
+            if (physical.endsWith('.sav')) {
+                return 'sav';
+            }
+            const original = this.form_local.file_info && this.form_local.file_info.original;
+            if (original && original.filename) {
+                const name = String(original.filename).toLowerCase();
+                if (name.endsWith('.dta')) {
+                    return 'dta';
+                }
+                if (name.endsWith('.sav')) {
+                    return 'sav';
+                }
+            }
+            return '';
+        },
+        sourceVersionDisplay: function(){
+            const fmt = this.resolveSourceFormat();
+            const version = this.form_local.source_format_version;
+            if (version === null || version === undefined || version === '') {
+                return null;
+            }
+            if (fmt === 'dta') {
+                const mapped = this.stataReleaseToVersion(version);
+                if (mapped) {
+                    return mapped;
+                }
+                return String(version);
+            }
+            if (fmt === 'sav') {
+                return String(version);
+            }
+            return null;
+        },
+        sourceFileNameDisplay: function(){
+            if (this.form_local.source_upload_filename) {
+                return this.form_local.source_upload_filename;
+            }
+            if (this.form_local.file_physical_name) {
+                return this.form_local.file_physical_name;
+            }
+            const original = this.form_local.file_info && this.form_local.file_info.original;
+            if (original && original.filename) {
+                return original.filename;
+            }
+            return this.displayDash();
+        },
+        sourceFileSizeDisplay: function(){
+            const original = this.form_local.file_info && this.form_local.file_info.original;
+            if (original && original.file_exists && original.file_size) {
+                return original.file_size;
+            }
+            return this.displayDash();
+        },
+        workingDataSizeDisplay: function(){
+            const csv = this.form_local.file_info && this.form_local.file_info.csv;
+            if (csv && csv.file_exists && csv.file_size) {
+                return csv.file_size;
+            }
+            return this.displayDash();
+        },
+        sourceStatusDisplay: function(){
+            const status = (this.form_local.source_status || 'unknown').toLowerCase();
+            const fmt = (this.form_local.source_format || '').toLowerCase();
+            const original = this.form_local.file_info && this.form_local.file_info.original;
+            const onDisk = !!(original && original.file_exists);
+
+            if (status === 'missing') {
+                return { label: this.$t('source_file_not_stored'), warning: true };
+            }
+            if (status === 'unknown') {
+                return { label: this.$t('source_original_format_unknown'), warning: false };
+            }
+            if ((fmt === 'dta' || fmt === 'sav') && (status === 'present' || onDisk)) {
+                return { label: this.$t('source_file_stored'), warning: false };
+            }
+            if (fmt === 'dta' || fmt === 'sav') {
+                return { label: this.$t('source_file_not_stored'), warning: true };
+            }
+            return null;
         }
     },
     computed:{
@@ -98,7 +241,27 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
         },
         ProjectID(){
             return this.$store.state.project_id;
-        }        
+        },
+        uploadedAsCsvNote: function(){
+            const fmt = (this.form_local.source_format || '').toLowerCase();
+            const status = (this.form_local.source_status || '').toLowerCase();
+            return fmt === 'csv' && status === 'not_applicable';
+        },
+        showSourceSection: function(){
+            if (this.uploadedAsCsvNote) {
+                return false;
+            }
+            const fmt = (this.form_local.source_format || '').toLowerCase();
+            const status = (this.form_local.source_status || 'unknown').toLowerCase();
+            if (fmt === 'dta' || fmt === 'sav') {
+                return true;
+            }
+            if (status === 'missing' || status === 'unknown') {
+                return true;
+            }
+            const physical = (this.form_local.file_physical_name || '').toLowerCase();
+            return physical.endsWith('.dta') || physical.endsWith('.sav');
+        }
     },  
     template: `
             <div class="datafile-edit-component container-fluid" >
@@ -112,12 +275,15 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
                         <div style="font-weight:normal">{{$t("Data file")}}: {{form_local.file_name}}</div>
 
                         <div>
-                            <v-btn color="primary" small  @click="saveForm">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
-                            <v-btn  @click="cancelForm" small>{{$t("cancel")}}</v-btn>
+                            <v-btn color="primary" small :loading="is_saving" :disabled="is_saving" @click="saveForm">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn  @click="cancelForm" small :disabled="is_saving">{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
                 </v-card>
 
+                <v-alert v-if="save_error" type="error" dense outlined dismissible class="my-3" style="background-color: #fff;" @input="save_error=''">
+                    {{save_error}}
+                </v-alert>
 
                 <v-card style="flex: 1;overflow:auto;">                    
                     <v-card-text>
@@ -162,26 +328,53 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
                             </div>
 
                             </div>
-                            <div class="col-md-4" style="display:none" >
-                                <div><strong>{{$t("file_information")}}</strong></div>
-                                <div class="mt-2">
-                                    <div>
-                                        <label>{{$t("physical_name")}}:</label>
-                                        <div>{{form_local.file_physical_name}}</div>
-                                    </div>                            
-                                    <div class="mt-2">
-                                        <label>{{$t("rows")}}:</label>
-                                        <div>{{form_local.case_count}}</div>
+                            <div class="col-md-4">
+                                <v-card outlined class="pa-4">
+                                    <div class="text-subtitle-2 font-weight-medium mb-3">{{$t("file_information")}}</div>
+
+                                    <div class="text-caption text-uppercase grey--text text--darken-1 mb-2">{{$t("working_data")}}</div>
+                                    <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                        <span class="text--secondary">{{$t("file_size")}}</span>
+                                        <span>{{workingDataSizeDisplay()}}</span>
                                     </div>
-                                    <div class="mt-2">
-                                        <label>{{$t("variables")}}:</label>
-                                        <div>{{form_local.var_count}}</div>
+                                    <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                        <span class="text--secondary">{{$t("variables")}}</span>
+                                        <span>{{form_local.var_count != null ? form_local.var_count : displayDash()}}</span>
                                     </div>
-                                    <div class="mt-2" v-if="form_local.file_info">
-                                        <label>{{$t("file_size")}}:</label>
-                                        <div v-if="form_local && form_local.file_info && form_local.file_info.original ">{{form_local.file_info.original.file_size}}</div>                        
+                                    <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                        <span class="text--secondary">{{$t("cases")}}</span>
+                                        <span>{{form_local.case_count != null ? form_local.case_count : displayDash()}}</span>
                                     </div>
-                                </div> 
+
+                                    <div v-if="uploadedAsCsvNote" class="text-caption text--secondary mt-3">
+                                        {{$t("uploaded_as_csv")}}
+                                    </div>
+
+                                    <template v-if="showSourceSection">
+                                        <v-divider class="my-3"></v-divider>
+                                        <div class="text-caption text-uppercase grey--text text--darken-1 mb-2">{{$t("source_file")}}</div>
+                                        <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                            <span class="text--secondary">{{$t("source_file_format")}}</span>
+                                            <span>{{sourceFormatDisplay() || displayDash()}}</span>
+                                        </div>
+                                        <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                            <span class="text--secondary">{{$t("source_file_version")}}</span>
+                                            <span>{{sourceVersionDisplay() || displayDash()}}</span>
+                                        </div>
+                                        <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                            <span class="text--secondary">{{$t("physical_name")}}</span>
+                                            <span class="text-right ml-2" style="word-break:break-all;">{{sourceFileNameDisplay()}}</span>
+                                        </div>
+                                        <div class="datafile-info-row d-flex justify-space-between mb-2">
+                                            <span class="text--secondary">{{$t("file_size")}}</span>
+                                            <span>{{sourceFileSizeDisplay()}}</span>
+                                        </div>
+                                        <div v-if="sourceStatusDisplay()" class="datafile-info-row d-flex justify-space-between">
+                                            <span class="text--secondary">{{$t("status")}}</span>
+                                            <span :class="sourceStatusDisplay().warning ? 'warning--text' : ''">{{sourceStatusDisplay().label}}</span>
+                                        </div>
+                                    </template>
+                                </v-card>
                             </div>
                             </div>
 

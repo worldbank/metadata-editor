@@ -18,6 +18,7 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                 { value: 'xpt', label: 'SAS (XPT)' }
             ],
             selected_file_ids: [],
+            file_modes: {},
             zip_option: true,
             overwrite: false,
             refresh_description: false,
@@ -33,15 +34,28 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
     created() {
         this.initializeForm();
     },
+    mounted() {
+        if (!this.dataFiles.length && this.projectId) {
+            this.$store.dispatch('loadDataFiles', { dataset_id: this.projectId });
+        }
+    },
     watch: {
         resource_id() {
             this.initializeForm();
         },
         dataFiles() {
             this.syncSelectedWithAvailableFiles();
+            this.syncFileModes();
         },
         selected_file_ids() {
             this.applyZipDefaultForSelection();
+            this.syncFileModes();
+        },
+        export_format() {
+            this.syncFileModes();
+        },
+        stata_version() {
+            this.syncFileModes();
         }
     },
     computed: {
@@ -87,6 +101,9 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                 return this.$t('batch_export_zip_option') || 'Zip all exported files into a single ZIP';
             }
             return this.$t('microdata_zip_single_recommended') || 'Zip exported file (recommended)';
+        },
+        generateOnlyFormat() {
+            return this.export_format === 'json' || this.export_format === 'xpt';
         }
     },
     methods: {
@@ -102,11 +119,14 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
             this.zip_option = true;
             this.overwrite = false;
             this.refresh_description = !!this.isRegenerate;
+            this.file_modes = {};
             this.selected_file_ids = this.dataFiles.map(f => f.file_id);
             this.prefill_loaded = false;
 
             if (this.isRegenerate) {
                 this.loadRegeneratePrefill();
+            } else {
+                this.syncFileModes();
             }
         },
         loadRegeneratePrefill() {
@@ -115,12 +135,14 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
             axios.get(url)
                 .then(function(response) {
                     if (!response.data || response.data.status !== 'success') {
+                        vm.syncFileModes();
                         return;
                     }
                     const entry = (response.data.microdata_resources || []).find(function(row) {
                         return row.resource && String(row.resource.id) === String(vm.resource_id);
                     });
                     if (!entry) {
+                        vm.syncFileModes();
                         return;
                     }
                     if (entry.export_format) {
@@ -129,17 +151,166 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                     if (entry.export_version != null && entry.export_version !== '') {
                         vm.stata_version = Number(entry.export_version) || 14;
                     }
-                    const fileIds = (entry.links || [])
-                        .filter(function(link) { return link.link_type === 'generated' && link.file_id; })
-                        .map(function(link) { return link.file_id; });
+                    const fileIds = [];
+                    const modes = {};
+                    (entry.links || []).forEach(function(link) {
+                        if (link.link_type === 'generated' && link.file_id) {
+                            fileIds.push(link.file_id);
+                            if (link.source_mode === 'original' || link.source_mode === 'generate') {
+                                modes[link.file_id] = link.source_mode;
+                            }
+                        }
+                    });
                     if (fileIds.length > 0) {
                         vm.selected_file_ids = fileIds;
                     }
+                    vm.file_modes = modes;
+                    vm.syncFileModes();
                     vm.prefill_loaded = true;
                 })
                 .catch(function() {
+                    vm.syncFileModes();
                     vm.prefill_loaded = true;
                 });
+        },
+        stataVersionFromRelease(release) {
+            const map = {
+                104: 8, 105: 9, 108: 10, 114: 11, 115: 12,
+                117: 13, 118: 14, 119: 15, 120: 16, 121: 17, 122: 18, 123: 19
+            };
+            const n = parseInt(release, 10);
+            if (isNaN(n)) {
+                return null;
+            }
+            if (n <= 30) {
+                return n;
+            }
+            return map[n] || null;
+        },
+        sourceExtOnDisk(file) {
+            if (!file) {
+                return null;
+            }
+            const fmt = (file.source_format || '').toLowerCase();
+            if (file.file_info && file.file_info.original && file.file_info.original.file_exists && file.file_info.original.filename) {
+                const name = String(file.file_info.original.filename).toLowerCase();
+                if (name.endsWith('.dta')) {
+                    return 'dta';
+                }
+                if (name.endsWith('.sav')) {
+                    return 'sav';
+                }
+            }
+            if ((fmt === 'dta' || fmt === 'sav') && (file.source_status === 'present' || file.source_status === 'unknown')) {
+                return fmt;
+            }
+            return null;
+        },
+        originalFormatLabel(file) {
+            if (!file) {
+                return '—';
+            }
+            const ext = this.sourceExtOnDisk(file);
+            const fmt = (file.source_format || ext || '').toLowerCase();
+            if (fmt === 'dta') {
+                const ver = this.stataVersionFromRelease(file.source_format_version);
+                if (ver) {
+                    return 'Stata ' + ver;
+                }
+                return 'Stata';
+            }
+            if (fmt === 'sav') {
+                if (file.source_format_version) {
+                    return 'SPSS ' + file.source_format_version;
+                }
+                return 'SPSS';
+            }
+            if (this.hasWorkingCsv(file)) {
+                return 'CSV';
+            }
+            return '—';
+        },
+        originalSizeLabel(file) {
+            if (!file || !file.file_info) {
+                return '';
+            }
+            if (file.file_info.original && file.file_info.original.file_exists && file.file_info.original.file_size) {
+                const ext = this.sourceExtOnDisk(file);
+                if (ext === 'dta' || ext === 'sav') {
+                    return file.file_info.original.file_size;
+                }
+            }
+            if (this.export_format === 'csv' && file.file_info.csv && file.file_info.csv.file_exists && file.file_info.csv.file_size) {
+                return file.file_info.csv.file_size;
+            }
+            return '';
+        },
+        hasWorkingCsv(file) {
+            return !!(file && file.file_info && file.file_info.csv && file.file_info.csv.file_exists);
+        },
+        canUseOriginal(file) {
+            if (!file || this.generateOnlyFormat) {
+                return false;
+            }
+            if (this.export_format === 'csv') {
+                return this.hasWorkingCsv(file);
+            }
+            const ext = this.sourceExtOnDisk(file);
+            return ext === this.export_format;
+        },
+        versionMismatch(file) {
+            if (!file || this.export_format !== 'dta' || !this.canUseOriginal(file)) {
+                return false;
+            }
+            const originalVer = this.stataVersionFromRelease(file.source_format_version);
+            if (originalVer === null) {
+                return false;
+            }
+            return Number(originalVer) !== Number(this.stata_version);
+        },
+        outputFormatLabel() {
+            if (this.export_format === 'dta') {
+                return 'Stata ' + this.stata_version;
+            }
+            const found = this.available_formats.find(f => f.value === this.export_format);
+            return found ? found.label : String(this.export_format).toUpperCase();
+        },
+        defaultFileMode() {
+            return 'generate';
+        },
+        syncFileModes() {
+            const modes = Object.assign({}, this.file_modes);
+            const vm = this;
+            this.dataFiles.forEach(function(file) {
+                const fid = file.file_id;
+                if (vm.selected_file_ids.indexOf(fid) === -1) {
+                    return;
+                }
+                if (!modes[fid] || !vm.canUseOriginal(file)) {
+                    modes[fid] = vm.defaultFileMode();
+                } else if (modes[fid] === 'original' && !vm.canUseOriginal(file)) {
+                    modes[fid] = 'generate';
+                }
+            });
+            this.file_modes = modes;
+        },
+        setFileMode(fileId, mode) {
+            this.$set(this.file_modes, fileId, mode);
+        },
+        publishSourceOptionLabel(file, mode) {
+            if (mode === 'original') {
+                return (this.$t('microdata_option_original') || 'Original') + ' (' + this.originalFormatLabel(file) + ')';
+            }
+            if (this.generateOnlyFormat) {
+                return this.$t('microdata_generate_only_format') || 'Will be generated from CSV';
+            }
+            return (this.$t('microdata_option_from_csv') || 'From CSV') + ' (' + this.outputFormatLabel() + ')';
+        },
+        publishSourceOptions(file) {
+            return [
+                { value: 'generate', label: this.publishSourceOptionLabel(file, 'generate') },
+                { value: 'original', label: this.publishSourceOptionLabel(file, 'original') }
+            ];
         },
         cancel() {
             if (this.state === 'running') {
@@ -200,16 +371,23 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                 return;
             }
 
+            const file_modes = {};
+            const vm = this;
+            file_ids.forEach(function(fid) {
+                file_modes[fid] = vm.file_modes[fid] || 'generate';
+            });
+
             const payload = {
                 export_format: this.export_format,
                 zip: this.effectiveZip,
-                max_wait_seconds: 900
+                max_wait_seconds: 900,
+                file_ids: file_ids,
+                file_modes: file_modes
             };
 
             if (this.export_format === 'dta') {
                 payload.export_version = this.stata_version;
             }
-            payload.file_ids = file_ids;
             if (!this.isRegenerate && this.overwrite) {
                 payload.overwrite = true;
             }
@@ -290,49 +468,9 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                         </v-alert>
                         <v-alert v-if="error_message" type="error" dense class="mb-4">{{ error_message }}</v-alert>
 
-                        <div class="mb-4">
-                            <label class="text-body-1 font-weight-medium d-block mb-2">
-                                {{ $t('microdata_data_files') || 'Data files' }}
-                                <span class="text-caption text--secondary ml-2">({{ selected_file_ids.length }} / {{ dataFiles.length }} {{ $t('selected') || 'selected' }})</span>
-                            </label>
-                            <div class="border rounded" style="max-height: 280px; overflow-y: auto;">
-                                <table class="table table-sm table-striped mb-0">
-                                    <thead class="bg-light" style="position: sticky; top: 0; z-index: 1;">
-                                        <tr>
-                                            <th style="width: 48px;">
-                                                <v-checkbox
-                                                    :value="allFilesSelected"
-                                                    :indeterminate="someFilesSelected"
-                                                    @change="toggleSelectAllFiles"
-                                                    :disabled="!isProjectEditable"
-                                                    hide-details dense class="mt-0"
-                                                ></v-checkbox>
-                                            </th>
-                                            <th>{{ $t('file') || 'File' }}</th>
-                                            <th>{{ $t('id') || 'ID' }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="file in dataFiles" :key="file.file_id">
-                                            <td>
-                                                <v-checkbox
-                                                    v-model="selected_file_ids"
-                                                    :value="file.file_id"
-                                                    :disabled="!isProjectEditable"
-                                                    hide-details dense class="mt-0"
-                                                ></v-checkbox>
-                                            </td>
-                                            <td>{{ file.file_name || file.file_id }}</td>
-                                            <td class="text-muted">{{ file.file_id }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
                         <div class="mb-4 d-flex flex-wrap align-center" style="gap: 16px;">
                             <div style="min-width: 200px; flex: 1; max-width: 320px;">
-                                <label class="text-body-2 font-weight-medium d-block mb-1">{{ $t('batch_export_format') || 'Format' }}</label>
+                                <label class="text-body-2 font-weight-medium d-block mb-1">{{ $t('microdata_output_format') || 'Output format' }}</label>
                                 <v-select
                                     v-model="export_format"
                                     :items="available_formats"
@@ -357,6 +495,78 @@ const VueExternalResourcesGenerateMicrodata = Vue.component('external-resources-
                                     hide-details
                                 ></v-select>
                             </div>
+                        </div>
+                        <div class="text-caption text--secondary mb-4">
+                            {{ $t('microdata_output_format_hint') }}
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="text-body-1 font-weight-medium mb-0">
+                                {{ $t('microdata_data_files') || 'Data files' }}
+                                <span class="text-caption text--secondary ml-2">({{ selected_file_ids.length }} / {{ dataFiles.length }} {{ $t('selected') || 'selected' }})</span>
+                            </label>
+                        </div>
+                        <div class="border rounded mb-4" style="max-height: 360px; overflow-y: auto;">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead class="bg-light" style="position: sticky; top: 0; z-index: 1;">
+                                    <tr>
+                                        <th>{{ $t('id') || 'ID' }}</th>
+                                        <th style="width: 48px;">
+                                            <v-checkbox
+                                                :value="allFilesSelected"
+                                                :indeterminate="someFilesSelected"
+                                                @change="toggleSelectAllFiles"
+                                                :disabled="!isProjectEditable"
+                                                hide-details dense class="mt-0"
+                                            ></v-checkbox>
+                                        </th>
+                                        <th>{{ $t('file') || 'File' }}</th>
+                                        <th>{{ $t('microdata_original_column') || 'Original' }}</th>
+                                        <th>{{ $t('microdata_options') || 'Options' }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="file in dataFiles" :key="file.file_id">
+                                        <td class="text-nowrap">{{ file.file_id }}</td>
+                                        <td>
+                                            <v-checkbox
+                                                v-model="selected_file_ids"
+                                                :value="file.file_id"
+                                                :disabled="!isProjectEditable"
+                                                hide-details dense class="mt-0"
+                                            ></v-checkbox>
+                                        </td>
+                                        <td>{{ file.file_name || file.file_id }}</td>
+                                        <td class="text-nowrap">
+                                            <div>{{ originalFormatLabel(file) }}</div>
+                                            <div v-if="originalSizeLabel(file)" class="text-caption text--secondary">{{ originalSizeLabel(file) }}</div>
+                                        </td>
+                                        <td style="min-width: 180px;">
+                                            <template v-if="selected_file_ids.indexOf(file.file_id) === -1">
+                                                <span class="text-caption text--secondary">—</span>
+                                            </template>
+                                            <template v-else-if="canUseOriginal(file) && !generateOnlyFormat">
+                                                <select
+                                                    class="form-control form-control-sm form-field-dropdown"
+                                                    style="min-width: 160px; max-width: 220px;"
+                                                    :value="file_modes[file.file_id] || 'generate'"
+                                                    @change="setFileMode(file.file_id, $event.target.value)"
+                                                    :disabled="!isProjectEditable"
+                                                >
+                                                    <option
+                                                        v-for="opt in publishSourceOptions(file)"
+                                                        :key="opt.value"
+                                                        :value="opt.value"
+                                                    >{{ opt.label }}</option>
+                                                </select>
+                                                <div v-if="versionMismatch(file) && file_modes[file.file_id] === 'original'" class="text-caption warning--text mt-1">
+                                                    {{ $t('microdata_version_mismatch') }}
+                                                </div>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
                         <v-checkbox

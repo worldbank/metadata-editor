@@ -31,6 +31,12 @@ class Editor_datafile_model extends CI_Model {
 		'metadata',
 		'wght',
 		'store_data',
+		'source_format',
+		'source_format_version',
+		'source_upload_filename',
+		'source_status',
+		'source_attached_at',
+		'source_attached_by',
 		'created',
 		'changed',
 		'created_by',
@@ -127,6 +133,7 @@ class Editor_datafile_model extends CI_Model {
 			}
 		} else {
 			$datafile_info = $this->check_uploaded_file_exists($sid);
+			$upload_info = null;
 		}
 
 		if ($overwrite==false && $datafile_info){
@@ -155,6 +162,19 @@ class Editor_datafile_model extends CI_Model {
 			$store_data=0;
 		}
 
+		$original_client_name = null;
+		if (is_array($upload_info) && !empty($upload_info['original_filename'])) {
+			$original_client_name = $upload_info['original_filename'];
+		} elseif (isset($_FILES['file']['name'])) {
+			$original_client_name = $_FILES['file']['name'];
+		}
+
+		$source_fields = $this->source_fields_from_upload(
+			$uploaded_file_name,
+			$original_client_name,
+			$user_id
+		);
+
 		if (!$datafile_info){
 			//create data file
 			$options=array(
@@ -167,6 +187,7 @@ class Editor_datafile_model extends CI_Model {
 				'created_by'=>$user_id,
 				'changed_by'=>$user_id
 			);
+			$options = array_merge($options, $source_fields);
 			if (!empty($meta_patch)) {
 				$options = array_merge($options, $meta_patch);
 			}
@@ -181,6 +202,7 @@ class Editor_datafile_model extends CI_Model {
 				'store_data'=>$store_data,
 				'changed_by'=>$user_id
 			);
+			$options = array_merge($options, $source_fields);
 			if (!empty($meta_patch)) {
 				$options = array_merge($options, $meta_patch);
 			}
@@ -448,6 +470,73 @@ class Editor_datafile_model extends CI_Model {
 	}
 
 	/**
+	 * Absolute path to the native source file (.dta/.sav) when stored on disk, or null.
+	 *
+	 * @param int $sid
+	 * @param string $file_id
+	 * @return string|null
+	 */
+	function get_source_physical_path($sid, $file_id)
+	{
+		$datafile = $this->data_file_by_id($sid, $file_id);
+		if (!$datafile) {
+			return null;
+		}
+
+		try {
+			$files = $this->get_files_info($sid, $file_id);
+		} catch (Exception $e) {
+			$files = array();
+		}
+
+		if (!empty($files['original']['file_exists']) && !empty($files['original']['filepath'])) {
+			$path = $files['original']['filepath'];
+			$ext = strtolower($this->get_file_extension($path));
+			if (in_array($ext, array('dta', 'sav'), true) && is_file($path)) {
+				return $path;
+			}
+		}
+
+		$project_folder = $this->Editor_model->get_project_folder($sid) . '/data/';
+		$base = !empty($datafile['file_name']) ? $datafile['file_name'] : $this->filename_part($datafile['file_physical_name']);
+		foreach (array('dta', 'sav') as $ext) {
+			$candidate = $project_folder . $base . '.' . $ext;
+			if (is_file($candidate)) {
+				return $candidate;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Map Stata internal release to display version (e.g. 118 -> 14).
+	 *
+	 * @param string|int|null $release
+	 * @return int|null
+	 */
+	function stata_version_from_release($release)
+	{
+		if ($release === null || $release === '') {
+			return null;
+		}
+
+		$map = array(
+			104 => 8, 105 => 9, 108 => 10, 114 => 11, 115 => 12,
+			117 => 13, 118 => 14, 119 => 15, 120 => 16, 121 => 17, 122 => 18, 123 => 19,
+		);
+		$n = (int) $release;
+		if ($n <= 0) {
+			return null;
+		}
+		if ($n <= 30) {
+			return $n;
+		}
+
+		return isset($map[$n]) ? $map[$n] : null;
+	}
+
+	/**
 	 * Resolve path to CSV file; tries .csv and .CSV so case-sensitive filesystems work.
 	 * @param string $dir Directory path (no trailing slash required)
 	 * @param string $base Filename without extension
@@ -687,11 +776,90 @@ class Editor_datafile_model extends CI_Model {
 
 
 	/**
+	 * Source_* fields at upload time (extension-based; version filled later via FastAPI).
+	 *
+	 * @param string $uploaded_file_name Basename stored on disk
+	 * @param string|null $original_client_name Client filename before sanitize
+	 * @param int|null $user_id
+	 * @return array
+	 */
+	function source_fields_from_upload($uploaded_file_name, $original_client_name = null, $user_id = null)
+	{
+		$fields = $this->build_source_fields_from_path($uploaded_file_name, $original_client_name);
+		$now = date('U');
+		if (!empty($fields['source_format']) && $fields['source_format'] !== 'csv') {
+			$fields['source_attached_at'] = $now;
+			if ($user_id !== null && $user_id !== '') {
+				$fields['source_attached_by'] = (int) $user_id;
+			}
+		}
+		return $fields;
+	}
+
+	/**
+	 * Build source_* column values from a physical file path (extension-based).
+	 * Format version is filled later via FastAPI name-labels when available.
+	 *
+	 * @param string $filepath Absolute or relative path / basename
+	 * @param string|null $upload_filename Original client filename (optional)
+	 * @return array Fields suitable for insert/update
+	 */
+	function build_source_fields_from_path($filepath, $upload_filename = null)
+	{
+		$basename = basename((string) $filepath);
+		$ext = strtolower($this->get_file_extension($basename));
+		$out = array(
+			'source_status' => 'unknown',
+			'source_format' => null,
+			'source_format_version' => null,
+		);
+
+		if ($upload_filename !== null && $upload_filename !== '') {
+			$out['source_upload_filename'] = basename((string) $upload_filename);
+		}
+
+		if ($ext === 'csv') {
+			$out['source_format'] = 'csv';
+			$out['source_status'] = 'not_applicable';
+		} elseif ($ext === 'dta' || $ext === 'sav') {
+			$out['source_format'] = $ext;
+			$out['source_status'] = 'present';
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Apply FastAPI name-labels file_info into source_* columns.
+	 *
+	 * @param array $file_info From name-labels response key file_info
+	 * @return array Partial update for editor_data_files
+	 */
+	function source_fields_from_file_info(array $file_info)
+	{
+		$out = array();
+		if (!empty($file_info['format'])) {
+			$out['source_format'] = strtolower((string) $file_info['format']);
+		}
+		if (array_key_exists('format_version', $file_info) && $file_info['format_version'] !== null && $file_info['format_version'] !== '') {
+			$out['source_format_version'] = (string) $file_info['format_version'];
+		}
+		if (!empty($out['source_format'])) {
+			if ($out['source_format'] === 'csv') {
+				$out['source_status'] = 'not_applicable';
+			} else {
+				$out['source_status'] = 'present';
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * 
 	 * Clean up data files
 	 * 
-	 *  - remove files marked to be deleted
-	 *  - remove original (non-csv) files if csv exists
+	 *  - store_data=0: remove source and CSV (metadata-only / clear data)
+	 *  - store_data=1: keep source and CSV (no longer deletes originals after conversion)
 	 * 
 	 */
 	function cleanup($sid, $file_id=null)
@@ -748,97 +916,54 @@ class Editor_datafile_model extends CI_Model {
 			//csv file path
 			$csv_path=$project_folder.'/data/'.$filename_csv;
 
-			//if store_data==0, delete the file
-			//remove original + csv file
+			// store_data==0: remove source and working CSV (clear data / metadata-only)
 			if ($file['store_data']==0){
-				
-				//remove original file - only if it's a file, not a directory
-				if (file_exists($original_path) && is_file($original_path)){
-					unlink($original_path);
-					$output['deleted']++;
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $file['file_physical_name'],
-						'file_physical_name' => $file['file_physical_name'],
-						'status' => 'deleted',
-						'type' => 'original'
-					];
-				} else {
-					$output['skipped']++;
-					$reason = 'Original file not deleted: ';
-					if (!file_exists($original_path)) {
-						$reason .= 'file does not exist';
-					} else if (!is_file($original_path)) {
-						$reason .= 'path is a directory, not a file';
-					}
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $file['file_physical_name'],
-						'file_physical_name' => $file['file_physical_name'],
-						'status' => 'skipped',
-					];
+				$paths_to_delete = array();
+				if (!$is_csv) {
+					$paths_to_delete[] = array('path' => $original_path, 'name' => $file['file_physical_name'], 'type' => 'original');
 				}
+				$paths_to_delete[] = array('path' => $csv_path, 'name' => $filename_csv, 'type' => 'csv');
 
-				//remove csv file - only if it's a file, not a directory
-				if (file_exists($csv_path) && is_file($csv_path)){
-					unlink($csv_path);
-					$output['deleted']++;
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $filename_csv,
-						'file_physical_name' => $filename_csv,
-						'status' => 'deleted',
-						'type' => 'csv'
-					];
-				} else {
-					$output['skipped']++;
-					$reason = 'CSV file not deleted: ';
-					if (!file_exists($csv_path)) {
-						$reason .= 'file does not exist';
-					} else if (!is_file($csv_path)) {
-						$reason .= 'path is a directory, not a file';
+				$seen = array();
+				foreach ($paths_to_delete as $item) {
+					$real = realpath($item['path']);
+					$key = $real !== false ? $real : $item['path'];
+					if (isset($seen[$key])) {
+						continue;
 					}
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $filename_csv,
-						'file_physical_name' => $filename_csv,
-						'status' => 'skipped',
-					];
+					$seen[$key] = true;
+
+					if (file_exists($item['path']) && is_file($item['path'])) {
+						unlink($item['path']);
+						$output['deleted']++;
+						$output['files'][] = array(
+							'file_id' => $file['file_id'],
+							'file_name' => $item['name'],
+							'file_physical_name' => $item['name'],
+							'status' => 'deleted',
+							'type' => $item['type'],
+						);
+					} else {
+						$output['skipped']++;
+						$output['files'][] = array(
+							'file_id' => $file['file_id'],
+							'file_name' => $item['name'],
+							'file_physical_name' => $item['name'],
+							'status' => 'skipped',
+						);
+					}
 				}
 			}
 			else{
-				//remove original file (non-csv) if csv exists
-				if (!$is_csv && file_exists($original_path) && is_file($original_path) && file_exists($csv_path) && is_file($csv_path)){
-					unlink($original_path);
-					$output['deleted']++;
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $file['file_physical_name'],
-						'file_physical_name' => $file['file_physical_name'],
-						'status' => 'deleted',
-						'type' => 'original',
-					];
-				} else {
-					$output['skipped']++;
-					$reason = 'Original file not deleted: ';
-					if ($is_csv) {
-						$reason .= 'file is already CSV, no conversion needed';
-					} else if (!file_exists($original_path)) {
-						$reason .= 'original file does not exist';
-					} else if (!is_file($original_path)) {
-						$reason .= 'original file is a directory';
-					} else if (!file_exists($csv_path)) {
-						$reason .= 'CSV file does not exist';
-					} else if (!is_file($csv_path)) {
-						$reason .= 'CSV file is a directory';
-					}
-					$output['files'][] = [
-						'file_id' => $file['file_id'],
-						'file_name' => $file['file_physical_name'],
-						'file_physical_name' => $file['file_physical_name'],
-						'status' => 'skipped',
-					];
-				}
+				// store_data=1: keep source file and working CSV
+				$output['skipped']++;
+				$output['files'][] = [
+					'file_id' => $file['file_id'],
+					'file_name' => $file['file_physical_name'],
+					'file_physical_name' => $file['file_physical_name'],
+					'status' => 'skipped',
+					'reason' => 'source file retained (store_data=1)',
+				];
 			}
 
 		}
@@ -865,13 +990,42 @@ class Editor_datafile_model extends CI_Model {
 	 */
 	function delete_physical_file($sid,$file_id)
 	{
-		try{
-			$file_path=$this->get_file_path($sid,$file_id);
-			unlink($file_path);
-		}
-		catch(Exception $e){
+		$datafile = $this->data_file_by_id($sid, $file_id);
+		if (!$datafile) {
 			return false;
 		}
+
+		$project_folder = $this->Editor_model->get_project_folder($sid);
+		$data_folder = rtrim($project_folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+
+		$paths = array();
+		if (!empty($datafile['file_physical_name'])) {
+			$paths[] = $data_folder . $datafile['file_physical_name'];
+		}
+		$csv_path = $this->get_file_csv_path($sid, $file_id);
+		if ($csv_path) {
+			$paths[] = $csv_path;
+		} elseif (!empty($datafile['file_name'])) {
+			$paths[] = $data_folder . $datafile['file_name'] . '.csv';
+		}
+
+		$deleted_any = false;
+		$seen = array();
+		foreach ($paths as $path) {
+			$real = realpath($path);
+			$key = $real !== false ? $real : $path;
+			if (isset($seen[$key])) {
+				continue;
+			}
+			$seen[$key] = true;
+			if (file_exists($path) && is_file($path)) {
+				if (@unlink($path)) {
+					$deleted_any = true;
+				}
+			}
+		}
+
+		return $deleted_any;
 	}
 
 	function delete($sid,$file_id)
@@ -1084,6 +1238,12 @@ class Editor_datafile_model extends CI_Model {
 			'metadata' => $source['metadata'],
 			'wght' => $this->max_wght($sid) + 1,
 			'store_data' => isset($source['store_data']) ? (int)$source['store_data'] : 1,
+			'source_format' => isset($source['source_format']) ? $source['source_format'] : null,
+			'source_format_version' => isset($source['source_format_version']) ? $source['source_format_version'] : null,
+			'source_upload_filename' => isset($source['source_upload_filename']) ? $source['source_upload_filename'] : null,
+			'source_status' => isset($source['source_status']) ? $source['source_status'] : 'unknown',
+			'source_attached_at' => isset($source['source_attached_at']) ? $source['source_attached_at'] : null,
+			'source_attached_by' => isset($source['source_attached_by']) ? $source['source_attached_by'] : null,
 			'created' => $now,
 			'changed' => $now,
 			'created_by' => $user_id,
@@ -1095,15 +1255,35 @@ class Editor_datafile_model extends CI_Model {
 			throw new Exception("Failed to insert duplicate data file");
 		}
 
-		// Copy physical CSV if it exists
-		$source_csv_path = $this->get_file_csv_path($sid, $source_file_id);
-		if ($source_csv_path && file_exists($source_csv_path) && is_file($source_csv_path)) {
-			$dest_csv_path = $data_folder . $new_csv_name;
-			if (!copy($source_csv_path, $dest_csv_path)) {
-				throw new Exception("Failed to copy data file to " . $new_csv_name);
+		// Copy source file when present (keep file_physical_name as source, not CSV)
+		$source_physical_path = null;
+		try {
+			$source_physical_path = $this->get_file_path($sid, $source_file_id);
+		} catch (Exception $e) {
+			$source_physical_path = null;
+		}
+		if ($source_physical_path && file_exists($source_physical_path) && is_file($source_physical_path)) {
+			$dest_physical_path = $data_folder . $new_file_physical_name;
+			$src_real = realpath($source_physical_path);
+			$dest_real = file_exists($dest_physical_path) ? realpath($dest_physical_path) : false;
+			if ($src_real === false || $dest_real === false || $src_real !== $dest_real) {
+				if (!copy($source_physical_path, $dest_physical_path)) {
+					throw new Exception("Failed to copy source data file to " . $new_file_physical_name);
+				}
 			}
-			$this->db->where('id', $new_pk_id);
-			$this->db->update('editor_data_files', array('file_physical_name' => $new_csv_name, 'changed' => $now));
+		}
+
+		// Copy working CSV when distinct from source
+		$source_csv_path = $this->get_file_csv_path($sid, $source_file_id);
+		$dest_csv_path = $data_folder . $new_csv_name;
+		if ($source_csv_path && file_exists($source_csv_path) && is_file($source_csv_path)) {
+			$src_csv_real = realpath($source_csv_path);
+			$src_phys_real = ($source_physical_path && file_exists($source_physical_path)) ? realpath($source_physical_path) : false;
+			if ($src_csv_real === false || $src_phys_real === false || $src_csv_real !== $src_phys_real) {
+				if (!copy($source_csv_path, $dest_csv_path)) {
+					throw new Exception("Failed to copy data file to " . $new_csv_name);
+				}
+			}
 		}
 
 		// Copy variables: load all for source file, assign new vids, insert for new file, then fix var_wgt_id
@@ -1423,14 +1603,22 @@ class Editor_datafile_model extends CI_Model {
 				
 				// Check if new file name already exists
 				$existing_file = $this->data_file_by_name($data_file['sid'], $new_file_name);
-				if ($existing_file && $existing_file['id'] != $id) {
+				if ($existing_file && (int)$existing_file['id'] !== (int)$id) {
 					throw new Exception("Data file name '{$new_file_name}' already exists");
 				}
 				
-				$extension = $this->get_file_extension($old_data_file['file_physical_name']);
-				$new_physical_name = $new_file_name . ($extension ? '.' . $extension : '');
-				$this->rename_physical_files($data_file['sid'], $id, $old_data_file['file_physical_name'], $new_physical_name);
+				$new_physical_name = $this->rename_physical_files(
+					$data_file['sid'],
+					$old_data_file['file_name'],
+					$new_file_name,
+					isset($old_data_file['file_physical_name']) ? $old_data_file['file_physical_name'] : ''
+				);
 				$data['file_physical_name'] = $new_physical_name;
+
+				$upload_ext = strtolower($this->get_file_extension($new_physical_name));
+				if ($upload_ext !== '') {
+					$data['source_upload_filename'] = $new_file_name . '.' . $upload_ext;
+				}
 			}
 		}
 		
@@ -1445,36 +1633,124 @@ class Editor_datafile_model extends CI_Model {
 	}
 
 	/**
-	 * Rename physical files when data file name changes
+	 * Rename physical files when logical data file name changes.
+	 * Renames working CSV and any Stata/SPSS source siblings ({file_name}.csv, .dta, .sav).
+	 *
+	 * @param int $sid
+	 * @param string $old_file_name Logical name (no extension)
+	 * @param string $new_file_name Logical name (no extension)
+	 * @param string $old_physical_name Previous file_physical_name value
+	 * @return string New file_physical_name
 	 */
-	private function rename_physical_files($sid, $file_id, $old_physical_name, $new_physical_name)
+	private function rename_physical_files($sid, $old_file_name, $new_file_name, $old_physical_name = '')
 	{
+		$old_file_name = $this->filename_part($old_file_name);
+		$new_file_name = $this->filename_part($new_file_name);
+
+		if ($old_file_name === $new_file_name) {
+			return $old_physical_name !== '' ? $old_physical_name : ($new_file_name . '.csv');
+		}
+
 		$project_folder = $this->Editor_model->get_project_folder($sid);
-		$data_folder = $project_folder . '/data/';
-		
-		// Get logical names for CSV file renaming
-		$old_logical_name = $this->filename_part($old_physical_name);
-		$new_logical_name = $this->filename_part($new_physical_name);
-		
-		// Paths for original and CSV files
-		$old_original_path = $data_folder . $old_physical_name;
-		$new_original_path = $data_folder . $new_physical_name;
-		$old_csv_path = $data_folder . $old_logical_name . '.csv';
-		$new_csv_path = $data_folder . $new_logical_name . '.csv';
-		
-		// Rename original file if it exists
-		if (file_exists($old_original_path) && is_file($old_original_path)) {
-			if (!rename($old_original_path, $new_original_path)) {
-				throw new Exception("Failed to rename original file from {$old_physical_name} to {$new_physical_name}");
+		$data_folder = rtrim($project_folder, '/') . '/data/';
+
+		if (!is_dir($data_folder)) {
+			return $this->resolve_physical_name_after_rename($data_folder, $new_file_name, $old_physical_name);
+		}
+
+		$renamed_realpaths = array();
+
+		// Working CSV
+		$old_csv = $this->resolve_csv_path($data_folder, $old_file_name);
+		if ($old_csv) {
+			$new_csv = $data_folder . $new_file_name . '.csv';
+			$this->safe_rename_data_file($old_csv, $new_csv, $renamed_realpaths);
+		}
+
+		// Stata / SPSS source files keyed by logical file_name
+		foreach (array('dta', 'sav') as $ext) {
+			$old_path = $data_folder . $old_file_name . '.' . $ext;
+			$new_path = $data_folder . $new_file_name . '.' . $ext;
+			if (is_file($old_path)) {
+				$this->safe_rename_data_file($old_path, $new_path, $renamed_realpaths);
 			}
 		}
-		
-		// Rename CSV file if it exists
-		if (file_exists($old_csv_path) && is_file($old_csv_path)) {
-			if (!rename($old_csv_path, $new_csv_path)) {
-				throw new Exception("Failed to rename CSV file from " . basename($old_csv_path) . " to " . basename($new_csv_path));
+
+		// Legacy row where file_physical_name basename differs from file_name
+		if ($old_physical_name !== '') {
+			$old_phys_path = $data_folder . $old_physical_name;
+			$old_phys_base = $this->filename_part($old_physical_name);
+			if ($old_phys_base !== $old_file_name && is_file($old_phys_path)) {
+				$ext = strtolower($this->get_file_extension($old_physical_name));
+				if ($ext === '') {
+					$ext = 'csv';
+				}
+				$new_phys_path = $data_folder . $new_file_name . '.' . $ext;
+				$this->safe_rename_data_file($old_phys_path, $new_phys_path, $renamed_realpaths);
 			}
 		}
+
+		return $this->resolve_physical_name_after_rename($data_folder, $new_file_name, $old_physical_name);
+	}
+
+	/**
+	 * @param string $old_path
+	 * @param string $new_path
+	 * @param array $renamed_realpaths Tracks paths already renamed in this operation
+	 */
+	private function safe_rename_data_file($old_path, $new_path, &$renamed_realpaths)
+	{
+		if (!is_file($old_path)) {
+			return;
+		}
+
+		$old_real = realpath($old_path);
+		if ($old_real && in_array($old_real, $renamed_realpaths, true)) {
+			return;
+		}
+
+		if (file_exists($new_path)) {
+			$new_real = realpath($new_path);
+			if ($old_real && $new_real && $old_real === $new_real) {
+				return;
+			}
+			throw new Exception("Cannot rename: target already exists: " . basename($new_path));
+		}
+
+		if (!@rename($old_path, $new_path)) {
+			throw new Exception(
+				"Failed to rename file from " . basename($old_path) . " to " . basename($new_path)
+			);
+		}
+
+		$new_real = realpath($new_path);
+		if ($new_real) {
+			$renamed_realpaths[] = $new_real;
+		}
+	}
+
+	/**
+	 * Choose file_physical_name after rename: prefer source (.dta/.sav) over working CSV.
+	 */
+	private function resolve_physical_name_after_rename($data_folder, $new_file_name, $fallback_old_physical = '')
+	{
+		foreach (array('dta', 'sav') as $ext) {
+			if (is_file($data_folder . $new_file_name . '.' . $ext)) {
+				return $new_file_name . '.' . $ext;
+			}
+		}
+
+		$csv_path = $this->resolve_csv_path($data_folder, $new_file_name);
+		if ($csv_path) {
+			return basename($csv_path);
+		}
+
+		$ext = strtolower($this->get_file_extension($fallback_old_physical));
+		if ($ext === '') {
+			$ext = 'csv';
+		}
+
+		return $new_file_name . '.' . $ext;
 	}
 
 	function data_files_get_varcount($sid)

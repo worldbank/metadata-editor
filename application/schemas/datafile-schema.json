@@ -48,6 +48,23 @@
 		"notes": {
 			"type": "string",
 			"title": "File notes"
+		},
+		"source_format": {
+			"type": ["string", "null"],
+			"title": "Source file format",
+			"description": "Uploaded source format: csv, dta, or sav. Distinct from documentation version.",
+			"enum": ["csv", "dta", "sav", null]
+		},
+		"source_format_version": {
+			"type": ["string", "null"],
+			"title": "Source format version",
+			"description": "Software format version of the source file (e.g. Stata 14, SPSS file version)."
+		},
+		"source_status": {
+			"type": "string",
+			"title": "Source file status",
+			"description": "Lifecycle of the uploaded source file relative to the working CSV.",
+			"enum": ["unknown", "present", "missing", "not_applicable"]
 		}
 	},
 	"required": [ "file_id", "file_name"]

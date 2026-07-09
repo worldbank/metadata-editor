@@ -24,6 +24,8 @@ class Editor_resource_datafile_model extends CI_Model
 		'link_type',
 		'data_file_changed',
 		'source_csv_mtime',
+		'source_mode',
+		'source_physical_mtime',
 		'generated_at',
 		'created',
 		'created_by',
@@ -164,6 +166,8 @@ class Editor_resource_datafile_model extends CI_Model
 				continue;
 			}
 
+			$source_mode = isset($link['source_mode']) ? strtolower((string) $link['source_mode']) : 'generated';
+
 			$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $link['file_id']);
 			if (!$datafile) {
 				$reasons[] = array('code' => 'data_file_removed', 'file_id' => $link['file_id']);
@@ -176,10 +180,21 @@ class Editor_resource_datafile_model extends CI_Model
 			}
 
 			$csv_path = $this->Editor_datafile_model->get_file_csv_path($sid, $link['file_id']);
-			if ($csv_path && is_file($csv_path) && $link['source_csv_mtime'] !== null && $link['source_csv_mtime'] !== '') {
+			if ($source_mode !== 'original' && $csv_path && is_file($csv_path) && $link['source_csv_mtime'] !== null && $link['source_csv_mtime'] !== '') {
 				$mtime = (int) filemtime($csv_path);
 				if ($mtime > (int) $link['source_csv_mtime']) {
 					$reasons[] = array('code' => 'csv_modified', 'file_id' => $link['file_id']);
+				}
+			}
+
+			if ($source_mode === 'original') {
+				$physical_path = $this->Editor_datafile_model->get_source_physical_path($sid, $link['file_id']);
+				if ($physical_path && is_file($physical_path)
+					&& $link['source_physical_mtime'] !== null && $link['source_physical_mtime'] !== '') {
+					$mtime = (int) filemtime($physical_path);
+					if ($mtime > (int) $link['source_physical_mtime']) {
+						$reasons[] = array('code' => 'source_modified', 'file_id' => $link['file_id']);
+					}
 				}
 			}
 
@@ -259,6 +274,8 @@ class Editor_resource_datafile_model extends CI_Model
 			'link_type' => $link_type,
 			'data_file_changed' => isset($link['data_file_changed']) ? $link['data_file_changed'] : null,
 			'source_csv_mtime' => isset($link['source_csv_mtime']) ? $link['source_csv_mtime'] : null,
+			'source_mode' => isset($link['source_mode']) ? $link['source_mode'] : null,
+			'source_physical_mtime' => isset($link['source_physical_mtime']) ? $link['source_physical_mtime'] : null,
 			'generated_at' => isset($link['generated_at']) ? $link['generated_at'] : null,
 			'created' => time(),
 			'created_by' => $user_id !== null ? (int) $user_id : null,
@@ -289,7 +306,7 @@ class Editor_resource_datafile_model extends CI_Model
 	 * @param string|null $zip_entry_name
 	 * @return array
 	 */
-	public function build_generated_link_row($sid, $file_id, $export_format, $export_version = null, $zip_entry_name = null)
+	public function build_generated_link_row($sid, $file_id, $export_format, $export_version = null, $zip_entry_name = null, $source_mode = 'generated')
 	{
 		$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $file_id);
 		if (!$datafile) {
@@ -302,6 +319,19 @@ class Editor_resource_datafile_model extends CI_Model
 			$csv_mtime = (int) filemtime($csv_path);
 		}
 
+		$source_mode = strtolower(trim((string) $source_mode));
+		if (!in_array($source_mode, array('original', 'generated'), true)) {
+			$source_mode = 'generated';
+		}
+
+		$physical_mtime = null;
+		if ($source_mode === 'original') {
+			$physical_path = $this->Editor_datafile_model->get_source_physical_path($sid, $file_id);
+			if ($physical_path && is_file($physical_path)) {
+				$physical_mtime = (int) filemtime($physical_path);
+			}
+		}
+
 		$now = time();
 
 		return array(
@@ -312,6 +342,8 @@ class Editor_resource_datafile_model extends CI_Model
 			'link_type' => self::LINK_TYPE_GENERATED,
 			'data_file_changed' => isset($datafile['changed']) ? (int) $datafile['changed'] : null,
 			'source_csv_mtime' => $csv_mtime,
+			'source_mode' => $source_mode,
+			'source_physical_mtime' => $physical_mtime,
 			'generated_at' => $now,
 		);
 	}

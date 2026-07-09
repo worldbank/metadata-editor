@@ -244,22 +244,53 @@ class ImportMicrodataJob implements JobHandlerInterface
             );
         }
         
-        // Step 4: Handle CSV cleanup (similar to generate_csv_job_status_get)
+        // Step 4: Confirm working CSV exists; keep source file (do not delete or repoint file_physical_name)
         $csv_file_path = $this->ci->Editor_datafile_model->check_csv_exists($project_id, $file_id);
-        $csv_cleanup_result = null;
-        
-        if ($csv_file_path) {
-            // Cleanup original non-CSV file
-            $cleanup_result = $this->ci->Editor_datafile_model->cleanup($project_id, $file_id);
-            
-            // Update datafile record to use CSV file
+        $csv_basename = $csv_file_path ? basename($csv_file_path) : null;
+
+        // Refresh source_* columns (format + version) via FastAPI name-labels on the source file
+        $datafile = $this->ci->Editor_datafile_model->data_file_by_id($project_id, $file_id);
+        $source_path = null;
+        if ($datafile && !empty($datafile['file_physical_name'])) {
+            $project_folder = $this->ci->Editor_model->get_project_folder($project_id);
+            $source_path = $project_folder . '/data/' . $datafile['file_physical_name'];
+            if (!file_exists($source_path)) {
+                $source_path = null;
+            }
+        }
+        if (!$source_path) {
+            $source_path = $datafile_path;
+        }
+
+        $source_update = $this->ci->Editor_datafile_model->build_source_fields_from_path($source_path);
+        try {
+            $name_labels = $this->ci->datautils->get_file_name_labels($source_path, array(
+                'include_file_info' => true,
+                'columns_only' => true,
+            ));
+            if (isset($name_labels['file_info']) && is_array($name_labels['file_info'])) {
+                $source_update = array_merge(
+                    $source_update,
+                    $this->ci->Editor_datafile_model->source_fields_from_file_info($name_labels['file_info'])
+                );
+            }
+        } catch (Exception $e) {
+            // Extension-based source_update still applied; version may remain null
+            log_message('error', 'ImportMicrodataJob: name-labels file_info failed: ' . $e->getMessage());
+        }
+        if (!empty($source_update)) {
             $datafile = $this->ci->Editor_datafile_model->data_file_by_id($project_id, $file_id);
             if ($datafile) {
-                $this->ci->Editor_datafile_model->update($datafile['id'], array('file_physical_name' => basename($csv_file_path)));
+                $this->ci->Editor_datafile_model->update($datafile['id'], $source_update);
             }
-            $csv_cleanup_result = basename($csv_file_path);
         }
-        
+
+        // store_data=0: remove physical data after metadata import (source + CSV)
+        $datafile = $this->ci->Editor_datafile_model->data_file_by_id($project_id, $file_id);
+        if ($datafile && isset($datafile['store_data']) && (int) $datafile['store_data'] === 0) {
+            $this->ci->Editor_datafile_model->cleanup($project_id, $file_id);
+        }
+
         // Return final result
         return array(
             'fastapi_job_id' => $fastapi_job_id,
@@ -268,9 +299,8 @@ class ImportMicrodataJob implements JobHandlerInterface
             'datafile_path' => $datafile_path,
             'variables_imported' => count($variable_import_result),
             'case_count' => isset($fastapi_result['data']['data_dictionary']['rows']) ? $fastapi_result['data']['data_dictionary']['rows'] : null,
-            'csv_file' => $csv_cleanup_result,
+            'csv_file' => $csv_basename,
             'fastapi_status' => $fastapi_status,
-            //'fastapi_response' => $fastapi_result, // Include full response for debugging
             'message' => 'Microdata import completed successfully'
         );
     }

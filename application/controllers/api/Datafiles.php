@@ -74,6 +74,15 @@ class Datafiles extends MY_REST_Controller
 			
 			$user_id=$this->get_api_user_id();
 			$survey_datafiles=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+
+			if (!$survey_datafiles){
+				throw new Exception("Data file not found");
+			}
+
+			$varcounts=$this->Editor_datafile_model->get_varcount($sid);
+			$survey_datafiles['var_count']=isset($varcounts[$file_id]) ? $varcounts[$file_id] : 0;
+			$survey_datafiles['file_info']=$this->Editor_datafile_model->get_files_info($sid,$file_id);
+			$survey_datafiles=$this->enrich_datafile_source_info($survey_datafiles);
 			
 			$response=array(
 				'datafile'=>$survey_datafiles
@@ -192,6 +201,7 @@ class Datafiles extends MY_REST_Controller
 			//validate 
 			if ($this->Editor_datafile_model->validate_data_file($options)){
 				$options['file_uri']=$options['file_name'];
+				$options['file_name']=trim((string)$options['file_name']);
 				$options['file_name']=$this->Editor_datafile_model->data_file_filename_part($options['file_name']);
 
 				if (isset($options['id'])){
@@ -201,13 +211,17 @@ class Datafiles extends MY_REST_Controller
 						throw new Exception("Data file not found");
 					}
 
-					$data_file_by_name=$this->Editor_datafile_model->data_file_by_name($sid,$options['file_name']);
+					$pk_id=(int)$data_file['id'];
 
-					if($data_file_by_name && $data_file_by_name['id']!=$options['id']){
-						throw new Exception("Data file name already exists");
+					if ($data_file['file_name'] !== $options['file_name']){
+						$data_file_by_name=$this->Editor_datafile_model->data_file_by_name($sid,$options['file_name']);
+
+						if($data_file_by_name && (int)$data_file_by_name['id'] !== $pk_id){
+							throw new Exception("Data file name already exists");
+						}
 					}
 
-					$this->Editor_datafile_model->data_file_update($data_file["id"],$options);
+					$this->Editor_datafile_model->data_file_update($pk_id,$options);
 				}else{
 
 					//check if file name exists
@@ -876,6 +890,62 @@ class Datafiles extends MY_REST_Controller
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * Fill missing source_format / source_format_version from the on-disk source file via FastAPI.
+	 * Does not persist — only enriches the API response for display.
+	 *
+	 * @param array $datafile
+	 * @return array
+	 */
+	private function enrich_datafile_source_info($datafile)
+	{
+		if (!is_array($datafile) || empty($datafile['file_info']['original']['file_exists'])) {
+			return $datafile;
+		}
+
+		$orig_path = isset($datafile['file_info']['original']['filepath'])
+			? $datafile['file_info']['original']['filepath']
+			: null;
+		if (!$orig_path || !is_file($orig_path)) {
+			return $datafile;
+		}
+
+		$ext = strtolower(pathinfo($orig_path, PATHINFO_EXTENSION));
+		if (!in_array($ext, array('dta', 'sav'), true)) {
+			return $datafile;
+		}
+
+		$needs_version = empty($datafile['source_format_version']);
+		$needs_format = empty($datafile['source_format']);
+		if (!$needs_version && !$needs_format) {
+			return $datafile;
+		}
+
+		try {
+			$this->load->library('DataUtils');
+			$name_labels = $this->datautils->get_file_name_labels($orig_path, array(
+				'include_file_info' => true,
+				'columns_only' => true,
+			));
+			if (empty($name_labels['file_info']) || !is_array($name_labels['file_info'])) {
+				return $datafile;
+			}
+			$patch = $this->Editor_datafile_model->source_fields_from_file_info($name_labels['file_info']);
+			foreach ($patch as $key => $value) {
+				if ($value === null || $value === '') {
+					continue;
+				}
+				if (empty($datafile[$key])) {
+					$datafile[$key] = $value;
+				}
+			}
+		} catch (Exception $e) {
+			log_message('debug', 'enrich_datafile_source_info: ' . $e->getMessage());
+		}
+
+		return $datafile;
 	}
 
 }

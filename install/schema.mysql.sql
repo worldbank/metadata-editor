@@ -420,12 +420,20 @@ CREATE TABLE `editor_data_files` (
   `wght` int DEFAULT NULL,
   `file_physical_name` varchar(500) DEFAULT NULL,
   `store_data` int DEFAULT NULL,
+  `source_format` varchar(10) DEFAULT NULL COMMENT 'csv|dta|sav — format of the uploaded source file',
+  `source_format_version` varchar(50) DEFAULT NULL COMMENT 'Stata/SPSS file format version (e.g. 14, 118)',
+  `source_upload_filename` varchar(500) DEFAULT NULL COMMENT 'Original client filename at upload (before sanitize)',
+  `source_status` varchar(20) NOT NULL DEFAULT 'unknown' COMMENT 'present|missing|not_applicable|unknown',
+  `source_attached_at` int DEFAULT NULL COMMENT 'Unix time when source file was uploaded or attached',
+  `source_attached_by` int DEFAULT NULL COMMENT 'User id who uploaded or attached the source file',
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   `changed_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `idx_edf_source_status` (`source_status`),
+  KEY `idx_edf_source_format` (`source_format`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
@@ -506,6 +514,8 @@ CREATE TABLE `editor_resource_data_files` (
   `link_type` varchar(20) DEFAULT NULL,
   `data_file_changed` int DEFAULT NULL,
   `source_csv_mtime` int DEFAULT NULL,
+  `source_mode` varchar(20) DEFAULT NULL COMMENT 'original|generated',
+  `source_physical_mtime` int DEFAULT NULL COMMENT 'Unix mtime when original was used',
   `generated_at` int DEFAULT NULL,
   `created` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,

@@ -41,7 +41,13 @@ class Project_versions
 			'changed',
 			'created_by',
 			'changed_by',
-			'store_data'
+			'store_data',
+			'source_format',
+			'source_format_version',
+			'source_upload_filename',
+			'source_status',
+			'source_attached_at',
+			'source_attached_by'
 		);
 		
 		$this->variable_fields = array(
@@ -562,6 +568,8 @@ class Project_versions
 			'link_type',
 			'data_file_changed',
 			'source_csv_mtime',
+			'source_mode',
+			'source_physical_mtime',
 			'generated_at',
 			'created',
 			'created_by',
@@ -673,10 +681,8 @@ class Project_versions
 	function copy_data_file_physical_files($source_sid, $target_sid)
 	{
 		// Get all data files for the source project
-		$this->ci->db->select('file_physical_name');
+		$this->ci->db->select('file_physical_name, file_name');
 		$this->ci->db->where('sid', $source_sid);
-		$this->ci->db->where('file_physical_name IS NOT NULL');
-		$this->ci->db->where('file_physical_name !=', '');
 		$data_files = $this->ci->db->get('editor_data_files')->result_array();
 
 		$output = array();
@@ -684,36 +690,44 @@ class Project_versions
 
 		foreach ($data_files as $data_file) {
 			try {
-				
-				// csv file
-				$file_parts = pathinfo($data_file['file_physical_name']);
-				$source_file = $this->ci->Editor_model->get_project_folder($source_sid) . '/data/' . $file_parts['filename'] . '.csv';
+				$project_folder_src = $this->ci->Editor_model->get_project_folder($source_sid) . '/data/';
+				$project_folder_tgt = $this->ci->Editor_model->get_project_folder($target_sid) . '/data';
+				$physical = isset($data_file['file_physical_name']) ? $data_file['file_physical_name'] : '';
+				$file_name = isset($data_file['file_name']) ? $data_file['file_name'] : '';
 
-				// Skip if file doesn't exist
-				if (!file_exists($source_file)) {
-					$output[] = [
-						'file' => $source_file,
-						'copied' => false,
-						'type' => 'data_file'
-					];
-					continue;
+				$candidates = array();
+				if ($physical !== '') {
+					$candidates[] = $physical;
+				}
+				if ($file_name !== '') {
+					$candidates[] = $file_name . '.csv';
 				}
 
-				// Determine target path - keep same filename in target project folder
-				$filename = basename($source_file);
-				$target_file = $this->ci->Editor_model->get_project_folder($target_sid) . '/data/' . $filename;
-
-				// Copy file
-				$copied = $this->copy_file_with_dir_creation($source_file, $target_file);
-				
-				if ($copied) {
-					$output[] = [
-						'file' => $filename,
-						'copied' => true,
-						'type' => 'data_file'
-					];
+				if (!file_exists($project_folder_tgt)) {
+					mkdir($project_folder_tgt, 0777, true);
 				}
-				
+
+				$seen = array();
+				foreach ($candidates as $filename) {
+					$basename = basename($filename);
+					if ($basename === '' || isset($seen[$basename])) {
+						continue;
+					}
+					$seen[$basename] = true;
+					$source_file = $project_folder_src . $basename;
+					if (!file_exists($source_file) || !is_file($source_file)) {
+						continue;
+					}
+					$target_file = $project_folder_tgt . '/' . $basename;
+					$copied = $this->copy_file_with_dir_creation($source_file, $target_file);
+					if ($copied) {
+						$output[] = array(
+							'file' => $basename,
+							'copied' => true,
+							'type' => 'data_file'
+						);
+					}
+				}
 			} catch (Exception $e) {
 				$errors[] = $e->getMessage();
 			}

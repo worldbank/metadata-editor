@@ -148,6 +148,11 @@ $lang['data_upload_notice']="<p>The uploaded files will be processed on the serv
 $lang['History']="History";
 $lang['Refresh summary statistics']="Refresh summary statistics";
 $lang['Replace file']="Replace file";
+$lang['source_status_present']="Original";
+$lang['source_status_missing']="Original missing";
+$lang['source_status_unknown']="Original unknown";
+$lang['source_status_not_applicable']="CSV";
+$lang['Select a file (CSV, DTA, SAV)']="Select a file (Stata .dta or SPSS .sav)";
 $lang['File manager']="File manager";
 
 $lang['administrative_metadata']="Administrative metadata";

@@ -701,20 +701,17 @@ class Data extends MY_REST_Controller
 
 			$csv_file_path=$this->Editor_datafile_model->check_csv_exists($sid, $file_id);
 
-			if ($csv_file_path){
-				$cleanup_result = $this->Editor_datafile_model->cleanup($sid, $file_id);
-				
-				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
-				if ($datafile){
-					$this->Editor_datafile_model->update($datafile['id'],array('file_physical_name'=>basename($csv_file_path)));
-				}
+			// Keep source file; only purge when store_data=0 (metadata-only)
+			$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+			if ($datafile && isset($datafile['store_data']) && (int) $datafile['store_data'] === 0) {
+				$this->Editor_datafile_model->cleanup($sid, $file_id);
 			}
 
 			$output=array(
 				'status'=>'success',
 				'api_response'=>$api_response,
 				'job_status'=>$job_status,
-				'csv_file'=>basename($csv_file_path)
+				'csv_file'=>$csv_file_path ? basename($csv_file_path) : null
 			);
 						
 			$this->set_response($output, REST_Controller::HTTP_OK);			
@@ -974,7 +971,7 @@ class Data extends MY_REST_Controller
 				throw new Exception("File upload failed");
 			}
 
-			$result=$this->datafile_update->update($sid, $file_id,$result['uploaded_path']);
+			$result=$this->datafile_update->update($sid, $file_id,$result['uploaded_path'], $this->get_api_user_id());
 			
 			$output=array(
 				'status'=>'success',
@@ -982,6 +979,66 @@ class Data extends MY_REST_Controller
 			);
 						
 			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$response=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * Attach (or re-attach) an original source file (.dta/.sav) for a datafile.
+	 * Validates columns against DB variables via FastAPI; does not regenerate CSV.
+	 *
+	 * POST /api/data/attach_source/{sid}/{file_id}
+	 */
+	function attach_source_post($sid=null, $file_id=null)
+	{
+		$this->load->library("Datafile_attach_source");
+
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+			if (!$datafile){
+				throw new Exception("Data file not found: ". $file_id);
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+
+			$result=$this->Editor_datafile_model->temp_upload_file($sid);
+			if (!isset($result['uploaded_path'])){
+				throw new Exception("File upload failed");
+			}
+
+			$original_client_name = null;
+			if (isset($_FILES['file']['name']) && $_FILES['file']['name'] !== '') {
+				$original_client_name = $_FILES['file']['name'];
+			} elseif (!empty($result['uploaded_file_name'])) {
+				$original_client_name = $result['uploaded_file_name'];
+			}
+
+			$result=$this->datafile_attach_source->attach(
+				$sid,
+				$file_id,
+				$result['uploaded_path'],
+				$this->get_api_user_id(),
+				false,
+				$original_client_name
+			);
+
+			$output=array(
+				'status'=>'success',
+				'result'=>$result
+			);
+			$this->set_response($output, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){
 			$response=array(

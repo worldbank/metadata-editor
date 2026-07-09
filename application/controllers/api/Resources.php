@@ -749,6 +749,16 @@ class Resources extends MY_REST_Controller
 		if (!empty($input['max_wait_seconds'])) {
 			$options['max_wait_seconds'] = (int) $input['max_wait_seconds'];
 		}
+		if (!empty($input['file_modes']) && is_array($input['file_modes'])) {
+			$normalized = array();
+			foreach ($input['file_modes'] as $fid => $mode) {
+				$mode = strtolower(trim((string) $mode));
+				if (in_array($mode, array('original', 'generate'), true)) {
+					$normalized[(string) $fid] = $mode;
+				}
+			}
+			$options['file_modes'] = $normalized;
+		}
 
 		return $options;
 	}

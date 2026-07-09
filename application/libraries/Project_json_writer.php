@@ -60,7 +60,20 @@ class Project_json_writer
 			throw new Exception("Data file not found: " . $file_id);
 		}
 
-		$exclude_fields = array('id', 'sid', 'file_physical_name', 'store_data', 'created', 'changed', 'created_by', 'changed_by');
+		$exclude_fields = array(
+			'id',
+			'sid',
+			'file_physical_name',
+			'store_data',
+			'source_status',
+			'source_upload_filename',
+			'source_attached_at',
+			'source_attached_by',
+			'created',
+			'changed',
+			'created_by',
+			'changed_by'
+		);
 		foreach ($exclude_fields as $field) {
 			if (array_key_exists($field, $datafile)) {
 				unset($datafile[$field]);

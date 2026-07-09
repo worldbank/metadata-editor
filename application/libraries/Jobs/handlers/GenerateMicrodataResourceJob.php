@@ -134,11 +134,14 @@ class GenerateMicrodataResourceJob implements JobHandlerInterface
         if (!empty($payload['refresh_description'])) {
             $options['refresh_description'] = true;
         }
-        if (!empty($payload['max_wait_seconds'])) {
-            $options['max_wait_seconds'] = (int) $payload['max_wait_seconds'];
-        }
+		if (!empty($payload['max_wait_seconds'])) {
+			$options['max_wait_seconds'] = (int) $payload['max_wait_seconds'];
+		}
+		if (!empty($payload['file_modes']) && is_array($payload['file_modes'])) {
+			$options['file_modes'] = $payload['file_modes'];
+		}
 
-        $result = $this->ci->microdata_resource_generator->generate($project_id, $options);
+		$result = $this->ci->microdata_resource_generator->generate($project_id, $options);
 
         if (isset($result['status']) && $result['status'] === 'exists') {
             return array(

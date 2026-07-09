@@ -396,13 +396,19 @@ class ProjectPackage
 			}
 
 			$physical = isset($data_file['file_physical_name']) ? trim((string) $data_file['file_physical_name']) : '';
-			if ($physical === '') {
-				continue;
+			if ($physical !== '') {
+				$relative_path = 'data/' . $this->normalize_package_path($physical);
+				if (is_file($project_folder . '/' . $relative_path)) {
+					$paths[] = $relative_path;
+				}
 			}
 
-			$relative_path = 'data/' . $this->normalize_package_path($physical);
-			if (is_file($project_folder . '/' . $relative_path)) {
-				$paths[] = $relative_path;
+			$file_name = isset($data_file['file_name']) ? trim((string) $data_file['file_name']) : '';
+			if ($file_name !== '') {
+				$csv_relative = 'data/' . $this->normalize_package_path($file_name . '.csv');
+				if ($csv_relative !== 'data/' . $this->normalize_package_path($physical) && is_file($project_folder . '/' . $csv_relative)) {
+					$paths[] = $csv_relative;
+				}
 			}
 		}
 

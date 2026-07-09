@@ -204,18 +204,6 @@ Vue.component('microdata-resource-details', {
             const found = files.find(function(f) { return f.file_id === link.file_id; });
             return found ? (found.file_name || link.file_id) : link.file_id;
         },
-        linkTypeLabel(linkType) {
-            if (linkType === 'generated') {
-                return this.$t('link_type_generated') || 'Generated';
-            }
-            if (linkType === 'manual') {
-                return this.$t('link_type_manual') || 'Manual';
-            }
-            if (linkType === 'associated') {
-                return this.$t('link_type_associated') || 'Associated';
-            }
-            return linkType || '—';
-        },
         formatLinkFormat(link) {
             if (!link.export_format) {
                 return '—';
@@ -227,6 +215,15 @@ Vue.component('microdata-resource-details', {
                 return '—';
             }
             return link.export_version;
+        },
+        formatLinkSource(link) {
+            if (link.source_mode === 'original') {
+                return this.$t('microdata_source_original') || 'Original';
+            }
+            if (link.source_mode === 'generated') {
+                return this.$t('microdata_source_generated') || 'Generated';
+            }
+            return '—';
         },
         goRegenerate() {
             if (this.resourceId) {
@@ -315,8 +312,8 @@ Vue.component('microdata-resource-details', {
                                             <th>{{ $t('id') || 'ID' }}</th>
                                             <th v-if="isGenerated">{{ $t('batch_export_format') || 'Format' }}</th>
                                             <th v-if="isGenerated">{{ $t('version') || 'Version' }}</th>
+                                            <th v-if="isGenerated">{{ $t('microdata_link_source') || 'Source' }}</th>
                                             <th v-if="isGenerated">{{ $t('zip_entry') || 'ZIP entry' }}</th>
-                                            <th>{{ $t('link_type') || 'Link' }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -325,8 +322,8 @@ Vue.component('microdata-resource-details', {
                                             <td class="text-muted">{{ link.file_id }}</td>
                                             <td v-if="isGenerated">{{ formatLinkFormat(link) }}</td>
                                             <td v-if="isGenerated">{{ formatLinkVersion(link) }}</td>
+                                            <td v-if="isGenerated">{{ formatLinkSource(link) }}</td>
                                             <td v-if="isGenerated" class="text-muted">{{ link.zip_entry_name || '—' }}</td>
-                                            <td>{{ linkTypeLabel(link.link_type) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
