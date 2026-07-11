@@ -1,6 +1,7 @@
 <?php
 
 require_once APPPATH . 'libraries/Jobs/JobHandlerInterface.php';
+require_once APPPATH . 'libraries/Worker_heartbeat.php';
 
 /**
  * Metadata Assessment Result Job Handler
@@ -109,12 +110,16 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	{
 		$this->ci->load->library('DataUtils');
 		$this->ci->load->model('Job_queue_model');
+		$this->ci->load->library('db_keepalive');
 
 		$poll_interval_ms = 2500;
 		$max_wait_ms = 10 * 60 * 1000; // 10 minutes
 		$start_at = (int) round(microtime(true) * 1000);
+		$last_db_ping = null;
 
 		while (true) {
+			$this->ci->db_keepalive->ping_if_due($last_db_ping);
+
 			// User cancelled from UI/internal API
 			if ($this->isLocalJobCancelled($job['id'])) {
 				$this->tryCancelFastApiJob($fastapi_job_id);
@@ -159,7 +164,6 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 				throw new Exception("FastAPI review job timed out after " . (int)($max_wait_ms / 1000) . " seconds");
 			}
 
-			$this->ci->load->library('Worker_heartbeat');
 			Worker_heartbeat::touch();
 
 			usleep($poll_interval_ms * 1000);

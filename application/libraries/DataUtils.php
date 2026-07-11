@@ -26,6 +26,20 @@ class DataUtils
 		$this->DataApiUrl = $this->ci->config->item('data_api_url', 'editor');
 	}
 
+	/**
+	 * Default Guzzle HTTP client options for FastAPI job polling.
+	 *
+	 * @return array
+	 */
+	private function fastapi_http_client_options()
+	{
+		return array(
+			'connect_timeout' => 10,
+			'timeout' => 60,
+			'http_errors' => false,
+		);
+	}
+
 
 	/**
 	 * 
@@ -244,14 +258,14 @@ class DataUtils
 	public function get_job_status($job_id)
 	{
 		$request_url = $this->DataApiUrl . 'jobs/' . $job_id;
-		$client = new Client([
-			'base_uri' => $request_url
-		]);
+		$client = new Client(array_merge(
+			array('base_uri' => $request_url),
+			$this->fastapi_http_client_options()
+		));
 
-		$api_response = $client->request('GET', '', [
+		$api_response = $client->request('GET', '', array(
 			'debug' => false,
-			'http_errors' => false
-		]);
+		));
 
 		$status_code = $api_response->getStatusCode();
 		$body_raw = $api_response->getBody()->getContents();

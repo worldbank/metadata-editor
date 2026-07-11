@@ -389,7 +389,7 @@ Vue.component('project-issues', {
             if (!this.assessmentJobUuid || this.assessmentCancelLoading) return;
             this.assessmentCancelLoading = true;
             try {
-                const url = (CI && CI.base_url ? CI.base_url : '') + '/api/jobs/cancel/' + this.assessmentJobUuid;
+                const url = (CI && CI.base_url ? CI.base_url : '') + '/api/jobs/' + this.assessmentJobUuid + '/cancel';
                 const response = await axios.post(url, {});
                 if (response.data.status !== 'success') {
                     throw new Error(response.data.message || 'Failed to cancel assessment job');

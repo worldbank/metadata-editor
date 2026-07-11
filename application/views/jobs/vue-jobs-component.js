@@ -168,6 +168,16 @@ Vue.component('vue-jobs-component', {
             return this.selected.filter(function (j) { return j.status === 'pending'; }).length;
         },
 
+        selected_processing_count: function () {
+            return this.selected.filter(function (j) { return j.status === 'processing'; }).length;
+        },
+
+        selected_cancellable_count: function () {
+            return this.selected.filter(function (j) {
+                return j.status === 'pending' || j.status === 'processing';
+            }).length;
+        },
+
         selected_failed_count: function () {
             return this.selected.filter(function (j) { return j.status === 'failed'; }).length;
         },
@@ -179,7 +189,7 @@ Vue.component('vue-jobs-component', {
         },
 
         can_batch_cancel: function () {
-            return this.selected_pending_count > 0;
+            return this.selected_cancellable_count > 0;
         },
 
         can_batch_retry: function () {
@@ -223,7 +233,8 @@ Vue.component('vue-jobs-component', {
         },
 
         can_cancel_selected_job: function () {
-            return this.selected_job && this.selected_job.status === 'pending';
+            return this.selected_job &&
+                (this.selected_job.status === 'pending' || this.selected_job.status === 'processing');
         },
 
         can_delete_selected_job: function () {
@@ -805,8 +816,8 @@ Vue.component('vue-jobs-component', {
                     if (result.data && result.data.status === 'success') {
                         vm.loadJobs();
                         vm.loadSummary();
-                        if (result.data.job) {
-                            vm.selected_job = result.data.job;
+                        if (vm.detail_dialog && vm.selected_job && vm.selected_job.uuid === uuid) {
+                            vm.openJobDetail(uuid);
                         }
                         if (typeof EventBus !== 'undefined') {
                             EventBus.$emit('alert', { message: vm.$t('job_cancelled') || 'Job cancelled' });
@@ -859,7 +870,14 @@ Vue.component('vue-jobs-component', {
 
         confirmCancelJob: function (uuid) {
             var vm = this;
-            vm.confirmAction(vm.$t('confirm_cancel_job') || 'Cancel this pending job?', function () {
+            var job = vm.selected_job;
+            if (!job || job.uuid !== uuid) {
+                job = vm.jobs.find(function (j) { return j.uuid === uuid; }) || null;
+            }
+            var message = (job && job.status === 'processing')
+                ? (vm.$t('confirm_cancel_processing_job') || 'Cancel this running job? It may take a moment to stop.')
+                : (vm.$t('confirm_cancel_job') || 'Cancel this pending job?');
+            vm.confirmAction(message, function () {
                 vm.cancelJob(uuid);
             });
         },
@@ -1258,7 +1276,7 @@ Vue.component('vue-jobs-component', {
                             :loading="action_loading"
                             @click="batchAction('cancel')"
                         >
-                            {{ $t('cancel_selected') || 'Cancel pending' }}
+                            {{ $t('cancel_selected') || 'Cancel selected' }}
                         </v-btn>
                         <v-btn
                             v-if="can_batch_retry"
@@ -1366,6 +1384,17 @@ Vue.component('vue-jobs-component', {
                             {{ item.attempts }} / {{ item.max_attempts }}
                         </template>
                         <template v-slot:item.actions="{ item }">
+                            <v-btn
+                                v-if="item.status === 'pending' || item.status === 'processing'"
+                                icon
+                                x-small
+                                color="warning"
+                                :title="$t('cancel_job') || 'Cancel'"
+                                :disabled="action_loading"
+                                @click.stop="confirmCancelJob(item.uuid)"
+                            >
+                                <v-icon small>mdi-cancel</v-icon>
+                            </v-btn>
                             <v-btn icon x-small @click.stop="openJobDetail(item.uuid)">
                                 <v-icon small>mdi-eye</v-icon>
                             </v-btn>

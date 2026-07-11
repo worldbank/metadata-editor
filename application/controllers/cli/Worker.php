@@ -15,6 +15,10 @@ use React\EventLoop\Factory;
  */
 class Worker extends CI_Controller
 {
+    private static $current_job_id = null;
+    private static $current_job_completed = false;
+    private static $shutdown_handler_registered = false;
+
     private $loop;
     private $poll_interval = 5; // seconds
     private $max_jobs = 0;      // 0 = unlimited; exit after N jobs to prevent memory leaks
@@ -151,8 +155,8 @@ class Worker extends CI_Controller
             });
         }
         
-        // Register shutdown function for cleanup
-        register_shutdown_function(array($this, 'cleanup_files'));
+        // Register shutdown function for cleanup and orphaned job recovery
+        $this->register_shutdown_handlers();
         
         // Run the event loop (blocks until stopped)
         $this->loop->run();
@@ -179,18 +183,56 @@ class Worker extends CI_Controller
     }
     
     /**
+     * Register shutdown handlers once per process.
+     */
+    private function register_shutdown_handlers()
+    {
+        register_shutdown_function(array($this, 'cleanup_files'));
+
+        if (!self::$shutdown_handler_registered) {
+            register_shutdown_function(array(__CLASS__, 'handle_abnormal_shutdown'));
+            self::$shutdown_handler_registered = true;
+        }
+    }
+
+    /**
+     * Mark the active job failed when the worker exits without completing it.
+     */
+    public static function handle_abnormal_shutdown()
+    {
+        if (self::$current_job_id === null || self::$current_job_completed) {
+            return;
+        }
+
+        $job_id = self::$current_job_id;
+        self::$current_job_id = null;
+
+        if (!function_exists('get_instance')) {
+            return;
+        }
+
+        $ci =& get_instance();
+        if (!$ci || !isset($ci->Job_queue_model)) {
+            return;
+        }
+
+        try {
+            if (isset($ci->db_keepalive)) {
+                $ci->db_keepalive->ping();
+            }
+            $ci->Job_queue_model->mark_failed($job_id, 'Worker process exited unexpectedly');
+        } catch (Throwable $e) {
+            log_message('error', 'Worker::handle_abnormal_shutdown failed for job #' . $job_id . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Update heartbeat file
      */
     private function update_heartbeat()
     {
-        $heartbeat_data = array(
-            'worker_id' => $this->worker_id,
-            'pid' => getmypid(),
-            'timestamp' => time(),
-            'datetime' => date('Y-m-d H:i:s')
-        );
-        
-        file_put_contents($this->heartbeat_file, json_encode($heartbeat_data, JSON_PRETTY_PRINT));
+        $this->load->library('Worker_heartbeat');
+        Worker_heartbeat::touch($this->worker_id);
     }
     
     /**
@@ -258,6 +300,9 @@ class Worker extends CI_Controller
     private function handle_job($job)
     {
         $payload = $job['payload'];
+
+        self::$current_job_id = $job['id'];
+        self::$current_job_completed = false;
         
         try {
             // Get handler for this job type
@@ -272,10 +317,13 @@ class Worker extends CI_Controller
             
             $this->db_keepalive->ping();
             $this->Job_queue_model->mark_completed($job['id'], $result);
+            self::$current_job_completed = true;
+            self::$current_job_id = null;
             $job_uuid = isset($job['uuid']) ? $job['uuid'] : 'N/A';
             echo "[Worker] Job #{$job['id']} (UUID: {$job_uuid}) completed successfully\n";
             
         } catch (Throwable $e) {
+            self::$current_job_id = null;
             $this->db_keepalive->ping();
             $this->Job_queue_model->mark_failed($job['id'], $e->getMessage());
             $job_uuid = isset($job['uuid']) ? $job['uuid'] : 'N/A';
