@@ -1051,7 +1051,15 @@
           const url = CI.site_url.replace(/\/?$/, '/') + 'api/schemas';
           axios.get(url)
             .then((response)=>{
-              const list = (response.data && Array.isArray(response.data.schemas)) ? response.data.schemas : [];
+              let list = (response.data && Array.isArray(response.data.schemas)) ? response.data.schemas : [];
+              const allowed = CI.user_info && CI.user_info.enabled_project_schemas;
+              if (Array.isArray(allowed) && allowed.length > 0) {
+                const allowedSet = {};
+                allowed.forEach(function(uid) { allowedSet[uid] = true; });
+                list = list.filter(function(s) {
+                  return s && s.uid && allowedSet[s.uid];
+                });
+              }
               this.schemas = list;
               const mapped = {};
               const types = {};

@@ -23,6 +23,7 @@ class Site_configurations {
 			'admin_allowed_hosts',
 			'supported_languages',
 			'default_user_roles',
+			'enabled_project_schemas',
 		);
 
 		if ($settings) {
@@ -40,6 +41,11 @@ class Site_configurations {
 
 		$this->normalize_boolean_config('project_sharing');
 		$this->normalize_boolean_config('metadata_assessment_enabled');
+		$this->normalize_boolean_config('issues_enabled');
+		$this->normalize_boolean_config('data_structures_enabled');
+		$this->normalize_boolean_config('schemas_enabled');
+		$this->normalize_boolean_config('tags_enabled');
+		$this->normalize_enabled_project_schemas();
 		$this->build_language_codes();
 	}
 
@@ -57,6 +63,34 @@ class Site_configurations {
 
 		$enabled = !($value === false || $value === 0 || $value === '0' || $value === 'false');
 		$this->ci->config->set_item($key, $enabled);
+	}
+
+	/**
+	 * Normalize enabled_project_schemas: empty array means all schemas enabled (null).
+	 */
+	protected function normalize_enabled_project_schemas()
+	{
+		$value = $this->ci->config->item('enabled_project_schemas');
+
+		if ($value === null || $value === '' || $value === false) {
+			$this->ci->config->set_item('enabled_project_schemas', null);
+			return;
+		}
+
+		if (is_string($value)) {
+			$decoded = json_decode($value, true);
+			$value = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : array();
+		}
+
+		if (!is_array($value) || empty($value)) {
+			$this->ci->config->set_item('enabled_project_schemas', null);
+			return;
+		}
+
+		$this->ci->config->set_item(
+			'enabled_project_schemas',
+			array_values(array_unique(array_map('strval', $value)))
+		);
 	}
 
 	/**

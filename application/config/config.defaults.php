@@ -43,5 +43,14 @@ $config['metadata_assessment_enabled'] = '0';
 // Site-wide monthly limit for metadata assessments (0 = unlimited, no limit enforced)
 $config['metadata_assessment_monthly_limit'] = '200';
 
+// Enabled project schema UIDs for create/import UI (JSON array; empty = all schemas enabled)
+$config['enabled_project_schemas'] = '';
+
+// Site feature toggles ('1' = enabled, '0' = disabled; UI hiding only in this phase)
+$config['issues_enabled'] = '1';
+$config['data_structures_enabled'] = '1';
+$config['schemas_enabled'] = '1';
+$config['tags_enabled'] = '1';
+
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

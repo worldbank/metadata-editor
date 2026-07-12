@@ -62,6 +62,18 @@ Vue.component('main-navigation-tabs', {
             }
             return false;
         },
+        issuesFeatureEnabled() {
+            return !(CI && CI.user_info && CI.user_info.issues_enabled === false);
+        },
+        dataStructuresFeatureEnabled() {
+            return !(CI && CI.user_info && CI.user_info.data_structures_enabled === false);
+        },
+        schemasFeatureEnabled() {
+            return !(CI && CI.user_info && CI.user_info.schemas_enabled === false);
+        },
+        tagsFeatureEnabled() {
+            return !(CI && CI.user_info && CI.user_info.tags_enabled === false);
+        },
         siteBaseUrl() {
             return (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url : '';
         }
@@ -133,11 +145,11 @@ Vue.component('main-navigation-tabs', {
                     <v-icon>mdi-alpha-t-box</v-icon>
                     <span class="ml-2">{{$t('templates')}}</span>
                 </v-tab>
-                <v-tab v-if="hasSchemaPermission" :value="3" @click="pageLink('schemas')">
+                <v-tab v-if="hasSchemaPermission && schemasFeatureEnabled" :value="3" @click="pageLink('schemas')">
                     <v-icon>mdi-file-tree</v-icon>
                     <span class="ml-2">{{$t('schemas')}}</span>
                 </v-tab>
-                <v-tab v-if="hasSchemaPermission" :value="4" @click="pageLink('tags')">
+                <v-tab v-if="hasSchemaPermission && tagsFeatureEnabled" :value="4" @click="pageLink('tags')">
                     <v-icon>mdi-tag-multiple</v-icon>
                     <span class="ml-2">{{$t('Tags')}}</span>
                 </v-tab>
@@ -145,11 +157,11 @@ Vue.component('main-navigation-tabs', {
                     <v-icon>mdi-format-list-bulleted-type</v-icon>
                     <span class="ml-2">{{$t('codelists')}}</span>
                 </v-tab>
-                <v-tab v-if="hasDataStructurePermission" :value="6" @click="pageLink('data_structures')">
+                <v-tab v-if="hasDataStructurePermission && dataStructuresFeatureEnabled" :value="6" @click="pageLink('data_structures')">
                     <v-icon>mdi-sitemap</v-icon>
                     <span class="ml-2">Data structures</span>
                 </v-tab>
-                <v-tab :value="7" @click="pageLink('issues')">
+                <v-tab v-if="issuesFeatureEnabled" :value="7" @click="pageLink('issues')">
                     <v-icon>mdi-alert-circle-outline</v-icon>
                     <span class="ml-2">{{$t('Issues')}}</span>
                 </v-tab>

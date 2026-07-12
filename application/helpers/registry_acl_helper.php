@@ -21,6 +21,8 @@ if (!function_exists('registry_acl_user_info_flags')) {
 		}
 		$flags = $ci->acl_manager->registry_user_info_flags($user);
 		$flags['has_schema_permission'] = $ci->acl_manager->check_access('schema', 'view', $user);
-		return $flags;
+
+		$ci->load->helper('user_access');
+		return array_merge($flags, site_features_user_info());
 	}
 }

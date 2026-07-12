@@ -66,13 +66,13 @@
       $user=$this->session->userdata('username');
       $this->load->helper('user_access');
 
-      $user_info=[
+      $user_info=array_merge(array(
         'username'=> $user,
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
         'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
         'metadata_assessment_enabled'=> metadata_assessment_enabled(),
-      ];
+      ), site_features_user_info());
       
     ?>
 
@@ -291,6 +291,9 @@
         },
         UserHasEditAccess(){
           return this.$store.state.user_has_edit_access && !this.$store.state.project_is_locked;
+        },
+        issuesFeatureEnabled(){
+          return !(CI && CI.user_info && CI.user_info.issues_enabled === false);
         },
         ProjectIsLocked(){
           return this.$store.state.project_is_locked;

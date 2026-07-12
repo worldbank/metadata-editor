@@ -97,6 +97,16 @@ class Configurations extends MY_Controller {
 		$settings['grant_editor_default'] = default_editor_role_enabled();
 		$settings['project_sharing_enabled'] = project_sharing_enabled();
 		$settings['metadata_assessment_enabled'] = metadata_assessment_enabled();
+		$settings['issues_enabled'] = site_feature_enabled('issues');
+		$settings['data_structures_enabled'] = site_feature_enabled('data_structures');
+		$settings['schemas_enabled'] = site_feature_enabled('schemas');
+		$settings['tags_enabled'] = site_feature_enabled('tags');
+
+		$this->load->library('Schema_registry');
+		$settings['registry_schemas'] = $this->schema_registry->list_schemas(array('status' => 'active'));
+		$enabled_uids = enabled_project_schema_uids();
+		$settings['enabled_project_schemas_all'] = ($enabled_uids === null);
+		$settings['enabled_project_schema_uids'] = $enabled_uids !== null ? $enabled_uids : array();
 
 		// Add editor config values (read-only, from config/editor.php)
 		$this->config->load('editor');
@@ -172,8 +182,46 @@ class Configurations extends MY_Controller {
 			? (string) max(0, (int) $raw_limit)
 			: '200';
 
+		// Site feature toggles
+		$options['issues_enabled'] = $this->input->post('issues_enabled') === '1' ? '1' : '0';
+		$options['data_structures_enabled'] = $this->input->post('data_structures_enabled') === '1' ? '1' : '0';
+		$options['schemas_enabled'] = $this->input->post('schemas_enabled') === '1' ? '1' : '0';
+		$options['tags_enabled'] = $this->input->post('tags_enabled') === '1' ? '1' : '0';
+
+		// Enabled project schemas (empty = all)
+		$all_schemas = $this->input->post('enabled_project_schemas_all') === '1';
+		if ($all_schemas) {
+			$options['enabled_project_schemas'] = '';
+		} else {
+			$schema_uids = $this->input->post('enabled_project_schema');
+			$uids = array();
+			if (is_array($schema_uids)) {
+				foreach ($schema_uids as $uid) {
+					$uid = trim($this->security->xss_clean((string) $uid));
+					if ($uid !== '') {
+						$uids[] = $uid;
+					}
+				}
+			}
+			$options['enabled_project_schemas'] = json_encode(array_values(array_unique($uids)));
+		}
+
 		// Remove nested-array keys so the generic loop below doesn't try to process them
-		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing'], $post['metadata_assessment_enabled'], $post['metadata_assessment_monthly_limit']);
+		unset(
+			$post['lang_enabled'],
+			$post['lang_code'],
+			$post['submit'],
+			$post['grant_editor_default'],
+			$post['project_sharing'],
+			$post['metadata_assessment_enabled'],
+			$post['metadata_assessment_monthly_limit'],
+			$post['issues_enabled'],
+			$post['data_structures_enabled'],
+			$post['schemas_enabled'],
+			$post['tags_enabled'],
+			$post['enabled_project_schemas_all'],
+			$post['enabled_project_schema']
+		);
 
 		foreach($post as $key=>$value)
 		{

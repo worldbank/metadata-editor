@@ -196,7 +196,7 @@
                                     {{$t('Change log')}}
                                 </v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="onRouterLinkClick('/issues')">
+                            <v-list-item v-if="issuesFeatureEnabled" @click="onRouterLinkClick('/issues')">
                                 <v-list-item-icon>
                                     <v-icon>mdi-alert-circle-outline</v-icon>
                                 </v-list-item-icon>

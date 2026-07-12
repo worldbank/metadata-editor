@@ -20,19 +20,12 @@
 
 <?php
   $user = $this->session->userdata('username');
-  $this->load->library('Editor_acl');
-  $has_schema_permission = false;
-  try {
-      $has_schema_permission = $this->editor_acl->has_access('schema', 'view');
-  } catch (Exception $e) {
-      $has_schema_permission = false;
-  }
-  $user_info = array(
+  $this->load->helper('user_access');
+  $user_info = array_merge(array(
     'username' => $user,
     'is_logged_in' => !empty($user),
     'is_admin' => $this->ion_auth->is_admin(),
-    'has_schema_permission' => $has_schema_permission,
-  );
+  ), registry_acl_user_info_flags());
 ?>
 
   <script>

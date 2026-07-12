@@ -179,6 +179,123 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 
 
 <fieldset class="field-expanded ">
+	<legend><i class="fas fa-sliders-h mr-3" style="color:#007bff;"></i><?php echo t('editor_features_settings');?></legend>
+
+	<div class="field">
+		<label><?php echo t('enabled_project_schemas');?></label>
+		<span class="field-note"><?php echo t('enabled_project_schemas_note');?></span>
+		<div class="mt-2" style="margin-left:200px;">
+			<label style="float:none;display:inline;font-weight:normal;">
+				<input type="hidden" name="enabled_project_schemas_all" value="0">
+				<input type="checkbox" name="enabled_project_schemas_all" value="1" id="enabled_project_schemas_all"<?php echo !empty($enabled_project_schemas_all) ? ' checked' : ''; ?>>
+				<?php echo t('enabled_project_schemas_all');?>
+			</label>
+		</div>
+		<div class="table-responsive mt-2" id="enabled-project-schemas-table" style="margin-left:200px;<?php echo !empty($enabled_project_schemas_all) ? ' opacity:0.6;' : ''; ?>">
+			<table class="table table-sm table-bordered">
+				<thead class="thead-light">
+					<tr>
+						<th style="width:60px;" class="text-center">Enabled</th>
+						<th>UID</th>
+						<th>Title</th>
+						<th>Type</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+						$_registry_schemas = isset($registry_schemas) && is_array($registry_schemas) ? $registry_schemas : array();
+						$_enabled_uids = isset($enabled_project_schema_uids) && is_array($enabled_project_schema_uids) ? $enabled_project_schema_uids : array();
+						$_all_enabled = !empty($enabled_project_schemas_all);
+						foreach ($_registry_schemas as $_schema):
+							$_uid = isset($_schema['uid']) ? $_schema['uid'] : '';
+							if ($_uid === '') continue;
+							$_title = isset($_schema['title']) ? $_schema['title'] : $_uid;
+							$_is_core = !empty($_schema['is_core']);
+							$_checked = $_all_enabled || in_array($_uid, $_enabled_uids, true);
+					?>
+					<tr>
+						<td class="text-center align-middle">
+							<input type="checkbox" class="enabled-project-schema-cb" name="enabled_project_schema[]" value="<?php echo htmlspecialchars($_uid); ?>"<?php echo $_checked ? ' checked' : ''; ?><?php echo $_all_enabled ? ' disabled' : ''; ?>>
+						</td>
+						<td class="align-middle"><code><?php echo htmlspecialchars($_uid); ?></code></td>
+						<td class="align-middle"><?php echo htmlspecialchars($_title); ?></td>
+						<td class="align-middle"><?php echo $_is_core ? t('schema_core') : t('schema_custom'); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script>
+	(function() {
+		var allCb = document.getElementById('enabled_project_schemas_all');
+		var table = document.getElementById('enabled-project-schemas-table');
+		if (!allCb || !table) return;
+		function syncSchemaTable() {
+			var all = allCb.checked;
+			table.style.opacity = all ? '0.6' : '1';
+			var boxes = table.querySelectorAll('.enabled-project-schema-cb');
+			for (var i = 0; i < boxes.length; i++) {
+				boxes[i].disabled = all;
+			}
+		}
+		allCb.addEventListener('change', syncSchemaTable);
+		syncSchemaTable();
+	})();
+	</script>
+
+	<div class="field">
+		<label><?php echo t('feature_issues');?></label>
+		<input type="hidden" name="issues_enabled" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="issues_enabled" value="1"<?php echo !empty($issues_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('feature_issues_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('feature_issues_note');?>
+		</div>
+	</div>
+
+	<div class="field">
+		<label><?php echo t('feature_data_structures');?></label>
+		<input type="hidden" name="data_structures_enabled" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="data_structures_enabled" value="1"<?php echo !empty($data_structures_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('feature_data_structures_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('feature_data_structures_note');?>
+		</div>
+	</div>
+
+	<div class="field">
+		<label><?php echo t('feature_schemas');?></label>
+		<input type="hidden" name="schemas_enabled" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="schemas_enabled" value="1"<?php echo !empty($schemas_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('feature_schemas_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('feature_schemas_note');?>
+		</div>
+	</div>
+
+	<div class="field">
+		<label><?php echo t('feature_tags');?></label>
+		<input type="hidden" name="tags_enabled" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="tags_enabled" value="1"<?php echo !empty($tags_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('feature_tags_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('feature_tags_note');?>
+		</div>
+	</div>
+</fieldset>
+
+
+<fieldset class="field-expanded ">
 	<legend><i class="fas fa-folder-open mr-3" style="color:#007bff;"></i><?php echo t('editor_storage_settings');?></legend>
 	<div class="field">
 		<label><?php echo t('editor_storage_path');?></label>

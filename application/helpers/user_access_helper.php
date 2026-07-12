@@ -176,6 +176,102 @@ if (!function_exists('user_has_global_project_access')) {
 	}
 }
 
+if (!function_exists('site_feature_enabled')) {
+
+	/**
+	 * Whether a site feature module is enabled (issues, data_structures, schemas, tags).
+	 */
+	function site_feature_enabled($feature)
+	{
+		$key_map = array(
+			'issues' => 'issues_enabled',
+			'data_structures' => 'data_structures_enabled',
+			'schemas' => 'schemas_enabled',
+			'tags' => 'tags_enabled',
+		);
+
+		if (!isset($key_map[$feature])) {
+			return true;
+		}
+
+		$ci =& get_instance();
+		$value = $ci->config->item($key_map[$feature]);
+
+		if ($value === false || $value === 0 || $value === '0' || $value === 'false' || $value === null) {
+			return false;
+		}
+
+		return true;
+	}
+}
+
+if (!function_exists('enabled_project_schema_uids')) {
+
+	/**
+	 * Enabled project schema UIDs for create/import UI.
+	 * Returns null when all schemas are enabled.
+	 *
+	 * @return string[]|null
+	 */
+	function enabled_project_schema_uids()
+	{
+		$ci =& get_instance();
+		$value = $ci->config->item('enabled_project_schemas');
+
+		if ($value === null || $value === '' || $value === false) {
+			return null;
+		}
+
+		if (is_string($value)) {
+			$decoded = json_decode($value, true);
+			$value = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : array();
+		}
+
+		if (!is_array($value) || empty($value)) {
+			return null;
+		}
+
+		return array_values(array_unique(array_map('strval', $value)));
+	}
+}
+
+if (!function_exists('project_schema_enabled')) {
+
+	/**
+	 * Whether a project schema UID is enabled for create/import UI.
+	 */
+	function project_schema_enabled($uid)
+	{
+		$enabled = enabled_project_schema_uids();
+		if ($enabled === null) {
+			return true;
+		}
+
+		return in_array((string) $uid, $enabled, true);
+	}
+}
+
+if (!function_exists('site_features_user_info')) {
+
+	/**
+	 * Site feature flags for CI.user_info (Vue editor shell).
+	 *
+	 * @return array<string, mixed>
+	 */
+	function site_features_user_info()
+	{
+		$enabled = enabled_project_schema_uids();
+
+		return array(
+			'issues_enabled' => site_feature_enabled('issues'),
+			'data_structures_enabled' => site_feature_enabled('data_structures'),
+			'schemas_enabled' => site_feature_enabled('schemas'),
+			'tags_enabled' => site_feature_enabled('tags'),
+			'enabled_project_schemas' => $enabled,
+		);
+	}
+}
+
 if (!function_exists('build_editor_user_info')) {
 
 	/**
