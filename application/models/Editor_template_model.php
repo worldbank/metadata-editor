@@ -824,6 +824,46 @@ class Editor_template_model extends ci_model {
 	}
 
 
+	function resolve_template_for_project($project)
+	{
+		if (!is_array($project) || empty($project['type'])){
+			throw new Exception("Project type is required to resolve template.");
+		}
+
+		$template = null;
+
+		if (isset($project['template_uid']) && $project['template_uid'] !== ''){
+			$template = $this->get_template_by_uid($project['template_uid']);
+			if ($template && isset($template['is_deleted']) && $template['is_deleted'] == 1){
+				$template = null;
+			}
+		}
+
+		if (!$template){
+			$default_template = $this->get_default_template($project['type']);
+			if (!empty($default_template['template_uid'])){
+				$template = $this->get_template_by_uid($default_template['template_uid']);
+				if ($template && isset($template['is_deleted']) && $template['is_deleted'] == 1){
+					$template = null;
+				}
+			}
+		}
+
+		if (!$template){
+			$core_templates = $this->get_core_templates_by_type($project['type']);
+			if (empty($core_templates)){
+				throw new Exception("Template not found for type: " . $project['type']);
+			}
+			$template = $this->get_template_by_uid($core_templates[0]['uid']);
+		}
+
+		if (!$template || !isset($template['template'])){
+			throw new Exception("Template structure invalid for project type: " . $project['type']);
+		}
+
+		return $template;
+	}
+
 	function get_project_template($sid)
 	{
 		$this->db->select("template_uid, type");
@@ -834,35 +874,7 @@ class Editor_template_model extends ci_model {
 			throw new Exception("Project not found: " . $sid);
 		}
 
-		$template_uid = isset($result['template_uid']) ? trim((string)$result['template_uid']) : '';
-		$project_type = isset($result['type']) ? $result['type'] : null;
-
-		if ($template_uid !== ''){
-			$template = $this->get_template_by_uid($template_uid);
-			if ($template){
-				return $template;
-			}
-		}
-
-		// Fallback for empty or missing template_uid
-		if ($project_type){
-			$default = $this->get_default_template($project_type);
-			if (!empty($default['template_uid'])){
-				$template = $this->get_template_by_uid($default['template_uid']);
-				if ($template){
-					return $template;
-				}
-			}
-			$core_templates = $this->get_core_templates_by_type($project_type);
-			if (!empty($core_templates)){
-				$template = $this->get_template_by_uid($core_templates[0]['uid']);
-				if ($template){
-					return $template;
-				}
-			}
-		}
-
-		throw new Exception("Template not found: " . $template_uid);
+		return $this->resolve_template_for_project($result);
 	}
 
 

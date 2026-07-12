@@ -60,18 +60,8 @@ class PDF_Report{
 		$this->html_report = new Html_report();
 		$this->html_report->project = $this->project;
 		
-		// Load template translations for HTML report
-		if (isset($this->project['template_uid']) && !empty($this->project['template_uid'])) {
-			$template = $this->ci->Editor_template_model->get_template_by_uid($this->project['template_uid']);
-			if ($template) {
-				$this->html_report->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
-			}
-		} else {
-			$template = $this->ci->pagepreview->get_template_project_type($this->project['type']);
-			if ($template) {
-				$this->html_report->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
-			}
-		}
+		$template = $this->ci->Editor_template_model->resolve_template_for_project($this->project);
+		$this->html_report->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
 
 		// Store options for use in generate method
 		$this->options = $options;
@@ -271,38 +261,6 @@ class PDF_Report{
 		}
 		
 		return $chunks;
-	}
-
-	/**
-	 * 
-	 * 
-	 * Get study level metadata as HTML
-	 * 
-	 */
-	private function project_metadata_html()
-	{
-		// Use selected template if provided, otherwise use default
-		if (isset($this->options['template_uid']) && !empty($this->options['template_uid'])) {
-			$template = $this->ci->Editor_template_model->get_template_by_uid($this->options['template_uid']);
-			if (!$template) {
-				throw new Exception("Template not found: " . $this->options['template_uid']);
-			}
-			// Validate template structure
-			if (!isset($template['template'])) {
-				throw new Exception("Template structure invalid: " . $this->options['template_uid']);
-			}
-		} else {
-			$template = $this->ci->pagepreview->get_template_project_type($this->project['type']);
-		}
-				
-		$this->ci->pagepreview->initialize($this->project, $template['template']);
-
-		return $this->ci->load->view('project_preview/index',
-			array(					
-				'project'=>$this->project,
-				'template'=>$template
-			),true
-		);
 	}
 
 

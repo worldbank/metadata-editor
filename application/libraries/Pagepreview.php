@@ -18,7 +18,6 @@ class Pagepreview{
 	{
         $this->ci =& get_instance();
         $this->ci->load->helper("array");
-        $this->ci->load->model("Editor_template_model");
     }
 
     function initialize($metadata,$template)
@@ -156,38 +155,6 @@ class Pagepreview{
     {
         return 'metadata.'.str_replace("/",".",$key);
     }
-
-
-    function get_template_project_type($type)
-	{
-		/*$user_template=$this->Editor_template_model->get_template_by_uid($uid);
-
-		if(!$user_template){
-			show_error("Template not found");
-		}
-
-		return $user_template;*/
-
-        $template_file_name='application/templates/display/'.$type.'_display_template.json';
-
-		if (file_exists($template_file_name)){
-			$template['template']=json_decode(file_get_contents($template_file_name),true);
-			return $template;
-		}
-
-		$core_templates=$this->ci->Editor_template_model->get_core_templates_by_type($type);
-
-		if (!$core_templates){
-			throw new Exception("No system templates found for type: "); 
-		}
-
-		//var_dump($core_templates);
-		//die();
-
-		$core_template=$this->ci->Editor_template_model->get_template_by_uid($core_templates[0]["uid"]);
-
-		return $core_template;
-	}
 
     
 }

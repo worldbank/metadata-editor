@@ -109,46 +109,7 @@ class Projects extends MY_Controller {
 	 */
 	function get_project_template($project)
 	{
-		$template=NULL;
-		
-		//load template set for the project
-		if (isset($project['template_uid']) && !empty($project['template_uid'])){
-			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
-			
-			// Check if template is soft-deleted (is_deleted=1)
-			// If deleted, fallback to default/core template
-			if ($template && isset($template['is_deleted']) && $template['is_deleted'] == 1){
-				$template = NULL; // Force fallback
-			}
-		}
-
-		if (!$template){		
-			//load default template for the project type
-			$default_template=$this->Editor_template_model->get_default_template($project['type']);
-
-			if (isset($default_template['template_uid'])){
-				$template=$this->Editor_template_model->get_template_by_uid($default_template['template_uid']);
-				
-				// Check if default template is also deleted
-				if ($template && isset($template['is_deleted']) && $template['is_deleted'] == 1){
-					$template = NULL; // Force fallback to core
-				}
-			}
-		}
-		
-		//load core template for the project type
-		if (empty($template)){
-			$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
-
-			if (!$core_templates_by_type){
-				throw new Exception("Template not found for type", $project['type']);
-			}
-
-			//load default core template by type
-			$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
-		}
-		
-		return $template;
+		return $this->Editor_template_model->resolve_template_for_project($project);
 	}
 
 

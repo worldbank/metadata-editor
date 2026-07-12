@@ -105,20 +105,8 @@ class Html_Report{
 	 */
 	 function project_metadata_html()
 	{
-		// Use project's assigned template if available, otherwise use default
-		if (isset($this->project['template_uid']) && !empty($this->project['template_uid'])) {
-			$template = $this->ci->Editor_template_model->get_template_by_uid($this->project['template_uid']);
-			if (!$template) {
-				throw new Exception("Template not found: " . $this->project['template_uid']);
-			}
-			// Ensure template has the correct structure
-			if (!isset($template['template'])) {
-				throw new Exception("Template structure invalid: " . $this->project['template_uid']);
-			}
-		} else {
-			$template = $this->ci->pagepreview->get_template_project_type($this->project['type']);
-		}
-		
+		$template = $this->ci->Editor_template_model->resolve_template_for_project($this->project);
+
 		// Load template translations using existing function
 		$this->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
 		
