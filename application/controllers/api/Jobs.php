@@ -41,6 +41,8 @@ class Jobs extends MY_REST_Controller
 	 *   job_type - Filter by job type
 	 *   project_id - Filter by project ID (payload.project_id; use with job_type, e.g. metadata_assessment_result)
 	 *   user_id - Filter by user ID (admin only, or own jobs)
+	 *   created_from - Filter jobs created on or after this date (Y-m-d)
+	 *   created_to - Filter jobs created on or before this date (Y-m-d)
 	 *   limit - Number of jobs to return (default: 50)
 	 *   offset - Offset for pagination (default: 0)
 	 * 
@@ -69,6 +71,10 @@ class Jobs extends MY_REST_Controller
 			$active_only = $this->input->get('active') === '1' || $this->input->get('active') === 'true';
 			$history_only = $this->input->get('history') === '1' || $this->input->get('history') === 'true';
 			$stale_only = $this->input->get('stale') === '1' || $this->input->get('stale') === 'true';
+			$created_from = $this->input->get('created_from');
+			$created_to = $this->input->get('created_to');
+			$has_date_filter = ($created_from !== null && $created_from !== '')
+				|| ($created_to !== null && $created_to !== '');
 			$limit = (int)($this->input->get('limit') ?: 50);
 			$offset = (int)($this->input->get('offset') ?: 0);
 
@@ -96,6 +102,10 @@ class Jobs extends MY_REST_Controller
 			}
 			if ($stale_only) {
 				$filters['stale'] = true;
+			} elseif ($has_date_filter) {
+				if ($status) {
+					$filters['status'] = $status;
+				}
 			} elseif ($active_only) {
 				$filters['active'] = true;
 			} elseif ($history_only) {
@@ -108,6 +118,12 @@ class Jobs extends MY_REST_Controller
 			}
 			if ($user_id_filter) {
 				$filters['user_id'] = $user_id_filter;
+			}
+			if ($created_from) {
+				$filters['created_from'] = $created_from;
+			}
+			if ($created_to) {
+				$filters['created_to'] = $created_to;
 			}
 
 			$total_count = $this->Job_queue_model->count_jobs($filters);
@@ -146,6 +162,32 @@ class Jobs extends MY_REST_Controller
 				'jobs' => $basic_jobs,
 				'stale_config' => $this->Job_queue_model->get_stale_config(),
 			);
+
+			if ($is_admin && $job_type === 'metadata_assessment_result') {
+				$this->load->helper('user_access');
+				if (metadata_assessment_monthly_limit_applies()) {
+					$monthly_limit = metadata_assessment_monthly_limit();
+					$period_start = date('Y-m-01');
+					$period_end = date('Y-m-t');
+					$used_this_month = $this->Job_queue_model->count_metadata_assessments_in_period(
+						$period_start,
+						$period_end
+					);
+					$response['assessment_usage'] = array(
+						'unlimited' => false,
+						'limit' => $monthly_limit,
+						'used_this_month' => $used_this_month,
+						'remaining_this_month' => max(0, $monthly_limit - $used_this_month),
+						'period_start' => $period_start,
+						'period_end' => $period_end,
+					);
+				} else {
+					$response['assessment_usage'] = array(
+						'unlimited' => true,
+						'limit' => 0,
+					);
+				}
+			}
 			
 			$this->set_response($response, REST_Controller::HTTP_OK);
 			
@@ -298,8 +340,8 @@ class Jobs extends MY_REST_Controller
 				throw new Exception("Invalid job_type: {$job_type}. Available types: " . implode(', ', $available_types));
 			}
 
-			if ($job_type === 'metadata_assessment_result' && !$this->is_admin()) {
-				throw new Exception('Admin access required to create metadata assessment jobs');
+			if ($job_type === 'metadata_assessment_result') {
+				$this->is_metadata_assessment_enabled_or_die();
 			}
 			
 			// Validate payload using the job handler
@@ -309,6 +351,14 @@ class Jobs extends MY_REST_Controller
 			}
 
 			$payload = $this->enforce_enqueue_project_access($job_type, $payload);
+
+			if ($job_type === 'metadata_assessment_result') {
+				$limit_error = $this->get_metadata_assessment_limit_error();
+				if ($limit_error !== null) {
+					$this->set_response($limit_error, REST_Controller::HTTP_TOO_MANY_REQUESTS);
+					return;
+				}
+			}
 			
 			// Enqueue the job
 			$job_id = $this->Job_queue_model->enqueue(
@@ -688,13 +738,6 @@ class Jobs extends MY_REST_Controller
 	 */
 	function metadata_assessment_post()
 	{
-		if (!$this->is_admin()) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => 'Admin access required to run metadata assessment',
-			), REST_Controller::HTTP_FORBIDDEN);
-			return;
-		}
 		$this->is_metadata_assessment_enabled_or_die();
 		try {
 			$input = json_decode($this->input->raw_input_stream, true);
@@ -709,7 +752,13 @@ class Jobs extends MY_REST_Controller
 
 			$this->load->model('Editor_model');
 			$this->load->library('Editor_acl');
-			$this->editor_acl->user_has_project_access($project_id, 'view', $this->api_user);
+			$this->editor_acl->user_has_project_access($project_id, 'edit', $this->api_user);
+
+			$limit_error = $this->get_metadata_assessment_limit_error();
+			if ($limit_error !== null) {
+				$this->set_response($limit_error, REST_Controller::HTTP_TOO_MANY_REQUESTS);
+				return;
+			}
 
 			$project = $this->Editor_model->get_row($project_id);
 			if (!$project || !isset($project['metadata'])) {
@@ -1132,6 +1181,62 @@ class Jobs extends MY_REST_Controller
 				'message' => $e->getMessage()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Lightweight readiness check for metadata assessment (worker + FastAPI).
+	 *
+	 * GET /api/jobs/assessment_readiness
+	 */
+	function assessment_readiness_get()
+	{
+		$this->is_metadata_assessment_enabled_or_die();
+
+		try {
+			$worker_status = $this->_get_worker_status_response();
+			$this->load->library('DataUtils');
+			$fastapi_status = $this->datautils->status();
+			$fastapi_online = is_array($fastapi_status)
+				&& isset($fastapi_status['status'])
+				&& $fastapi_status['status'] === 'ok';
+
+			$this->load->helper('user_access');
+			$usage = null;
+			if (metadata_assessment_monthly_limit_applies()) {
+				$monthly_limit = metadata_assessment_monthly_limit();
+				$period_start = date('Y-m-01');
+				$period_end = date('Y-m-t');
+				$used_this_month = $this->Job_queue_model->count_metadata_assessments_in_period(
+					$period_start,
+					$period_end
+				);
+				$usage = array(
+					'unlimited' => false,
+					'limit' => $monthly_limit,
+					'used_this_month' => $used_this_month,
+					'remaining_this_month' => max(0, $monthly_limit - $used_this_month),
+					'period_start' => $period_start,
+					'period_end' => $period_end,
+				);
+			} else {
+				$usage = array(
+					'unlimited' => true,
+					'limit' => 0,
+				);
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'worker_running' => isset($worker_status['status']) && $worker_status['status'] === 'running',
+				'fastapi_online' => $fastapi_online,
+				'usage' => $usage,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -1684,8 +1789,7 @@ class Jobs extends MY_REST_Controller
 		}
 
 		$resolved_sid = $this->get_sid((string) $payload['project_id']);
-		$permission = ($job_type === 'metadata_assessment_result') ? 'view' : 'edit';
-		$this->editor_acl->user_has_project_access($resolved_sid, $permission, $this->api_user);
+		$this->editor_acl->user_has_project_access($resolved_sid, 'edit', $this->api_user);
 		$payload['project_id'] = (int) $resolved_sid;
 
 		return $payload;
@@ -1701,6 +1805,42 @@ class Jobs extends MY_REST_Controller
 	{
 		$this->load->library('DataUtils');
 		return $this->datautils->cancel_job($fastapi_job_id);
+	}
+
+	/**
+	 * Return an error payload when the monthly assessment limit is exceeded, or null if allowed.
+	 *
+	 * @return array|null
+	 */
+	private function get_metadata_assessment_limit_error()
+	{
+		$this->load->helper('user_access');
+		$limit = metadata_assessment_monthly_limit();
+		if (!metadata_assessment_monthly_limit_applies()) {
+			return null;
+		}
+
+		$period_start = date('Y-m-01');
+		$period_end = date('Y-m-t');
+		$used = $this->Job_queue_model->count_metadata_assessments_in_period($period_start, $period_end);
+		if ($used < $limit) {
+			return null;
+		}
+
+		return array(
+			'status' => 'failed',
+			'message' => sprintf(
+				'Monthly metadata assessment limit reached (%d). Resets on the 1st of next month.',
+				$limit
+			),
+			'usage' => array(
+				'limit' => $limit,
+				'used_this_month' => $used,
+				'remaining_this_month' => 0,
+				'period_start' => $period_start,
+				'period_end' => $period_end,
+			),
+		);
 	}
 
 	/**

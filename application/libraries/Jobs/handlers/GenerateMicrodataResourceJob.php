@@ -3,7 +3,7 @@
 require_once APPPATH . 'libraries/Jobs/JobHandlerInterface.php';
 
 /**
- * Generate a dat/micro external resource from project data files (background job).
+ * Generate microdata external resource
  */
 class GenerateMicrodataResourceJob implements JobHandlerInterface
 {

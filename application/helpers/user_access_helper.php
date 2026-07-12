@@ -90,6 +90,37 @@ if (!function_exists('metadata_assessment_enabled')) {
 	}
 }
 
+if (!function_exists('metadata_assessment_monthly_limit')) {
+
+	/**
+	 * Site-wide monthly metadata assessment limit.
+	 * Returns 0 when unlimited (no enforcement).
+	 */
+	function metadata_assessment_monthly_limit()
+	{
+		$ci =& get_instance();
+		$value = $ci->config->item('metadata_assessment_monthly_limit');
+
+		if ($value === false || $value === null || $value === '') {
+			return 200;
+		}
+
+		return max(0, (int) $value);
+	}
+}
+
+if (!function_exists('metadata_assessment_monthly_limit_applies')) {
+
+	/**
+	 * Whether a monthly assessment cap is configured (limit > 0).
+	 * A limit of 0 means unlimited.
+	 */
+	function metadata_assessment_monthly_limit_applies()
+	{
+		return metadata_assessment_monthly_limit() > 0;
+	}
+}
+
 if (!function_exists('user_can_access_projects')) {
 
 	/**

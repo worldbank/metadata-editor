@@ -581,6 +581,8 @@ class Job_queue_model extends CI_Model {
 			$this->db->where('user_id', $user_id);
 		}
 
+		$this->apply_created_at_filters($filters);
+
 		$this->db->order_by('created_at', 'DESC');
 
 		if ($project_id !== null) {
@@ -653,7 +655,73 @@ class Job_queue_model extends CI_Model {
 			$this->db->where('user_id', $user_id);
 		}
 
+		$this->apply_created_at_filters($filters);
+
 		return (int) $this->db->count_all_results();
+	}
+
+	/**
+	 * Count metadata assessment jobs submitted in a date range (excludes cancelled).
+	 *
+	 * @param string $from Inclusive start (Y-m-d or datetime)
+	 * @param string $to Inclusive end (Y-m-d or datetime)
+	 * @return int
+	 */
+	function count_metadata_assessments_in_period($from, $to)
+	{
+		return $this->count_jobs(array(
+			'job_type' => 'metadata_assessment_result',
+			'created_from' => $from,
+			'created_to' => $to,
+			'exclude_cancelled' => true,
+		));
+	}
+
+	/**
+	 * Apply created_at range and optional status exclusions to the active query.
+	 *
+	 * @param array $filters
+	 */
+	private function apply_created_at_filters($filters)
+	{
+		if (!empty($filters['created_from'])) {
+			$from = $this->normalize_date_filter($filters['created_from'], true);
+			if ($from !== null) {
+				$this->db->where('created_at >=', $from);
+			}
+		}
+
+		if (!empty($filters['created_to'])) {
+			$to = $this->normalize_date_filter($filters['created_to'], false);
+			if ($to !== null) {
+				$this->db->where('created_at <=', $to);
+			}
+		}
+
+		if (!empty($filters['exclude_cancelled'])) {
+			$this->db->where('status !=', 'cancelled');
+		}
+	}
+
+	/**
+	 * Normalize a date filter value to a SQL datetime boundary.
+	 *
+	 * @param string $value
+	 * @param bool $is_start
+	 * @return string|null
+	 */
+	private function normalize_date_filter($value, $is_start)
+	{
+		$value = trim((string) $value);
+		if ($value === '') {
+			return null;
+		}
+
+		if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+			return $value . ($is_start ? ' 00:00:00' : ' 23:59:59');
+		}
+
+		return $value;
 	}
 
 	/**

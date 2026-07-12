@@ -40,5 +40,8 @@ $config['project_sharing'] = '1';
 // Metadata assessment (Issues → Assess metadata); requires FastAPI review routes and background worker ('1' = enabled, '0' = disabled)
 $config['metadata_assessment_enabled'] = '0';
 
+// Site-wide monthly limit for metadata assessments (0 = unlimited, no limit enforced)
+$config['metadata_assessment_monthly_limit'] = '200';
+
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

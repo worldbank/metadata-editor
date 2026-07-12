@@ -39,7 +39,8 @@ Vue.component('project-issues', {
             assessmentStatusLoading: false,
             assessmentCancelLoading: false,
             assessmentLastCheckedAt: null,
-            assessmentStatusTimer: null
+            assessmentStatusTimer: null,
+            assessmentUsage: null
         };
     },
     computed: {
@@ -53,7 +54,7 @@ Vue.component('project-issues', {
             return !!(this.assessmentJobUuid && this.isRunningStatus(this.assessmentJobStatus));
         },
         showAssessButton: function () {
-            if (!this.isAdmin) {
+            if (!this.canEdit) {
                 return false;
             }
             if (this.hasActiveAssessmentJob) {
@@ -68,10 +69,16 @@ Vue.component('project-issues', {
             return this.fastapiOnline === true;
         },
         canStartNewAssessment: function () {
-            return this.metadataAssessmentEnabled
-                && this.workerIsRunning
-                && this.fastApiIsOnline
-                && !this.assessmentSubmitting;
+            if (!this.metadataAssessmentEnabled
+                || !this.workerIsRunning
+                || !this.fastApiIsOnline
+                || this.assessmentSubmitting) {
+                return false;
+            }
+            if (this.assessmentUsage && !this.assessmentUsage.unlimited && this.assessmentUsage.limit > 0) {
+                return this.assessmentUsage.remaining_this_month > 0;
+            }
+            return true;
         },
         assessmentIsQueued: function () {
             return this.assessmentPhase === 'running'
@@ -101,6 +108,9 @@ Vue.component('project-issues', {
             if (!this.fastApiIsOnline) {
                 return this.$t('assessment_fastapi_offline') || 'Assessment service is unavailable. Ensure the FastAPI backend is running.';
             }
+            if (this.assessmentUsage && !this.assessmentUsage.unlimited && this.assessmentUsage.limit > 0 && this.assessmentUsage.remaining_this_month <= 0) {
+                return this.$t('assessment_monthly_limit_reached') || 'Monthly assessment limit reached for this site.';
+            }
             return 'Run metadata assessment';
         },
         assessConfirmWarnings: function () {
@@ -111,11 +121,21 @@ Vue.component('project-issues', {
             if (!this.workerIsRunning) {
                 warnings.push(this.$t('assessment_worker_offline') || 'Background worker is not running. Start the worker before running an assessment.');
             }
+            if (this.assessmentUsage && !this.assessmentUsage.unlimited && this.assessmentUsage.limit > 0) {
+                warnings.push(
+                    (this.$t('assessment_monthly_usage') || 'Site usage this month: {used} of {limit}.')
+                        .replace('{used}', this.assessmentUsage.used_this_month)
+                        .replace('{limit}', this.assessmentUsage.limit)
+                );
+                if (this.assessmentUsage.remaining_this_month <= 0) {
+                    warnings.push(this.$t('assessment_monthly_limit_reached') || 'Monthly assessment limit reached for this site.');
+                }
+            }
             return warnings;
         }
     },
     mounted() {
-        if (this.isAdmin) {
+        if (this.canEdit && this.metadataAssessmentEnabled) {
             this.loadAssessmentReadiness();
         }
         this.checkAssessmentStatus();
@@ -142,33 +162,27 @@ Vue.component('project-issues', {
             return status === 'pending' || status === 'processing';
         },
         async loadAssessmentReadiness() {
-            if (!this.isAdmin) {
+            if (!this.canEdit || !this.metadataAssessmentEnabled) {
                 return;
             }
             this.readinessLoading = true;
             var baseUrl = CI && CI.base_url ? CI.base_url : '';
             try {
-                var results = await Promise.all([
-                    axios.get(baseUrl + '/api/jobs/worker_status').catch(function () { return null; }),
-                    axios.get(baseUrl + '/api/data/status/').catch(function () { return null; })
-                ]);
-                var workerResp = results[0];
-                var fastapiResp = results[1];
-                if (workerResp && workerResp.data && workerResp.data.status === 'success' && workerResp.data.worker) {
-                    var worker = workerResp.data.worker;
-                    this.workerStatus = worker.is_running ? 'running' : 'stopped';
+                var response = await axios.get(baseUrl + '/api/jobs/assessment_readiness').catch(function () { return null; });
+                if (response && response.data && response.data.status === 'success') {
+                    this.workerStatus = response.data.worker_running ? 'running' : 'stopped';
+                    this.fastapiOnline = response.data.fastapi_online === true;
+                    this.assessmentUsage = response.data.usage || null;
                 } else {
                     this.workerStatus = 'unknown';
-                }
-                if (fastapiResp && fastapiResp.data) {
-                    this.fastapiOnline = fastapiResp.data.status === 'ok';
-                } else {
                     this.fastapiOnline = false;
+                    this.assessmentUsage = null;
                 }
             } catch (err) {
                 console.error('Load assessment readiness:', err);
                 this.workerStatus = this.workerStatus || 'unknown';
                 this.fastapiOnline = false;
+                this.assessmentUsage = null;
             } finally {
                 this.readinessLoading = false;
             }

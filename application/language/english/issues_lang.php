@@ -130,6 +130,8 @@ $lang['assessment_running_view_status'] = "Assessment running - View status";
 $lang['assessment_fastapi_offline']    = "Assessment service is unavailable. Ensure the FastAPI backend is running.";
 $lang['assessment_worker_offline']     = "Background worker is not running. Start the worker before running an assessment.";
 $lang['assessment_submit_blocked']     = "Assessment cannot be started until all required services are available.";
+$lang['assessment_monthly_limit_reached']    = "Monthly assessment limit reached for this site.";
+$lang['assessment_monthly_usage']          = "Site usage this month: {used} of {limit}.";
 
 // ─── Success messages ─────────────────────────────────────────────────────────
 $lang['issue_created']                 = "Issue created successfully";

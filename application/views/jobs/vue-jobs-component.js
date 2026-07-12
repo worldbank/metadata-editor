@@ -23,8 +23,11 @@ Vue.component('vue-jobs-component', {
                 status: null,
                 job_type: null,
                 user_id: null,
-                stale_only: null
+                stale_only: null,
+                created_from: null,
+                created_to: null
             },
+            assessment_usage: null,
             selected_job: null,
             detail_dialog: false,
             poll_timer: null,
@@ -251,7 +254,12 @@ Vue.component('vue-jobs-component', {
         },
 
         hasActiveFilters: function () {
-            return !!(this.filters.status || this.filters.job_type || this.filters.user_id || this.filters.stale_only);
+            return !!(this.filters.status || this.filters.job_type || this.filters.user_id
+                || this.filters.stale_only || this.filters.created_from || this.filters.created_to);
+        },
+
+        hasDateFilter: function () {
+            return !!(this.filters.created_from || this.filters.created_to);
         },
 
         activeFilterChips: function () {
@@ -293,7 +301,36 @@ Vue.component('vue-jobs-component', {
                 });
             }
 
+            if (vm.filters.created_from) {
+                chips.push({
+                    key: 'created_from',
+                    label: (vm.$t('date_from') || 'From') + ' ' + vm.filters.created_from,
+                    color: 'grey'
+                });
+            }
+
+            if (vm.filters.created_to) {
+                chips.push({
+                    key: 'created_to',
+                    label: (vm.$t('date_to') || 'To') + ' ' + vm.filters.created_to,
+                    color: 'grey'
+                });
+            }
+
             return chips;
+        },
+
+        assessmentUsageBanner: function () {
+            if (!this.isAdmin || this.filters.job_type !== 'metadata_assessment_result' || !this.assessment_usage) {
+                return null;
+            }
+            var usage = this.assessment_usage;
+            if (usage.unlimited || !usage.limit || usage.limit <= 0) {
+                return this.$t('assessment_monthly_unlimited') || 'No monthly assessment limit configured.';
+            }
+            return (this.$t('assessment_monthly_usage') || 'Site usage this month: {used} of {limit}.')
+                .replace('{used}', usage.used_this_month)
+                .replace('{limit}', usage.limit);
         },
 
         dashboardStatCards: function () {
@@ -338,18 +375,30 @@ Vue.component('vue-jobs-component', {
             if (vm.filters.job_type) {
                 params.append('job_type', vm.filters.job_type);
             }
-            if (vm.isActiveTab) {
-                if (vm.filters.stale_only) {
-                    params.append('stale', '1');
-                } else if (vm.filters.status === 'pending' || vm.filters.status === 'held' || vm.filters.status === 'processing') {
+            if (vm.filters.created_from) {
+                params.append('created_from', vm.filters.created_from);
+            }
+            if (vm.filters.created_to) {
+                params.append('created_to', vm.filters.created_to);
+            }
+            if (!vm.hasDateFilter) {
+                if (vm.isActiveTab) {
+                    if (vm.filters.stale_only) {
+                        params.append('stale', '1');
+                    } else if (vm.filters.status === 'pending' || vm.filters.status === 'held' || vm.filters.status === 'processing') {
+                        params.append('status', vm.filters.status);
+                    } else {
+                        params.append('active', '1');
+                    }
+                } else if (vm.filters.status === 'completed' || vm.filters.status === 'failed' || vm.filters.status === 'cancelled') {
                     params.append('status', vm.filters.status);
                 } else {
-                    params.append('active', '1');
+                    params.append('history', '1');
                 }
-            } else if (vm.filters.status === 'completed' || vm.filters.status === 'failed' || vm.filters.status === 'cancelled') {
+            } else if (vm.filters.status) {
                 params.append('status', vm.filters.status);
-            } else {
-                params.append('history', '1');
+            } else if (vm.isActiveTab && vm.filters.stale_only) {
+                params.append('stale', '1');
             }
             if (vm.isAdmin && vm.filters.user_id) {
                 params.append('user_id', vm.filters.user_id);
@@ -368,6 +417,7 @@ Vue.component('vue-jobs-component', {
                 if (data.status === 'success') {
                     vm.jobs = data.jobs || [];
                     vm.pagination.total = data.total != null ? data.total : vm.jobs.length;
+                    vm.assessment_usage = data.assessment_usage || null;
                     if (data.stale_config) {
                         vm.stale_config = data.stale_config;
                     }
@@ -481,7 +531,9 @@ Vue.component('vue-jobs-component', {
                 status: null,
                 job_type: null,
                 user_id: null,
-                stale_only: null
+                stale_only: null,
+                created_from: null,
+                created_to: null
             };
             this.pagination.page = 1;
             this.loadJobs();
@@ -496,6 +548,10 @@ Vue.component('vue-jobs-component', {
                 this.filters.user_id = null;
             } else if (key === 'stale_only') {
                 this.filters.stale_only = null;
+            } else if (key === 'created_from') {
+                this.filters.created_from = null;
+            } else if (key === 'created_to') {
+                this.filters.created_to = null;
             }
             this.applyFilters();
         },
@@ -1156,6 +1212,38 @@ Vue.component('vue-jobs-component', {
                                     ></v-select>
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
+
+                            <v-expansion-panel>
+                                <v-expansion-panel-header class="capitalize">
+                                    {{ $t('date_range') || 'Date range' }}
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <v-text-field
+                                        v-model="filters.created_from"
+                                        :label="$t('date_from') || 'From'"
+                                        type="date"
+                                        background-color="white"
+                                        dense
+                                        outlined
+                                        hide-details
+                                        clearable
+                                        class="jobs-filter-select mt-1"
+                                        @change="applyFilters"
+                                    ></v-text-field>
+                                    <v-text-field
+                                        v-model="filters.created_to"
+                                        :label="$t('date_to') || 'To'"
+                                        type="date"
+                                        background-color="white"
+                                        dense
+                                        outlined
+                                        hide-details
+                                        clearable
+                                        class="jobs-filter-select mt-1"
+                                        @change="applyFilters"
+                                    ></v-text-field>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
                         </v-expansion-panels>
 
                         <v-btn
@@ -1196,6 +1284,16 @@ Vue.component('vue-jobs-component', {
                         class="mb-4"
                     >
                         {{ worker_banner.text }}
+                    </v-alert>
+
+                    <v-alert
+                        v-if="assessmentUsageBanner"
+                        dense
+                        outlined
+                        type="info"
+                        class="mb-4"
+                    >
+                        {{ assessmentUsageBanner }}
                     </v-alert>
 
                     <v-row v-if="isAdmin && queue_stats" class="mb-2">

@@ -165,6 +165,16 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 			<?php echo t('metadata_assessment_note');?>
 		</div>
 	</div>
+
+	<div class="field">
+		<label><?php echo t('metadata_assessment_monthly_limit');?></label>
+		<input type="number" name="metadata_assessment_monthly_limit" min="0" step="1"
+			value="<?php echo isset($metadata_assessment_monthly_limit) ? (int) $metadata_assessment_monthly_limit : 200; ?>"
+			style="width:120px;">
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('metadata_assessment_monthly_limit_note');?>
+		</div>
+	</div>
 </fieldset>
 
 

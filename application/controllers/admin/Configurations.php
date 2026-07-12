@@ -167,8 +167,13 @@ class Configurations extends MY_Controller {
 		// Metadata assessment toggle
 		$options['metadata_assessment_enabled'] = $this->input->post('metadata_assessment_enabled') === '1' ? '1' : '0';
 
+		$raw_limit = $this->input->post('metadata_assessment_monthly_limit');
+		$options['metadata_assessment_monthly_limit'] = is_numeric($raw_limit)
+			? (string) max(0, (int) $raw_limit)
+			: '200';
+
 		// Remove nested-array keys so the generic loop below doesn't try to process them
-		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing'], $post['metadata_assessment_enabled']);
+		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing'], $post['metadata_assessment_enabled'], $post['metadata_assessment_monthly_limit']);
 
 		foreach($post as $key=>$value)
 		{

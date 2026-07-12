@@ -962,7 +962,7 @@ components:
             description: PDF Generation Job Handler
           - job_type: generate_microdata_resource
             available: true
-            description: Generate a dat/micro external resource from project data files (background job).
+            description: Generate microdata external resource
           - job_type: import_microdata
             available: true
             description: Microdata Import Job Handler
