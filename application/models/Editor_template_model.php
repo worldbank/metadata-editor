@@ -52,12 +52,15 @@ class Editor_template_model extends ci_model {
 		'timeseries-db'=>'indicator-db'
 	);
 	private $generated_suffix='__core';
+	private $core_template_base_path=null;
 	private $ci;
 
     public function __construct()
     {
         parent::__construct();		
 		$this->ci =& get_instance();
+		$this->ci->config->load('editor');
+		$this->init_core_template_base_path();
 		$this->init_core_templates();
 		$this->ci->load->model('Template_acl_model');
 		$this->ci->load->model('Edit_history_model');
@@ -135,6 +138,33 @@ class Editor_template_model extends ci_model {
 		return $rows;
 	}
 
+	private function init_core_template_base_path()
+	{
+		$editor_config = $this->ci->config->item('editor');
+		$base_path = APPPATH . 'editor_templates';
+
+		if (is_array($editor_config) && !empty($editor_config['core_template_path'])) {
+			$base_path = $editor_config['core_template_path'];
+		}
+
+		$this->core_template_base_path = unix_path(rtrim($base_path, '/'));
+	}
+
+	public function get_core_template_base_path()
+	{
+		if ($this->core_template_base_path === null) {
+			$this->init_core_template_base_path();
+		}
+
+		return $this->core_template_base_path;
+	}
+
+	private function resolve_core_template_path($relative_path)
+	{
+		$relative_path = ltrim(str_replace('\\', '/', (string)$relative_path), '/');
+		return unix_path($this->get_core_template_base_path() . '/' . $relative_path);
+	}
+
 	function init_core_templates()
 	{
 		require_once(APPPATH.'config/editor_templates.php');
@@ -148,10 +178,10 @@ class Editor_template_model extends ci_model {
 			foreach($templates as $idx=>$template){
 
 				$template_json='';
-				$template_path=APPPATH.'/views/'.$template['template'];
+				$template_path=$this->resolve_core_template_path($template['template']);
 
 				if (file_exists($template_path)){
-					$template_json=$template['template'];//json_decode(file_get_contents($template_path),true);
+					$template_json=$template['template'];
 				}
 				else{
 					//throw new Exception("template not found" .$template_path);
@@ -356,7 +386,7 @@ class Editor_template_model extends ci_model {
 	{
 		foreach($this->core_templates as $template){
 			if ($template['uid']==$uid){				
-				$template_path=APPPATH.'/views/'.$template["template"];
+				$template_path=$this->resolve_core_template_path($template["template"]);
 				if (!file_exists($template_path)){
 					throw new Exception("Template not found:",$template['template']);
 				}

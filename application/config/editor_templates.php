@@ -9,21 +9,21 @@
 | such as survey, geospatial, time series, dublin core, etc.
 |
 |
-| @template - path to the view file 
+| @template - path relative to editor core_template_path (application/editor_templates/)
 | 
 | @language_translations - language file containing the translations for fields names/labels
 |
 */
 
 $config['microdata'][]=array(
-        'template' => 'metadata_editor/metadata_editor_templates/survey_form_template.json',
+        'template' => 'survey_form_template.json',
         'lang'=>'en',        
         'uid'=>'microdata-system-en',
         'name'=>'Microdata DDI 2.5 EN'
 );
 
 $config['microdata'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/survey_template_ihsn_2.5_v1_fr.json',
+    'template' => 'survey_template_ihsn_2.5_v1_fr.json',
     'lang'=>'fr',
     'uid'=>'232ea3aaece0cdf1db157f797f6b92e5fr',
     'name'=>'IHSN DDI 2.5 Modèle v01 FR',
@@ -35,7 +35,7 @@ $config['microdata'][]=array(
 );
 
 $config['microdata'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/survey_template_es.json',
+    'template' => 'survey_template_es.json',
     'lang'=>'es',
     'uid'=>'microdata-system-es',
     'name'=>'Microdatos DDI 2.5 ES',
@@ -48,7 +48,7 @@ $config['microdata'][]=array(
 
 
 $config['microdata'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/survey_template_ihsn_2.5_v1.json',
+    'template' => 'survey_template_ihsn_2.5_v1.json',
     "uid"=> "6740f5f920502baf3f6cbcaa5c113deeen",
     "data_type"=> "microdata",
     "lang"=> "en",
@@ -61,7 +61,7 @@ $config['microdata'][]=array(
 );
 
 $config['microdata'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/microdata_template_uzbek.json',
+    'template' => 'microdata_template_uzbek.json',
     "uid"=> "6740f5f920502baf3f6cbcaa5c113uzbek",
     "data_type"=> "microdata",
     "lang"=> "uz",
@@ -75,7 +75,7 @@ $config['microdata'][]=array(
 
 
 $config['indicator'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries_form_template.json',
+    'template' => 'timeseries_form_template.json',
     'lang'=>'en',
     'uid'=>'timeseries-system-en',
     'name'=>'Indicator Schema 1.0 EN',
@@ -84,7 +84,7 @@ $config['indicator'][]=array(
 ); 
 
 $config['indicator'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries_template_ihsn.json',    
+    'template' => 'timeseries_template_ihsn.json',    
     "data_type"=> "indicator",
     "uid"=> "8603d94e27bccc2bdad1e00dbbf0fe32en",
     "data_type"=> "indicator",
@@ -98,7 +98,7 @@ $config['indicator'][]=array(
 
 
 $config['indicator'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries_template_ihsn_fr.json',    
+    'template' => 'timeseries_template_ihsn_fr.json',    
     "uid"=> "b576eb7519fe8e761a239f9d36f032c3fr",
     "data_type"=> "indicator",
     "lang"=> "fr",
@@ -112,7 +112,7 @@ $config['indicator'][]=array(
 
 
 $config['indicator-db'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_form_template.json',
+    'template' => 'timeseries-db_form_template.json',
     'lang'=>'en',
     'uid'=>'timeseries-db-system-en',
     'name'=>'Database Schema 1.0 EN'
@@ -120,7 +120,7 @@ $config['indicator-db'][]=array(
 
 
 $config['indicator-db'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_template_ihsn_fr.json',
+    'template' => 'timeseries-db_template_ihsn_fr.json',
     "uid"=> "776d77524fe8130f520035fb9b077d82",
     "data_type"=> "indicator-db",
     "lang"=> "fr",
@@ -133,7 +133,7 @@ $config['indicator-db'][]=array(
 
 
 $config['indicator-db'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_template_ihsn.json',
+    'template' => 'timeseries-db_template_ihsn.json',
     "uid"=> "f3e2d1c8c494be27bc229463a265a33d",
     "data_type"=> "indicator-db",
     "lang"=> "en",
@@ -145,7 +145,7 @@ $config['indicator-db'][]=array(
 ); 
 
 $config['script'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/script_form_template.json',
+    'template' => 'script_form_template.json',
     'lang'=>'en',
     'uid'=>'script-system-en',
     'name'=>'Script IHSN Schema 1.0 EN'
@@ -153,7 +153,7 @@ $config['script'][]=array(
 
 
 $config['script'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/script_template_ihsn_fr.json',
+    'template' => 'script_template_ihsn_fr.json',
     "uid"=> "d31789f2d6dcdf3c7dc07a5729d09ac9fr",
     "data_type"=> "script",
     "lang"=> "fr",
@@ -165,7 +165,7 @@ $config['script'][]=array(
 ); 
 
 $config['script'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/script_template_ihsn.json',
+    'template' => 'script_template_ihsn.json',
     "uid"=> "d0e54377885c64c360259b65398e319den",
     "data_type"=> "script",
     "lang"=> "en",
@@ -179,14 +179,14 @@ $config['script'][]=array(
 
 //geospatial
 $config['geospatial'][]=array(
-        'template' => 'metadata_editor/metadata_editor_templates/geospatial_form_template.json',
+        'template' => 'geospatial_form_template.json',
         'lang'=>'en',
         'uid'=>'geospatial-system-en',
         'name'=>'Geospatial schema'
 );
 
 $config['geospatial'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/geospatial_form_template_gemini.json',
+    'template' => 'geospatial_form_template_gemini.json',
     "uid"=> "geospatial-gemini-inspire-en",
     "data_type"=> "geospatial",
     "lang"=> "en",
@@ -200,14 +200,14 @@ $config['geospatial'][]=array(
 
 //document
 $config['document'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/document_form_template.json',
+    'template' => 'document_form_template.json',
     'lang'=>'en',
     'uid'=>'document-system-en',
     'name'=>'Document IHSN Schema 1.0 EN'
 );
 
 $config['document'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/document_form_template_es.json',
+    'template' => 'document_form_template_es.json',
     'lang'=>'es',
     'uid'=>'document-system-es',
     'name'=>'Documento IHSN Esquema 1.0 ES',
@@ -218,7 +218,7 @@ $config['document'][]=array(
 );
 
 $config['document'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/document_template_ihsn_fr.json',
+    'template' => 'document_template_ihsn_fr.json',
     "uid"=> "4915f93564fbde26945dd9022b9d7fc1fr",
     "data_type"=> "document",
     "lang"=> "fr",
@@ -232,7 +232,7 @@ $config['document'][]=array(
 
 
 $config['document'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/document_template_ihsn.json',
+    'template' => 'document_template_ihsn.json',
     "uid"=> "2f62a6b2716ab55b4426005abdbe1600en",
     "data_type"=> "document",
     "lang"=> "en",
@@ -249,14 +249,14 @@ $config['document'][]=array(
 
 //table
 $config['table'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/table_form_template.json',
+    'template' => 'table_form_template.json',
     'lang'=>'en',
     'uid'=>'table-system-en',
     'name'=>'Table IHSN Schema 1.0 EN'
 );
 
 $config['table'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/table_template_ihsn.json',
+    'template' => 'table_template_ihsn.json',
     "uid"=> "4b56b6c4ec82324c7c2865ad61c4f2c0en",
     "data_type"=> "table",
     "lang"=> "en",
@@ -268,7 +268,7 @@ $config['table'][]=array(
 );
 
 $config['table'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/table_template_ihsn_fr.json',
+    'template' => 'table_template_ihsn_fr.json',
     "uid"=> "9454eee369c79c65cdc0b4ee23aed4e8fr",
     "data_type"=> "table",
     "lang"=> "fr",
@@ -285,21 +285,21 @@ $config['table'][]=array(
 
 //image
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_form_template.json',
+    'template' => 'image_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-en',
     'name'=> 'Image IHSN Schema (DCMI and IPTC)'
 ); 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_dcmi_form_template.json',
+    'template' => 'image_dcmi_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-dcmi',
     'name'=> 'Image IHSN Schema (DCMI option) 1.0 EN'
 ); 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_iptc_form_template.json',
+    'template' => 'image_iptc_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-iptc',
     'name'=> 'Image IHSN Schema (IPTC option) 1.0 EN'
@@ -307,7 +307,7 @@ $config['image'][]=array(
 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_dcmi_template_ihsn_fr.json',
+    'template' => 'image_dcmi_template_ihsn_fr.json',
     "uid"=> "6192765f2dbddb6bd93f3f92a29129d3fr",
     "data_type"=> "image",
     "lang"=> "fr",
@@ -320,7 +320,7 @@ $config['image'][]=array(
 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_dcmi_template_ihsn.json',
+    'template' => 'image_dcmi_template_ihsn.json',
     "uid"=> "0d8e25111cee667a4b4636088cdb33e3",
     "data_type"=> "image",
     "lang"=> "en",
@@ -333,7 +333,7 @@ $config['image'][]=array(
 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_iptc_template_ihsn_fr.json',
+    'template' => 'image_iptc_template_ihsn_fr.json',
     "uid"=> "21769091754bb7c998a1caf0fa75800cfr",
     "data_type"=> "image",
     "lang"=> "fr",
@@ -346,7 +346,7 @@ $config['image'][]=array(
 
 
 $config['image'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/image_iptc_template_ihsn.json',
+    'template' => 'image_iptc_template_ihsn.json',
     "uid"=> "2bfd3fb47e291331a43e949e9e38675een",
     "data_type"=> "image",
     "lang"=> "en",
@@ -372,7 +372,7 @@ $config['image'][]=array(
 
 //video
 $config['video'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/video_form_template.json',
+    'template' => 'video_form_template.json',
     'lang'=>'en',
     'uid'=>'video-system-en',
     'name'=>'Video IHSN Schema 1.0 EN'
@@ -380,7 +380,7 @@ $config['video'][]=array(
 
 
 $config['video'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/video_template_ihsn_fr.json',
+    'template' => 'video_template_ihsn_fr.json',
     "uid"=> "e3e5a1d8bd0338c1b3a5d6bfff8e5517",
     "data_type"=> "video",
     "lang"=> "fr",
@@ -392,7 +392,7 @@ $config['video'][]=array(
 );
 
 $config['video'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/video_template_ihsn.json',
+    'template' => 'video_template_ihsn.json',
     "uid"=> "1f899824931c133f162f584c928d4256",
     "data_type"=> "video",
     "lang"=> "en",
@@ -405,7 +405,7 @@ $config['video'][]=array(
 
 
 $config['resource'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/resource_form_template.json',
+    'template' => 'resource_form_template.json',
     'lang'=>'en',
     'uid'=>'resource-system-en',
     'name'=>'resource-system-en'
@@ -413,7 +413,7 @@ $config['resource'][]=array(
 
 
 $config['resource'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/resource_template_ihsn.json',
+    'template' => 'resource_template_ihsn.json',
     "uid"=> "e6670ad469892a3871ee0e5d47cf243den",
     "data_type"=> "resource",
     "lang"=> "en",
@@ -426,7 +426,7 @@ $config['resource'][]=array(
 
 
 $config['resource'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/resource_template_ihsn_fr.json',
+    'template' => 'resource_template_ihsn_fr.json',
     "uid"=> "453a8bf9f800465f3cb8dc37699cb574",
     "data_type"=> "resource",
     "lang"=> "fr",
@@ -439,7 +439,7 @@ $config['resource'][]=array(
 
 
 $config['admin_meta'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/admin_metadata_template.json',
+    'template' => 'admin_metadata_template.json',
     "uid"=> "system-core-admin-meta",
     "data_type"=> "admin_meta",
     "lang"=> "EN",
@@ -451,7 +451,7 @@ $config['admin_meta'][]=array(
 ); 
 
 $config['custom'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/custom_form_template.json',
+    'template' => 'custom_form_template.json',
     'lang'=>'en',
     'uid'=>'custom-system-en',
     'name'=>'Custom schema template',
