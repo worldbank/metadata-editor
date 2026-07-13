@@ -424,8 +424,8 @@
                 metadata_idno:'',//study idno
                 project_id:project_sid,
                 formData: project_metadata,
-                formTemplate:form_template,
-                formTemplateParts:form_template_parts,
+                formTemplate: {},
+                formTemplateParts: {},
                 templates:[],//list of templates available                
                 treeActiveNode:null,
                 treeItems:[],
@@ -443,7 +443,8 @@
                 project_isloading:false,
                 project_is_locked:false,
                 project_version_info:null,
-                template_structure_valid: (typeof template_structure_valid !== 'undefined' ? template_structure_valid : true),
+                template_structure_valid: false,
+                template_isloading: false,
                 variables_loaded:false,
                 variables_isloading:false,
                 variables_active_tab:"documentation",
@@ -634,21 +635,29 @@
             actions: {               
                 async initData({commit},options) {
                     store.state.project_isloading=true;
-                    await store.dispatch('loadTemplatesList',{});
-                    await store.dispatch('loadProject',{dataset_id:options.dataset_id});
-                    await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
-                    await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
-                    await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
-                    await store.dispatch('loadMetadataTypesList',{});
-                    await store.dispatch('fetchOpenIssuesSummary', { projectId: store.state.project_id });
-                    
-                    // Load geospatial features for geospatial projects
-                    if (store.state.project_type === 'geospatial') {
-                        await store.dispatch('loadGeospatialFeatures',{dataset_id:options.dataset_id});
+                    store.state.template_isloading=true;
+                    try {
+                        await store.dispatch('loadProjectTemplate', {
+                            template_uid: (typeof project_template_uid !== 'undefined') ? project_template_uid : ''
+                        });
+                        await store.dispatch('loadTemplatesList',{});
+                        await store.dispatch('loadProject',{dataset_id:options.dataset_id});
+                        await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
+                        await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
+                        await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
+                        await store.dispatch('loadMetadataTypesList',{});
+                        await store.dispatch('fetchOpenIssuesSummary', { projectId: store.state.project_id });
+
+                        // Load geospatial features for geospatial projects
+                        if (store.state.project_type === 'geospatial') {
+                            await store.dispatch('loadGeospatialFeatures',{dataset_id:options.dataset_id});
+                        }
+
+                        store.state.variables_loaded=true;
+                    } finally {
+                        store.state.template_isloading=false;
+                        store.state.project_isloading=false;
                     }
-                    
-                    store.state.variables_loaded=true;
-                    store.state.project_isloading=false;
                 },
                 async initTreeItems({commit},options) {               
                     if (editorTemplateHasItems(store.state.formTemplate)) {
@@ -668,22 +677,39 @@
                         console.log(error);
                     });
                 },
-                async loadTemplateByUID({commit},options) {                    
-                    let url=CI.base_url + '/api/templates/'+options.template_uid;
-                    return axios
-                    .get(url)
-                    .then(function (response) {                        
-                        if (response.data.template){
-                            store.state.formTemplate=response.data;
-                            store.state.template_structure_valid = editorTemplateHasItems(response.data);
-                        }else{
-                            console.log("error load template", response.data);
-                            alert("error loading template");
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
+                async loadProjectTemplate({dispatch}, options) {
+                    return dispatch('loadTemplateByUID', {
+                        template_uid: options.template_uid || ''
                     });
+                },
+                async loadTemplateByUID({commit},options) {
+                    const template_uid = options.template_uid || '';
+                    if (!template_uid) {
+                        store.state.formTemplate = {};
+                        store.state.template_structure_valid = false;
+                        return false;
+                    }
+
+                    const url = CI.base_url + '/api/templates/' + template_uid;
+                    try {
+                        const response = await axios.get(url);
+                        if (response.data && response.data.template) {
+                            store.state.formTemplate = response.data;
+                            store.state.template_structure_valid = editorTemplateHasItems(response.data);
+                            return true;
+                        }
+
+                        store.state.formTemplate = {};
+                        store.state.template_structure_valid = false;
+                        console.log("error load template", response.data);
+                        alert("error loading template");
+                        return false;
+                    } catch (error) {
+                        store.state.formTemplate = {};
+                        store.state.template_structure_valid = false;
+                        console.log(error);
+                        throw error;
+                    }
                 },
                 fetchOpenIssuesSummary: function({ commit, state }, options) {
                     var projectId = (options && options.projectId) || state.project_id;

@@ -48,6 +48,11 @@
       'base_url': '<?php echo base_url(); ?>',
       'user_info': <?php echo json_encode($user_info); ?>
     };
+
+    function siteApiUrl(path) {
+      path = String(path || '').replace(/^\//, '');
+      return CI.site_url.replace(/\/?$/, '/') + path;
+    }
   </script>
 
   <div id="app" data-app >    
@@ -218,7 +223,7 @@
                     </div>
                     <div class="">
                       <v-btn small color="primary"  @click="dialog_create_project=true">{{$t("create_project")}}</v-btn>        
-                      <v-btn small color="primary"  @click="dialog_import_project=true">{{$t("import")}}</v-btn>
+                      <v-btn small color="primary"  @click="openImportDialog">{{$t("import")}}</v-btn>
                     </div>
                   </div>
 
@@ -523,90 +528,117 @@
 
     <template class="import-project">
       <div class="text-center">
-        <v-dialog v-model="dialog_import_project" width="500" :key="dialog_import_project_key">
-
+        <v-dialog
+          v-model="dialog_import_project"
+          width="520"
+          :key="dialog_import_project_key"
+          :persistent="import_project_loading"
+          @click:outside="onImportDialogOutsideClick"
+        >
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-              {{$t("import_project")}}
+              <span v-if="import_dialog_step === 'conflict'">{{$t("import_project_idno_conflict_title")}}</span>
+              <span v-else>{{$t("import_project")}}</span>
             </v-card-title>
 
             <v-card-text style="min-height:200px;">
-              <div class="mb-2">
-                <div  class="pb-1">{{$t("select_project_type")}}</div>
-                <v-select
-                    :items="ProjectTypes"
+              <div v-if="import_dialog_step === 'conflict'" class="pt-2">
+                <p>
+                  {{$t("import_project_idno_conflict_message_prefix")}}
+                  <a v-if="import_conflict_existing_sid"
+                    :href="importConflictProjectUrl"
+                    target="_blank"
+                    rel="noopener noreferrer">{{import_conflict_package_idno}}</a><span v-else>{{import_conflict_package_idno}}</span>{{$t("import_project_idno_conflict_message_suffix")}}
+                </p>
+                <p class="mb-0">{{$t("import_project_idno_conflict_study_idno_note", {idno: import_conflict_package_idno})}}</p>
+              </div>
+
+              <template v-else>
+                <div class="mb-2">
+                  <div class="pb-1">{{$t("select_project_type")}}</div>
+                  <v-select
+                      :items="ProjectTypes"
+                      label=""
+                      item-text="text"
+                      item-value="value"
+                      label=""
+                      persistent-hint
+                      return-object
+                      dense
+                      outlined
+                      v-model="import_project_type"
+                      :disabled="import_project_loading"
+                  ></v-select>
+                </div>
+                <div class="mb-2">
+                  <div class="pb-1">
+                  {{$t("upload_file")}}
+                    <?php /*
+                    <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='file'">Upload file</button></span>
+                    <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='url'">URL</button></span>
+                    */ ?>
+                  </div>
+                  <v-file-input v-if="upload_type=='file'"
+                    accept=".json,.jsonl,.xml,.zip"
                     label=""
-                    item-text="text"
-                    item-value="value"
-                    label=""
-                    persistent-hint
-                    return-object                    
+                    truncate-length="50"
                     dense
                     outlined
-                    v-model="import_project_type"
-                ></v-select>
-                
-              </div>
-              <div class="mb-2">
-                <div class="pb-1">
-                {{$t("upload_file")}}
-                  <?php /* 
-                  <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='file'">Upload file</button></span>
-                  <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='url'">URL</button></span>
-                  */ ?>
+                    v-model="import_file"
+                    prepend-icon=""
+                    prepend-inner-icon="mdi-file-upload"
+                    :disabled="import_project_loading"
+                  ></v-file-input>
+
+                  <v-text-field v-if="upload_type=='url'"
+                    label=""
+                    dense
+                    outlined
+                    v-model="import_url"
+                    prepend-icon=""
+                    prepend-inner-icon="mdi-link"
+                    :disabled="import_project_loading">
+                  </v-text-field>
                 </div>
-                <v-file-input v-if="upload_type=='file'"
-                  accept=".json,.jsonl,.xml,.zip"
-                  label=""                  
-                  truncate-length="50"                  
-                  dense
-                  outlined
-                  v-model="import_file"
-                  prepend-icon=""
-                  prepend-inner-icon="mdi-file-upload"
-                ></v-file-input>
+              </template>
 
-                <v-text-field v-if="upload_type=='url'"
-                  label=""
-                  dense
-                  outlined
-                  v-model="import_url"
-                  prepend-icon=""
-                  prepend-inner-icon="mdi-link">
-                </v-text-field>
-                
+              <div v-if="import_project_loading" class="mb-2 mt-3">
+                <v-progress-linear
+                  :indeterminate="!import_upload_show_progress"
+                  :value="import_upload_show_progress ? import_upload_percent : 0"
+                  color="primary"
+                ></v-progress-linear>
+                <div class="caption mt-1" v-if="import_status_message">{{import_status_message}}</div>
               </div>
 
-
-              <div v-if="import_project_loading">
-                <div class="mb-2 mt-3 pl-4 pr-4">
-                  <v-app>
-                  <v-progress-linear
-                    indeterminate
-                    color="primary"
-                  ></v-progress-linear>
-                  </v-app>
-                </div>
-              </div>
               <div v-if="import_file_errors">
                 <div class="mb-2 text-color-danger text-danger">
                   <div class="pb-1">{{$t("failed")}}</div>
-                  <div>{{import_file_errors.response.data}}</div>
+                  <div>{{formatImportError(import_file_errors)}}</div>
                 </div>
               </div>
-
             </v-card-text>
 
             <v-divider></v-divider>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="secondary" text @click="dialog_import_project = false">
-              {{$t("close")}}
-              </v-btn>
-              <v-btn color="primary" text @click="importProject" :disabled="!this.import_file || this.import_project_loading">
-              {{$t("import")}}
-              </v-btn>
+              <template v-if="import_dialog_step === 'conflict'">
+                <v-btn color="secondary" text @click="cancelImportConflict" :disabled="import_project_loading">
+                  {{$t("close")}}
+                </v-btn>
+                <v-btn color="primary" text @click="importProjectAnyway" :loading="import_project_loading" :disabled="import_project_loading">
+                  {{$t("import")}}
+                </v-btn>
+              </template>
+              <template v-else>
+                <v-btn color="secondary" text @click="closeImportDialog" :disabled="import_project_loading">
+                  {{$t("close")}}
+                </v-btn>
+                <v-btn color="primary" text @click="importProject" :loading="import_project_loading" :disabled="!this.import_file || this.import_project_loading">
+                  {{$t("import")}}
+                </v-btn>
+              </template>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -711,6 +743,7 @@
     echo $this->load->view("project/vue-create-revision-component.js", null, true);
     echo $this->load->view("project/vue-duplicate-project-component.js", null, true);
     echo $this->load->view("project/vue-list-revisions-component.js", null, true);
+    echo $this->load->view("metadata_editor/vue-resumable-chunk-uploader.js", null, true);
     echo $this->load->view("project/vue-user-filter-component.js", null, true);
     echo $this->load->view("project/vue-tag-filter-component.js", null, true);
 
@@ -834,6 +867,13 @@
         upload_type:'file',
         import_project_loading: false,
         import_file_errors:null,
+        import_upload_id: null,
+        import_upload_percent: 0,
+        import_upload_show_progress: false,
+        import_status_message: '',
+        import_dialog_step: 'form',
+        import_conflict_package_idno: '',
+        import_conflict_existing_sid: null,
         dialog_share_project: false,
         dialog_share_options: [],
         dialog_access_project:false,
@@ -918,7 +958,13 @@
             );
           }
           return types;
-        },        
+        },
+        importConflictProjectUrl() {
+          if (!this.import_conflict_existing_sid) {
+            return '#';
+          }
+          return siteApiUrl('editor/edit/' + this.import_conflict_existing_sid);
+        },
         
         Projects() {
           return this.projects.projects;
@@ -1781,12 +1827,37 @@
             });
           }
         },
+        openImportDialog: function() {
+          this.resetImportDialogState();
+          this.dialog_import_project = true;
+        },
+        closeImportDialog: function() {
+          if (this.import_project_loading) {
+            return;
+          }
+          this.dialog_import_project = false;
+          this.resetImportDialogState();
+        },
+        onImportDialogOutsideClick: function() {
+          if (this.import_project_loading) {
+            return;
+          }
+          this.closeImportDialog();
+        },
+        resetImportDialogState: function() {
+          this.import_dialog_step = 'form';
+          this.import_project_loading = false;
+          this.import_file_errors = null;
+          this.import_upload_id = null;
+          this.import_upload_percent = 0;
+          this.import_upload_show_progress = false;
+          this.import_status_message = '';
+          this.import_conflict_package_idno = '';
+          this.import_conflict_existing_sid = null;
+        },
         importProject: async function(){
-            let formData = new FormData();
-            formData.append('file', this.import_file);
-            
             if (this.import_project_type && this.import_project_type.value){
-              formData.append('type', this.import_project_type.value);
+              // type validated below
             }
             else{
               await this.$alert(this.$t("select_project_type"), { color: 'warning' });
@@ -1799,33 +1870,166 @@
                 return false;
             }
 
-            vm=this;
-            this.import_file_errors=null;
-            this.import_project_loading=true;
-            let url=CI.site_url + '/api/importproject/';
+            if (typeof ResumableChunkUploader === 'undefined') {
+                await this.$alert('ResumableChunkUploader is not loaded', { color: 'error' });
+                return false;
+            }
 
-            axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
+            const vm = this;
+            this.import_dialog_step = 'form';
+            this.import_file_errors = null;
+            this.import_project_loading = true;
+            this.import_upload_show_progress = false;
+            this.import_upload_percent = 0;
+            this.import_status_message = this.$t('import_project_uploading');
+            this.import_upload_id = null;
+
+            try {
+              const chunkResult = await ResumableChunkUploader.uploadFileChunks(this.import_file, {
+                fileType: 'import_project',
+                uploadMetadata: {
+                  purpose: 'import_project',
+                  allowed_types: 'json,jsonl,xml,zip'
+                },
+                onInitializing: function(isInit) {
+                  vm.import_upload_show_progress = false;
+                  if (isInit) {
+                    vm.import_status_message = vm.$t('import_project_uploading');
+                  }
+                },
+                onProgress: function(p) {
+                  vm.import_upload_show_progress = true;
+                  vm.import_upload_percent = p.progress;
+                  vm.import_status_message = vm.$t('import_project_uploading_progress', {
+                    uploaded: p.uploaded_chunks,
+                    total: p.total_chunks,
+                    percent: p.progress
+                  });
                 }
-            ).then(function(response){
-                vm.import_project_loading=false;
-                if (response.data.sid){
-                  vm.EditProject(response.data.sid);
+              });
+
+              vm.import_upload_id = chunkResult.upload_id;
+              vm.import_status_message = vm.$t('import_project_previewing');
+
+              const previewForm = new FormData();
+              previewForm.append('upload_id', chunkResult.upload_id);
+              previewForm.append('type', vm.import_project_type.value);
+
+              let previewResponse;
+              try {
+                previewResponse = await axios.post(siteApiUrl('api/importproject/preview'), previewForm);
+              } catch (previewError) {
+                if (previewError.response && previewError.response.status === 409) {
+                  vm.showImportConflictDialog(previewError.response.data, chunkResult.upload_id);
+                  return;
                 }
-                vm.dialog_import_project=false;
-                vm.loadProjects();
-                vm.dialog_import_project_key++;
-                vm.import_file=null;
-            })
-            .catch(function(response){
-                vm.import_file_errors=response;
-                vm.import_project_loading=false;
-                console.log("error", response);
-            }); 
+                throw previewError;
+              }
+
+              await vm.runImportWithUploadId(chunkResult.upload_id, 'fail');
+            } catch (e) {
+              vm.import_file_errors = e;
+              vm.import_project_loading = false;
+              console.log("importProject error", e);
+            }
+        },
+        importProjectAnyway: async function() {
+          if (!this.import_upload_id) {
+            return;
+          }
+          const vm = this;
+          vm.import_file_errors = null;
+          try {
+            await vm.runImportWithUploadId(vm.import_upload_id, 'assign_new_idno');
+          } catch (e) {
+            vm.import_file_errors = e;
+          }
+        },
+        cancelImportConflict: function() {
+          if (this.import_project_loading) {
+            return;
+          }
+          this.import_dialog_step = 'form';
+          this.import_upload_id = null;
+          this.import_conflict_package_idno = '';
+          this.import_conflict_existing_sid = null;
+          this.import_file_errors = null;
+        },
+        showImportConflictDialog: function(conflictData, uploadId) {
+          this.import_upload_id = uploadId;
+          this.import_conflict_package_idno = conflictData.package_idno || (conflictData.package && conflictData.package.idno) || '';
+          const existing = conflictData.existing_project;
+          this.import_conflict_existing_sid = (existing && existing.sid) ? parseInt(existing.sid, 10) : null;
+          if (this.import_conflict_existing_sid && isNaN(this.import_conflict_existing_sid)) {
+            this.import_conflict_existing_sid = null;
+          }
+          this.import_dialog_step = 'conflict';
+          this.import_project_loading = false;
+          this.import_status_message = '';
+          this.import_upload_show_progress = false;
+          this.import_file_errors = null;
+        },
+        runImportWithUploadId: async function(uploadId, onIdnoConflict) {
+          const vm = this;
+          const formData = new FormData();
+          formData.append('upload_id', uploadId);
+          formData.append('type', vm.import_project_type.value);
+          formData.append('on_idno_conflict', onIdnoConflict);
+
+          vm.import_project_loading = true;
+          vm.import_upload_show_progress = false;
+          vm.import_status_message = vm.$t('import_project_importing');
+
+          try {
+            const response = await axios.post(siteApiUrl('api/importproject/'), formData);
+
+            if (response.data && response.data.idno_reassigned) {
+              const studyIdno = response.data.study_idno || response.data.package_idno || vm.import_conflict_package_idno;
+              await vm.$alert(
+                vm.$t('import_project_success_reassigned', {
+                  idno: response.data.idno,
+                  study_idno: studyIdno
+                }),
+                { color: 'success' }
+              );
+            }
+
+            vm.dialog_import_project = false;
+            vm.resetImportDialogState();
+            vm.dialog_import_project_key++;
+            vm.import_file = null;
+            vm.loadProjects();
+
+            if (response.data && response.data.sid) {
+              vm.EditProject(response.data.sid);
+            }
+          } catch (e) {
+            vm.import_file_errors = e;
+            throw e;
+          } finally {
+            vm.import_project_loading = false;
+            vm.import_upload_show_progress = false;
+            vm.import_status_message = '';
+          }
+        },
+        formatImportError: function(err) {
+          if (!err) {
+            return '';
+          }
+          const data = err.response && err.response.data ? err.response.data : null;
+          if (!data) {
+            return err.message || String(err);
+          }
+          if (typeof data === 'string') {
+            return data;
+          }
+          if (data.errors) {
+            return typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors);
+          }
+          if (data.message) {
+            return data.message;
+          }
+          return JSON.stringify(data);
         },
         projectSubInfo: function(project){
           let info=[];

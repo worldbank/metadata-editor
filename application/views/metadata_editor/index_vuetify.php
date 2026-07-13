@@ -17,48 +17,6 @@
   <style>[v-cloak]{display:none !important;}</style>
 </head>
 
-<?php
-  //break template into smaller templates by spliting template ['items']
-  $template_parts=array();
-  
-  //update template_parts
-  //get_template_part($metadata_template_arr['items'],$template_parts);
-
-  function get_template_part($items,&$output)
-  {
-    foreach($items as $item){
-      if (isset($item['items'])){
-        get_template_part($item['items'],$output);
-      }
-      if (isset($item['key'])){
-        $output[$item['key']]=$item;
-      }
-    }
-  } 
-
-  $template_keys = array();
-  if (is_array($metadata_template_arr)
-    && isset($metadata_template_arr['items'])
-    && is_array($metadata_template_arr['items'])) {
-    get_template_keys($metadata_template_arr['items'],$template_keys);
-  }
-  function get_template_keys($items,&$output)
-  {
-    foreach($items as $item){
-      if (isset($item['items'])){
-        get_template_keys($item['items'],$output);
-      }
-      if (!isset($item['type'])){
-        $item['type']='string';
-      }
-      if (isset($item['key']) && $item['type']!='section' ){
-        $output[]=$item['key'];
-      }
-    }        
-  }
-  
-?>
-
 <body class="hold-transition sidebar-mini layout-fixed">
 
 
@@ -84,9 +42,7 @@
           'user_info': <?php echo json_encode($user_info); ?>
         }; 
         let sid='<?php echo $sid;?>';
-        let form_template=<?php echo $metadata_template;?>;
-        let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
-        var template_structure_valid=<?php echo (!isset($template_structure_valid) || $template_structure_valid) ? 'true' : 'false'; ?>;
+        let project_template_uid=<?php echo json_encode(isset($template_uid) ? $template_uid : ''); ?>;
     </script>
 
   <div id="app" data-app>

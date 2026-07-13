@@ -39,8 +39,11 @@ class ImportPackage
      * @return array - Import results
      * 
      */
-    public function import($sid, $zip_path)
+    public function import($sid, $zip_path, $options = array())
     {
+        $skip_idno_validation = !empty($options['skip_idno_validation']);
+        $preserve_project_idno = !empty($options['preserve_project_idno']);
+
         // Validate ZIP file exists
         if (!file_exists($zip_path)){
             throw new Exception("ZIP file not found: " . $zip_path);
@@ -53,10 +56,16 @@ class ImportPackage
         $project_info = $this->read_project_info($project_path);
 
         // Validate IDNO - check if it already exists (for different project)
-        $this->validate_idno($sid, $project_info);
+        if (!$skip_idno_validation) {
+            $this->validate_idno($sid, $project_info);
+        }
 
         // Import metadata (JSON or XML)
-        $metadata_result = $this->import_metadata($sid, $project_path, $project_info);
+        $metadata_import_options = array();
+        if (!empty($options['metadata_import_options']) && is_array($options['metadata_import_options'])) {
+            $metadata_import_options = $options['metadata_import_options'];
+        }
+        $metadata_result = $this->import_metadata($sid, $project_path, $project_info, $metadata_import_options);
 
         // Link data files for microdata projects
         $this->link_data_files($sid, $project_path);
@@ -67,8 +76,8 @@ class ImportPackage
         // Set thumbnail if available
         $thumbnail = $this->set_thumbnail($sid, $project_info);
 
-        // Update project IDNO if provided in package
-        if (!empty($project_info['idno'])){
+        // Update project IDNO if provided in package (skip when preserving generated idno)
+        if (!$preserve_project_idno && !empty($project_info['idno'])){
             $this->ci->Editor_model->set_project_options($sid, array(
                 'idno' => $project_info['idno']
             ));
@@ -80,6 +89,61 @@ class ImportPackage
             'resources_imported' => $resources_imported,
             'thumbnail' => $thumbnail,
             'project_info' => $project_info
+        );
+    }
+
+
+    /**
+     * Read info.json from a ZIP package without extracting the archive.
+     *
+     * @param string $zip_path
+     * @return array Parsed info.json manifest
+     */
+    public function peek_info_json($zip_path)
+    {
+        if (!file_exists($zip_path)) {
+            throw new Exception("ZIP file not found: " . $zip_path);
+        }
+
+        $this->validate_zip_entries($zip_path);
+
+        $zipFile = new \PhpZip\ZipFile();
+        try {
+            $zipFile->openFile($zip_path);
+            $info_content = $zipFile->getEntryContents('info.json');
+        }
+        catch (\PhpZip\Exception\ZipException $e) {
+            throw new Exception("Project info.json not found in package archive");
+        }
+        finally {
+            $zipFile->close();
+        }
+
+        if ($info_content === false || $info_content === '') {
+            throw new Exception("Project info.json not found in package archive");
+        }
+
+        $project_info = json_decode($info_content, true);
+        if ($project_info === null) {
+            throw new Exception("Invalid JSON in info.json: " . json_last_error_msg());
+        }
+
+        return $project_info;
+    }
+
+
+    /**
+     * Summarize package manifest fields used by import preview.
+     *
+     * @param array $project_info
+     * @return array
+     */
+    public function summarize_package_info($project_info)
+    {
+        return array(
+            'idno' => isset($project_info['idno']) ? trim((string) $project_info['idno']) : '',
+            'type' => isset($project_info['type']) ? trim((string) $project_info['type']) : '',
+            'title' => isset($project_info['title']) ? trim((string) $project_info['title']) : '',
         );
     }
 
@@ -230,7 +294,7 @@ class ImportPackage
      * @return mixed - Import result
      * 
      */
-    private function import_metadata($sid, $project_path, $project_info)
+    private function import_metadata($sid, $project_path, $project_info, $import_options = array())
     {
         $metadata_file_path = null;
         $file_source = null;
@@ -267,8 +331,7 @@ class ImportPackage
         }
 
         // Import using ImportJsonMetadata (handles both JSON and XML)
-        $options = array();
-        $result = $this->ci->importjsonmetadata->import($sid, $metadata_file_path, $validate=false, $options);
+        $result = $this->ci->importjsonmetadata->import($sid, $metadata_file_path, $validate=false, $import_options);
 
         return array(
             'result' => $result,

@@ -3,6 +3,7 @@
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use JsonMachine\JsonDecoder\DecodingError;
+use JsonMachine\JsonDecoder\PassThruDecoder;
 
 
 /**
@@ -41,6 +42,7 @@ class ImportJsonMetadata
         
         // Threshold for using streaming parser (10MB)
         $this->streaming_threshold = 5 * 1024 * 1024;
+        $this->import_min_memory_bytes = 1024 * 1024 * 1024;
 	}
     
     /**
@@ -58,6 +60,8 @@ class ImportJsonMetadata
      */
     function import($sid,$file_path,$validate=true,$options=array())
     {
+        $this->ensure_import_php_limits();
+
         // Validate file exists
         if (!file_exists($file_path)){
             throw new Exception("File not found: " . $file_path);
@@ -99,6 +103,14 @@ class ImportJsonMetadata
     {
         $type = $this->detect_project_type($json_file_path, $options);
         $canonical_type = $this->ci->Editor_model->resolve_canonical_type($type) ?: $type;
+
+        if (isset($options['type']) && !empty($options['type'])) {
+            $canonical_options_type = $this->ci->Editor_model->resolve_canonical_type($options['type']) ?: $options['type'];
+            if ($canonical_options_type) {
+                $canonical_type = $canonical_options_type;
+                $type = $options['type'];
+            }
+        }
         
         // microdata and geospatial always use streaming
         $is_microdata = ($canonical_type === 'microdata' || $canonical_type === 'survey');
@@ -164,6 +176,79 @@ class ImportJsonMetadata
     }
 
 
+    /**
+     * Read top-level JSON object fields while skipping large subtrees without decoding them.
+     *
+     * ExtJsonDecoder decodes each property value in full; skipping assignment after decode
+     * still exhausts memory on keys such as "variables". PassThruDecoder yields raw JSON
+     * fragments so excluded keys are never decoded into PHP structures.
+     *
+     * @param string $json_file_path
+     * @param string[] $exclude_keys Top-level keys to skip (e.g. variables, data_files)
+     * @return array
+     */
+    private function extract_root_metadata_excluding_keys($json_file_path, array $exclude_keys)
+    {
+        if (!file_exists($json_file_path)) {
+            throw new Exception("File not found: " . $json_file_path);
+        }
+
+        $exclude_lookup = array_flip($exclude_keys);
+        $json_data = array();
+
+        $items = Items::fromFile($json_file_path, array(
+            'decoder' => new PassThruDecoder(),
+        ));
+
+        foreach ($items as $raw_key => $raw_value) {
+            $key = json_decode($raw_key, true);
+            if (!is_string($key) || $key === '' || isset($exclude_lookup[$key])) {
+                continue;
+            }
+
+            $decoded = json_decode($raw_value, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("Invalid JSON for key '{$key}': " . json_last_error_msg());
+            }
+
+            $json_data[$key] = $decoded;
+        }
+
+        return $json_data;
+    }
+
+
+    /**
+     * Raise PHP limits for large metadata imports (matches Data API import limits).
+     */
+    private function ensure_import_php_limits()
+    {
+        set_time_limit(0);
+
+        $current = ini_get('memory_limit');
+        if ($current === '-1') {
+            return;
+        }
+
+        $bytes = 0;
+        if (preg_match('/^(\d+)([KMG])?$/i', trim((string) $current), $m)) {
+            $bytes = (int) $m[1];
+            $unit = isset($m[2]) ? strtoupper($m[2]) : '';
+            if ($unit === 'K') {
+                $bytes *= 1024;
+            } elseif ($unit === 'M') {
+                $bytes *= 1024 * 1024;
+            } elseif ($unit === 'G') {
+                $bytes *= 1024 * 1024 * 1024;
+            }
+        }
+
+        if ($bytes > 0 && $bytes < $this->import_min_memory_bytes) {
+            ini_set('memory_limit', '1024M');
+        }
+    }
+
+
     
     /**
      * 
@@ -186,23 +271,12 @@ class ImportJsonMetadata
      */
     private function import_microdata_streaming($sid,$json_file_path,$validate=true,$options=array())
     {
-        // Extract metadata using json-machine, but exclude large arrays
-        // Use iterator_to_array but then remove large arrays before processing
-        $json_data = array();
-        
         try {
-            $items = Items::fromFile($json_file_path, [
-                'decoder' => new ExtJsonDecoder(true)
-            ]);
-            
-            // Convert iterator to array
-            $json_data = iterator_to_array($items, true);
-            
-            // Remove large arrays
-            unset($json_data['variables']);
-            unset($json_data['data_files']);
-            unset($json_data['variable_groups']);
-            
+            $json_data = $this->extract_root_metadata_excluding_keys($json_file_path, array(
+                'variables',
+                'data_files',
+                'variable_groups',
+            ));
         } catch (Exception $e) {
             log_message('error', 'Failed to extract metadata using json-machine: ' . $e->getMessage());
             throw new Exception("Failed to extract metadata from JSON file: " . $e->getMessage());
@@ -241,6 +315,11 @@ class ImportJsonMetadata
         
         // Import project metadata first
         $this->import_project_metadata($type, $sid, $json_data, $validate);
+        unset($json_data);
+
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
         
         // Stream process data_files array
         $file_id_mappings = $this->stream_process_datafiles($sid, $json_file_path, $validate);
@@ -266,23 +345,11 @@ class ImportJsonMetadata
      * 
      */
     private function import_geospatial_streaming($sid,$json_file_path,$validate=true,$options=array())
-    {        
-        // Extract metadata using json-machine, but exclude feature_catalogue
-        $json_data = array();
-        $root_feature_catalogue = null;
-        
+    {
         try {
-            $items = Items::fromFile($json_file_path, [
-                'decoder' => new ExtJsonDecoder(true)
-            ]);
-            
-            // Convert iterator to array
-            $json_data = iterator_to_array($items, true);
-            
-            // Handle feature_catalogue
-            if (isset($json_data['feature_catalogue'])) {
-                $root_feature_catalogue = $json_data['feature_catalogue'];
-            }            
+            $json_data = $this->extract_root_metadata_excluding_keys($json_file_path, array(
+                'feature_catalogue',
+            ));
         } catch (Exception $e) {
             log_message('error', 'Failed to extract metadata using json-machine: ' . $e->getMessage());
             throw new Exception("Failed to extract metadata from JSON file: " . $e->getMessage());
@@ -325,19 +392,6 @@ class ImportJsonMetadata
             isset($json_data['description']['identificationInfo'][0])
         ){
             $json_data['description']['identificationInfo'] = $json_data['description']['identificationInfo'][0];
-        }
-        
-        // Handle feature_catalogue at root level - move to description if needed
-        if (!isset($json_data['description']['feature_catalogue']) && $root_feature_catalogue !== null) {
-            if (!isset($json_data['description'])) {
-                $json_data['description'] = array();
-            }
-            // Copy feature_catalogue data except featureType (we'll process it separately)
-            $feature_catalogue_data = $root_feature_catalogue;
-            if (isset($feature_catalogue_data['featureType'])) {
-                unset($feature_catalogue_data['featureType']);
-            }
-            $json_data['description']['feature_catalogue'] = $feature_catalogue_data;
         }
         
         // Import project metadata first
@@ -869,17 +923,17 @@ class ImportJsonMetadata
     {
         require_once(APPPATH.'../vendor/autoload.php');
         
-        $batch_size = 500;
+        $batch_size = 200;
         $variable_batch = array();
         $batch_count = 0;
         $total_variables = 0;
         
         try {
             // Stream process variables array using JSON Pointer
-            $items = Items::fromFile($json_file_path, [
+            $items = Items::fromFile($json_file_path, array(
                 'decoder' => new ExtJsonDecoder(true),
-                'pointer' => '/variables'
-            ]);
+                'pointer' => '/variables',
+            ));
             
             foreach ($items as $variable) {
                 $variable_batch[] = $variable;

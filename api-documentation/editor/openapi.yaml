@@ -1056,12 +1056,49 @@ paths:
                 $ref: sdmx-json-metadata-schema.json
       security:
         - ApiKeyAuth: []
+  /importproject/preview:
+    post:
+      tags:
+        - Projects
+      summary: Preview project import package
+      description: >
+        Validate a completed resumable upload before creating a project. For ZIP packages,
+        reads info.json from the archive and returns 409 when the package IDNO already exists.
+      operationId: previewImportProject
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                type:
+                  description: Project type selected for import
+                  type: string
+                upload_id:
+                  description: Completed resumable upload ID from POST /api/uploads/*
+                  type: string
+              required:
+                - type
+                - upload_id
+        required: true
+      responses:
+        "200":
+          description: Package is ready to import
+        "409":
+          description: Package IDNO already exists
+      security:
+        - ApiKeyAuth: []
   /importproject/:
     post:
       tags:
         - Projects
       summary: Import project
-      description: Create a project by importing metadata (XML/JSON) or project zip package
+      description: >
+        Create a project by importing metadata (XML/JSON/JSONL) or a project ZIP package.
+        Provide either a multipart `file` upload (legacy) or a completed resumable `upload_id`.
+        For ZIP packages with a duplicate package IDNO, use `on_idno_conflict=assign_new_idno`
+        to import as a new project with a generated internal IDNO while preserving study IDNO
+        from the package metadata.
       operationId: importProject
       requestBody:
         content:
@@ -1073,16 +1110,29 @@ paths:
                   description: "Project type e.g. microdata, document, table, timeseries, etc "
                   type: string
                 file:
-                  description: Project file (XML, JSON or package zip)
+                  description: Project file (XML, JSON, JSONL or package zip) — legacy single upload
                   type: string
                   format: binary
+                upload_id:
+                  description: Completed resumable upload ID (mutually exclusive with file)
+                  type: string
+                idno:
+                  description: Optional project IDNO (rare; ZIP packages normally use manifest IDNO)
+                  type: string
+                on_idno_conflict:
+                  description: "ZIP duplicate IDNO handling: fail (default) or assign_new_idno"
+                  type: string
+                  enum:
+                    - fail
+                    - assign_new_idno
               required:
                 - type
-                - file
         required: true
       responses:
         "200":
           description: successful operation
+        "409":
+          description: Package IDNO already exists and on_idno_conflict=fail
       security:
         - ApiKeyAuth: []
   /editor/create/survey:

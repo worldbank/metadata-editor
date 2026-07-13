@@ -7,6 +7,15 @@
 
     var limitsCache = null;
 
+    function apiUrl(path) {
+        var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url : '';
+        if (!base && typeof CI !== 'undefined' && CI.base_url) {
+            base = CI.base_url;
+        }
+        path = String(path || '').replace(/^\//, '');
+        return base.replace(/\/?$/, '/') + path;
+    }
+
     function delay(ms) {
         return new Promise(function (resolve) {
             setTimeout(resolve, ms);
@@ -18,7 +27,7 @@
             return Promise.resolve(limitsCache);
         }
         return axios
-            .get(CI.base_url + '/api/uploads/limits')
+            .get(apiUrl('api/uploads/limits'))
             .then(function (response) {
                 if (response.data && response.data.status === 'success') {
                     limitsCache = {
@@ -58,8 +67,9 @@
     /**
      * @param {File} file
      * @param {object} options
-     * @param {string|number} options.projectId
+     * @param {string|number} [options.projectId]
      * @param {string} [options.fileType='data']
+     * @param {object} [options.uploadMetadata] Extra fields merged into resumable init metadata
      * @param {number} [options.chunkSize]
      * @param {number} [options.maxChunkSize]
      * @param {number} [options.maxRetries=3]
@@ -75,6 +85,7 @@
         options = options || {};
         var projectId = options.projectId;
         var fileType = options.fileType || 'data';
+        var uploadMetadata = options.uploadMetadata || {};
         var maxRetries = options.maxRetries != null ? options.maxRetries : 3;
         var retryDelay = options.retryDelay != null ? options.retryDelay : 1000;
         var exponentialBackoff = options.exponentialBackoff !== false;
@@ -97,16 +108,18 @@
                 options.onInitializing(true);
             }
 
+            var initMetadata = Object.assign({
+                project_id: projectId,
+                file_type: fileType
+            }, uploadMetadata);
+
             return axios
-                .post(CI.base_url + '/api/uploads/init', {
+                .post(apiUrl('api/uploads/init'), {
                     filename: file.name,
                     total_size: totalSize,
                     total_chunks: totalChunks,
                     chunk_size: chunkSize,
-                    metadata: {
-                        project_id: projectId,
-                        file_type: fileType
-                    }
+                    metadata: initMetadata
                 })
                 .then(function (response) {
                     if (options.onInitializing) {
@@ -163,7 +176,7 @@
                         var actualChunkSize = chunkData.byteLength;
                         return axios
                             .post(
-                                CI.base_url + '/api/uploads/chunk/' + uploadId,
+                                apiUrl('api/uploads/chunk/' + uploadId),
                                 chunkData,
                                 {
                                     headers: {

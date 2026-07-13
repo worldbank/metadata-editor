@@ -86,12 +86,20 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
         this.loadUploadLimits();
     },
     methods: {
+        siteApiUrl(path) {
+            var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url : '';
+            if (!base && typeof CI !== 'undefined' && CI.base_url) {
+                base = CI.base_url;
+            }
+            path = String(path || '').replace(/^\//, '');
+            return base.replace(/\/?$/, '/') + path;
+        },
         /**
          * Load upload limits from server
          */
         loadUploadLimits() {
             const vm = this;
-            axios.get(CI.base_url + '/api/uploads/limits')
+            axios.get(this.siteApiUrl('api/uploads/limits'))
                 .then(function(response) {
                     if (response.data.status === 'success') {
                         vm.uploadLimits = response.data;
@@ -311,7 +319,7 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
                 formData.append('upload_id', this.uploadId);
                 
                 axios.post(
-                    CI.base_url + '/api/files/' + this.projectId + '/' + this.fileType,
+                    vm.siteApiUrl('api/files/' + vm.projectId + '/' + vm.fileType),
                     formData,
                     {
                         headers: {
@@ -351,7 +359,7 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
             
             // Optionally delete the upload on server
             if (this.uploadId) {
-                axios.delete(CI.base_url + '/api/uploads/' + this.uploadId)
+                axios.delete(this.siteApiUrl('api/uploads/' + this.uploadId))
                     .catch(function(error) {
                         console.error('Failed to cancel upload on server:', error);
                     });
