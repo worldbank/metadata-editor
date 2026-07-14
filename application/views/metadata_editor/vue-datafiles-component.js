@@ -213,6 +213,12 @@ Vue.component('datafiles', {
             let url = CI.base_url + '/api/datafiles/export_metadata/' + this.dataset_id + '/' + encodeURIComponent(data_file.file_id);
             window.location.href = url;
         },
+        exportDictionaryCsv: function(file_idx) {
+            let data_file = this.data_files[file_idx];
+            if (!data_file) return;
+            let url = CI.base_url + '/api/variables/export_csv/' + this.dataset_id + '/' + encodeURIComponent(data_file.file_id) + '?download=1';
+            window.location.href = url;
+        },
         openImportMetadataDialog: function(file_idx){
             let data_file = this.data_files[file_idx];
             if (!data_file) return;
@@ -690,6 +696,13 @@ Vue.component('datafiles', {
                                                 <v-icon>mdi-code-json</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("export_metadata")}}</v-list-item-title>
+                                        </v-list-item>
+
+                                        <v-list-item @click="exportDictionaryCsv(index)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-book-open-variant</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("export_data_dictionary")}}</v-list-item-title>
                                         </v-list-item>
                                         
                                         <v-list-item @click="openImportMetadataDialog(index)">

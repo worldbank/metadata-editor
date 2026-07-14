@@ -703,31 +703,53 @@ class Variables extends MY_REST_Controller
 
 	/**
 	 * 
-	 * Export variables as CSV
+	 * Export data dictionary as CSV (info rows then category rows).
 	 * 
 	 * @sid - project ID
 	 * @fid - file ID
 	 * 
-	 * Note: Exports only a selective list of variable fields
+	 * Query: download=1 — Content-Disposition attachment (default for browsers)
 	 * 
 	 */
 	function export_csv_get($sid=null, $fid=null)
 	{
 		try{
 			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
-			$user_id=$this->get_api_user_id();        						
+			$user_id=$this->get_api_user_id();
 
-			//$survey_variables=$this->Editor_variable_model->select_all($sid,$file_id,$variable_detailed=true);
-			//$this->update_variable_weight_info($sid,$survey_variables);
+			if (!$sid || !$fid) {
+				throw new Exception('Project ID and file ID are required');
+			}
 
-			$this->load->library("Variables_transform");
-			$response=$this->variables_transform->variables_to_csv($sid,$fid);
-			
-			/*$response=array(
-				'variables'=>$survey_variables
-			);*/
+			$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $fid);
+			if (!$datafile) {
+				throw new Exception('Data file not found');
+			}
 
-			$this->set_response($response, REST_Controller::HTTP_OK);
+			$this->load->library('Data_dictionary_csv');
+			$csv = $this->data_dictionary_csv->export_csv($sid, $fid);
+
+			$download = $this->input->get('download');
+			if ($download === null || $download === '') {
+				$download = true;
+			} else {
+				$download = filter_var($download, FILTER_VALIDATE_BOOLEAN);
+			}
+
+			if ($download) {
+				$filename = $this->data_dictionary_csv->dictionary_filename_for_datafile($datafile);
+				header('Content-Type: text/csv; charset=UTF-8');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
+				header('Cache-Control: no-store, no-cache');
+				echo $csv;
+				exit();
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'csv' => $csv,
+				'format_version' => Data_dictionary_csv::FORMAT_VERSION,
+			), REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){
 			$error_output=array(

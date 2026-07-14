@@ -21,6 +21,7 @@ class Microdata_resource_generator
 		$this->ci->load->library('Datafile_export');
 		$this->ci->load->library('Datafile_export_zip');
 		$this->ci->load->library('Microdata_resource_mapper');
+		$this->ci->load->library('Data_dictionary_csv');
 	}
 
 	/**
@@ -117,7 +118,7 @@ class Microdata_resource_generator
 		foreach ($selected as $fid => $datafile) {
 			$mode = $this->resolve_file_export_mode($sid, $fid, $datafile, $export_format, $file_modes);
 			if ($mode === 'original') {
-				$exported_files[] = $this->copy_original_to_tmp(
+				$exported = $this->copy_original_to_tmp(
 					$sid,
 					$fid,
 					$datafile,
@@ -125,7 +126,7 @@ class Microdata_resource_generator
 					$tmp_folder
 				);
 			} else {
-				$exported_files[] = $this->export_datafile_to_tmp(
+				$exported = $this->export_datafile_to_tmp(
 					$sid,
 					$fid,
 					$datafile,
@@ -135,6 +136,10 @@ class Microdata_resource_generator
 					$max_wait
 				);
 			}
+			if ($export_format === 'csv') {
+				$exported = $this->attach_dictionary_csv_export($sid, $fid, $datafile, $tmp_folder, $exported);
+			}
+			$exported_files[] = $exported;
 		}
 
 		$bundle_type = $use_zip ? 'zip' : 'single';
@@ -150,6 +155,12 @@ class Microdata_resource_generator
 					'full' => $exp['path'],
 					'entry' => $exp['zip_entry_name'],
 				);
+				if ($export_format === 'csv' && !empty($exp['dictionary_path']) && !empty($exp['dictionary_zip_entry'])) {
+					$files_to_add[] = array(
+						'full' => $exp['dictionary_path'],
+						'entry' => $exp['dictionary_zip_entry'],
+					);
+				}
 			}
 			$zip_filename = $this->ci->datafile_export_zip->compute_zip_filename($sid, $files_to_add, array(
 				'export_format' => $export_format,
@@ -413,6 +424,26 @@ class Microdata_resource_generator
 	}
 
 	/**
+	 * Write companion dictionary CSV for a data file export (CSV bundles only).
+	 *
+	 * @param int $sid
+	 * @param string $file_id
+	 * @param array $datafile
+	 * @param string $tmp_folder
+	 * @param array $exported
+	 * @return array
+	 */
+	private function attach_dictionary_csv_export($sid, $file_id, array $datafile, $tmp_folder, array $exported)
+	{
+		$dict_name = $this->ci->data_dictionary_csv->dictionary_filename_for_datafile($datafile);
+		$dict_path = rtrim($tmp_folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $dict_name;
+		$this->ci->data_dictionary_csv->export_csv_to_path($sid, $file_id, $dict_path);
+		$exported['dictionary_path'] = $dict_path;
+		$exported['dictionary_zip_entry'] = $dict_name;
+		return $exported;
+	}
+
+	/**
 	 * @param string $tmp_folder
 	 * @param array $exported_files
 	 * @param string|null $zip_basename
@@ -422,6 +453,9 @@ class Microdata_resource_generator
 		foreach ($exported_files as $exp) {
 			if (!empty($exp['path']) && is_file($exp['path'])) {
 				@unlink($exp['path']);
+			}
+			if (!empty($exp['dictionary_path']) && is_file($exp['dictionary_path'])) {
+				@unlink($exp['dictionary_path']);
 			}
 		}
 		if ($zip_basename !== null) {
