@@ -587,7 +587,17 @@ CREATE TABLE `editor_templates_default` (
 
 insert into `editor_templates_default` (data_type, template_uid)
 values
+('microdata','microdata-system-en'),
+('indicator','timeseries-system-en'),
+('indicator-db','timeseries-db-system-en'),
+('script','script-system-en'),
+('geospatial','geospatial-system-en'),
+('document','document-system-en'),
+('table','table-system-en'),
+('image','image-system-en'),
+('video','video-system-en'),
 ('resource','resource-system-en'),
+('admin_meta','system-core-admin-meta'),
 ('custom','custom-system-en');
 
 
