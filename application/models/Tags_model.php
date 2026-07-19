@@ -388,10 +388,9 @@ class Tags_model extends CI_Model {
             
             if (!$is_admin) {
                 $uid = (int) $user_id;
+                $this->load->helper('collection_acl');
                 $subquery = 'SELECT sid FROM editor_project_owners WHERE user_id = ' . $uid;
-                $coll_query = 'SELECT sid FROM editor_collection_projects ecp '
-                    . 'INNER JOIN editor_collection_project_acl ecpa ON ecpa.collection_id = ecp.collection_id '
-                    . 'WHERE ecpa.user_id = ' . $uid;
+                $coll_query = collection_acl_sql_project_ids_for_user($uid);
                 $this->db->where('(p.created_by = ' . $uid . ' OR p.id IN (' . $subquery . ') OR p.id IN (' . $coll_query . '))', null, false);
             }
         }

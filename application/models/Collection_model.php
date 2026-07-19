@@ -357,17 +357,22 @@ class Collection_model extends CI_Model {
 
     /**
      * 
-     * Get collection by user access
+     * Get collections by user access (project ACL, including inheritance) or ownership.
      * 
      */
     function get_collection_by_user($user_id)
     {
-        $this->db->select('editor_collections.id,editor_collections.title');
-        		$this->db->join('editor_collection_project_acl','editor_collections.id=editor_collection_project_acl.collection_id');
-        $this->db->where('user_id',$user_id);
-        $this->db->or_where('editor_collections.created_by',$user_id);
-        $result=$this->db->get('editor_collections')->result_array();
-        return $result;
+        $user_id = (int) $user_id;
+        $sql = 'SELECT DISTINCT c.id, c.title
+            FROM editor_collections c
+            WHERE c.created_by = ' . $this->db->escape($user_id) . '
+            OR c.id IN (
+                SELECT DISTINCT t.child_id
+                FROM editor_collections_tree t
+                INNER JOIN editor_collection_project_acl a ON a.collection_id = t.parent_id
+                WHERE a.user_id = ' . $this->db->escape($user_id) . '
+            )';
+        return $this->db->query($sql)->result_array();
     }
 
 
@@ -489,10 +494,9 @@ class Collection_model extends CI_Model {
     function get_projects_count_by_user_access($user_id, $collection_id = null)
     {
         $user_id = (int) $user_id;
+        $this->load->helper('collection_acl');
         $subquery = 'SELECT sid FROM editor_project_owners WHERE user_id=' . $user_id;
-        $collection_query = 'SELECT sid FROM editor_collection_projects 
-            INNER JOIN editor_collection_project_acl ON editor_collection_project_acl.collection_id = editor_collection_projects.collection_id
-            WHERE editor_collection_project_acl.user_id=' . $user_id;
+        $collection_query = collection_acl_sql_project_ids_for_user($user_id);
         $access_where = '(ep.created_by=' . $user_id
             . ' OR ep.id IN (' . $subquery . ') OR ep.id IN (' . $collection_query . '))';
 
@@ -613,8 +617,9 @@ class Collection_model extends CI_Model {
 
     /**
      * Get collection tree filtered by user access
-     * Users can see collections they have access to and their parent chain
-     * but NOT siblings they don't have access to
+     * Users can see collections they have access to (including descendants via
+     * inherited ACL), plus their parent chain for path context — but NOT
+     * siblings they don't have access to.
      * 
      * @param int $user_id User ID
      * @param int $id Optional collection ID to get specific subtree
@@ -632,31 +637,16 @@ class Collection_model extends CI_Model {
             $collection['users']=isset($collection_users_count[$collection['id']]) ? $collection_users_count[$collection['id']] : 0;
         }
 
-        // Get collections the user has explicit access to
-        $this->db->select('collection_id, permissions');
-        $this->db->from('editor_collection_acl');
-        $this->db->where('user_id', $user_id);
-        $user_access = $this->db->get()->result_array();
-
-        // Create set of accessible collection IDs
-        $accessible_ids = array();
-        foreach ($user_access as $access) {
-            $accessible_ids[$access['collection_id']] = $access['permissions'];
-        }
-
-        // If user is the owner of any collection, add it to accessible IDs with admin permission
-        foreach ($collections as $collection) {
-            if ($collection['created_by'] == $user_id) {
-                $accessible_ids[$collection['id']] = 'admin';
-            }
-        }
+        // Direct ACL + ownership, expanded to all descendants (inherited access)
+        $this->load->model('Collection_acl_model');
+        $accessible_ids = $this->Collection_acl_model->get_accessible_collection_ids_with_permissions($user_id, true);
 
         // If no access to any collections, return empty array
         if (empty($accessible_ids)) {
             return array();
         }
 
-        // Get parent chain for all accessible collections
+        // Get parent chain for all accessible collections (path display only)
         $ids_to_include = $this->get_parent_chain_for_collections(array_keys($accessible_ids), $collections);
 
         // Filter collections to only those that should be visible
@@ -838,34 +828,29 @@ class Collection_model extends CI_Model {
      */
     function get_collections_with_user_permissions($user_id)
     {
-        // Get all collections
+        $user_id = (int) $user_id;
+        $this->load->model('Collection_acl_model');
+
+        // Effective ACL including inheritance (direct/owned seeds + descendants)
+        $accessible = $this->Collection_acl_model->get_accessible_collection_ids_with_permissions($user_id, true);
+
+        if (empty($accessible)) {
+            return array();
+        }
+
         $this->db->select('editor_collections.*, users.username as owner_username');
         $this->db->from('editor_collections');
         $this->db->join('users', 'users.id = editor_collections.created_by', 'left');
+        $this->db->where_in('editor_collections.id', array_keys($accessible));
         $this->db->order_by('editor_collections.title', 'ASC');
         $collections = $this->db->get()->result_array();
 
-        // Get user's collection ACL permissions
-        $this->db->select('collection_id, permissions');
-        $this->db->from('editor_collection_acl');
-        $this->db->where('user_id', $user_id);
-        $user_permissions = $this->db->get()->result_array();
-
-        // Create lookup array for user permissions
-        $permission_lookup = array();
-        foreach ($user_permissions as $perm) {
-            $permission_lookup[$perm['collection_id']] = $perm['permissions'];
-        }
-
-        // Build result with permission information
         $result = array();
         foreach ($collections as $collection) {
-            $collection_id = $collection['id'];
-            $permissions = isset($permission_lookup[$collection_id]) ? $permission_lookup[$collection_id] : 'view';
-            
-            // Check if user is collection owner
-            if ($collection['created_by'] == $user_id) {
-                $permissions = 'admin';
+            $collection_id = (int) $collection['id'];
+            $permissions = isset($accessible[$collection_id]) ? $accessible[$collection_id] : null;
+            if ($permissions === null) {
+                continue;
             }
 
             $result[] = array(

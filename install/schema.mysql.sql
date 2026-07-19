@@ -777,11 +777,14 @@ CREATE TABLE `admin_metadata_projects` (
 ) DEFAULT CHARSET=utf8mb4;
 
 
--- collection indexes
+-- collection indexes (ACL inheritance / project-via-collection access)
 CREATE INDEX idx_eca_user_collection ON editor_collection_acl(user_id, collection_id);
 CREATE INDEX idx_ecpa_user_collection ON editor_collection_project_acl(user_id, collection_id);
 CREATE INDEX idx_collections_created_by ON editor_collections(created_by);
 CREATE INDEX idx_collection_id ON editor_collection_projects(collection_id);
+CREATE INDEX idx_ecp_sid ON editor_collection_projects(sid);
+CREATE INDEX idx_ecp_collection_sid ON editor_collection_projects(collection_id, sid);
+CREATE INDEX idx_ect_child_parent ON editor_collections_tree(child_id, parent_id, depth);
 
 
 CREATE TABLE `metadata_schemas` (

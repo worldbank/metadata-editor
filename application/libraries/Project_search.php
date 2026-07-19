@@ -203,10 +203,9 @@ class Project_search
 			//projects user owns by direct sharing
 			$subquery='select sid from editor_project_owners where user_id='.(int)$project_owners[0];
 
-			//projects user can access via collections
-			$collection_query='select sid from editor_collection_projects 
-							inner join editor_collection_project_acl on editor_collection_project_acl.collection_id=editor_collection_projects.collection_id
-		where editor_collection_project_acl.user_id='.(int)$project_owners[0];
+			//projects user can access via collections (including inherited ACL)
+			$this->ci->load->helper('collection_acl');
+			$collection_query = collection_acl_sql_project_ids_for_user((int)$project_owners[0]);
 			
 			$query='(editor_projects.created_by='.(int)$project_owners[0]
 				.' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
@@ -690,10 +689,9 @@ class Project_search
 			// Projects user owns by direct sharing
 			$subquery = 'select sid from editor_project_owners where user_id='.(int)$user_id;
 
-			// Projects user can access via collections
-			$collection_query = 'select sid from editor_collection_projects 
-								inner join editor_collection_project_acl on editor_collection_project_acl.collection_id=editor_collection_projects.collection_id
-			where editor_collection_project_acl.user_id='.(int)$user_id;
+			// Projects user can access via collections (including inherited ACL)
+			$this->ci->load->helper('collection_acl');
+			$collection_query = collection_acl_sql_project_ids_for_user((int)$user_id);
 			
 			$query = '(editor_projects.created_by='.(int)$user_id
 				.' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';

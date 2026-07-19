@@ -133,4 +133,49 @@ class Collection_project_acl_model extends CI_Model {
     }
 
 
+    /**
+     * Effective project-ACL privilege for a user on a collection.
+     * Includes grants on the collection itself and all ancestors.
+     *
+     * @param int $collection_id
+     * @param int $user_id
+     * @return string|null view|edit|admin
+     */
+    function get_effective_permission($collection_id, $user_id)
+    {
+        $this->load->helper('collection_acl');
+        $collection_id = (int) $collection_id;
+        $user_id = (int) $user_id;
+
+        $sql = 'SELECT a.permissions
+            FROM editor_collections_tree t
+            INNER JOIN editor_collection_project_acl a
+                ON a.collection_id = t.parent_id
+                AND a.user_id = ' . $this->db->escape($user_id) . '
+            WHERE t.child_id = ' . $this->db->escape($collection_id);
+
+        $rows = $this->db->query($sql)->result_array();
+        $permissions = array();
+        foreach ($rows as $row) {
+            if (!empty($row['permissions'])) {
+                $permissions[] = $row['permissions'];
+            }
+        }
+        return collection_acl_max_permission($permissions);
+    }
+
+
+    /**
+     * SQL selecting project SIDs accessible via inherited collection project ACL.
+     *
+     * @param int $user_id
+     * @return string
+     */
+    function sql_project_ids_for_user($user_id)
+    {
+        $this->load->helper('collection_acl');
+        return collection_acl_sql_project_ids_for_user($user_id);
+    }
+
+
 }

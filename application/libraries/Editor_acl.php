@@ -261,14 +261,18 @@ class Editor_acl
 			$user=(object)$this->current_user();
 		}
 
-		//check user has access to the collection		
-		$this->ci->db->select("editor_collection_project_acl.*,editor_collection_projects.sid");
-		$this->ci->db->join("editor_collection_project_acl","editor_collection_projects.collection_id=editor_collection_project_acl.collection_id");
-		$this->ci->db->where("editor_collection_projects.sid",$project_id);
-		$this->ci->db->where("editor_collection_project_acl.user_id",$user->id);				
-		$collection_access=$this->ci->db->get("editor_collection_projects")->result_array();
+		// Project access via collection project ACL, including ancestor inheritance
+		$project_id = (int) $project_id;
+		$user_id = (int) $user->id;
+		$sql = 'SELECT DISTINCT a.permissions, ecp.sid, ecp.collection_id, a.user_id
+			FROM editor_collection_projects ecp
+			INNER JOIN editor_collections_tree t ON t.child_id = ecp.collection_id
+			INNER JOIN editor_collection_project_acl a
+				ON a.collection_id = t.parent_id
+				AND a.user_id = ' . $this->ci->db->escape($user_id) . '
+			WHERE ecp.sid = ' . $this->ci->db->escape($project_id);
 
-		return $collection_access;
+		return $this->ci->db->query($sql)->result_array();
 	}
 
 	function user_has_collection_access($permission,$project_id,$user=null)
@@ -718,14 +722,18 @@ class Editor_acl
      */
     function get_project_access_permissions_by_collections($sid)
     {
-		$this->ci->db->select("editor_collections.id as collection_id,editor_collections.title, ca.user_id, ca.permissions, p.sid,users.username, users.email");
-		$this->ci->db->join("editor_collection_project_acl ca","ca.collection_id=editor_collections.id");
-		$this->ci->db->join("editor_collection_projects p","p.collection_id= ca.collection_id");
-		$this->ci->db->join("users","users.id=ca.user_id");
-		$this->ci->db->where("p.sid",$sid);
-		$result=$this->ci->db->get("editor_collections")->result_array();
+		// Include users granted on the collection or any ancestor (inherited project ACL)
+		$sid = (int) $sid;
+		$sql = 'SELECT DISTINCT c.id AS collection_id, c.title, a.user_id, a.permissions,
+				p.sid, users.username, users.email
+			FROM editor_collection_projects p
+			INNER JOIN editor_collections c ON c.id = p.collection_id
+			INNER JOIN editor_collections_tree t ON t.child_id = p.collection_id
+			INNER JOIN editor_collection_project_acl a ON a.collection_id = t.parent_id
+			INNER JOIN users ON users.id = a.user_id
+			WHERE p.sid = ' . $this->ci->db->escape($sid);
 
-		return $result;
+		return $this->ci->db->query($sql)->result_array();
     }
 
 
@@ -937,9 +945,9 @@ class Editor_acl
 			return true;
 		}
 
-		//check if user has collection ACL access from database
+		// Effective collection ACL (self + ancestors; strongest privilege wins)
 		$this->ci->load->model("Collection_acl_model");
-		$user_permissions_result = $this->ci->Collection_acl_model->get_user_permissions($collection_id, $user->id);
+		$user_permissions_result = $this->ci->Collection_acl_model->get_effective_user_permissions($collection_id, $user->id);
 		
 		if ($user_permissions_result) {
 			$user_permissions = [];
@@ -993,19 +1001,10 @@ class Editor_acl
 			return true;
 		}
 
-		//check if user has collection ACL access from database
+		// Effective collection ACL (self + ancestors); admin required to manage ACL
 		$this->ci->load->model("Collection_acl_model");
-		$user_permissions_result = $this->ci->Collection_acl_model->get_user_permissions($collection_id, $user->id);
-		
-		if ($user_permissions_result) {
-			foreach($user_permissions_result as $row) {
-				if ($row['permissions'] === 'admin') {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		$effective = $this->ci->Collection_acl_model->get_effective_permission($collection_id, $user->id);
+		return $effective === 'admin';
 	}
 
 	/**

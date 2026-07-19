@@ -140,12 +140,11 @@ class Issues extends MY_REST_Controller {
                 $shared_projects = $this->db->get('editor_project_owners')->result_array();
                 $shared_ids = array_column($shared_projects, 'sid');
                 
-                // Get projects from collections user has access to
-                $this->db->select('DISTINCT editor_collection_projects.sid');
-                $this->db->join('editor_collection_project_acl', 
-                    'editor_collection_projects.collection_id = editor_collection_project_acl.collection_id');
-                $this->db->where('editor_collection_project_acl.user_id', $user_id);
-                $collection_projects = $this->db->get('editor_collection_projects')->result_array();
+                // Projects from collections user has access to (including inherited ACL)
+                $this->load->helper('collection_acl');
+                $collection_projects = $this->db->query(
+                    collection_acl_sql_project_ids_for_user($user_id)
+                )->result_array();
                 $collection_ids = array_column($collection_projects, 'sid');
                 
                 // Merge all accessible project IDs

@@ -126,8 +126,11 @@ class Collection_tree_model extends CI_Model {
                 ORDER BY 
                     c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
         } else {
-            // Non-admin user - apply ACL filtering with implied access
-            // Use closure table to get all ancestors of accessible collections with projects
+            // Non-admin: collections with projects that the user can access via
+            // collection ACL, project ACL, or ownership — including inheritance
+            // (ACL on an ancestor grants access to descendant collections).
+            // Also include ancestors of those collections for path display.
+            $uid = $this->db->escape($user_id);
             $sql='SELECT 
                     ect.parent_id, 
                     ect.child_id, 
@@ -149,33 +152,32 @@ class Collection_tree_model extends CI_Model {
                             c.pid IS NULL
                     )
                     AND c.id IN (
-                        -- Get all ancestors (including self) of accessible collections with projects
                         SELECT DISTINCT ect2.parent_id
                         FROM editor_collections_tree ect2
                         WHERE ect2.child_id IN (
-                            -- Collections that have projects
-                            SELECT DISTINCT collection_id 
-                            FROM editor_collection_projects
-                        )
-                        AND ect2.child_id IN (
-                            -- AND user has access via Collection ACL (NEW system)
-                            SELECT collection_id 
-                            FROM editor_collection_acl 
-                            WHERE user_id = '. $this->db->escape($user_id) . '
-                            
-                            UNION
-                            
-                            -- OR via Project ACL (OLD system)
-                            SELECT DISTINCT collection_id
-                            FROM editor_collection_project_acl
-                            WHERE user_id = '. $this->db->escape($user_id) . '
-                            
-                            UNION
-                            
-                            -- OR collections owned by user
-                            SELECT id as collection_id
-                            FROM editor_collections
-                            WHERE created_by = '. $this->db->escape($user_id) . '
+                            SELECT DISTINCT t_access.child_id
+                            FROM editor_collections_tree t_access
+                            WHERE t_access.parent_id IN (
+                                SELECT collection_id
+                                FROM editor_collection_acl
+                                WHERE user_id = '. $uid . '
+
+                                UNION
+
+                                SELECT collection_id
+                                FROM editor_collection_project_acl
+                                WHERE user_id = '. $uid . '
+
+                                UNION
+
+                                SELECT id AS collection_id
+                                FROM editor_collections
+                                WHERE created_by = '. $uid . '
+                            )
+                            AND t_access.child_id IN (
+                                SELECT DISTINCT collection_id
+                                FROM editor_collection_projects
+                            )
                         )
                     )
                 ORDER BY 
@@ -361,7 +363,8 @@ class Collection_tree_model extends CI_Model {
 
     /**
      * Get flat tree list filtered by user access
-     * Users can see collections they have access to and their parent chain
+     * Users can see collections they have access to (including descendants via
+     * inherited ACL) and their parent chain for path context.
      * 
      * @param int $user_id User ID
      * @param int $parent_id Optional parent collection ID
@@ -369,28 +372,10 @@ class Collection_tree_model extends CI_Model {
      */
     function get_tree_flat_by_user($user_id, $parent_id=null)
     {
-        // Get collections user has access to
-        $this->db->select('collection_id');
-        $this->db->from('editor_collection_acl');
-        $this->db->where('user_id', $user_id);
-        $user_access = $this->db->get()->result_array();
-        
-        $accessible_ids = array();
-        foreach ($user_access as $access) {
-            $accessible_ids[] = $access['collection_id'];
-        }
-        
-        // Add collections owned by user
-        $this->db->select('id');
-        $this->db->from('editor_collections');
-        $this->db->where('created_by', $user_id);
-        $owned_collections = $this->db->get()->result_array();
-        foreach ($owned_collections as $owned) {
-            if (!in_array($owned['id'], $accessible_ids)) {
-                $accessible_ids[] = $owned['id'];
-            }
-        }
-        
+        $this->load->model('Collection_acl_model');
+        $accessible = $this->Collection_acl_model->get_accessible_collection_ids_with_permissions($user_id, true);
+        $accessible_ids = array_keys($accessible);
+
         // If no access to any collections, return empty array
         if (empty($accessible_ids)) {
             return array();
