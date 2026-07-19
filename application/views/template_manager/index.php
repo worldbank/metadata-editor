@@ -348,6 +348,67 @@
       return Array.from(new Set(output));
     }
 
+    // Rewrite template item-form prefixes to schema array names
+    // e.g. variable.name → variables.name (aliases: {variable:'variables'})
+    function resolveTemplateKeyToSchema(key, aliases) {
+      if (!key || !aliases || typeof aliases !== 'object') {
+        return key;
+      }
+      const parts = String(key).split('.');
+      const mapped = aliases[parts[0]];
+      if (!mapped) {
+        return key;
+      }
+      parts[0] = mapped;
+      return parts.join('.');
+    }
+
+    // Reverse: schema path → preferred template key for autocomplete
+    function resolveSchemaKeyToTemplate(key, aliases) {
+      if (!key || !aliases || typeof aliases !== 'object') {
+        return key;
+      }
+      const reverse = {};
+      Object.keys(aliases).forEach(function(templatePrefix) {
+        reverse[aliases[templatePrefix]] = templatePrefix;
+      });
+      const parts = String(key).split('.');
+      const mapped = reverse[parts[0]];
+      if (!mapped) {
+        return key;
+      }
+      parts[0] = mapped;
+      return parts.join('.');
+    }
+
+    function isAcceptedSchemaKey(key, schemaKeys, aliases) {
+      if (!key || !schemaKeys || !schemaKeys.length) {
+        return false;
+      }
+      if (schemaKeys.indexOf(key) !== -1) {
+        return true;
+      }
+      const resolved = resolveTemplateKeyToSchema(key, aliases);
+      return resolved !== key && schemaKeys.indexOf(resolved) !== -1;
+    }
+
+    // Extension / free-form keys under additional (and nested paths like additional.kv.key)
+    function isAdditionalTemplateKey(key) {
+      if (!key) {
+        return false;
+      }
+      const k = String(key);
+      return k === 'additional' || k.indexOf('additional.') === 0;
+    }
+
+    // Custom/extension field nodes (including nested/array custom fields outside additional.*)
+    function isExtensionTemplateNode(node) {
+      if (!node || typeof node !== 'object') {
+        return false;
+      }
+      return node.is_additional === true || node.is_additional === 1 || node.is_additional === '1';
+    }
+
     <?php echo include_once("vue-field-key-component.js"); ?>
     <?php echo include_once("vue-field-custom-key-component.js"); ?>
     <?php echo include_once("vue-prop-key-component.js"); ?>
@@ -495,7 +556,14 @@
         core_tree_keys: [], //default system template keys
         user_tree_keys: [], //custom user defined template keys
 
-        user_template_info: user_template_info
+        user_template_info: user_template_info,
+
+        // schema field paths for key validation / autocomplete (dotted keys)
+        schema_field_keys: [],
+        schema_fields: [],
+        schema_key_aliases: {},
+        schema_fields_loaded: false,
+        schema_fields_error: null
 
       },
       mutations: {
@@ -504,6 +572,13 @@
         },
         activeCoreNode(state, node) {
           state.active_core_node = node;
+        },
+        setSchemaFields(state, payload) {
+          state.schema_field_keys = payload.keys || [];
+          state.schema_fields = payload.fields || [];
+          state.schema_key_aliases = payload.key_aliases || {};
+          state.schema_fields_loaded = true;
+          state.schema_fields_error = payload.error || null;
         }
       },
       getters: {
@@ -522,6 +597,26 @@
           let items = [];
           items = getTreeKeys(state.user_tree_items, items);
           return items;
+        },
+        getSchemaFieldKeys: function(state) {
+          return state.schema_field_keys;
+        },
+        getSchemaKeyAliases: function(state) {
+          return state.schema_key_aliases || {};
+        },
+        getUnusedSchemaFieldKeys: function(state) {
+          let used = [];
+          used = getTreeKeys(state.user_tree_items, used);
+          // Normalize used keys to schema form so alias prefixes match
+          const aliases = state.schema_key_aliases || {};
+          const usedResolved = used.map(function(k) {
+            return resolveTemplateKeyToSchema(k, aliases);
+          });
+          const unusedSchema = _.difference(state.schema_field_keys, usedResolved);
+          // Prefer template-convention prefixes in autocomplete (variable.* not variables.*)
+          return unusedSchema.map(function(k) {
+            return resolveSchemaKeyToTemplate(k, aliases);
+          });
         }
 
       },
@@ -557,6 +652,7 @@
           initiallyOpen: ['template_root'],
           tree_active_items: [],
           is_dirty: false,
+          deep_link_ready: false,
           treeSearchQuery: '',
           user_has_edit_access: user_has_edit_access,
           files: {
@@ -626,16 +722,131 @@
       created: function() {
         this.init_template();
         this.init_tree();
+        this.loadSchemaFields();
         // Reset dirty state after initialization to prevent false positives
         this.$nextTick(() => {
           this.is_dirty = false;
+          this.applyDeepLinkFromUrl();
+          this.deep_link_ready = true;
         });
         let vm=this;
         window.addEventListener('beforeunload', function(event) {
           return vm.onWindowUnload(event);
         });
+        window.addEventListener('popstate', function() {
+          if (!vm.deep_link_ready) {
+            return;
+          }
+          vm.applyDeepLinkFromUrl();
+        });
       },
       methods: {
+
+        getDeepLinkKeyFromUrl: function() {
+          try {
+            const params = new URLSearchParams(window.location.search || '');
+            const queryKey = params.get('key');
+            if (queryKey) {
+              return queryKey;
+            }
+          } catch (e) {}
+
+          const hash = (window.location.hash || '').replace(/^#/, '');
+          if (!hash) {
+            return null;
+          }
+          if (hash.indexOf('key=') === 0) {
+            try {
+              return decodeURIComponent(hash.substring(4));
+            } catch (e) {
+              return hash.substring(4);
+            }
+          }
+          // Bare hash path, e.g. #metadata_information.title
+          if (hash.indexOf('=') === -1 && hash !== 'template_root' && hash !== 'template_description') {
+            try {
+              return decodeURIComponent(hash);
+            } catch (e) {
+              return hash;
+            }
+          }
+          return null;
+        },
+        setDeepLinkKeyInUrl: function(key) {
+          try {
+            const url = new URL(window.location.href);
+            if (!key || key === 'template_root' || key === 'template_description') {
+              url.searchParams.delete('key');
+            } else {
+              url.searchParams.set('key', key);
+            }
+
+            // Prefer query param; clear deep-link-style hashes
+            const hash = (url.hash || '').replace(/^#/, '');
+            if (hash && (hash.indexOf('key=') === 0 || (hash.indexOf('=') === -1 && hash.indexOf('.') !== -1))) {
+              url.hash = '';
+            }
+
+            const next = url.pathname + url.search + url.hash;
+            const current = window.location.pathname + window.location.search + window.location.hash;
+            if (next !== current) {
+              history.replaceState(history.state, '', next);
+            }
+          } catch (e) {}
+        },
+        getActiveNodeDeepLinkKey: function(node) {
+          if (!node) {
+            return null;
+          }
+          if (node.type === 'template_root' || node.type === 'template_description') {
+            return null;
+          }
+          // Prefer absolute prop_key for array props (avoids relative key collisions)
+          if (node.prop_key && (node.isProp || node.is_prop)) {
+            return node.prop_key;
+          }
+          return node.key || node.prop_key || null;
+        },
+        applyDeepLinkFromUrl: function() {
+          const key = this.getDeepLinkKeyFromUrl();
+          if (!key) {
+            return false;
+          }
+          return this.selectTemplateNodeByKey(key);
+        },
+
+        loadSchemaFields: function(){
+          const dataType = this.user_template_info && this.user_template_info.data_type
+            ? this.user_template_info.data_type
+            : null;
+
+          if (!dataType || dataType === 'custom') {
+            store.commit('setSchemaFields', { keys: [], fields: [], key_aliases: {} });
+            return;
+          }
+
+          const url = CI.base_url + '/api/schemas/fields/' + encodeURIComponent(dataType) + '?format=dotted';
+          axios.get(url)
+            .then(response => {
+              const data = response.data || {};
+              store.commit('setSchemaFields', {
+                keys: data.keys || [],
+                fields: data.fields || [],
+                key_aliases: data.template_key_aliases || data.key_aliases || {}
+              });
+            })
+            .catch(error => {
+              const message = (error.response && error.response.data && error.response.data.message)
+                ? error.response.data.message
+                : (error.message || 'Failed to load schema fields');
+              store.commit('setSchemaFields', {
+                keys: [],
+                fields: [],
+                key_aliases: {},
+                error: message
+              });
+            });
+        },
         
         onWindowUnload: function(event){
           if (!this.is_dirty){
@@ -1438,6 +1649,190 @@
           }
           return found;
         },
+        findTemplateNodeByKey: function(items, targetKey, ancestors) {
+          if (!items || !Array.isArray(items) || !targetKey) {
+            return null;
+          }
+          ancestors = ancestors || [];
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const itemKey = item.key || item.prop_key;
+            if (itemKey === targetKey) {
+              return {
+                node: item,
+                tree_key: itemKey,
+                parent_key: ancestors.length ? ancestors[ancestors.length - 1] : null,
+                ancestor_keys: ancestors.slice(),
+                is_prop: false
+              };
+            }
+
+            if ((item.type === 'array' || item.type === 'nested_array') && item.props && Array.isArray(item.props)) {
+              for (let p = 0; p < item.props.length; p++) {
+                const prop = item.props[p];
+                const propKey = prop.prop_key || (item.key && prop.key ? (item.key + '.' + prop.key) : prop.key);
+                if (propKey === targetKey) {
+                  return {
+                    node: prop,
+                    tree_key: prop.key || propKey,
+                    parent_key: item.key,
+                    ancestor_keys: ancestors.concat(item.key ? [item.key] : []),
+                    is_prop: true
+                  };
+                }
+              }
+            }
+
+            if (item.items) {
+              const nextAncestors = itemKey ? ancestors.concat([itemKey]) : ancestors;
+              const nested = this.findTemplateNodeByKey(item.items, targetKey, nextAncestors);
+              if (nested) {
+                return nested;
+              }
+            }
+          }
+
+          return null;
+        },
+        selectTemplateNodeByKey: function(selectKey) {
+          if (!selectKey) {
+            return false;
+          }
+
+          const found = this.findTemplateNodeByKey(this.UserTreeItems, selectKey);
+          if (!found || !found.node) {
+            return false;
+          }
+
+          if (found.is_prop) {
+            found.node.isProp = true;
+          }
+
+          store.commit('activeNode', found.node);
+          this.tree_active_items = [found.tree_key];
+
+          if (!Array.isArray(this.initiallyOpen)) {
+            this.initiallyOpen = [];
+          }
+          // Ensure root + all ancestors are expanded so the node is visible
+          ['template_root'].concat(found.ancestor_keys || []).concat([found.parent_key, found.tree_key]).forEach((k) => {
+            if (k && this.initiallyOpen.indexOf(k) === -1) {
+              this.initiallyOpen.push(k);
+            }
+          });
+
+          this.setDeepLinkKeyInUrl(
+            found.is_prop
+              ? (found.node.prop_key || selectKey)
+              : (found.node.key || selectKey)
+          );
+
+          return true;
+        },
+        collectInvalidTemplateKeys: function(items, issues, seenKeys) {
+          if (!items || !Array.isArray(items)) {
+            return;
+          }
+
+          const structural = {
+            section: true,
+            section_container: true,
+            template_root: true,
+            template_description: true
+          };
+          const schemaKeys = this.$store.state.schema_field_keys || [];
+          const keyAliases = this.$store.state.schema_key_aliases || {};
+          const schemaLoaded = this.$store.state.schema_fields_loaded;
+          const isCustomType = this.user_template_info && this.user_template_info.data_type === 'custom';
+          const checkSchema = schemaLoaded && schemaKeys.length > 0 && !isCustomType;
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item || !item.key) {
+              continue;
+            }
+
+            const key = item.key;
+            const isStructural = !!(item.type && structural[item.type]);
+            const errors = [];
+
+            if (!isStructural) {
+              const parts = String(key).split('.');
+              if (parts.indexOf('') !== -1) {
+                errors.push(this.$t('key_must_not_contain_empty_parts'));
+              }
+              for (let p = 0; p < parts.length; p++) {
+                if (parts[p].match(/^[a-zA-Z0-9:_-]+$/) == null) {
+                  errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
+                  break;
+                }
+              }
+              if (seenKeys[key]) {
+                errors.push(this.$t('key_already_exists'));
+              }
+              if (
+                checkSchema &&
+                !isExtensionTemplateNode(item) &&
+                !isAdditionalTemplateKey(key) &&
+                !isAcceptedSchemaKey(key, schemaKeys, keyAliases)
+              ) {
+                errors.push(this.$t('key_unknown_schema_path'));
+              }
+            }
+
+            seenKeys[key] = true;
+
+            if (errors.length > 0) {
+              issues.push({
+                key: key,
+                select_key: key,
+                title: item.title || key,
+                message: errors[0],
+                prop_key: null
+              });
+            }
+
+            if ((item.type === 'array' || item.type === 'nested_array') && item.props && Array.isArray(item.props)) {
+              for (let p = 0; p < item.props.length; p++) {
+                const prop = item.props[p];
+                if (!prop || !prop.key) {
+                  continue;
+                }
+                const absolute = prop.prop_key || (key + '.' + prop.key);
+                const propErrors = [];
+
+                if (String(prop.key).indexOf('.') !== -1 || String(prop.key).match(/^[a-zA-Z0-9:_-]+$/) == null) {
+                  propErrors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
+                }
+                if (
+                  checkSchema &&
+                  !isExtensionTemplateNode(prop) &&
+                  !isExtensionTemplateNode(item) &&
+                  !isAdditionalTemplateKey(absolute) &&
+                  !isAdditionalTemplateKey(key) &&
+                  !isAcceptedSchemaKey(absolute, schemaKeys, keyAliases)
+                ) {
+                  propErrors.push(this.$t('key_unknown_schema_path'));
+                }
+
+                if (propErrors.length > 0) {
+                  issues.push({
+                    key: absolute,
+                    select_key: absolute,
+                    title: prop.title || absolute,
+                    message: propErrors[0],
+                    prop_key: absolute
+                  });
+                }
+              }
+            }
+
+            if (item.items) {
+              this.collectInvalidTemplateKeys(item.items, issues, seenKeys);
+            }
+          }
+        },
         getNodePath: function(arr, name) {
           if (!arr || !name) {
             return false;
@@ -1616,6 +2011,12 @@
         }
       },
       watch: {
+        activeNodeDeepLinkKey: function(newKey, oldKey) {
+          if (!this.deep_link_ready || newKey === oldKey) {
+            return;
+          }
+          this.setDeepLinkKeyInUrl(newKey);
+        },
         treeSearchQuery: function(newQuery) {
           if (newQuery && newQuery.length > 0) {
             // Auto-expand all items when searching to show results
@@ -1680,6 +2081,9 @@
           // 1. It's not a core template
           // 2. User has edit access
           return !this.isCoreTemplate && this.user_has_edit_access;
+        },
+        activeNodeDeepLinkKey() {
+          return this.getActiveNodeDeepLinkKey(this.ActiveNode);
         },
         TemplateIsAdminMeta(){
           return this.user_template_info.data_type=='admin_meta';
@@ -1988,6 +2392,13 @@
           return coreContainers.filter(container => 
             container.key && !userContainerKeys.includes(container.key)
           );
+        },
+        InvalidTemplateKeys() {
+          const issues = [];
+          const seenKeys = {};
+          const items = this.UserTreeItems || (this.UserTemplate && this.UserTemplate.items) || [];
+          this.collectInvalidTemplateKeys(items, issues, seenKeys);
+          return issues;
         },
       }
     });

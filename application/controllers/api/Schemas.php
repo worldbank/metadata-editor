@@ -653,6 +653,18 @@ class Schemas extends MY_REST_Controller
         }
     }
 
+    /**
+     * Schema field paths for a schema UID.
+     *
+     * GET /api/schemas/fields/{uid}
+     *
+     * Query:
+     *  - format=json_patch|default|dotted
+     *      json_patch/default: slash paths from collect_schema_fields (existing)
+     *      dotted: template-oriented dotted keys + keys[] list
+     *
+     * Response always includes template_key_aliases (template prefix → schema prefix).
+     */
     public function fields_get($uid = null)
     {
         try {
@@ -662,10 +674,10 @@ class Schemas extends MY_REST_Controller
                 throw new Exception("Schema UID is required.");
             }
 
-        $format = $this->input->get('format', true);
-        $format = $format ? strtolower(trim($format)) : 'default';
-            if (!in_array($format, array('json_patch', 'default'), true)) {
-                throw new Exception("Invalid format parameter. Allowed values: json_patch, default");
+            $format = $this->input->get('format', true);
+            $format = $format ? strtolower(trim($format)) : 'default';
+            if (!in_array($format, array('json_patch', 'default', 'dotted'), true)) {
+                throw new Exception("Invalid format parameter. Allowed values: json_patch, default, dotted");
             }
 
             $schema = $this->Metadata_schemas_model->get_by_uid($uid);
@@ -679,36 +691,71 @@ class Schemas extends MY_REST_Controller
                 throw new Exception("Schema directory not found: " . $schema_dir);
             }
 
-            $documents = $this->schema_registry->load_schema_documents($schema, $schema_dir);
-        $compiled = $this->schema_registry->inline_schema($schema['filename'], $documents, $schema_dir);
+            // Resolve actual filename (handles aliases / renamed files)
+            $schema_file = $this->Metadata_schemas_model->get_schema_file_path($uid);
+            $actual_filename = basename($schema_file);
+            $schema_for_loading = $schema;
+            $schema_for_loading['filename'] = $actual_filename;
 
+            $documents = $this->schema_registry->load_schema_documents($schema_for_loading, $schema_dir);
+            $compiled = $this->schema_registry->inline_schema($actual_filename, $documents, $schema_dir);
+
+            // Walk with json_patch paths; convert to dotted when requested
+            $collect_format = ($format === 'dotted') ? 'json_patch' : $format;
             $fields = array();
-            
+
             // Only collect fields from properties, not from root schema metadata
-            // This ensures we don't incorrectly associate root title/description with properties
             if (isset($compiled['properties']) && is_array($compiled['properties'])) {
                 $seen_paths = array();
+                $required = array();
+                if (isset($compiled['required']) && is_array($compiled['required'])) {
+                    $required = $compiled['required'];
+                }
+                $required_set = array_flip($required);
+
                 foreach ($compiled['properties'] as $name => $child) {
                     $canonical_path = '/' . $name;
                     if (!isset($seen_paths[$canonical_path])) {
-                        $required = array();
-                        if (isset($compiled['required']) && is_array($compiled['required'])) {
-                            $required = $compiled['required'];
-                        }
-                        $required_set = array_flip($required);
-                        $this->schema_registry->collect_schema_fields($child, $canonical_path, $fields, isset($required_set[$name]), $format, $seen_paths);
+                        $this->schema_registry->collect_schema_fields(
+                            $child,
+                            $canonical_path,
+                            $fields,
+                            isset($required_set[$name]),
+                            $collect_format,
+                            $seen_paths
+                        );
                     }
                 }
             } else {
-                // Fallback to old method if no properties
-                $this->schema_registry->collect_schema_fields($compiled, '', $fields, false, $format);
+                $this->schema_registry->collect_schema_fields($compiled, '', $fields, false, $collect_format);
             }
 
-            $response = array(
-                'status' => 'success',
-                'count' => count($fields),
-                'fields' => $fields
-            );
+            $schema_uid = isset($schema['uid']) ? $schema['uid'] : $uid;
+            $template_key_aliases = $this->schema_registry->get_template_key_aliases($schema_uid);
+            // Also resolve by request uid (alias) in case it differs
+            if (empty($template_key_aliases) && strtolower((string)$uid) !== strtolower((string)$schema_uid)) {
+                $template_key_aliases = $this->schema_registry->get_template_key_aliases($uid);
+            }
+
+            if ($format === 'dotted') {
+                $dotted = $this->schema_registry->fields_to_dotted_template_keys($fields);
+                $response = array(
+                    'status' => 'success',
+                    'schema_uid' => $schema_uid,
+                    'count' => count($dotted['fields']),
+                    'keys' => $dotted['keys'],
+                    'fields' => $dotted['fields'],
+                    'template_key_aliases' => $template_key_aliases
+                );
+            } else {
+                $response = array(
+                    'status' => 'success',
+                    'schema_uid' => $schema_uid,
+                    'count' => count($fields),
+                    'fields' => $fields,
+                    'template_key_aliases' => $template_key_aliases
+                );
+            }
 
             $this->set_response($response, REST_Controller::HTTP_OK);
         } catch (Exception $e) {

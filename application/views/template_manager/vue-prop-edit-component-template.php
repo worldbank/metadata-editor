@@ -5,6 +5,7 @@
             <label for="name">{{$t('key')}}:</label>
             <vue-prop-key-field                
                 :parent="parent"
+                :field="prop"
                 :value="prop.key"
                 @input="updatePropKey"
                 >

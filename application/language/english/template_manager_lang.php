@@ -38,6 +38,11 @@ $lang['external-resource']="External resource";
 $lang['administrative_metadata']="Administrative metadata";
 $lang['missing_section_containers']="Missing Section Containers";
 $lang['add_missing_section_containers_help']="Click the add icon to add a section container to your template";
+$lang['invalid_template_keys']="Invalid keys";
+$lang['invalid_template_keys_help']="These field keys do not match the schema. Click a row to open the field.";
+$lang['key_edit']="Edit key";
+$lang['key_edit_warning']="Changing a key can break the template mapping to the schema. Use a valid schema path or additional.* for custom fields.";
+$lang['key_unknown_schema_path']="Key does not match a schema field";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/english/template_manager_lang.php */

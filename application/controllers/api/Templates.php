@@ -669,5 +669,6 @@ class Templates extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
-	
+
+
 }

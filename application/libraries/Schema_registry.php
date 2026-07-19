@@ -688,6 +688,76 @@ class Schema_registry
         return rtrim($base, '/') . '/' . $segment;
     }
 
+    /**
+     * Template key prefix aliases for item-form sections.
+     *
+     * Maps template prefixes to schema array property names so validation can
+     * accept e.g. variable.name when the schema path is variables.name.
+     *
+     * @param string $schema_uid Schema UID or alias (microdata, survey, …)
+     * @return array template_prefix => schema_prefix
+     */
+    public function get_template_key_aliases($schema_uid)
+    {
+        $uid = strtolower((string)$schema_uid);
+
+        if (in_array($uid, array('microdata', 'survey'), true)) {
+            return array(
+                'variable' => 'variables',
+                'data_file' => 'data_files'
+            );
+        }
+
+        return array();
+    }
+
+    /**
+     * Convert collected schema fields to dotted template-style keys.
+     *
+     * @param array $fields Output of collect_schema_fields()
+     * @return array{keys: string[], fields: array}
+     */
+    public function fields_to_dotted_template_keys($fields)
+    {
+        $dotted_fields = array();
+        $keys = array();
+
+        if (!is_array($fields)) {
+            return array('keys' => array(), 'fields' => array());
+        }
+
+        foreach ($fields as $field) {
+            $slash_path = isset($field['path']) ? $field['path'] : '';
+            $slash_path = ltrim((string)$slash_path, '/');
+            if ($slash_path === '') {
+                continue;
+            }
+
+            $slash_path = str_replace('/*/', '/', $slash_path);
+            $slash_path = preg_replace('#/\*$#', '', $slash_path);
+            $dotted_key = str_replace('/', '.', $slash_path);
+
+            if ($dotted_key === '' || isset($keys[$dotted_key])) {
+                continue;
+            }
+
+            $keys[$dotted_key] = true;
+            $dotted_fields[] = array(
+                'key' => $dotted_key,
+                'path' => $slash_path,
+                'title' => isset($field['title']) ? $field['title'] : '',
+                'description' => isset($field['description']) ? $field['description'] : '',
+                'type' => isset($field['type']) ? $field['type'] : '',
+                'required' => !empty($field['required'])
+            );
+        }
+
+        return array(
+            'keys' => array_keys($keys),
+            'fields' => $dotted_fields
+        );
+    }
+
     private function looks_like_json_schema($schema)
     {
         if (is_object($schema)) {
