@@ -213,7 +213,7 @@ class Schema_template_generator
 
     protected function build_field($schema, $path, $name, $is_required = false)
     {
-        return array(
+        $field = array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => $this->normalize_type($schema),
@@ -221,6 +221,14 @@ class Schema_template_generator
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($schema)
         );
+
+        $enum = $this->build_enum($schema);
+        if (!empty($enum)) {
+            $field['enum'] = $enum;
+            $field['enum_store_column'] = 'code';
+        }
+
+        return $field;
     }
 
     protected function build_array_field($schema, $path, $name, $depth, $is_required = false)
@@ -271,6 +279,12 @@ class Schema_template_generator
                     'help_text' => isset($child['description']) ? $child['description'] : '',
                     'display_type' => $this->resolve_display_type($child)
                 );
+
+                $enum = $this->build_enum($child);
+                if (!empty($enum)) {
+                    $props[count($props) - 1]['enum'] = $enum;
+                    $props[count($props) - 1]['enum_store_column'] = 'code';
+                }
             }
 
             return $props;
@@ -286,6 +300,12 @@ class Schema_template_generator
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($schema)
         );
+
+        $enum = $this->build_enum($schema);
+        if (!empty($enum)) {
+            $props[count($props) - 1]['enum'] = $enum;
+            $props[count($props) - 1]['enum_store_column'] = 'code';
+        }
 
         return $props;
     }
@@ -315,10 +335,27 @@ class Schema_template_generator
                     return 'text';
                 }
                 if (isset($schema['enum']) && is_array($schema['enum']) && count($schema['enum']) > 0) {
-                    return 'select';
+                    return 'dropdown';
                 }
                 return 'text';
         }
+    }
+
+    protected function build_enum($schema)
+    {
+        if (!isset($schema['enum']) || !is_array($schema['enum']) || empty($schema['enum'])) {
+            return array();
+        }
+
+        $enum = array();
+        foreach ($schema['enum'] as $value) {
+            $enum[] = array(
+                'code' => $value,
+                'label' => (string)$value
+            );
+        }
+
+        return $enum;
     }
 
     protected function normalize_type($schema)
@@ -386,4 +423,3 @@ class Schema_template_generator
         return sha1(json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 }
-
