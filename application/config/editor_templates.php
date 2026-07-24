@@ -458,3 +458,22 @@ $config['custom'][]=array(
     'description'=>'Flexible starter template for documenting resources that do not match existing schema types.'
 ); 
 
+/*
+| Default core template uid per data type (used at install and when a project has no template_uid).
+| Each uid must match an entry above for the same data type key.
+*/
+$config['editor_template_defaults'] = array(
+    'microdata' => 'microdata-system-en',
+    'indicator' => 'timeseries-system-en',
+    'indicator-db' => 'timeseries-db-system-en',
+    'script' => 'script-system-en',
+    'geospatial' => 'geospatial-system-en',
+    'document' => 'document-system-en',
+    'table' => 'table-system-en',
+    'image' => 'image-system-en',
+    'video' => 'video-system-en',
+    'resource' => 'resource-system-en',
+    'admin_meta' => 'system-core-admin-meta',
+    'custom' => 'custom-system-en',
+);
+
