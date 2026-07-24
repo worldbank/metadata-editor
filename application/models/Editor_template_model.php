@@ -65,8 +65,19 @@ class Editor_template_model extends ci_model {
 		$this->ci->load->model('Template_acl_model');
 		$this->ci->load->model('Edit_history_model');
 		$this->ci->load->library('Metadata_change_log');
+		$this->ci->load->library('Audit_log');
 		$this->Edit_history_model=$this->ci->Edit_history_model;
     }
+
+	private function is_soft_deleted_row($template)
+	{
+		return is_array($template) && isset($template['is_deleted']) && (int)$template['is_deleted'] === 1;
+	}
+
+	private function active_template_filter_sql()
+	{
+		return "(`is_deleted` IS NULL OR `is_deleted` != 1)";
+	}
 
 
 	private function canonical_data_type($type)
@@ -175,7 +186,15 @@ class Editor_template_model extends ci_model {
 
 		foreach($config as $key=>$templates){
 
+			if ($key === 'editor_template_defaults' || !is_array($templates)){
+				continue;
+			}
+
 			foreach($templates as $idx=>$template){
+
+				if (!is_array($template) || !isset($template['uid'], $template['template'])){
+					continue;
+				}
 
 				$template_json='';
 				$template_path=$this->resolve_core_template_path($template['template']);
@@ -474,6 +493,35 @@ class Editor_template_model extends ci_model {
 		];
 	}
 
+	/**
+	 * Return soft-deleted custom templates.
+	 */
+	function select_deleted()
+	{
+		$fields=array_diff($this->fields,["template"]);
+
+		$fields=array_map(function($field){
+			return 'editor_templates.'.$field;
+		},$fields);
+
+		$this->db->select($fields);
+		$this->db->join('users','users.id=editor_templates.owner_id','left');
+		$this->db->select('users.username as owner_username, users.email as owner_email');
+		$this->db->join('users as deleted_by_user','deleted_by_user.id=editor_templates.deleted_by','left');
+		$this->db->select('deleted_by_user.username as deleted_by_username, deleted_by_user.email as deleted_by_email');
+		$this->db->order_by('editor_templates.deleted_at','DESC');
+		$this->db->order_by('editor_templates.name','ASC');
+		$this->db->where('editor_templates.is_deleted', 1);
+
+		$result=$this->db->get('editor_templates')->result_array();
+		$result=$this->decorate_template_rows($result);
+
+		return array(
+			'core' => array(),
+			'custom' => $result,
+		);
+	}
+
     function select_single($uid)
 	{
 		$this->db->select('*');
@@ -496,16 +544,72 @@ class Editor_template_model extends ci_model {
 
 	function check_uid_exists($uid)
 	{
-		$this->db->select('uid');
-		$this->db->where('uid',$uid);
-		$result=$this->db->get('editor_templates')->row_array();
-
-		if (isset($result['uid'])){
+		if ($this->check_core_uid_exists($uid)){
 			return true;
 		}
 
-		//check core templates
-		return $this->check_core_uid_exists($uid);
+		$this->db->select('uid,is_deleted');
+		$this->db->where('uid',$uid);
+		$result=$this->db->get('editor_templates')->row_array();
+
+		return isset($result['uid']);
+	}
+
+	function check_uid_exists_active($uid)
+	{
+		if ($this->check_core_uid_exists($uid)){
+			return true;
+		}
+
+		$this->db->select('uid');
+		$this->db->where('uid',$uid);
+		$this->db->where($this->active_template_filter_sql(), null, false);
+		$result=$this->db->get('editor_templates')->row_array();
+
+		return isset($result['uid']);
+	}
+
+	function get_soft_deleted_template_by_uid($uid)
+	{
+		$this->db->select('*');
+		$this->db->where('uid',$uid);
+		$this->db->where('is_deleted',1);
+		$row=$this->db->get('editor_templates')->row_array();
+
+		return $this->decorate_template_row($row);
+	}
+
+	function get_uid_conflict_status($uid)
+	{
+		if ($this->check_core_uid_exists($uid)){
+			return array(
+				'exists' => true,
+				'status' => 'active',
+			);
+		}
+
+		$this->db->select('uid,is_deleted');
+		$this->db->where('uid',$uid);
+		$result=$this->db->get('editor_templates')->row_array();
+
+		if (!isset($result['uid'])){
+			return array(
+				'exists' => false,
+				'status' => null,
+			);
+		}
+
+		if ((int)$result['is_deleted'] === 1){
+			return array(
+				'exists' => true,
+				'status' => 'deleted',
+			);
+		}
+
+		return array(
+			'exists' => true,
+			'status' => 'active',
+		);
 	}
 
 	function check_core_uid_exists($uid)
@@ -521,8 +625,13 @@ class Editor_template_model extends ci_model {
 
     function delete($uid, $user_id=null)
 	{
+		return $this->soft_delete($uid, $user_id);
+	}
+
+	function purge($uid, $user_id=null)
+	{
 		$template=$this->select_single($uid);
-		
+
 		if (!$template){
 			throw new Exception("Template not found: " .$uid);
 		}
@@ -531,21 +640,57 @@ class Editor_template_model extends ci_model {
 			throw new Exception("Template is read-only and cannot be deleted.");
 		}
 
-		//check if template is in use
+		if (!$this->is_soft_deleted_row($template)){
+			throw new Exception("Template must be soft-deleted before it can be permanently deleted.");
+		}
+
 		$count=$this->get_project_count($uid);
 
 		if ($count>0){
 			throw new Exception("Template is in use by ".$count. " projects");
 		}
 
-		//only delete if is_deleted is 1
-		if ($template['is_deleted']==0){
-			//soft delete
-			return $this->soft_delete($uid,$user_id);
+		return $this->purge_template_row($template, $user_id);
+	}
+
+	function restore($uid, $user_id=null)
+	{
+		$template=$this->select_single($uid);
+
+		if (!$template){
+			throw new Exception("Template not found: " .$uid);
 		}
 
-        $this->db->where('uid',$uid);
-		return $this->db->delete('editor_templates');
+		if (in_array($template['template_type'], array('generated','core'), true)){
+			throw new Exception("Template is read-only and cannot be restored.");
+		}
+
+		if (!$this->is_soft_deleted_row($template)){
+			throw new Exception("Template is not deleted.");
+		}
+
+		if ($this->check_uid_exists_active($uid)){
+			throw new Exception("An active template with this UID already exists.");
+		}
+
+		$update=array(
+			'is_deleted' => 0,
+			'deleted_at' => null,
+			'deleted_by' => null,
+			'changed' => date("U"),
+			'changed_by' => $user_id,
+		);
+
+		$this->db->where('uid', $uid);
+		$result=$this->db->update('editor_templates', $update);
+
+		if ($result === false){
+			throw new Exception("Restore failed");
+		}
+
+		$this->log_template_audit_event($template, 'restore', $user_id);
+
+		return $result;
 	}
 
 	/**
@@ -568,12 +713,35 @@ class Editor_template_model extends ci_model {
 			throw new Exception("Template is read-only and cannot be deleted.");
 		}
 
-		$options=array();
-		$options['deleted_at']=date("U");
-		$options['deleted_by']=$user_id;
-		$options['is_deleted']=1;
+		if ($this->is_soft_deleted_row($template)){
+			throw new Exception("Template is already deleted.");
+		}
 
-		return $this->update($uid,$options);
+		$count=$this->get_project_count($uid);
+
+		if ($count>0){
+			throw new Exception("Template is in use by ".$count. " projects");
+		}
+
+		$update=array(
+			'deleted_at' => date("U"),
+			'deleted_by' => $user_id,
+			'is_deleted' => 1,
+			'changed' => date("U"),
+			'changed_by' => $user_id,
+		);
+
+		$this->db->where('uid', $uid);
+		$result=$this->db->update('editor_templates', $update);
+
+		if ($result === false){
+			throw new Exception("Delete failed");
+		}
+
+		$this->clear_default_template_by_uid($uid);
+		$this->log_template_audit_event($template, 'soft_delete', $user_id);
+
+		return $result;
 	}
 
     /**
@@ -587,6 +755,10 @@ class Editor_template_model extends ci_model {
 
 		if (!$template){
 			throw new Exception("Template not found: " .$uid);
+		}
+
+		if ($this->is_soft_deleted_row($template)){
+			throw new Exception("Template is deleted. Restore it before editing.");
 		}
 
 		$valid_fields=$this->fields;
@@ -700,9 +872,13 @@ class Editor_template_model extends ci_model {
 			$template_options["uid"]=nada_random_hash();
 		}
 		else{
-			$exists=$this->check_uid_exists($template_options['uid']);
+			$deleted_template=$this->get_soft_deleted_template_by_uid($template_options['uid']);
+			if ($deleted_template){
+				require_once APPPATH.'libraries/Template_uid_conflict_exception.php';
+				throw new Template_uid_conflict_exception($template_options['uid'], $deleted_template);
+			}
 
-			if ($exists==true){
+			if ($this->check_uid_exists_active($template_options['uid'])){
 				throw new Exception("Template with UID already exists");
 			}
 		}
@@ -836,6 +1012,12 @@ class Editor_template_model extends ci_model {
 	function set_default_template($type,$template_uid)
 	{
 		$type=$this->canonical_data_type($type);
+		$template=$this->select_single($template_uid);
+
+		if ($template && $this->is_soft_deleted_row($template)){
+			throw new Exception("Cannot set a deleted template as default.");
+		}
+
 		$this->remove_default_template($type);
 
 		$options=array(
@@ -851,6 +1033,12 @@ class Editor_template_model extends ci_model {
 		$type=$this->canonical_data_type($type);
 		$this->db->where("data_type",$type);
 		return $this->db->delete("editor_templates_default");
+	}
+
+	function clear_default_template_by_uid($template_uid)
+	{
+		$this->db->where('template_uid', $template_uid);
+		return $this->db->delete('editor_templates_default');
 	}
 
 
@@ -1109,7 +1297,7 @@ class Editor_template_model extends ci_model {
 		$this->validate_uid_format($new_uid);
 
 		//check if new uid exists
-		if ($this->check_uid_exists($new_uid)){
+		if ($this->check_uid_exists_active($new_uid)){
 			throw new Exception("New UID already exists: " .$new_uid);
 		}
 
@@ -1265,6 +1453,67 @@ class Editor_template_model extends ci_model {
 		}
 		
 		return $compact_translations;
+	}
+
+	private function purge_template_row($template, $user_id=null)
+	{
+		$template_id=(int)$template['id'];
+		$uid=$template['uid'];
+
+		$this->delete_template_related_data($template_id, $uid);
+
+		$this->db->where('uid', $uid);
+		$result=$this->db->delete('editor_templates');
+
+		if ($result === false){
+			throw new Exception("Permanent delete failed");
+		}
+
+		$this->log_template_audit_event($template, 'purge', $user_id);
+
+		return $result;
+	}
+
+	private function delete_template_related_data($template_id, $template_uid)
+	{
+		$this->db->where('template_id', $template_id);
+		$this->db->delete('editor_template_acl');
+
+		$this->db->where('template_id', $template_id);
+		$this->db->delete('admin_metadata_acl');
+
+		$this->db->where('template_id', $template_id);
+		$this->db->delete('admin_metadata');
+
+		$this->db->where('obj_type', 'template');
+		$this->db->where('obj_id', $template_id);
+		$this->db->delete('edit_history');
+
+		$this->clear_default_template_by_uid($template_uid);
+	}
+
+	private function log_template_audit_event($template, $action, $user_id=null, array $extra=array())
+	{
+		if (!is_array($template) || empty($template['id'])){
+			return;
+		}
+
+		$metadata=array_merge(array(
+			'uid' => isset($template['uid']) ? $template['uid'] : null,
+			'name' => isset($template['name']) ? $template['name'] : null,
+			'data_type' => isset($template['data_type']) ? $template['data_type'] : null,
+			'template_type' => isset($template['template_type']) ? $template['template_type'] : null,
+			'deleted_at' => isset($template['deleted_at']) ? $template['deleted_at'] : null,
+			'deleted_by' => isset($template['deleted_by']) ? $template['deleted_by'] : null,
+		), $extra);
+
+		$this->ci->audit_log->log_event(
+			'template',
+			(int)$template['id'],
+			$action,
+			$metadata,
+			$user_id
+		);
 	}
     
 }

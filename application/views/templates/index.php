@@ -68,12 +68,20 @@
     <?php
       $user=$this->session->userdata('username');
       $this->load->library('Editor_acl');
+      $can_template_admin=false;
+      try{
+        $can_template_admin=$this->editor_acl->has_access('template_manager','admin');
+      }catch(Exception $e){
+        $can_template_admin=false;
+      }
       
       $user_info=array_merge(array(
         'username'=> $user,
+        'user_id'=> (int)$this->session->userdata('user_id'),
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
         'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
+        'can_template_admin'=> $can_template_admin,
       ), registry_acl_user_info_flags());
       
     ?>
@@ -157,14 +165,19 @@
                     </div>
 
                     <div class="justify-content-end">
-                      <v-btn class="primary" @click="showImportTemplateDialog">{{$t('import_template')}}</v-btn>
+                      <v-btn class="primary mr-2" @click="showImportTemplateDialog" v-if="list_view === 'active'">{{$t('import_template')}}</v-btn>
                     </div>
 
                   </div>
+
+                  <v-tabs v-model="list_view" class="mt-3 mb-4">
+                    <v-tab href="#active">{{$t('active')}}</v-tab>
+                    <v-tab href="#deleted">{{$t('deleted')}}</v-tab>
+                  </v-tabs>
                   
                 </div>
                
-                <div>
+                <div v-show="list_view === 'active'">
                   <div v-if="!templates"> {{$t('no_templates_found')}}</div>
 
                   <div
@@ -236,6 +249,43 @@
 
                 </div>
 
+                <div v-show="list_view === 'deleted'">
+                  <div v-if="!deleted_templates || !deleted_templates.custom || !deleted_templates.custom.length">{{$t('no_deleted_templates_found')}}</div>
+
+                  <div
+                    v-for="schema in schemaGroups"
+                    :key="'deleted-' + schema.uid"
+                    class="mb-5"
+                    v-if="sidebar_selected === '' || sidebar_selected === schema.uid"
+                  >
+                    <v-data-table
+                      :headers="deletedTableHeaders"
+                      :items="getDeletedTemplatesForSchema(schema)"
+                      class="elevation-7 mb-5 pt-3"
+                      :disable-pagination="true"
+                      :items-per-page="100"
+                      :hide-default-footer="true"
+                      v-if="getDeletedTemplatesForSchema(schema).length"
+                    >
+                      <template v-slot:top>
+                        <div class="d-flex pl-6 pb-4 align-center">
+                          <div class="schema-icon-avatar mr-3">
+                            <img v-if="getSchemaIconSrc(schema)" :src="getSchemaIconSrc(schema)" :alt="schema.label">
+                            <span v-else class="schema-icon-placeholder">{{ getSchemaInitial(schema) }}</span>
+                          </div>
+                          <div class="text-h6">{{ getSchemaLabel(schema) }}</div>
+                        </div>
+                      </template>
+                      <template v-slot:item.deleted_at="{ item }">
+                        <span v-if="item.deleted_at">{{ momentDate(item.deleted_at) }}</span>
+                      </template>
+                      <template v-slot:item.actions="{ item }">
+                        <v-icon @click="showDeletedMenu($event, item)">mdi-dots-vertical</v-icon>
+                      </template>
+                    </v-data-table>
+                  </div>
+                </div>
+
               </div>
 
             </div>
@@ -299,6 +349,27 @@
       >
 
         <v-list>
+          <template v-if="menu_is_deleted">
+            <v-list-item v-if="canManageTemplate(menu_active_template_item)">
+              <v-list-item-icon>
+                <v-icon>mdi-restore</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="restoreTemplate(menu_active_template_id)"><v-btn text> {{$t('restore')}}</v-btn></v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="canManageTemplate(menu_active_template_item)">
+              <v-list-item-icon>
+                <v-icon>mdi-delete-forever</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="purgeTemplate(menu_active_template_id)"><v-btn text> {{$t('delete_permanently')}}</v-btn></v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-code-json</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text> {{$t('export')}}</v-btn></v-list-item-title>
+            </v-list-item>
+          </template>
+          <template v-else>
           <v-list-item v-if="!isCoreTemplate(menu_active_template_id)">
             <v-list-item-icon>
               <v-icon>mdi-share</v-icon>
@@ -317,7 +388,7 @@
             </v-list-item-icon>
             <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text> {{$t('export')}}</v-btn></v-list-item-title>
           </v-list-item>
-          <template v-if="!menu_active_template_core">
+          <template v-if="!menu_active_template_core && canManageTemplate(getTemplateRecord(menu_active_template_id))">
             <v-list-item>
               <v-list-item-icon>
                 <v-icon>mdi-delete-outline</v-icon>
@@ -357,6 +428,7 @@
             </v-list-item-icon>
             <v-list-item-title @click="updateTemplateUUID(menu_active_template_id)"><v-btn text> {{$t('UUID')}}</v-btn></v-list-item-title>        
           </v-list-item>
+          </template>
 
         </v-list>
       </v-menu>
@@ -453,6 +525,8 @@
       data: {
         site_base_url: CI.site_url,
         templates: { core: [], custom: [] },
+        deleted_templates: { core: [], custom: [] },
+        list_view: 'active',
         is_loading: false,
         loading_status: null,
         form_errors: [],
@@ -473,6 +547,8 @@
         menu_x: 0,
         menu_y: 0,
         menu_active_template_id: null,
+        menu_active_template_item: null,
+        menu_is_deleted: false,
         menu_active_template_core: false,
         menu_active_template_data_type:'',
         nav_tabs_active:2,
@@ -492,8 +568,12 @@
       },
       mounted: async function() {
         var vm = this;
+        this.initListViewFromUrl();
         await this.loadSchemaMeta();
         await this.loadTemplates();
+        if (this.list_view === 'deleted') {
+          await this.loadDeletedTemplates();
+        }
         this.visiblility_change_handler();
       },
       computed: {
@@ -502,10 +582,43 @@
         },
         Projects() {
           return this.projects.projects;
+        },
+        deletedTableHeaders() {
+          return [
+            { text: this.$t('title'), value: 'name' },
+            { text: this.$t('language'), value: 'lang' },
+            { text: this.$t('owner'), value: 'owner_username' },
+            { text: this.$t('deleted_at'), value: 'deleted_at' },
+            { text: this.$t('deleted_by'), value: 'deleted_by_username' },
+            { text: '', value: 'actions', sortable: false }
+          ];
         }
       },
-      watch: {},
+      watch: {
+        list_view: function(newValue) {
+          this.syncListViewToUrl(newValue);
+          if (newValue === 'deleted') {
+            this.loadDeletedTemplates();
+          }
+        }
+      },
       methods: {
+        initListViewFromUrl() {
+          const params = new URLSearchParams(window.location.search);
+          const tab = params.get('tab');
+          if (tab === 'deleted' || tab === 'active') {
+            this.list_view = tab;
+          }
+        },
+        syncListViewToUrl(tab) {
+          const url = new URL(window.location.href);
+          if (tab === 'active') {
+            url.searchParams.delete('tab');
+          } else {
+            url.searchParams.set('tab', tab);
+          }
+          window.history.replaceState({}, '', url);
+        },
         async loadSchemaMeta(){
           this.schemasLoading = true;
           try{
@@ -752,12 +865,40 @@
           this.menu_x = e.clientX
           this.menu_y = e.clientY
           this.menu_active_template_id = templateId
+          this.menu_active_template_item = this.getTemplateRecord(templateId)
+          this.menu_is_deleted = false
           this.menu_active_template_core = isCore
           this.menu_active_template_data_type=templateDataType
-          console.log("showMenu", e.clientX, e.clientY, templateId, isCore, templateDataType);
           this.$nextTick(() => {
             this.showTemplateMenu = true
           })
+        },
+        showDeletedMenu (e, item) {
+          e.preventDefault()
+          this.showTemplateMenu = false
+          this.menu_x = e.clientX
+          this.menu_y = e.clientY
+          this.menu_active_template_id = item.uid
+          this.menu_active_template_item = item
+          this.menu_is_deleted = true
+          this.menu_active_template_core = false
+          this.menu_active_template_data_type = item.data_type || ''
+          this.$nextTick(() => {
+            this.showTemplateMenu = true
+          })
+        },
+        canManageTemplate(item) {
+          if (!item) {
+            return false;
+          }
+          const info = CI.user_info || {};
+          if (info.is_admin || info.can_template_admin) {
+            return true;
+          }
+          if (!info.user_id || !item.owner_id) {
+            return false;
+          }
+          return parseInt(info.user_id, 10) === parseInt(item.owner_id, 10);
         },
         momentDate(date) {
           return moment.unix(date).format("MM/DD/YYYY")
@@ -778,6 +919,32 @@
               this.loading_status = "";
             this.updateSchemaGroups();
           }
+        },
+        async loadDeletedTemplates() {
+          const url = CI.site_url + '/api/templates/deleted';
+          try{
+            const response = await axios.get(url);
+            const templates = response.data && response.data.templates ? response.data.templates : {};
+            this.deleted_templates = {
+              core: Array.isArray(templates.core) ? templates.core : [],
+              custom: Array.isArray(templates.custom) ? templates.custom : []
+            };
+          }catch(error){
+            console.log("error", error);
+          }
+        },
+        getDeletedTemplatesForSchema(schema){
+          if (!schema){
+            return [];
+          }
+          const keys = (schema.matchKeys && schema.matchKeys.length)
+            ? schema.matchKeys
+            : (schema.uid ? [schema.uid] : []);
+          if (!keys.length){
+            return [];
+          }
+          const custom = Array.isArray(this.deleted_templates.custom) ? this.deleted_templates.custom : [];
+          return custom.filter(template => template && keys.includes(template.data_type));
         },
         setDefaultTemplate: function(template_type, uid) {
           vm = this;
@@ -845,6 +1012,42 @@
               console.log("request completed");
             });
         },
+        restoreTemplate: function(uid) {
+          if (!confirm(this.$t('confirm_restore_template'))) {
+            return false;
+          }
+          const vm = this;
+          axios.post(CI.site_url + '/api/templates/restore/' + uid, {})
+            .then(function() {
+              vm.loadDeletedTemplates();
+              vm.loadTemplates();
+              vm.list_view = 'active';
+            })
+            .catch(function(error) {
+              let message = vm.$t('failed');
+              if (error.response && error.response.data && error.response.data.message) {
+                message += ': ' + error.response.data.message;
+              }
+              alert(message);
+            });
+        },
+        purgeTemplate: function(uid) {
+          if (!confirm(this.$t('confirm_delete_permanently'))) {
+            return false;
+          }
+          const vm = this;
+          axios.post(CI.site_url + '/api/templates/purge/' + uid, {})
+            .then(function() {
+              vm.loadDeletedTemplates();
+            })
+            .catch(function(error) {
+              let message = vm.$t('failed');
+              if (error.response && error.response.data && error.response.data.message) {
+                message += ': ' + error.response.data.message;
+              }
+              alert(message);
+            });
+        },
         exportTemplate: function(uid) {
           window.open(CI.site_url + '/api/templates/' + uid);
         },
@@ -892,6 +1095,26 @@
         editTemplate: function(uid) {
           window.open(CI.site_url + '/templates/edit/' + uid);
         },
+        getApiErrorMessage: function(error, fallback) {
+          fallback = fallback || this.$t('failed');
+          if (!error || !error.response || !error.response.data) {
+            return fallback;
+          }
+          const data = error.response.data;
+          if (typeof data === 'string') {
+            return data.trim() ? data : fallback;
+          }
+          if (data.code === 'TEMPLATE_UID_DELETED' && data.message) {
+            return data.message;
+          }
+          if (data.message) {
+            return data.message;
+          }
+          if (data.error) {
+            return data.error;
+          }
+          return fallback;
+        },
         showImportTemplateDialog: function(){
           this.dialog_import_template=true;
           this.template_import_errors=[];
@@ -910,14 +1133,10 @@
               alert(vm.$t("imported_successfully"));
               vm.dialog_import_template = false;
             })
-            .catch(function(response) {
-              console.log("failed",response);
-              let error_message=vm.$t('failed');
-              if (response.response.data.message){
-                error_message+=" - " + response.response.data.message
-              }
-              alert(error_message);
-              vm.template_import_errors = response;
+            .catch(function(error) {
+              console.log("failed", error);
+              alert(vm.getApiErrorMessage(error));
+              vm.template_import_errors = error;
             });
         },
         handleTemplateUpload(event) {

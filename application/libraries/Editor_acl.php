@@ -814,6 +814,42 @@ class Editor_acl
 
 
 	/**
+	 *
+	 * Owner or template manager admin may restore, delete, or purge templates.
+	 *
+	 */
+	function user_can_manage_template($template_uid, $user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		if ($this->user_is_admin($user)){
+			return true;
+		}
+
+		try{
+			if ($this->has_access('template_manager','admin', $user)){
+				return true;
+			}
+		}
+		catch(Exception $e){
+			//do nothing
+		}
+
+		if ($this->is_user_template_owner($template_uid,$user)){
+			return true;
+		}
+
+		throw new Exception("You don't have permissions to manage this template");
+	}
+
+
+	/**
 	 * 
 	 * check if user has shared access to the template
 	 * 
