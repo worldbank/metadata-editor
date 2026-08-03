@@ -167,10 +167,13 @@ Vue.component("form-input", {
                     </div>
                 </div>
                 <div v-else-if="field.type=='simple_array'" >
-                    <div class="d-flex align-center flex-nowrap">
-                        <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
-                        <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
-                    </div>
+                    <div class="form-field form-field-table">
+                        <div class="d-flex align-center flex-nowrap">
+                            <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
+                            <span v-if="field.help_text" class="small ml-1" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" aria-label="Help"><i class="far fa-question-circle"></i></span>
+                            <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
+                        </div>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                     <div v-if="fieldDisplayType(field)=='text' ||fieldDisplayType(field)=='textarea' " >
                         <repeated-field
                                 v-model=" local"
@@ -198,7 +201,7 @@ Vue.component("form-input", {
                         </v-combobox>
                         
                     </div>
-                                    
+                    </div>
                 </div>
 
                 <div  v-else-if="fieldDisplayType(field)=='text'">                            
