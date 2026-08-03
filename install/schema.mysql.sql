@@ -441,7 +441,7 @@ CREATE TABLE `editor_data_files` (
 CREATE TABLE `editor_projects` (
   `id` int NOT NULL AUTO_INCREMENT,
   `idno` varchar(200) DEFAULT NULL,
-  `type` varchar(15) DEFAULT NULL,
+  `type` varchar(100) DEFAULT NULL,
   `title` varchar(255) NOT NULL DEFAULT '',
   `abbreviation` varchar(45) DEFAULT NULL,
   `authoring_entity` text ,
@@ -551,8 +551,8 @@ CREATE INDEX idx_sid_fid_name ON editor_variables (sid, fid, name);
 
 CREATE TABLE `editor_templates` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `uid` varchar(45) DEFAULT NULL,
-  `data_type` varchar(45) NOT NULL,
+  `uid` varchar(100) DEFAULT NULL,
+  `data_type` varchar(100) NOT NULL,
   `lang` varchar(45) DEFAULT NULL,
   `template_type` varchar(20) NOT NULL DEFAULT 'custom',
   `name` varchar(100) NOT NULL,
@@ -579,7 +579,7 @@ CREATE TABLE `editor_templates` (
 
 CREATE TABLE `editor_templates_default` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `data_type` varchar(30) NOT NULL,
+  `data_type` varchar(100) NOT NULL,
   `template_uid` varchar(255) NOT NULL,  
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
