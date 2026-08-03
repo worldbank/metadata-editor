@@ -45,9 +45,58 @@ class Schema_registry
                 $schema['icon_full_url'] = $this->get_schema_icon_full_url($schema['uid']);
                 $schema['display_name'] = $this->get_schema_display_name($schema['uid']);
             }
+
+            // Custom schemas only: boolean flag for list UI (avoid sending full field list)
+            $conflicts = $this->get_custom_schema_reserved_root_properties($schema);
+            $schema['has_schema_issues'] = !empty($conflicts);
         }
+        unset($schema);
 
         return $schemas;
+    }
+
+    /**
+     * For custom schemas, return root property names that collide with excluded metadata fields.
+     * Core schemas are skipped (empty array).
+     *
+     * @param array $schema
+     * @return array
+     */
+    public function get_custom_schema_reserved_root_properties($schema)
+    {
+        if (!is_array($schema) || empty($schema['uid'])) {
+            return array();
+        }
+
+        // Core schemas are skipped (strict int check; empty("0") is true in PHP)
+        if (isset($schema['is_core']) && (int)$schema['is_core'] === 1) {
+            return array();
+        }
+
+        try {
+            $path = $this->get_model()->get_schema_file_path($schema['uid']);
+            if (!is_file($path)) {
+                return array();
+            }
+
+            $contents = file_get_contents($path);
+            if ($contents === false) {
+                return array();
+            }
+
+            $decoded = json_decode($contents, true);
+            if (!is_array($decoded)) {
+                return array();
+            }
+
+            $this->ci->load->model('Editor_model');
+            return self::find_excluded_root_properties(
+                $decoded,
+                $this->ci->Editor_model->get_metadata_excluded_fields()
+            );
+        } catch (Exception $e) {
+            return array();
+        }
     }
 
     /**
@@ -245,6 +294,61 @@ class Schema_registry
             }
             throw new Exception("Schema validation failed: " . implode("; ", $messages));
         }
+    }
+
+    /**
+     * Find root-level schema property names that collide with excluded metadata fields.
+     *
+     * Only direct properties on the schema document are checked (nested keys are allowed).
+     *
+     * @param array|object $schema_data
+     * @param array $excluded_fields
+     * @return array Sorted list of conflicting root property names
+     */
+    public static function find_excluded_root_properties($schema_data, array $excluded_fields)
+    {
+        $schema_array = json_decode(json_encode($schema_data), true);
+        if (!is_array($schema_array)
+            || empty($schema_array['properties'])
+            || !is_array($schema_array['properties'])
+        ) {
+            return array();
+        }
+
+        $conflicts = array_intersect(array_keys($schema_array['properties']), $excluded_fields);
+        $conflicts = array_values(array_unique($conflicts));
+        sort($conflicts);
+
+        return $conflicts;
+    }
+
+    /**
+     * Reject main schemas whose root properties use reserved project/metadata field names.
+     *
+     * These names are stripped from the metadata blob on project save
+     * (Editor_model::get_metadata_excluded_fields), so root-level form fields
+     * with these keys cannot be persisted.
+     *
+     * @param array|object $schema_data
+     * @param string|null $filename
+     * @throws Exception
+     */
+    public function assert_no_excluded_root_properties($schema_data, $filename = null)
+    {
+        $this->ci->load->model('Editor_model');
+        $excluded = $this->ci->Editor_model->get_metadata_excluded_fields();
+        $conflicts = self::find_excluded_root_properties($schema_data, $excluded);
+
+        if (empty($conflicts)) {
+            return;
+        }
+
+        $label = $filename ? " ({$filename})" : '';
+        throw new Exception(
+            "Schema{$label} defines reserved root-level properties that cannot be saved in project metadata: "
+            . implode(', ', $conflicts)
+            . ". Nest these fields under an object grouping instead of placing them at the schema root."
+        );
     }
 
     /**

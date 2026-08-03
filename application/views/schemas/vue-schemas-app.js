@@ -150,8 +150,11 @@
 
         return momentValue.utc().format('YYYY-MM-DD HH:mm');
       },
+      isCoreSchema(item) {
+        return !!(item && Number(item.is_core) === 1);
+      },
       editSchema(item) {
-        if (!item || item.is_core) {
+        if (!item || this.isCoreSchema(item)) {
           return;
         }
         this.$router.push({
@@ -169,7 +172,7 @@
         });
       },
       deleteSchema(item) {
-        if (!item || item.is_core) {
+        if (!item || this.isCoreSchema(item)) {
           return;
         }
         this.$confirm(this.$t('delete_schema_confirm'))
@@ -189,7 +192,7 @@
           .catch(() => {});
       },
       regenerateTemplate(item) {
-        if (!item || item.is_core) {
+        if (!item || this.isCoreSchema(item)) {
           return;
         }
 
@@ -217,7 +220,7 @@
         window.open(previewUrl, '_blank', 'noopener');
       },
       handleTitleClick(item) {
-        if (!item || item.is_core) {
+        if (!item || this.isCoreSchema(item)) {
           return;
         }
         this.editSchema(item);
@@ -255,7 +258,8 @@
         deletingFiles: {},
         pendingUploadLoading: false,
         formErrorMessage: '',
-        uploadErrorMessage: ''
+        uploadErrorMessage: '',
+        reservedRootProperties: []
       };
     },
     computed: {
@@ -452,6 +456,7 @@
         this.fileManifestLoading = false;
         this.deletingFiles = {};
         this.pendingUploadLoading = false;
+        this.reservedRootProperties = [];
         if (this.isCreate) {
           this.initializing = false;
           this.currentSchema = null;
@@ -531,13 +536,14 @@
 
             const schema = response.data.schema;
 
-            if (schema.is_core) {
+            if (Number(schema.is_core) === 1) {
               this.$alert(this.$t('core_schema_edit_forbidden'), { color: 'error' });
               this.$router.push({ name: 'schemas-list' });
               return;
             }
 
             this.currentSchema = schema;
+            this.applySchemaValidation(schema);
             this.form.uid = schema.uid || '';
             this.form.title = schema.title || '';
             this.form.description = schema.description || '';
@@ -554,6 +560,15 @@
           .finally(() => {
             this.initializing = false;
           });
+      },
+      applySchemaValidation(schema) {
+        if (!schema || typeof schema !== 'object') {
+          this.reservedRootProperties = [];
+          return;
+        }
+        this.reservedRootProperties = Array.isArray(schema.reserved_root_properties)
+          ? schema.reserved_root_properties.slice()
+          : [];
       },
       loadFiles() {
         if (this.isCreate || !this.schemaUid) {
@@ -804,6 +819,7 @@
             });
             if (response.data && response.data.schema) {
               this.currentSchema = response.data.schema;
+              this.applySchemaValidation(response.data.schema);
             }
             if (response.data && response.data.files) {
               this.fileManifest = response.data.files;
@@ -821,6 +837,7 @@
             });
             if (response.data && response.data.schema) {
               this.currentSchema = response.data.schema;
+              this.applySchemaValidation(response.data.schema);
             }
             if (response.data && response.data.files) {
               this.fileManifest = response.data.files;

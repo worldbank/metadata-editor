@@ -398,17 +398,31 @@
               </template>
 
               <template v-slot:item.title="{ item }">
-                <span
-                  class="schema-title-link"
-                  :class="{ 'schema-title-link--disabled': item.is_core }"
-                  role="button"
-                  tabindex="0"
-                  @click="handleTitleClick(item)"
-                  @keyup.enter="handleTitleClick(item)"
-                  @keyup.space.prevent="handleTitleClick(item)"
-                >
-                  {{ item.title || item.uid }}
-                </span>
+                <div class="d-flex align-center flex-wrap">
+                  <span
+                    class="schema-title-link"
+                    :class="{ 'schema-title-link--disabled': isCoreSchema(item) }"
+                    role="button"
+                    tabindex="0"
+                    @click="handleTitleClick(item)"
+                    @keyup.enter="handleTitleClick(item)"
+                    @keyup.space.prevent="handleTitleClick(item)"
+                  >
+                    {{ item.title || item.uid }}
+                  </span>
+                  <v-tooltip v-if="item.has_schema_issues" bottom max-width="320">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        class="ml-2"
+                        color="warning"
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >mdi-alert</v-icon>
+                    </template>
+                    <span>{{ $t('schema_has_issues') }}</span>
+                  </v-tooltip>
+                </div>
               </template>
 
               <template v-slot:item.uid="{ item }">
@@ -426,7 +440,7 @@
               </template>
 
               <template v-slot:item.is_core="{ item }">
-                <span>{{ item.is_core ? $t('core') : $t('custom') }}</span>
+                <span>{{ isCoreSchema(item) ? $t('core') : $t('custom') }}</span>
               </template>
 
               <template v-slot:item.updated="{ item }">
@@ -448,26 +462,26 @@
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('preview_schema')}}</v-list-item-title>
                       </v-list-item>
-                      <v-list-item @click="editSchemaMappings(item)" :disabled="item.is_core">
+                      <v-list-item @click="editSchemaMappings(item)" :disabled="isCoreSchema(item)">
                         <v-list-item-icon>
                           <v-icon small>mdi-source-fork</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('edit_core_mappings')}}</v-list-item-title>
                       </v-list-item>
-                      <v-list-item @click="regenerateTemplate(item)" :disabled="item.is_core">
+                      <v-list-item @click="regenerateTemplate(item)" :disabled="isCoreSchema(item)">
                         <v-list-item-icon>
                           <v-icon small>mdi-refresh</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('regenerate_template')}}</v-list-item-title>
                       </v-list-item>
-                      <v-divider class="my-1" v-if="!item.is_core"></v-divider>
-                      <v-list-item @click="editSchema(item)" :disabled="item.is_core">
+                      <v-divider class="my-1" v-if="!isCoreSchema(item)"></v-divider>
+                      <v-list-item @click="editSchema(item)" :disabled="isCoreSchema(item)">
                         <v-list-item-icon>
                           <v-icon small>mdi-pencil</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>{{$t('edit')}}</v-list-item-title>
                       </v-list-item>
-                      <v-list-item @click="deleteSchema(item)" :disabled="item.is_core">
+                      <v-list-item @click="deleteSchema(item)" :disabled="isCoreSchema(item)">
                         <v-list-item-icon>
                           <v-icon small>mdi-delete</v-icon>
                         </v-list-item-icon>
@@ -495,6 +509,23 @@
 
           <v-card-text>
             <v-progress-linear indeterminate color="primary" v-if="initializing"></v-progress-linear>
+
+            <v-alert
+              v-if="!initializing && !isCreate && reservedRootProperties.length"
+              type="warning"
+              dense
+              outlined
+              class="mb-4"
+            >
+              <div class="font-weight-medium mb-2">{{ $t('reserved_root_properties_report_title') }}</div>
+              <div class="mb-2">{{ $t('reserved_root_properties_report_intro') }}</div>
+              <ul class="mb-2 pl-4">
+                <li v-for="field in reservedRootProperties" :key="field">
+                  <code>{{ field }}</code>
+                </li>
+              </ul>
+              <div>{{ $t('reserved_root_properties_report_fix') }}</div>
+            </v-alert>
 
             <v-form v-if="!initializing" ref="form" v-model="valid" lazy-validation>
               <v-row>

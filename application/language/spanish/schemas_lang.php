@@ -105,6 +105,12 @@ $lang['schema_template_regenerated']="Plantilla de esquema regenerada exitosamen
 $lang['regenerate_template_failed']="Error al regenerar plantilla.";
 $lang['generated_template_locked']="Las plantillas generadas son de solo lectura. Duplique la plantilla para personalizarla.";
 
+// Reserved root properties (custom schemas)
+$lang['schema_has_issues']="El esquema tiene problemas. Ábralo para ver el informe de validación.";
+$lang['reserved_root_properties_report_title']="Propiedades de nivel raíz reservadas detectadas";
+$lang['reserved_root_properties_report_intro']="Estas propiedades de nivel raíz no se pueden guardar en los metadatos del proyecto:";
+$lang['reserved_root_properties_report_fix']="Anídelas bajo un agrupamiento de objeto y luego reemplace el archivo de esquema principal.";
+
 // Miscellaneous
 $lang['not_implemented']="Aún no implementado.";
 

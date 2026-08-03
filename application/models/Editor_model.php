@@ -299,11 +299,12 @@ class Editor_model extends CI_Model {
 
 
 	/**
-	 * Get list of table columns that should be excluded from metadata column
-	 * 
+	 * Get list of table/app fields that must not appear as root keys in the
+	 * stored metadata document (and therefore must not be root schema properties).
+	 *
 	 * @return array List of field names to exclude
 	 */
-	private function get_metadata_excluded_fields()
+	public function get_metadata_excluded_fields()
 	{
 		return array(
 			'id', 'idno', 'type', 'pid',

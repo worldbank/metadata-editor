@@ -144,6 +144,7 @@ class Schemas extends MY_REST_Controller
             }
 
             $this->schema_registry->assert_valid_json_schema($main_json_decoded, $main_filename);
+            $this->schema_registry->assert_no_excluded_root_properties($main_json_decoded, $main_filename);
 
             $main_destination = $schema_dir . '/' . $main_filename;
             if (!@move_uploaded_file($main_file_tmp, $main_destination)) {
@@ -181,7 +182,7 @@ class Schemas extends MY_REST_Controller
                 'schema_files' => $related_files_list,
                 'metadata_options' => $this->parse_metadata_options($metadata_options_raw),
                 'created' => $now,
-                'created_by' => $this->api_user ? $this->api_user->id : null
+                'created_by' => $this->get_api_user_id() ?: null
             );
 
             $schema_id = $this->Metadata_schemas_model->insert($insert_data);
@@ -291,6 +292,11 @@ class Schemas extends MY_REST_Controller
                     break;
                 default:
                     throw new Exception("Invalid mode. Allowed values: replace_main, add_related.");
+            }
+
+            if (!empty($result['schema'])) {
+                $result['schema']['reserved_root_properties'] = $this->schema_registry
+                    ->get_custom_schema_reserved_root_properties($result['schema']);
             }
 
             $response = array(
@@ -487,6 +493,10 @@ class Schemas extends MY_REST_Controller
                 $schema['display_name'] = $this->schema_registry->get_schema_display_name($schema['uid']);
             }
 
+            // Custom schemas only: report root properties that cannot be persisted
+            $schema['reserved_root_properties'] = $this->schema_registry
+                ->get_custom_schema_reserved_root_properties($schema);
+
             $response = array(
                 'status' => 'success',
                 'schema' => $schema
@@ -585,7 +595,7 @@ class Schemas extends MY_REST_Controller
                 'description' => $description,
                 'metadata_options' => $metadata_options,
                 'updated' => date('U'),
-                'updated_by' => $this->api_user ? $this->api_user->id : null
+                'updated_by' => $this->get_api_user_id() ?: null
             );
 
             if (!empty($status)) {
@@ -885,6 +895,7 @@ class Schemas extends MY_REST_Controller
         }
 
         $this->schema_registry->assert_valid_json_schema($decoded, $clean_name);
+        $this->schema_registry->assert_no_excluded_root_properties($decoded, $clean_name);
 
         $documents = array();
         try {
@@ -947,7 +958,7 @@ class Schemas extends MY_REST_Controller
         $update_data = array(
             'filename' => $clean_name,
             'updated' => date('U'),
-            'updated_by' => $this->api_user ? $this->api_user->id : null
+            'updated_by' => $this->get_api_user_id() ?: null
         );
 
         if ($schema_files_changed) {
@@ -1019,7 +1030,7 @@ class Schemas extends MY_REST_Controller
         $update_data = array(
             'schema_files' => array_values($existing_files),
             'updated' => date('U'),
-            'updated_by' => $this->api_user ? $this->api_user->id : null
+            'updated_by' => $this->get_api_user_id() ?: null
         );
 
         $this->Metadata_schemas_model->update($schema['id'], $update_data);
@@ -1063,7 +1074,7 @@ class Schemas extends MY_REST_Controller
 
         $update_data = array(
             'updated' => date('U'),
-            'updated_by' => $this->api_user ? $this->api_user->id : null
+            'updated_by' => $this->get_api_user_id() ?: null
         );
 
         if ($is_main) {
@@ -1204,7 +1215,7 @@ class Schemas extends MY_REST_Controller
 
         $result = $this->schema_template_generator->regenerate($schema, array(
             'force' => $force,
-            'updated_by' => $this->api_user ? $this->api_user->id : null
+            'updated_by' => $this->get_api_user_id() ?: null
         ));
 
         if (isset($result['schema']) && is_array($result['schema'])) {
