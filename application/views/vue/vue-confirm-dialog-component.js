@@ -3,8 +3,10 @@ Vue.component('confirm-dialog', {
   template: `
     <v-dialog v-model="dialogVisible" persistent max-width="600">
       <v-card>
-        <v-card-title class="text-h5 border-bottom">Confirmation</v-card-title>
-        <v-card-text class="text-center pt-5 pb-5"><span class="h5">{{ message }}</span></v-card-text>
+        <v-card-title class="text-h6 border-bottom">Confirmation</v-card-title>
+        <v-card-text class="pt-4 pb-4">
+          <div class="body-1">{{ message }}</div>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="confirm">Confirm</v-btn>

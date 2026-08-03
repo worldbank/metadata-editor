@@ -1035,6 +1035,39 @@ class Editor_template_model extends ci_model {
 		return $this->db->delete("editor_templates_default");
 	}
 
+	/**
+	 * Permanently remove all DB templates for a schema data type (including generated).
+	 * Used when deleting a custom schema definition.
+	 *
+	 * @param string $type Schema UID / data_type
+	 * @param int|null $user_id
+	 * @return int Number of templates removed
+	 */
+	public function delete_all_for_data_type($type, $user_id = null)
+	{
+		$types = $this->matching_data_types($type);
+		$removed = 0;
+
+		if (!empty($types)) {
+			$this->db->select('*');
+			$this->db->where_in('data_type', $types);
+			$rows = $this->db->get('editor_templates')->result_array();
+
+			foreach ($rows as $row) {
+				$template = $this->decorate_template_row($row);
+				if (empty($template['id'])) {
+					continue;
+				}
+				$this->purge_template_row($template, $user_id);
+				$removed++;
+			}
+		}
+
+		$this->remove_default_template($type);
+
+		return $removed;
+	}
+
 	function clear_default_template_by_uid($template_uid)
 	{
 		$this->db->where('template_uid', $template_uid);

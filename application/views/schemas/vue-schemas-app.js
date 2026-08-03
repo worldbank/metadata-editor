@@ -175,7 +175,8 @@
         if (!item || this.isCoreSchema(item)) {
           return;
         }
-        this.$confirm(this.$t('delete_schema_confirm'))
+        const title = item.title || item.uid;
+        this.$confirm(this.$t('delete_schema_confirm', { title: title }))
           .then(() => {
             axios.delete(this.baseApiUrl + '/' + encodeURIComponent(item.uid))
               .then(() => {
@@ -183,9 +184,13 @@
                 this.loadSchemas();
               })
               .catch(error => {
-                const message = (error.response && error.response.data && error.response.data.message)
-                  ? error.response.data.message
-                  : 'Failed to delete schema';
+                const data = error.response && error.response.data;
+                let message = 'Failed to delete schema';
+                if (data && data.error_code === 'schema_in_use_by_projects') {
+                  message = this.$t('schema_delete_in_use_by_projects');
+                } else if (data && data.message) {
+                  message = data.message;
+                }
                 this.$alert(message, { color: 'error' });
               });
           })

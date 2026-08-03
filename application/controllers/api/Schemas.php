@@ -1161,20 +1161,30 @@ class Schemas extends MY_REST_Controller
                 throw new Exception("Core schemas cannot be deleted.");
             }
 
-            if ($this->schema_in_use_by_templates($uid)) {
-                throw new Exception("Schema is in use by templates.");
-            }
-
             if ($this->schema_in_use_by_projects($uid)) {
                 throw new Exception("Schema is in use by projects.");
+            }
+
+            $this->db->trans_start();
+
+            $this->load->model('Editor_template_model');
+            $this->Editor_template_model->delete_all_for_data_type(
+                $uid,
+                $this->get_api_user_id() ?: null
+            );
+
+            $this->Metadata_schemas_model->delete($schema['id']);
+
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === false) {
+                throw new Exception("Failed to delete schema.");
             }
 
             $schema_path = $this->Metadata_schemas_model->resolve_schema_path($schema);
             if ($schema_path && is_dir($schema_path)) {
                 $this->delete_directory($schema_path);
             }
-
-            $this->Metadata_schemas_model->delete($schema['id']);
 
             $response = array(
                 'status' => 'success',
@@ -1187,15 +1197,11 @@ class Schemas extends MY_REST_Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             );
+            if ($e->getMessage() === 'Schema is in use by projects.') {
+                $response['error_code'] = 'schema_in_use_by_projects';
+            }
             $this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
         }
-    }
-
-    private function schema_in_use_by_templates($schema_uid)
-    {
-        $this->db->from('editor_templates');
-        $this->db->where('data_type', $schema_uid);
-        return $this->db->count_all_results() > 0;
     }
 
     private function schema_in_use_by_projects($schema_uid)
