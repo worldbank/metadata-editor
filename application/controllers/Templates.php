@@ -42,13 +42,19 @@ class Templates extends MY_Controller {
 		}
 
 		
-		// Check if template is a core template (core templates cannot be edited)
-		$is_core_template = (isset($user_template['template_type']) && $user_template['template_type'] === 'core') 
-			|| $this->Editor_template_model->get_core_template_by_uid($uid);
-		
-		// Check if user has edit access (only for custom templates)
+		// Core and generated templates are read-only in the editor
+		$is_read_only_template = false;
+		if (!empty($user_template['template_type']) && in_array($user_template['template_type'], array('core', 'generated'), true)) {
+			$is_read_only_template = true;
+		} elseif (!empty($user_template['is_generated'])) {
+			$is_read_only_template = true;
+		} elseif ($this->Editor_template_model->get_core_template_by_uid($uid)) {
+			$is_read_only_template = true;
+		}
+
+		// Check if user has edit access (only for editable custom templates)
 		$user_has_edit_access = false;
-		if (!$is_core_template) {
+		if (!$is_read_only_template) {
 			try {
 				$this->editor_acl->user_has_template_access($uid,$permission='edit');
 				$user_has_edit_access = true;

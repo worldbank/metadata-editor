@@ -95,7 +95,7 @@
                 </div>
                 <div>
                     <v-icon 
-                        v-if="!isItemInUse(container.key) && user_has_edit_access"
+                        v-if="!isItemInUse(container.key) && isEditable"
                         color="#007bff" 
                         @click="addSectionContainer(container)"
                         style="cursor: pointer;"
@@ -166,7 +166,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-text-field>
     </div>
 
@@ -178,7 +178,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-text-field>
     </div>
 
@@ -190,7 +190,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-text-field>
     </div>
 
@@ -202,7 +202,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-text-field>
     </div>
 
@@ -214,7 +214,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-text-field>
     </div>
 
@@ -226,7 +226,7 @@
         outlined
         rows="8"
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-textarea>
     </div>
 
@@ -239,7 +239,7 @@
         rows="12"
         hide-details
         class="mt-2"
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
       ></v-textarea>
     </div>
 </div>
@@ -270,7 +270,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
     ></v-text-field>
 </div>
 <div v-if="ActiveNode && !ActiveNodeIsProp && ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small mb-3" style="font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} <span class="pl-3">Name: {{ActiveNode.key}}</span> <span class="pl-3">Type: {{ActiveNode.type}}</span>  </div>
@@ -294,7 +294,7 @@
         outlined
         dense
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
     ></v-select>
 </div>
 
@@ -306,7 +306,7 @@
             @change="markDirty"
             :label="$t('required')"
             hide-details
-            :disabled="!user_has_edit_access"
+            :disabled="!isEditable"
         ></v-checkbox>
     </v-col>
 
@@ -317,7 +317,7 @@
             @change="markDirty"
             :label="$t('recommended')"
             hide-details
-            :disabled="!user_has_edit_access"
+            :disabled="!isEditable"
         ></v-checkbox>
     </v-col>
 
@@ -328,7 +328,7 @@
             @change="markDirty"
             :label="$t('private')"
             hide-details
-            :disabled="!user_has_edit_access"
+            :disabled="!isEditable"
         ></v-checkbox>
     </v-col>
 
@@ -339,7 +339,7 @@
             @change="markDirty"
             :label="$t('readonly')"
             hide-details
-            :disabled="!user_has_edit_access"
+            :disabled="!isEditable"
         ></v-checkbox>
     </v-col>
 </v-row>
@@ -352,7 +352,7 @@
         outlined
         rows="8"
         hide-details
-        :disabled="!user_has_edit_access"
+        :disabled="!isEditable"
     ></v-textarea>
 </div>
 <div v-if="ActiveNode && (ActiveNode.key || ActiveNode.prop_key) && !ActiveNodeIsProp && ActiveNode.key" class="text-secondary p-1 mb-3" style="font-size:small;">
@@ -396,7 +396,7 @@
                     outlined
                     dense
                     hide-details
-                    :disabled="!user_has_edit_access"
+                    :disabled="!isEditable"
                 ></v-select>
             </div>
 
@@ -409,7 +409,7 @@
                     outlined
                     dense
                     hide-details
-                    :disabled="!user_has_edit_access"
+                    :disabled="!isEditable"
                 ></v-select>
             </div>
 
@@ -425,7 +425,7 @@
                     outlined
                     dense
                     hide-details
-                    :disabled="!user_has_edit_access"
+                    :disabled="!isEditable"
                 ></v-select>
             </div>
 
@@ -457,7 +457,7 @@
                                     outlined
                                     clearable
                                     label=""
-                                    :disabled="!user_has_edit_access"
+                                    :disabled="!isEditable"
                                 ></v-select>
                             </div>
                         </div>
@@ -515,7 +515,7 @@
                             rows="8"
                             hide-details
                             class="mt-2"
-                            :disabled="!user_has_edit_access"
+                            :disabled="!isEditable"
                         ></v-textarea>
                         <v-select
                             v-else-if="ActiveNode && ActiveNode.type=='boolean'"
@@ -526,7 +526,7 @@
                             clearable
                             hide-details
                             class="mt-2"
-                            :disabled="!user_has_edit_access"
+                            :disabled="!isEditable"
                         ></v-select>
                         <v-text-field
                             v-else
@@ -536,7 +536,7 @@
                             v-model="ActiveNode.default"
                             hide-details
                             class="mt-2"
-                            :disabled="!user_has_edit_access"
+                            :disabled="!isEditable"
                         ></v-text-field>
                     </div>
                 </div>

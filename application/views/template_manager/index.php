@@ -253,55 +253,55 @@
                 <div class="pr-1" style="position:fixed;">
 
                   <div>
-                    <v-icon v-if="ActiveCoreNode.type && user_has_edit_access" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
+                    <v-icon v-if="ActiveCoreNode.type && isEditable" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-chevron-left-box</v-icon>
                   </div>
                   <div>
-                    <v-icon v-if="ActiveNodeIsField && user_has_edit_access" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
+                    <v-icon v-if="ActiveNodeIsField && isEditable" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-chevron-right-box</v-icon>
                   </div>
 
                   <div>
-                    <v-icon v-if="ActiveNode && (ActiveNode.type=='section_container' || ActiveNode.type=='section') && user_has_edit_access" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
+                    <v-icon v-if="ActiveNode && (ActiveNode.type=='section_container' || ActiveNode.type=='section') && isEditable" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-plus-box</v-icon>
                   </div>
                   <div>
-                    <v-icon v-if="ActiveNode && ActiveNode.type=='section' && user_has_edit_access" color="#3498db" @click="removeField()">mdi-minus-box</v-icon>
+                    <v-icon v-if="ActiveNode && ActiveNode.type=='section' && isEditable" color="#3498db" @click="removeField()">mdi-minus-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-minus-box</v-icon>
                   </div>
                   <div>
-                    <v-icon v-if="ActiveNode && ActiveNode.type && ActiveNode.key && !ActiveNodeIsRoot && !ActiveNodeIsDescription && user_has_edit_access" color="#3498db" @click="moveUp()">mdi-arrow-up-bold-box</v-icon>
+                    <v-icon v-if="ActiveNode && ActiveNode.type && ActiveNode.key && !ActiveNodeIsRoot && !ActiveNodeIsDescription && isEditable" color="#3498db" @click="moveUp()">mdi-arrow-up-bold-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-arrow-up-bold-box</v-icon>
                   </div>
                   <div>
-                    <v-icon v-if="ActiveNode && ActiveNode.type && ActiveNode.key && !ActiveNodeIsRoot && !ActiveNodeIsDescription && user_has_edit_access" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
+                    <v-icon v-if="ActiveNode && ActiveNode.type && ActiveNode.key && !ActiveNodeIsRoot && !ActiveNodeIsDescription && isEditable" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
                     <v-icon v-else class="disabled-button-color">mdi-arrow-down-bold-box</v-icon>
                   </div>
 
 
                   <div class="mt-5" title="Move">
-                    <v-icon v-if="ActiveNodeIsField && user_has_edit_access" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
+                    <v-icon v-if="ActiveNodeIsField && isEditable" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
                     <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-copy</v-icon>
                   </div>
 
                   <div class="mt-2" title="Paste">
-                    <v-icon v-if="ActiveNode && ActiveNode.type=='section' && cut_fields.length>0 && user_has_edit_access" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
+                    <v-icon v-if="ActiveNode && ActiveNode.type=='section' && cut_fields.length>0 && isEditable" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
                     <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
                   </div>
 
                   <!--additional (not allowed directly under section_container) -->
                   <div class="mt-5" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array')) || TemplateIsAdminMeta || TemplateIsCustom)">
-                    <v-icon title="Add custom field" v-if="ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array') && user_has_edit_access" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
+                    <v-icon title="Add custom field" v-if="ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array') && isEditable" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
                     <v-icon title="Add custom field" v-else class="disabled-button-color">mdi-text-box-plus-outline</v-icon>
                   </div>
 
                   <div class="mt-1" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
-                    <v-icon title="Add custom Array field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && user_has_edit_access" class="additional-item"  @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
+                    <v-icon title="Add custom Array field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && isEditable" class="additional-item"  @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
                     <v-icon title="Add custom Array field" v-else class="disabled-button-color">mdi-table-large-plus</v-icon>
                   </div>
 
                   <div class="mt-1" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
-                    <v-icon title="Add custom NestedArray field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && user_has_edit_access" class="additional-item"  @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>
+                    <v-icon title="Add custom NestedArray field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && isEditable" class="additional-item"  @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>
                     <v-icon title="Add custom NestedArray field" v-else class="disabled-button-color">mdi-file-tree</v-icon>
                   </div>
 
@@ -1904,7 +1904,7 @@
           return parts.length > 0 ? parts[0] : null;
         },
         saveTemplate: function() {
-          if (!this.user_has_edit_access) {
+          if (!this.isEditable) {
             alert(this.$t("read_only") + " - " + this.$t("no_edit_permission"));
             return;
           }
@@ -2068,19 +2068,20 @@
 
       },
       computed: {
-        isCoreTemplate: function() {
+        isReadOnlyTemplate: function() {
           if (!this.user_template_info) {
             return false;
           }
-          // Core templates have template_type === 'core'
-          // Generated templates also cannot be edited, but we're specifically checking for core here
-          return this.user_template_info.template_type === 'core';
+          if (this.user_template_info.template_type === 'core') {
+            return true;
+          }
+          if (this.user_template_info.template_type === 'generated') {
+            return true;
+          }
+          return !!this.user_template_info.is_generated;
         },
         isEditable: function() {
-          // Template is editable if:
-          // 1. It's not a core template
-          // 2. User has edit access
-          return !this.isCoreTemplate && this.user_has_edit_access;
+          return !this.isReadOnlyTemplate && this.user_has_edit_access;
         },
         activeNodeDeepLinkKey() {
           return this.getActiveNodeDeepLinkKey(this.ActiveNode);
