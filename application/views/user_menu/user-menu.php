@@ -21,7 +21,7 @@ $user=$this->session->userdata('username');
                 <a class="dropdown-item" href="<?php echo site_url('auth/profile'); ?>"><?php echo t('profile');?> </a>
                 <a class="dropdown-item" href="<?php echo site_url('auth/change_password'); ?>"><?php echo t('password');?></a>
                 <div class="dropdown-divider"></div>
-                <?php if ($this->ion_auth->can_access_site_admin()): ?>
+                <?php if ($this->ion_auth->can_access_admin_dashboard()): ?>
                     <a class="dropdown-item" href="<?php echo site_url('admin'); ?>"><?php echo t('site_administration');?></a>
                     <div class="dropdown-divider"></div>
                 <?php endif; ?>

@@ -403,6 +403,27 @@ class Ion_auth
 
 		return $this->ci->acl_manager->has_site_admin_access($user);
 	}
+
+	/**
+	 * True when the user may open the site administration dashboard (/admin).
+	 */
+	function can_access_admin_dashboard($user_id=null)
+	{
+		if(!$user_id){
+			$user_id=$this->ci->session->userdata("user_id");
+		}
+
+		if(!$user_id){
+			return false;
+		}
+
+		$user=$this->get_user($user_id);
+		if(!$user){
+			return false;
+		}
+
+		return $this->ci->acl_manager->check_access('dashboard', 'view', $user);
+	}
 	
 	/**
 	 * is_group

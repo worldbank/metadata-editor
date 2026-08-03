@@ -69,10 +69,22 @@
       $user=$this->session->userdata('username');
       $this->load->library('Editor_acl');
       $can_template_admin=false;
+      $can_import_template=false;
+      $can_duplicate_template=false;
       try{
         $can_template_admin=$this->editor_acl->has_access('template_manager','admin');
       }catch(Exception $e){
         $can_template_admin=false;
+      }
+      try{
+        $can_import_template=$this->editor_acl->has_access('template_manager','edit');
+      }catch(Exception $e){
+        $can_import_template=false;
+      }
+      try{
+        $can_duplicate_template=$this->editor_acl->has_access('template_manager','duplicate');
+      }catch(Exception $e){
+        $can_duplicate_template=false;
       }
       
       $user_info=array_merge(array(
@@ -81,7 +93,10 @@
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
         'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
+        'can_access_admin_dashboard'=> $this->ion_auth->can_access_admin_dashboard(),
         'can_template_admin'=> $can_template_admin,
+        'can_import_template'=> $can_import_template,
+        'can_duplicate_template'=> $can_duplicate_template,
       ), registry_acl_user_info_flags());
       
     ?>
@@ -165,7 +180,7 @@
                     </div>
 
                     <div class="justify-content-end">
-                      <v-btn class="primary mr-2" @click="showImportTemplateDialog" v-if="list_view === 'active'">{{$t('import_template')}}</v-btn>
+                      <v-btn class="primary mr-2" @click="showImportTemplateDialog" v-if="list_view === 'active' && canImportTemplate">{{$t('import_template')}}</v-btn>
                     </div>
 
                   </div>
@@ -376,7 +391,7 @@
             </v-list-item-icon>
             <v-list-item-title @click="shareTemplate(menu_active_template_id)"><v-btn text> {{$t('share')}}</v-btn></v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item v-if="canDuplicateTemplate">
             <v-list-item-icon>
               <v-icon>mdi-content-duplicate</v-icon>
             </v-list-item-icon>
@@ -592,6 +607,14 @@
             { text: this.$t('deleted_by'), value: 'deleted_by_username' },
             { text: '', value: 'actions', sortable: false }
           ];
+        },
+        canImportTemplate() {
+          const info = CI.user_info || {};
+          return info.can_import_template === true || info.is_admin === true;
+        },
+        canDuplicateTemplate() {
+          const info = CI.user_info || {};
+          return info.can_duplicate_template === true || info.is_admin === true;
         }
       },
       watch: {

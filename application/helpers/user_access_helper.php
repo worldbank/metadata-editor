@@ -272,6 +272,33 @@ if (!function_exists('site_features_user_info')) {
 	}
 }
 
+if (!function_exists('user_can_access_admin_dashboard')) {
+
+	/**
+	 * True when the user may open the site administration dashboard (/admin).
+	 *
+	 * @param object|null $user
+	 */
+	function user_can_access_admin_dashboard($user = null)
+	{
+		$ci =& get_instance();
+
+		if (!isset($ci->acl_manager)) {
+			$ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+
+		if ($user === null) {
+			$user = $ci->acl_manager->current_user();
+		}
+
+		if (!$user) {
+			return false;
+		}
+
+		return (bool) $ci->acl_manager->check_access('dashboard', 'view', $user);
+	}
+}
+
 if (!function_exists('build_editor_user_info')) {
 
 	/**
@@ -303,6 +330,7 @@ if (!function_exists('build_editor_user_info')) {
 			'is_logged_in' => !empty($username),
 			'is_admin' => $is_admin,
 			'can_access_site_admin' => $user ? (bool) $ci->acl_manager->has_site_admin_access($user) : false,
+			'can_access_admin_dashboard' => user_can_access_admin_dashboard($user),
 			'has_editor_access' => $has_editor_access,
 			'has_global_project_access' => $has_global_project_access,
 			'show_editor_access_notice' => $show_editor_access_notice && !empty($username) && !$is_admin && !$has_editor_access,

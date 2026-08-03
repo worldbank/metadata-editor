@@ -29,6 +29,7 @@
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
         'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
+        'can_access_admin_dashboard'=> $this->ion_auth->can_access_admin_dashboard(),
         'metadata_assessment_enabled'=> metadata_assessment_enabled(),
       ), site_features_user_info());
       

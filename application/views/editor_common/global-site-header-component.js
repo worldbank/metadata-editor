@@ -76,10 +76,7 @@ Vue.component('vue-global-site-header', {
             if (!CI || !CI.user_info) {
                 return false;
             }
-            if (CI.user_info.can_access_site_admin === true) {
-                return true;
-            }
-            return CI.user_info.is_admin === true;
+            return CI.user_info.can_access_admin_dashboard === true;
         }
 
     },
