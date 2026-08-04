@@ -42,6 +42,12 @@
 			"description": "indicates whether the variable is a weight",
 			"default": 0
 		},
+		"is_key": {
+			"type": "integer",
+			"title": "Is key variable",
+			"description": "Indicates whether the variable is a key variable (1) or not (0). Key variables are used to identify records in a data file.",
+			"default": 0
+		},
 		"loc_start_pos": {
 			"type": "number",
 			"title": "Variable start position"

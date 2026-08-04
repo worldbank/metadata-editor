@@ -226,19 +226,30 @@
                             "help_text": "A series or an indicator can be referred to using different names. For example, the indicator \"Child mortality rate\" could also be referred to as \"Under-five mortality rate\". The aliases element is provided to capture the alternative names of the documented series or indicator. Pay attention to the consistent use of capitalization in the aliases."
                         },
                         {
-                            "key": "series_description.database_id",
-                            "type": "string",
+                            "key": "series_description.databases",
+                            "type": "array",
                             "class": "database_id",
-                            "title": "Database ID",
-                            "help_text": "The unique identifier of the database the indicator/series belongs to. This field must correspond to the element \"Database description / Title statement / Primary ID\" of the database metadata. This is the only field that is needed to establish the link between the indicator metadata and the information on the database it belongs to.",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "series_description.database_name",
-                            "type": "string",
-                            "title": "Database name",
-                            "help_text": "Database name",
-                            "display_type": "text"
+                            "title": "Database",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "Database ID",
+                                    "type": "string",
+                                    "class": "database_id",
+                                    "prop_key": "series_description.databases.id",
+                                    "help_text": "The unique identifier of the database the indicator/series belongs to. This field must correspond to the element \"Database description / Title statement / Primary ID\" of the database metadata. This is the only field that is needed to establish the link between the indicator metadata and the information on the database it belongs to.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Database name",
+                                    "type": "string",
+                                    "prop_key": "series_description.databases.name",
+                                    "help_text": "Database name",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The database (or databases) that contain this indicator or series."
                         },
                         {
                             "key": "series_description.date_last_update",

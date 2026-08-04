@@ -218,12 +218,30 @@
                             "help_text": "Une série ou un indicateur peuvent être référencés en utilisant des noms différents. Par exemple, l'indicateur \"Taux de mortalité infantile\" pourrait également être appelé \"Taux de mortalité des moins de cinq ans\". L'élément alias est fourni pour saisir les noms alternatifs de la série ou de l'indicateur documenté. Faites attention à l'utilisation cohérente des majuscules dans les alias."
                         },
                         {
-                            "key": "series_description.database_id",
-                            "type": "string",
+                            "key": "series_description.databases",
+                            "type": "array",
                             "class": "database_id",
-                            "title": "ID de la base de données",
-                            "help_text": "L'identifiant unique de la base de données à laquelle appartient l'indicateur/la série. Ce champ doit correspondre à l'élément \"Database description / Title statement / Primary ID\" des métadonnées de la base de données. C'est le seul champ nécessaire pour établir le lien entre les métadonnées de l'indicateur et les informations de la base de données à laquelle il appartient.",
-                            "display_type": "text"
+                            "title": "Base de données",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID de la base de données",
+                                    "type": "string",
+                                    "class": "database_id",
+                                    "prop_key": "series_description.databases.id",
+                                    "help_text": "L'identifiant unique de la base de données à laquelle appartient l'indicateur/la série. Ce champ doit correspondre à l'élément \"Database description / Title statement / Primary ID\" des métadonnées de la base de données. C'est le seul champ nécessaire pour établir le lien entre les métadonnées de l'indicateur et les informations de la base de données à laquelle il appartient.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom de la base de données",
+                                    "type": "string",
+                                    "prop_key": "series_description.databases.name",
+                                    "help_text": "Nom de la base de données",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "La ou les bases de données qui contiennent cet indicateur ou cette série."
                         }
                     ],
                     "help_text": ""

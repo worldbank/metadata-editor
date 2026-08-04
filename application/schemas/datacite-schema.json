@@ -43,7 +43,33 @@
           "familyName": {
             "type": "string",
             "title": "Family name"
-          }          
+          },
+          "affiliation": {
+            "type": "array",
+            "title": "Affiliation",
+            "description": "Organizational affiliation(s) of the creator",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name"
+                },
+                "affiliationIdentifier": {
+                  "type": "string",
+                  "title": "Affiliation identifier"
+                },
+                "affiliationIdentifierScheme": {
+                  "type": "string",
+                  "title": "Affiliation identifier scheme"
+                },
+                "schemeUri": {
+                  "type": "string",
+                  "title": "Scheme URI"
+                }
+              }
+            }
+          }
         }
       }
     },

@@ -750,10 +750,10 @@
                             "title": "Errata",
                             "props": [
                                 {
-                                    "key": "type",
+                                    "key": "date",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "database_description.errata.type",
+                                    "prop_key": "database_description.errata.date",
                                     "help_text": "The date the erratum was published.",
                                     "display_type": "text"
                                 },

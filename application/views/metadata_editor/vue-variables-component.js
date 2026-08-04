@@ -72,7 +72,7 @@ Vue.component('variables', {
                 "var_qstn_qstnlit",
                 "var_codinstr",
                 "var_imputation",
-                "var_qstn_ivuinstr",
+                "var_qstn_ivulnstr",
                 "var_resp_unit",
                 "sum_stats_options",
                 "var_wgt_id",

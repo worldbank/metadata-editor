@@ -294,10 +294,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string",
-                                    "prop_key": "video_description.contributors.abbreviation",
+                                    "prop_key": "video_description.contributors.abbr",
                                     "help_text": "The abbreviation for the institution which has been listed as the affiliation of the contributor.",
                                     "display_type": "text"
                                 },

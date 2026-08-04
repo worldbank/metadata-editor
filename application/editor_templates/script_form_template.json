@@ -187,7 +187,7 @@
                     "class": "recommended",
                     "items": [
                         {
-                            "key": "project_desc.reproducibility_status.type",
+                            "key": "project_desc.reproducibility_status.status",
                             "title": "Status",
                             "help_text": "Information on the reproducibility status of the project, using a controlled vocabulary",
                             "type": "string",

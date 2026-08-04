@@ -26,7 +26,7 @@ Vue.component('spread-metadata', {
                     "var_qstn_preqtxt",
                     "var_qstn_qstnlit",
                     "var_qstn_postqtxt",
-                    "var_qstn_ivuinstr"
+                    "var_qstn_ivulnstr"
                 ],
                 'categories':[
                     'var_catgry'

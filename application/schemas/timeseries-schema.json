@@ -128,11 +128,13 @@
 							},
 							"abbreviation": {
 								"title": "Abbreviation",
-								"description": "Abbreviation"
+								"description": "Abbreviation",
+								"type": "string"
 							},
 							"email": {
 								"title": "Email",
-								"description": "Email"
+								"description": "Email",
+								"type": "string"
 							},
 							"uri": {
 								"title": "URI",

@@ -3839,7 +3839,7 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "variable.var_qstn_ivuinstr",
+                                    "key": "variable.var_qstn_ivulnstr",
                                     "title": "Suhbat o'tkazuvchi ko'rsatmalari",
                                     "type": "string",
                                     "help_text": "Specific instructions to the individual conducting an interview. The content will typically be entered by copy/pasting instructions in the interviewer’s manual (or in the CAPI application). In cases where the same instructions relate to multiple variables, repeat the same information in the metadata for all these variables.",

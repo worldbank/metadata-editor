@@ -2709,38 +2709,6 @@
                         }
                     ],
                     "help_text": ""
-                },
-                {
-                    "type": "section",
-                    "key": "document_tags",
-                    "title": "Tags",
-                    "class": "recommended",
-                    "items": [
-                        {
-                            "key": "tags",
-                            "title": "Tags",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "tag",
-                                    "title": "Tag",
-                                    "type": "string",
-                                    "prop_key": "tags.tag",
-                                    "help_text": "Un tag défini par l'utilisateur.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "tag_group",
-                                    "title": "Tag group",
-                                    "type": "string",
-                                    "prop_key": "tags.tag_group",
-                                    "help_text": "Le nom d'un groupe de tags",
-                                    "display_type": "text"
-                                }
-                            ],
-                            "help_text": "Les tags, en particulier lorsqu'ils sont organisées en groupes de tags, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
-                        }
-                    ]
                 }
             ]
         },

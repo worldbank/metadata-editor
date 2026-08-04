@@ -166,14 +166,7 @@
                             "key": "table_description.title_statement.alternate_title",
                             "title": "Alternate title",
                             "type": "string",
-                            "help_text": "A title that may be given to the table, other than the main title entered in \"Title\". This element will rarely be used. ",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "table_description.title_statement.alternate_title",
-                            "title": "Alternate title",
-                            "help_text": "An abbreviated title, which can for example be an acronym (but not the table number, which should be captured in \"Table number\") by which the table may be referred to. This element will rarely be used.",
-                            "type": "string",
+                            "help_text": "A title other than the main title (for example an acronym or abbreviation—not the table number, which belongs in \"Table number\"). Any substitute or alternative form of the formal title. Rarely used.",
                             "display_type": "text"
                         },
                         {

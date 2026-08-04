@@ -98,7 +98,7 @@
     <?php 
     $questions_fields = array(
         "var_qstn_preqtxt", "var_qstn_qstnlit", "var_catgry", 
-        "var_qstn_ivuinstr", "var_qstn_postqtxt", "var_qstn_ivulnstr"
+        "var_qstn_postqtxt", "var_qstn_ivulnstr"
     );
     $has_questions = false;
     foreach($questions_fields as $field) {

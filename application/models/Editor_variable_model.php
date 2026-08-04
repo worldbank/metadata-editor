@@ -451,6 +451,7 @@ class Editor_variable_model extends ci_model {
         if (isset($options['metadata'])) {
             $options['metadata'] = $this->sync_invalrng_and_is_missing($options['metadata']);
             $options['metadata'] = $this->remove_catgry_when_freq_disabled($options['metadata']);
+            $this->normalize_variable_metadata($options['metadata']);
             $core = $this->get_variable_core_fields($options['metadata']);
             $options = array_merge($options, $core);
             $options['metadata'] = $this->Editor_model->encode_metadata($options['metadata']);
@@ -853,6 +854,34 @@ class Editor_variable_model extends ci_model {
 				unset($var_metadata['var_wgt_id']);
 			}
 		}
+
+		// Legacy typo var_qstn_ivuinstr → canonical var_qstn_ivulnstr (NADA / variable-schema)
+		if (array_key_exists('var_qstn_ivuinstr', $var_metadata)) {
+			$legacy = $var_metadata['var_qstn_ivuinstr'];
+			if (($var_metadata['var_qstn_ivulnstr'] ?? '') === '' && $legacy !== '' && $legacy !== null) {
+				$var_metadata['var_qstn_ivulnstr'] = $legacy;
+			}
+			unset($var_metadata['var_qstn_ivuinstr']);
+		}
+	}
+
+	/**
+	 * Interviewer instructions (DDI ivuInstr), canonical metadata key var_qstn_ivulnstr.
+	 *
+	 * @param array $variable Variable row or metadata array
+	 * @return string
+	 */
+	public static function var_qstn_ivulnstr_value($variable)
+	{
+		if (!is_array($variable)) {
+			return '';
+		}
+		$canonical = $variable['var_qstn_ivulnstr'] ?? '';
+		if ($canonical !== '' && $canonical !== null) {
+			return (string)$canonical;
+		}
+		$legacy = $variable['var_qstn_ivuinstr'] ?? '';
+		return $legacy !== null ? (string)$legacy : '';
 	}
 
 	/**
@@ -1060,6 +1089,7 @@ class Editor_variable_model extends ci_model {
             $options['metadata'] = $this->sync_invalrng_and_is_missing($options['metadata']);
             // Remove var_catgry when freq is disabled
             $options['metadata'] = $this->remove_catgry_when_freq_disabled($options['metadata']);
+            $this->normalize_variable_metadata($options['metadata']);
             
             $core=$this->get_variable_core_fields($options['metadata']);
             $options=array_merge($options,$core);
@@ -1093,6 +1123,7 @@ class Editor_variable_model extends ci_model {
             $options['metadata'] = $this->sync_invalrng_and_is_missing($options['metadata']);
             // Remove var_catgry when sum_stats_options.freq is false
             $options['metadata'] = $this->remove_catgry_when_freq_disabled($options['metadata']);
+            $this->normalize_variable_metadata($options['metadata']);
             
             $core=$this->get_variable_core_fields($options['metadata']);
             $options=array_merge($options,$core);

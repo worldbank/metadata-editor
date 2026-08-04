@@ -1517,38 +1517,6 @@
 						}
 					],
 					"help_text": ""
-				},
-				{
-					"type": "section",
-					"key": "document_tags",
-					"title": "Etiquetas",
-					"class": "recommended",
-					"items": [
-						{
-							"key": "tags",
-							"title": "Etiquetas",
-							"type": "array",
-							"props": [
-								{
-									"key": "tag",
-									"title": "Etiqueta",
-									"type": "string",
-									"prop_key": "tags.tag",
-									"help_text": "Una etiqueta definida por el usuario.",
-									"display_type": "text"
-								},
-								{
-									"key": "tag_group",
-									"title": "grupo de etiquetas",
-									"type": "string",
-									"prop_key": "tags.tag_group",
-									"help_text": "El nombre de un grupo de etiquetas.",
-									"display_type": "text"
-								}
-							],
-							"help_text": "Las etiquetas, especialmente cuando se organizan en grupos de etiquetas, proporcionan una solución potente y flexible para habilitar facetas (filtros) personalizados en catálogos de datos."
-						}
-					]
 				}
 			]
 		},

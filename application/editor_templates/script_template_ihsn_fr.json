@@ -465,7 +465,7 @@
                     "type": "section",
                     "items": [
                         {
-                            "key": "project_desc.reproducibility_status.type",
+                            "key": "project_desc.reproducibility_status.status",
                             "title": "Statut",
                             "help_text": "Statut de reproducibilité du projet; un vocabulaire contrôlé devrait être utilisé.",
                             "type": "string",

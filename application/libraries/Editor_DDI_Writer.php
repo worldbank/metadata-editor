@@ -410,7 +410,7 @@ class Editor_DDI_Writer
             'preQTxt' => $var['var_qstn_preqtxt'] ?? '',
             'qstnLit' => $var['var_qstn_qstnlit'] ?? '',
             'postQTxt' => $var['var_qstn_postqtxt'] ?? '',
-            'ivuInstr' => $var['var_qstn_ivulnstr'] ?? '',
+            'ivuInstr' => Editor_variable_model::var_qstn_ivulnstr_value($var),
         );
         $has_qstn = false;
         foreach ($qstn_fields as $qv) {

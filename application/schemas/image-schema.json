@@ -111,18 +111,10 @@
 					}
 				  },
 				"iptc": {
-					"allOf": [
-						{
-							"$ref": "../schemas/iptc-pmd-schema.json"
-						}
-					]
+					"$ref": "iptc-pmd-schema.json"
 				},
 				"dcmi": {
-					"allOf": [
-						{
-							"$ref": "dcmi-schema.json"
-						}
-					]
+					"$ref": "dcmi-schema.json"
 				},
 				"license": {
 					"type": "array",
@@ -195,7 +187,13 @@
 			"required": [
 				"tag"
 			]
-		},		
+		},
+		"datacite": {
+			"type": "object",
+			"title": "DataCite",
+			"description": "DataCite metadata for generating DOI",
+			"$ref": "datacite-schema.json"
+		},
 		"additional": {
 			"type": "object",
 			"description": "Additional metadata",

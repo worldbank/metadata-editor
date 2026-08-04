@@ -663,10 +663,10 @@
                             "title": "Errata",
                             "props": [
                                 {
-                                    "key": "type",
+                                    "key": "date",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "database_description.errata.type",
+                                    "prop_key": "database_description.errata.date",
                                     "help_text": "La date à laquelle l'erratum a été publié.",
                                     "display_type": "text"
                                 },

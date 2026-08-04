@@ -636,6 +636,12 @@
         "tag"
       ]
     },
+    "datacite": {
+      "type": "object",
+      "title": "DataCite",
+      "description": "DataCite metadata for generating DOI",
+      "$ref": "datacite-schema.json"
+    },
 
     "additional": {
       "type": "object",

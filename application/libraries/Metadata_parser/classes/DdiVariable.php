@@ -147,7 +147,7 @@ class DdiVariable
         $output["var_qstn_preqtxt"] = $this->get_element_value('preQTxt',$question);
         $output["var_qstn_qstnlit"] = $this->get_element_value('qstnLit',$question);
         $output["var_qstn_postqtxt"] = $this->get_element_value('postQTxt',$question);
-        $output["var_qstn_ivuinstr"] = $this->get_element_value('ivuInstr',$question);
+        $output["var_qstn_ivulnstr"] = $this->get_element_value('ivuInstr',$question);
 
         $output["var_universe"] = $this->get_element_value('universe');
         $output["var_universe_clusion"] = $this->get_attribute_value($this->get_simple_element('universe'),'clusion');

@@ -9,6 +9,7 @@ class DDI_Writer
     public function __construct()
     {
         $this->ci =& get_instance();
+        $this->ci->load->model('Editor_variable_model');
     }
 
 
@@ -344,7 +345,7 @@ class DDI_Writer
             'qstn.preQTxt'=>$var['var_qstn_preqtxt'],
             'qstn.qstnLit'=>$var['var_qstn_qstnlit'],
             'qstn.postQTxt'=>$var['var_qstn_postqtxt'],
-            'qstn.ivuInstr'=>$var['var_qstn_ivulnstr'],
+            'qstn.ivuInstr'=>Editor_variable_model::var_qstn_ivulnstr_value($var),
 
             //'valrng'=>$var[''],//repeatable field - not supported
             'universe'=>$var['var_universe'],

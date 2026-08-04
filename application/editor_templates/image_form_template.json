@@ -1105,13 +1105,13 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "cvid",
+                                    "key": "cvId",
                                     "title": "ID",
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
                                     "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from",
-                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvid"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId"
                                 },
                                 {
                                     "key": "cvTermName",

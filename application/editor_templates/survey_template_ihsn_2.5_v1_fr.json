@@ -3859,7 +3859,7 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "variable.var_qstn_ivuinstr",
+                                    "key": "variable.var_qstn_ivulnstr",
                                     "title": "Instructions aux enquêteurs",
                                     "type": "string",
                                     "help_text": "Instructions spécifiques destinées à la personne chargée de mener l'entretien. Le contenu sera généralement saisi en copiant\/collant les instructions du manuel de l'intervieweur (ou dans l'application CAPI). Dans les cas où les mêmes instructions s'appliquent à plusieurs variables, répétez les mêmes informations dans les métadonnées de toutes ces variables.",

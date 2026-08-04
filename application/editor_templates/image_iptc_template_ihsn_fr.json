@@ -486,13 +486,13 @@
                                             "type": "array",
                                             "props": [
                                                 {
-                                                    "key": "cvld",
+                                                    "key": "cvId",
                                                     "title": "ID du vocabulaire",
                                                     "class": "required",
                                                     "required": true,
                                                     "type": "string",
                                                     "help_text": "L'identifiant global unique du vocabulaire contrôlé d'où provient le terme.",
-                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvld",
+                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId",
                                                     "display_type": "text"
                                                 },
                                                 {

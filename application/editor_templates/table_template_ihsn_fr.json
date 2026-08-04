@@ -165,14 +165,7 @@
                             "key": "table_description.title_statement.alternate_title",
                             "title": "Titre alternatif",
                             "type": "string",
-                            "help_text": "Un titre qui peut être donné au tableau, autre que le titre principal saisi dans \"Titre\". Cet élément sera rarement utilisé.",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "table_description.title_statement.alternate_title",
-                            "title": "Titre abrégé",
-                            "help_text": "Un titre abrégé, qui peut par exemple être un acronyme (mais pas le numéro de table, qui doit être saisi dans \"Numéro de table\") par lequel la table peut être référencée. Cet élément sera rarement utilisé.",
-                            "type": "string",
+                            "help_text": "Un titre autre que le titre principal (par exemple un acronyme ou une abréviation—pas le numéro de table, qui doit figurer dans « Numéro de table »). Toute forme substitutive ou alternative du titre formel. Rarement utilisé.",
                             "display_type": "text"
                         },
                         {
