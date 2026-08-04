@@ -379,6 +379,11 @@ class Editor_model extends CI_Model {
 			$survey=$this->decode_encoded_fields($survey);
 		}
 
+		if ($survey && isset($survey['type']) && $survey['type'] === 'geospatial' && !empty($survey['metadata']) && is_array($survey['metadata'])) {
+			$this->load->library('Metadata_helper');
+			$survey['metadata'] = $this->metadata_helper->prepare_geospatial_metadata_for_editor($survey['metadata']);
+		}
+
 		if (!is_array($survey['metadata']) || empty($survey['metadata'])){
 			$survey['metadata']=array(
 				'type'=>$survey['type']			
@@ -598,6 +603,10 @@ class Editor_model extends CI_Model {
 		}
 
 		if ($validate){
+			if ($type === 'geospatial') {
+				$this->load->library('Metadata_helper');
+				$options = $this->metadata_helper->normalize_geospatial_metadata_for_schema($options);
+			}
 			$this->validate_schema($type,$options);
 		}
 
@@ -641,6 +650,10 @@ class Editor_model extends CI_Model {
 
 		// Filter out table-level fields from metadata before encoding
 		$metadata_only = $this->filter_metadata_fields($options);
+		if ($type === 'geospatial') {
+			$this->load->library('Metadata_helper');
+			$metadata_only = $this->metadata_helper->normalize_geospatial_metadata_for_schema($metadata_only);
+		}
 		$db_options['metadata'] = $this->encode_metadata($metadata_only);
 
 		$options = $db_options;
@@ -878,6 +891,11 @@ class Editor_model extends CI_Model {
 		if ($schema_type !== 'variable') {
 			$this->load->library('Project_validation');
 			$data = Project_validation::strip_application_managed_metadata_for_schema($data);
+		}
+
+		if ($schema_type === 'geospatial') {
+			$this->load->library('Metadata_helper');
+			$data = $this->metadata_helper->normalize_geospatial_metadata_for_schema($data);
 		}
 		
 		// Get schema file path using schema registry (handles aliases and custom schemas)

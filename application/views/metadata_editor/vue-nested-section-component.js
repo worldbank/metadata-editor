@@ -69,11 +69,12 @@ Vue.component('nested-section', {
                                         <v-expansion-panel-content>
                                             
                                             <nested-section-subsection 
-                                                :value="getData(index+'.'+column.key)"
+                                                :parentElement="field_data[index]"
                                                 :columns="column.props"
                                                 :title="column.title"
-                                                :path="path + '.' + index">
-                                            </nested-section-subsection> 
+                                                :path="path + '.' + index"
+                                                @input="onSubsectionInput(index, $event)"
+                                            ></nested-section-subsection> 
 
                                         </v-expansion-panel-content>
                                         </v-expansion-panel>
@@ -199,6 +200,12 @@ Vue.component('nested-section', {
         setData: function (field_xpath,event){
             _.set(this.field_data,field_xpath,event);
             Vue.set(this.field_data, 0, this.field_data[0]);
+        },
+        onSubsectionInput: function (index, payload) {
+            if (!payload || typeof payload !== 'object') {
+                return;
+            }
+            Vue.set(this.field_data, index, payload);
         },
         toggleChildren(index) {
             if (!this.active_sections.includes(index)) {

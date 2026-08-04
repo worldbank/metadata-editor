@@ -1,31 +1,9 @@
 {
   "$id": "http://ihsn.org/schemas/document",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Script Schema [DRAFT]",
+  "title": "Document Schema",
   "description": "Schema for Document data type",
   "type": "object",
-  "definitions": {
-    "keyword": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "vocabulary": {
-            "title": "Vocabulary name",
-            "type": "string"
-          },
-          "uri": {
-            "title": "Vocabulary URI",
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
   "properties": {
     "idno": {
       "type": "string",
@@ -157,11 +135,13 @@
                   "properties": {
                     "type": {
                       "title": "Type",
-                      "description": "Source of identifier, e.g. ORCID"
+                      "description": "Source of identifier, e.g. ORCID",
+                      "type": "string"
                     },
                     "id": {
                       "title": "Identifier",
-                      "description": "Author's unique identifier for the corresponding source"
+                      "description": "Author's unique identifier for the corresponding source",
+                      "type": "string"
                     }
                   }
                 }
@@ -743,13 +723,26 @@
           }
         },
         "keywords": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/keyword"
-            }
-          ],
+          "type": "array",
           "title": "Keywords",
-          "description": "Keywords"
+          "description": "Keywords",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "vocabulary": {
+                "title": "Vocabulary name",
+                "type": "string"
+              },
+              "uri": {
+                "title": "Vocabulary URI",
+                "type": "string"
+              }
+            }
+          }
         },
         "themes": {
           "type": "array",
@@ -968,6 +961,12 @@
       "required": [
         "tag"
       ]
+    },
+    "datacite": {
+      "type": "object",
+      "title": "DataCite",
+      "description": "DataCite metadata for generating DOI",
+      "$ref": "datacite-schema.json"
     },
     "additional": {
       "type": "object",

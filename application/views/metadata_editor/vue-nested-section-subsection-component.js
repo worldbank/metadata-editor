@@ -112,7 +112,8 @@ Vue.component('nested-section-subsection', {
                                             fieldDisplayType(column)=='textarea' || 
                                             fieldDisplayType(column)=='dropdown' ||
                                             fieldDisplayType(column)=='dropdown-custom' ||
-                                            fieldDisplayType(column)=='simple_array'
+                                            fieldDisplayType(column)=='simple_array' ||
+                                            column.type=='coordinate_pairs'
                                             "
                                     >
                                             <form-input
@@ -154,9 +155,9 @@ Vue.component('nested-section-subsection', {
                                                         :value="localValue(column.key)"
                                                         @input="update(column.key, $event)"
                                                         :columns="column.props"                                                        
-                                                        :path="column.key">
+                                                        :path="column.key"
                                                         :field="column"
-                                                    </nested-array> 
+                                                    ></nested-array> 
                                                 </div>
                                             
                                     </div>

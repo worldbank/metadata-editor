@@ -166,6 +166,21 @@ Vue.component("form-input", {
                         </table-grid-component>
                     </div>
                 </div>
+                <div v-else-if="field.type=='coordinate_pairs'">
+                    <div class="form-field form-field-coordinate-pairs">
+                        <div class="d-flex align-center flex-nowrap">
+                            <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
+                            <span v-if="field.help_text" class="small ml-1" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" aria-label="Help"><i class="far fa-question-circle"></i></span>
+                            <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
+                        </div>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+                        <editor-coordinate-pairs-field
+                            :value="local"
+                            @input="update($event)"
+                            :field="field"
+                        ></editor-coordinate-pairs-field>
+                    </div>
+                </div>
                 <div v-else-if="field.type=='simple_array'" >
                     <div class="form-field form-field-table">
                         <div class="d-flex align-center flex-nowrap">
@@ -174,7 +189,7 @@ Vue.component("form-input", {
                             <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
                         </div>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
-                    <div v-if="fieldDisplayType(field)=='text' ||fieldDisplayType(field)=='textarea' " >
+                    <div v-if="fieldDisplayType(field)=='text' || fieldDisplayType(field)=='textarea' || fieldDisplayType(field)=='number' || fieldDisplayType(field)=='integer' " >
                         <repeated-field
                                 v-model=" local"
                                 :field="field"                            

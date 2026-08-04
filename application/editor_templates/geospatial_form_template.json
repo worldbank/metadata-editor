@@ -2593,7 +2593,7 @@
                                                 },
                                                 {
                                                     "key": "geographicBoundingPolygon.polygon",
-                                                    "type": "array",
+                                                    "type": "nested_array",
                                                     "title": "Polygon",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon",
                                                     "props": [
@@ -2628,7 +2628,7 @@
                                                                     "label": "Point"
                                                                 },
                                                                 {
-                                                                    "code": "line",
+                                                                    "code": "lineString",
                                                                     "label": "Line"
                                                                 },
                                                                 {
@@ -2641,10 +2641,10 @@
                                                         },
                                                         {
                                                             "key": "coordinates",
-                                                            "type": "textarea",
+                                                            "type": "coordinate_pairs",
                                                             "title": "Coordinates",
                                                             "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.coordinates",
-                                                            "help_text": "Coordinates of the polygon. These are the longitude-latitude pairs that define the polygon boundary. Each pair is ordered as <longitude> <latitude>, separated by spaces. The first and last coordinates must be the same to close the polygon."
+                                                            "help_text": "Longitude and latitude for each vertex (decimal degrees, WGS 84). Enter longitude first, then latitude. For a closed polygon ring, the first and last pair must be identical."
                                                         }
                                                     ],
                                                     "help_text": "A geometric object that defines the shape and extent of the area covered. This is defined in GML (Geography Markup Language), typically using EPSG:4326 (WGS 84) as the coordinate system."
@@ -4068,14 +4068,14 @@
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.title",
                                             "title": "Title",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.title",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.title",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.alternateTitle",
                                             "title": "Alternate title",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.alternateTitle",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.alternateTitle",
                                             "display_type": "text"
                                         },
                                         {
@@ -4087,7 +4087,7 @@
                                                     "key": "date",
                                                     "type": "string",
                                                     "title": "Date",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.date.date",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.date.date",
                                                     "display_type": "text"
                                                 },
                                                 {
@@ -4095,38 +4095,38 @@
                                                     "type": "string",
                                                     "title": "Type",
                                                     "help_text": "Date type e.g. publication, revision, creation",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.date.type",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.date.type",
                                                     "display_type": "text"
                                                 }
                                             ],
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.date"
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.date"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.edition",
                                             "title": "Edition",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.edition",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.edition",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.editionDate",
                                             "title": "Edition date",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.editionDate",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.editionDate",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.identifier.code",
                                             "title": "Identifier code",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.identifier.code",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.identifier.code",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.identifier.authority",
                                             "title": "Identifier authority",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.identifier.authority",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.identifier.authority",
                                             "help_text": "Identifier",
                                             "display_type": "text"
                                         },
@@ -4139,28 +4139,28 @@
                                                     "key": "individualName",
                                                     "title": "Individual name",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.individualName",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.individualName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "organisationName",
                                                     "title": "Organisation name",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.organisationName",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.organisationName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "positionName",
                                                     "title": "Position",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.positionName",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.positionName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "role",
                                                     "title": "Role",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.role",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.role",
                                                     "display_type": "dropdown-custom",
                                                     "enum": [
                                                         {
@@ -4249,26 +4249,26 @@
                                                     "key": "contactInfo.address.electronicMailAddress",
                                                     "title": "Email",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.address.electronicMailAddress",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.address.electronicMailAddress",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.voice",
                                                     "title": "Voice",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.phone.voice",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.phone.voice",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.facsimile",
                                                     "title": "Facsimile",
                                                     "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.phone.facsimile",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.contactInfo.phone.facsimile",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "section-1676484775072",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072",
                                                     "title": "Address",
                                                     "type": "section",
                                                     "props": [
@@ -4276,28 +4276,28 @@
                                                             "key": "contactInfo.address.deliveryPoint",
                                                             "title": "Delivery point",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.deliveryPoint",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.deliveryPoint",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.city",
                                                             "title": "City",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.city",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.city",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.country",
                                                             "title": "Country",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.country",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.country",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.postalCode",
                                                             "title": "Postal code",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.postalCode",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484775072.contactInfo.address.postalCode",
                                                             "display_type": "text"
                                                         }
                                                     ],
@@ -4305,7 +4305,7 @@
                                                 },
                                                 {
                                                     "key": "section-1676484798167",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167",
+                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167",
                                                     "title": "Online resource",
                                                     "type": "section",
                                                     "props": [
@@ -4313,21 +4313,21 @@
                                                             "key": "contactInfo.onlineResource.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.name",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.description",
                                                             "title": "Description",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.description",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.description",
                                                             "display_type": "textarea"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.linkage",
                                                             "title": "URL",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.linkage",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.linkage",
                                                             "rules": {
                                                                 "is_uri": true
                                                             },
@@ -4337,21 +4337,21 @@
                                                             "key": "contactInfo.onlineResource.protocol",
                                                             "title": "Protocol",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.protocol",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.protocol",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.function",
                                                             "title": "Function",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.function",
+                                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.section-1676484798167.contactInfo.onlineResource.function",
                                                             "display_type": "text"
                                                         }
                                                     ],
                                                     "help_text": ""
                                                 }
                                             ],
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty"
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.presentationForm",
@@ -4443,7 +4443,7 @@
                                                     "label": "Diagram hardcopy"
                                                 }
                                             ],
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.presentationForm",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.presentationForm",
                                             "display_type": "dropdown-custom"
                                         },
                                         {
@@ -4480,28 +4480,28 @@
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.otherCitationDetails",
                                             "title": "Other citation details",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.otherCitationDetails",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.otherCitationDetails",
                                             "display_type": "textarea"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.collectiveTitle",
                                             "title": "Collective title",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.collectiveTitle",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.collectiveTitle",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.ISBN",
                                             "title": "ISBN",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.ISBN",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.ISBN",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "featureCatalogueDescription.featureCatalogueCitation.ISSN",
                                             "title": "ISSN",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.ISSN",
+                                            "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.ISSN",
                                             "display_type": "text"
                                         }
                                     ]
@@ -5830,14 +5830,14 @@
                                                             "key": "specification.series.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.specification.series.name",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.series.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "specification.series.issueIdentification",
                                                             "title": "Issue",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.specification.series.issueIdentification",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.series.issueIdentification",
                                                             "display_type": "text",
                                                             "help_text": "Identification of the issue"
                                                         },
@@ -5845,7 +5845,7 @@
                                                             "key": "specification.series.page",
                                                             "title": "Page",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.specification.series.page",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.series.page",
                                                             "display_type": "text"
                                                         }
                                                     ],

@@ -1990,7 +1990,7 @@
                                                     "key": "northBoundLatitude",
                                                     "type": "number",
                                                     "title": "North bound latitude",
-                                                    "prop_key": "northBoundLatitude",
+                                                    "prop_key": "geographicBoundingBox.northBoundLatitude",
                                                     "display_type": "text",
                                                     "help_text": "Northern-most coordinate of the limit of the dataset extent, expressed in latitude in decimal degrees."
                                                 }
@@ -2043,7 +2043,7 @@
                                                 },
                                                 {
                                                     "key": "geographicBoundingPolygon.polygon",
-                                                    "type": "array",
+                                                    "type": "nested_array",
                                                     "title": "Polygon",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon",
                                                     "props": [
@@ -2078,7 +2078,7 @@
                                                                     "label": "Point"
                                                                 },
                                                                 {
-                                                                    "code": "line",
+                                                                    "code": "lineString",
                                                                     "label": "Line"
                                                                 },
                                                                 {
@@ -2091,10 +2091,10 @@
                                                         },
                                                         {
                                                             "key": "coordinates",
-                                                            "type": "textarea",
+                                                            "type": "coordinate_pairs",
                                                             "title": "Coordinates",
                                                             "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.coordinates",
-                                                            "help_text": "Coordinates of the polygon. These are the longitude-latitude pairs that define the polygon boundary. Each pair is ordered as <longitude> <latitude>, separated by spaces. The first and last coordinates must be the same to close the polygon."
+                                                            "help_text": "Longitude and latitude for each vertex (decimal degrees, WGS 84). Enter longitude first, then latitude. For a closed polygon ring, the first and last pair must be identical."
                                                         }
                                                     ],
                                                     "help_text": "A geometric object that defines the shape and extent of the area covered. This is defined in GML (Geography Markup Language), typically using EPSG:4326 (WGS 84) as the coordinate system."

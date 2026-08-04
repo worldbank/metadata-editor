@@ -381,6 +381,48 @@
       return parts.join('.');
     }
 
+    // Each dot-separated segment must be a valid identifier (dots allowed for nested array bindings).
+    function templateKeyHasValidSegments(key) {
+      if (key === null || key === undefined || String(key) === '') {
+        return false;
+      }
+      const parts = String(key).split('.');
+      if (parts.indexOf('') !== -1) {
+        return false;
+      }
+      for (let i = 0; i < parts.length; i++) {
+        if (parts[i].match(/^[a-zA-Z0-9:_-]+$/) == null) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Layout-only section nodes (not persisted schema paths).
+    function isUiOnlySectionKeyName(key) {
+      if (key === null || key === undefined) {
+        return false;
+      }
+      const k = String(key);
+      if (/^section-\d+$/.test(k)) {
+        return true;
+      }
+      if (k === 'series_section' || k.endsWith('_section') || k.endsWith('-section')) {
+        return true;
+      }
+      return false;
+    }
+
+    function isUiOnlyTemplateSectionNode(node) {
+      if (!node || typeof node !== 'object') {
+        return false;
+      }
+      if (node.type === 'section') {
+        return true;
+      }
+      return isUiOnlySectionKeyName(node.key);
+    }
+
     function isAcceptedSchemaKey(key, schemaKeys, aliases) {
       if (!key || !schemaKeys || !schemaKeys.length) {
         return false;
@@ -389,7 +431,348 @@
         return true;
       }
       const resolved = resolveTemplateKeyToSchema(key, aliases);
-      return resolved !== key && schemaKeys.indexOf(resolved) !== -1;
+      if (resolved !== key && schemaKeys.indexOf(resolved) !== -1) {
+        return true;
+      }
+      // prop_key paths may embed UI-only section segments; compare without them.
+      const normalizedKey = normalizeTemplateSchemaPath(key);
+      if (normalizedKey && normalizedKey !== key && isAcceptedSchemaKey(normalizedKey, schemaKeys, aliases)) {
+        return true;
+      }
+      if (normalizedKey && normalizedKey !== key) {
+        const normalizedResolved = resolveTemplateKeyToSchema(normalizedKey, aliases);
+        if (schemaKeys.indexOf(normalizedResolved) !== -1) {
+          return true;
+        }
+      }
+      const parts = String(key).split('.').filter(function(part) {
+        return !isUiOnlySectionKeyName(part);
+      });
+      const stripped = parts.join('.');
+      if (stripped && stripped !== key && schemaKeys.indexOf(stripped) !== -1) {
+        return true;
+      }
+      if (stripped && stripped !== key) {
+        const strippedResolved = resolveTemplateKeyToSchema(stripped, aliases);
+        if (schemaKeys.indexOf(strippedResolved) !== -1) {
+          return true;
+        }
+      }
+      const keyLower = String(key).toLowerCase();
+      for (let i = 0; i < schemaKeys.length; i++) {
+        if (String(schemaKeys[i]).toLowerCase() === keyLower) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function joinTemplateSchemaPath(parentKey, relativeKey) {
+      if (!parentKey) {
+        return relativeKey || '';
+      }
+      if (!relativeKey) {
+        return parentKey;
+      }
+      if (relativeKey.indexOf(parentKey + '.') === 0) {
+        return relativeKey;
+      }
+      return parentKey + '.' + relativeKey;
+    }
+
+    function dedupeAdjacentPathSegments(path) {
+      if (!path) {
+        return path;
+      }
+      const parts = String(path).split('.');
+      const out = [];
+      for (let i = 0; i < parts.length; i++) {
+        if (i > 0 && parts[i] === parts[i - 1]) {
+          continue;
+        }
+        out.push(parts[i]);
+      }
+      return out.join('.');
+    }
+
+    function stripUiSegmentsFromTemplatePath(path) {
+      if (!path) {
+        return path;
+      }
+      return String(path).split('.').filter(function(part) {
+        return part && !isUiOnlySectionKeyName(part);
+      }).join('.');
+    }
+
+    function collapseRepeatedPathBlocks(path) {
+      let parts = String(path).split('.').filter(function(part) {
+        return part !== '';
+      });
+      if (parts.length < 2) {
+        return parts.join('.');
+      }
+      let changed = true;
+      while (changed && parts.length > 1) {
+        changed = false;
+        const maxBlock = Math.min(Math.floor(parts.length / 2), 10);
+        for (let blockLen = maxBlock; blockLen >= 1; blockLen--) {
+          for (let start = 0; start + 2 * blockLen <= parts.length; start++) {
+            let match = true;
+            for (let j = 0; j < blockLen; j++) {
+              if (parts[start + j] !== parts[start + blockLen + j]) {
+                match = false;
+                break;
+              }
+            }
+            if (match) {
+              parts.splice(start + blockLen, blockLen);
+              changed = true;
+              break;
+            }
+          }
+          if (changed) {
+            break;
+          }
+        }
+      }
+      return parts.join('.');
+    }
+
+    function normalizeTemplateSchemaPath(path) {
+      if (!path) {
+        return path;
+      }
+      let normalized = stripUiSegmentsFromTemplatePath(path);
+      normalized = dedupeAdjacentPathSegments(normalized);
+      normalized = collapseRepeatedPathBlocks(normalized);
+      return normalized;
+    }
+
+    function schemaPathCandidatesForField(field, userTreeItems) {
+      const candidates = [];
+      const seen = {};
+
+      function add(path) {
+        if (!path) {
+          return;
+        }
+        const variants = [
+          path,
+          dedupeAdjacentPathSegments(path),
+          normalizeTemplateSchemaPath(path)
+        ];
+        for (let i = 0; i < variants.length; i++) {
+          const candidate = variants[i];
+          if (candidate && !seen[candidate]) {
+            seen[candidate] = true;
+            candidates.push(candidate);
+          }
+        }
+      }
+
+      if (!field) {
+        return candidates;
+      }
+
+      if (field.prop_key) {
+        add(field.prop_key);
+      }
+      if (field.key) {
+        add(field.key);
+      }
+
+      const arrayParentKey = findNestedArrayParentKeyForField(userTreeItems, field);
+      if (arrayParentKey) {
+        if (field.key) {
+          add(joinTemplateSchemaPath(arrayParentKey, field.key));
+        }
+        if (field.prop_key) {
+          add(joinTemplateSchemaPath(arrayParentKey, field.prop_key));
+        }
+      }
+
+      addBoundingBoxSchemaPathCandidates(field, userTreeItems, add);
+
+      return candidates;
+    }
+
+    function addBoundingBoxSchemaPathCandidates(field, userTreeItems, addFn) {
+      if (!field || !userTreeItems || typeof addFn !== 'function') {
+        return;
+      }
+
+      function fieldMatchesMappedPath(mappedPath) {
+        if (!mappedPath) {
+          return false;
+        }
+        const last = mappedPath.split('.').pop();
+        return field.key === mappedPath
+          || field.prop_key === mappedPath
+          || field.key === last
+          || field.prop_key === last;
+      }
+
+      function searchProps(props, arrayParentKey) {
+        if (!props || !Array.isArray(props)) {
+          return;
+        }
+        for (let i = 0; i < props.length; i++) {
+          const prop = props[i];
+          if (!prop) {
+            continue;
+          }
+          if (prop.display_type === 'bounding_box' && prop.bounding_box_options && prop.props) {
+            for (let c = 0; c < prop.props.length; c++) {
+              if (prop.props[c] !== field) {
+                continue;
+              }
+              const opts = prop.bounding_box_options;
+              Object.keys(opts).forEach(function(optKey) {
+                const mappedPath = opts[optKey];
+                if (fieldMatchesMappedPath(mappedPath)) {
+                  addFn(joinTemplateSchemaPath(arrayParentKey, mappedPath));
+                }
+              });
+              return;
+            }
+          }
+          if (prop.props) {
+            searchProps(prop.props, arrayParentKey);
+          }
+        }
+      }
+
+      function walk(nodes) {
+        if (!nodes || !Array.isArray(nodes)) {
+          return;
+        }
+        for (let i = 0; i < nodes.length; i++) {
+          const item = nodes[i];
+          if (!item) {
+            continue;
+          }
+          if ((item.type === 'array' || item.type === 'nested_array') && item.props) {
+            const arrayKey = item.prop_key || item.key;
+            searchProps(item.props, arrayKey);
+          }
+          if (item.items) {
+            walk(item.items);
+          }
+        }
+      }
+
+      walk(userTreeItems);
+    }
+
+    function resolveTemplatePropSchemaPath(field, userTreeItems, schemaKeys, aliases) {
+      const candidates = schemaPathCandidatesForField(field, userTreeItems);
+      if (schemaKeys && schemaKeys.length) {
+        for (let i = 0; i < candidates.length; i++) {
+          if (isAcceptedSchemaKey(candidates[i], schemaKeys, aliases)) {
+            return candidates[i];
+          }
+        }
+      }
+      const normalized = field && (field.prop_key || field.key)
+        ? normalizeTemplateSchemaPath(field.prop_key || field.key)
+        : '';
+      if (normalized) {
+        return normalized;
+      }
+      return field && (field.prop_key || field.key) ? (field.prop_key || field.key) : '';
+    }
+
+    function computeTemplatePropKey(prop, parent, userTreeItems, schemaKeys, aliases) {
+      if (!prop || !prop.key) {
+        return '';
+      }
+      const fieldRef = prop;
+      const candidates = schemaPathCandidatesForField(fieldRef, userTreeItems);
+      if (schemaKeys && schemaKeys.length) {
+        for (let i = 0; i < candidates.length; i++) {
+          if (isAcceptedSchemaKey(candidates[i], schemaKeys, aliases)) {
+            return candidates[i];
+          }
+        }
+      }
+      const arrayParentKey = findNestedArrayParentKeyForField(userTreeItems, fieldRef);
+      if (arrayParentKey) {
+        return joinTemplateSchemaPath(arrayParentKey, prop.key);
+      }
+      if (parent) {
+        const parentPath = parent.prop_key || parent.key || '';
+        if (parentPath) {
+          return joinTemplateSchemaPath(parentPath, prop.key);
+        }
+      }
+      return prop.key;
+    }
+
+    // Props under nested_array rows often use paths relative to the array item (e.g. geographicBoundingBox.*).
+    function findNestedArrayParentKeyForField(items, fieldNode) {
+      if (!items || !fieldNode) {
+        return null;
+      }
+
+      function searchProps(props, arrayParentKey) {
+        if (!props || !Array.isArray(props)) {
+          return null;
+        }
+        for (let i = 0; i < props.length; i++) {
+          const prop = props[i];
+          if (prop === fieldNode) {
+            return arrayParentKey;
+          }
+          if (prop.props) {
+            const nested = searchProps(prop.props, arrayParentKey);
+            if (nested !== null) {
+              return nested;
+            }
+          }
+        }
+        return null;
+      }
+
+      function walk(nodes) {
+        if (!nodes || !Array.isArray(nodes)) {
+          return null;
+        }
+        for (let i = 0; i < nodes.length; i++) {
+          const item = nodes[i];
+          if (!item) {
+            continue;
+          }
+          if ((item.type === 'array' || item.type === 'nested_array') && item.props) {
+            const arrayKey = item.prop_key || item.key;
+            const hit = searchProps(item.props, arrayKey);
+            if (hit !== null) {
+              return hit;
+            }
+          }
+          if (item.items) {
+            const deep = walk(item.items);
+            if (deep !== null) {
+              return deep;
+            }
+          }
+        }
+        return null;
+      }
+
+      return walk(items);
+    }
+
+    function isTemplateFieldAcceptedBySchema(field, userTreeItems, schemaKeys, aliases) {
+      if (!field) {
+        return false;
+      }
+      const candidates = schemaPathCandidatesForField(field, userTreeItems);
+      for (let i = 0; i < candidates.length; i++) {
+        if (isAcceptedSchemaKey(candidates[i], schemaKeys, aliases)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     // Extension / free-form keys under additional (and nested paths like additional.kv.key)
@@ -604,6 +987,22 @@
         getSchemaKeyAliases: function(state) {
           return state.schema_key_aliases || {};
         },
+        getSchemaFieldByDottedKey: function(state) {
+          return function(dottedKey) {
+            if (!dottedKey) {
+              return null;
+            }
+            const aliases = state.schema_key_aliases || {};
+            const resolved = resolveTemplateKeyToSchema(dottedKey, aliases);
+            const fields = state.schema_fields || [];
+            for (let i = 0; i < fields.length; i++) {
+              if (fields[i].key === resolved || fields[i].key === dottedKey) {
+                return fields[i];
+              }
+            }
+            return null;
+          };
+        },
         getUnusedSchemaFieldKeys: function(state) {
           let used = [];
           used = getTreeKeys(state.user_tree_items, used);
@@ -716,13 +1115,17 @@
               "value":"label",
               "label":"Label"
             }            
-          ]          
+          ],
+          schemaAlignmentIssues: [],
+          schemaAlignmentWarnings: [],
+          schemaAlignmentLoaded: false,
         }
       },
       created: function() {
         this.init_template();
         this.init_tree();
         this.loadSchemaFields();
+        this.loadSchemaAlignment();
         // Reset dirty state after initialization to prevent false positives
         this.$nextTick(() => {
           this.is_dirty = false;
@@ -845,6 +1248,38 @@
                 key_aliases: {},
                 error: message
               });
+            });
+        },
+        loadSchemaAlignment: function(){
+          const uid = this.user_template_info && this.user_template_info.uid
+            ? this.user_template_info.uid
+            : null;
+          const dataType = this.user_template_info && this.user_template_info.data_type
+            ? this.user_template_info.data_type
+            : null;
+
+          if (!uid || !dataType || dataType === 'custom') {
+            this.schemaAlignmentIssues = [];
+            this.schemaAlignmentWarnings = [];
+            this.schemaAlignmentLoaded = true;
+            return;
+          }
+
+          const url = CI.base_url + '/api/templates/template/' + encodeURIComponent(uid)
+            + '?include=schema_alignment';
+
+          axios.get(url)
+            .then(response => {
+              const data = response.data || {};
+              const alignment = data.schema_alignment || {};
+              this.schemaAlignmentIssues = alignment.issues || [];
+              this.schemaAlignmentWarnings = alignment.warnings || [];
+              this.schemaAlignmentLoaded = true;
+            })
+            .catch(() => {
+              this.schemaAlignmentIssues = [];
+              this.schemaAlignmentWarnings = [];
+              this.schemaAlignmentLoaded = true;
             });
         },
         
@@ -1532,44 +1967,51 @@
         },
         // Find parent node that contains a prop
         findPropParentNode: function(propKey) {
-          // Search through user template to find the array/nested_array that contains this prop
-          const findInTree = (items) => {
-            for (let item of items) {
-              if ((item.type === 'array' || item.type === 'nested_array') && item.props) {
-                // Check if prop is directly in this array's props
-                const found = item.props.find(p => {
-                  const pKey = p.prop_key || p.key;
-                  return pKey === propKey;
-                });
-                if (found) {
-                  return item;
-                }
-                // Check nested props - if a prop is itself an array/nested_array, check its props
-                for (let prop of item.props) {
-                  if ((prop.type === 'array' || prop.type === 'nested_array') && prop.props && Array.isArray(prop.props)) {
-                    // Check if the target prop is in this prop's props array
-                    const nestedFound = prop.props.find(p => {
-                      const pKey = p.prop_key || p.key;
-                      return pKey === propKey;
-                    });
-                    if (nestedFound) {
-                      // Return the prop (array) that contains the target prop
-                      return prop;
-                    }
-                    // Recursively check deeper nested props
-                    const deeperResult = findInTree([{ type: prop.type, props: prop.props }]);
-                    if (deeperResult) return deeperResult;
-                  }
-                }
+          const matchPropKey = function(node) {
+            if (!node) {
+              return false;
+            }
+            const pKey = node.prop_key || node.key;
+            return pKey === propKey;
+          };
+
+          const searchProps = function(props, container) {
+            if (!props || !Array.isArray(props)) {
+              return null;
+            }
+            for (let i = 0; i < props.length; i++) {
+              const prop = props[i];
+              if (matchPropKey(prop)) {
+                return container;
               }
-              if (item.items) {
-                const result = findInTree(item.items);
-                if (result) return result;
+              if (prop.props) {
+                const nested = searchProps(prop.props, prop);
+                if (nested) {
+                  return nested;
+                }
               }
             }
             return null;
           };
-          
+
+          const findInTree = (items) => {
+            for (let item of items) {
+              if ((item.type === 'array' || item.type === 'nested_array') && item.props) {
+                const found = searchProps(item.props, item);
+                if (found) {
+                  return found;
+                }
+              }
+              if (item.items) {
+                const result = findInTree(item.items);
+                if (result) {
+                  return result;
+                }
+              }
+            }
+            return null;
+          };
+
           return findInTree(this.UserTreeItems);
         },
         moveUp: function() {
@@ -1668,19 +2110,10 @@
               };
             }
 
-            if ((item.type === 'array' || item.type === 'nested_array') && item.props && Array.isArray(item.props)) {
-              for (let p = 0; p < item.props.length; p++) {
-                const prop = item.props[p];
-                const propKey = prop.prop_key || (item.key && prop.key ? (item.key + '.' + prop.key) : prop.key);
-                if (propKey === targetKey) {
-                  return {
-                    node: prop,
-                    tree_key: prop.key || propKey,
-                    parent_key: item.key,
-                    ancestor_keys: ancestors.concat(item.key ? [item.key] : []),
-                    is_prop: true
-                  };
-                }
+            if ((item.type === 'array' || item.type === 'nested_array' || item.type === 'section') && item.props && Array.isArray(item.props)) {
+              const propHit = this.findTemplatePropByKey(item.props, item.key, ancestors, targetKey);
+              if (propHit) {
+                return propHit;
               }
             }
 
@@ -1689,6 +2122,49 @@
               const nested = this.findTemplateNodeByKey(item.items, targetKey, nextAncestors);
               if (nested) {
                 return nested;
+              }
+            }
+          }
+
+          return null;
+        },
+        findTemplatePropByKey: function(props, parentKey, ancestors, targetKey) {
+          if (!props || !Array.isArray(props)) {
+            return null;
+          }
+
+          for (let p = 0; p < props.length; p++) {
+            const prop = props[p];
+            if (!prop) {
+              continue;
+            }
+            const propKey = prop.prop_key || (parentKey && prop.key ? (parentKey + '.' + prop.key) : prop.key);
+            if (propKey === targetKey || prop.key === targetKey) {
+              return {
+                node: prop,
+                tree_key: prop.key || propKey,
+                parent_key: parentKey,
+                ancestor_keys: ancestors.concat(parentKey ? [parentKey] : []),
+                is_prop: true
+              };
+            }
+
+            if (prop.props && Array.isArray(prop.props)) {
+              const nestedProp = this.findTemplatePropByKey(
+                prop.props,
+                parentKey,
+                ancestors,
+                targetKey
+              );
+              if (nestedProp) {
+                return nestedProp;
+              }
+            }
+
+            if (prop.items && Array.isArray(prop.items)) {
+              const nestedItem = this.findTemplateNodeByKey(prop.items, targetKey, ancestors);
+              if (nestedItem) {
+                return nestedItem;
               }
             }
           }
@@ -1757,16 +2233,9 @@
             const isStructural = !!(item.type && structural[item.type]);
             const errors = [];
 
-            if (!isStructural) {
-              const parts = String(key).split('.');
-              if (parts.indexOf('') !== -1) {
-                errors.push(this.$t('key_must_not_contain_empty_parts'));
-              }
-              for (let p = 0; p < parts.length; p++) {
-                if (parts[p].match(/^[a-zA-Z0-9:_-]+$/) == null) {
-                  errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
-                  break;
-                }
+            if (!isStructural && !isUiOnlyTemplateSectionNode(item)) {
+              if (!templateKeyHasValidSegments(key)) {
+                errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
               }
               if (seenKeys[key]) {
                 errors.push(this.$t('key_already_exists'));
@@ -1789,42 +2258,68 @@
                 select_key: key,
                 title: item.title || key,
                 message: errors[0],
-                prop_key: null
+                prop_key: null,
+                issue_type: 'invalid_key'
               });
             }
 
             if ((item.type === 'array' || item.type === 'nested_array') && item.props && Array.isArray(item.props)) {
-              for (let p = 0; p < item.props.length; p++) {
-                const prop = item.props[p];
+              const arrayParentKey = item.prop_key || item.key;
+              const userTree = this.UserTreeItems || [];
+              const vm = this;
+
+              const collectPropIssues = function(prop, arrayParent) {
                 if (!prop || !prop.key) {
-                  continue;
+                  return;
                 }
-                const absolute = prop.prop_key || (key + '.' + prop.key);
+                if (isUiOnlyTemplateSectionNode(prop)) {
+                  if (prop.props && Array.isArray(prop.props)) {
+                    prop.props.forEach(function(child) {
+                      collectPropIssues(child, arrayParent);
+                    });
+                  }
+                  return;
+                }
+
+                const displayKey = resolveTemplatePropSchemaPath(prop, userTree, schemaKeys, keyAliases)
+                  || prop.prop_key
+                  || prop.key;
                 const propErrors = [];
 
-                if (String(prop.key).indexOf('.') !== -1 || String(prop.key).match(/^[a-zA-Z0-9:_-]+$/) == null) {
-                  propErrors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
+                if (!templateKeyHasValidSegments(prop.key)) {
+                  propErrors.push(vm.$t('key_can_only_contain_letters_numbers_and_underscores'));
                 }
                 if (
                   checkSchema &&
                   !isExtensionTemplateNode(prop) &&
                   !isExtensionTemplateNode(item) &&
-                  !isAdditionalTemplateKey(absolute) &&
+                  !isAdditionalTemplateKey(displayKey) &&
                   !isAdditionalTemplateKey(key) &&
-                  !isAcceptedSchemaKey(absolute, schemaKeys, keyAliases)
+                  !isTemplateFieldAcceptedBySchema(prop, userTree, schemaKeys, keyAliases)
                 ) {
-                  propErrors.push(this.$t('key_unknown_schema_path'));
+                  propErrors.push(vm.$t('key_unknown_schema_path'));
                 }
 
                 if (propErrors.length > 0) {
                   issues.push({
-                    key: absolute,
-                    select_key: absolute,
-                    title: prop.title || absolute,
+                    key: displayKey,
+                    select_key: prop.prop_key || prop.key || displayKey,
+                    title: prop.title || displayKey,
                     message: propErrors[0],
-                    prop_key: absolute
+                    prop_key: prop.prop_key || displayKey,
+                    issue_type: 'invalid_key'
                   });
                 }
+
+                if (prop.props && Array.isArray(prop.props)) {
+                  prop.props.forEach(function(child) {
+                    collectPropIssues(child, arrayParent);
+                  });
+                }
+              };
+
+              for (let p = 0; p < item.props.length; p++) {
+                collectPropIssues(item.props[p], arrayParentKey);
               }
             }
 
@@ -1930,6 +2425,7 @@
               //window.location.href = CI.base_url + '/editor/templates';
               alert(vm.$t("changes_saved"));
               vm.is_dirty = false;
+              vm.loadSchemaAlignment();
             })
             .catch(function(response) {
               vm.errors = response;
@@ -2400,6 +2896,38 @@
           const items = this.UserTreeItems || (this.UserTemplate && this.UserTemplate.items) || [];
           this.collectInvalidTemplateKeys(items, issues, seenKeys);
           return issues;
+        },
+        TemplateValidationIssues() {
+          const merged = [];
+          const seen = {};
+
+          (this.InvalidTemplateKeys || []).forEach(function(issue) {
+            const id = issue.issue_type + ':' + issue.key + ':' + (issue.message || '');
+            if (!seen[id]) {
+              seen[id] = true;
+              merged.push(issue);
+            }
+          });
+
+          (this.schemaAlignmentIssues || []).forEach(function(issue) {
+            const id = 'enum:' + issue.key + ':' + (issue.code || '') + ':' + (issue.message || '');
+            if (seen[id]) {
+              return;
+            }
+            seen[id] = true;
+            merged.push({
+              key: issue.key,
+              select_key: issue.select_key || issue.prop_key || issue.key,
+              title: issue.title || issue.key,
+              message: issue.message,
+              prop_key: issue.prop_key || issue.key,
+              issue_type: 'enum_mismatch',
+              code: issue.code,
+              allowed: issue.allowed
+            });
+          });
+
+          return merged;
         },
       }
     });

@@ -141,6 +141,21 @@
                                 class="border m-2 pb-2"
                             ></table-grid-component>
 
+                            <div class="mx-3 mb-3">
+                                <div class="text-muted font-small" v-if="schemaFieldForProp && schemaFieldForProp.enum && schemaFieldForProp.enum.length">
+                                    <strong>{{$t("schema_enum_hint_title")}}:</strong>
+                                    <span class="ml-1">{{ schemaEnumAllowedLabel }}</span>
+                                </div>
+                                <div class="text-muted font-small" v-else-if="$store.state.schema_fields_loaded && prop.prop_key">
+                                    {{$t("schema_enum_no_field")}}
+                                </div>
+                                <div v-if="propEnumSchemaWarnings.length" class="mt-2">
+                                    <div v-for="badCode in propEnumSchemaWarnings" :key="'enum-warn-' + badCode" class="text-danger font-small">
+                                        {{ $t("enum_code_not_in_schema", { code: badCode, allowed: schemaEnumAllowedLabel }) }}
+                                    </div>
+                                </div>
+                            </div>
+
                         </template>
                         <template v-else>
                             

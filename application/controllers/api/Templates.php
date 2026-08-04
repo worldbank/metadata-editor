@@ -154,6 +154,39 @@ class Templates extends MY_REST_Controller
 				throw new Exception("TEMPLATE_NOT_FOUND");
 			}
 
+			$include = $this->input->get('include');
+			$include_parts = array();
+			if ($include !== null && $include !== '') {
+				foreach (explode(',', (string)$include) as $part) {
+					$part = trim($part);
+					if ($part !== '') {
+						$include_parts[] = $part;
+					}
+				}
+			}
+
+			if (in_array('schema_alignment', $include_parts, true)) {
+				$this->load->library('Editor_template_schema_alignment_validator');
+				$template_payload = isset($result['template']) ? $result['template'] : array();
+				if (!is_array($template_payload)) {
+					$template_payload = json_decode((string)$template_payload, true);
+				}
+				if (!is_array($template_payload)) {
+					$template_payload = array();
+				}
+				$data_type = isset($result['data_type']) ? $result['data_type'] : '';
+				$alignment = Editor_template_schema_alignment_validator::collect_enum_alignment_issues(
+					$data_type,
+					$template_payload,
+					$uid
+				);
+				$result['schema_alignment'] = array(
+					'issues' => isset($alignment['issues']) ? $alignment['issues'] : array(),
+					'warnings' => isset($alignment['warnings']) ? $alignment['warnings'] : array(),
+					'issue_count' => count(isset($alignment['issues']) ? $alignment['issues'] : array()),
+				);
+			}
+
 			$this->set_response($result, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){

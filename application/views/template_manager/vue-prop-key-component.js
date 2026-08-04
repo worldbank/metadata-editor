@@ -143,7 +143,11 @@ Vue.component('vue-prop-key-field', {
                 return false;
             }
 
-            if (key.indexOf('.') !== -1 || key.match(/^[a-zA-Z0-9:_-]+$/)==null){
+            if (typeof templateKeyHasValidSegments === 'function') {
+                if (!templateKeyHasValidSegments(key)) {
+                    this.validation_errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
+                }
+            } else if (key.indexOf('.') !== -1 || key.match(/^[a-zA-Z0-9:_-]+$/)==null){
                 this.validation_errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
             }
 
@@ -155,15 +159,26 @@ Vue.component('vue-prop-key-field', {
             }
 
             const absoluteKey = this.ParentPath ? (this.ParentPath + '.' + key) : key;
+            const parentIsUiSection = typeof isUiOnlyTemplateSectionNode === 'function'
+                && isUiOnlyTemplateSectionNode(this.parent);
+            const schemaOk = typeof isTemplateFieldAcceptedBySchema === 'function'
+                ? isTemplateFieldAcceptedBySchema(
+                    this.field,
+                    this.$store.state.user_tree_items || [],
+                    this.SchemaFieldKeys,
+                    this.SchemaKeyAliases
+                  )
+                : isAcceptedSchemaKey(absoluteKey, this.SchemaFieldKeys, this.SchemaKeyAliases);
             if (
                 this.validation_errors.length === 0 &&
                 !this.TemplateIsCustom &&
                 !this.IsExtensionField &&
+                !parentIsUiSection &&
                 this.SchemaFieldsLoaded &&
                 this.SchemaFieldKeys.length > 0 &&
                 this.ParentPath &&
                 !(typeof isAdditionalTemplateKey === 'function' && (isAdditionalTemplateKey(absoluteKey) || isAdditionalTemplateKey(this.ParentPath))) &&
-                !isAcceptedSchemaKey(absoluteKey, this.SchemaFieldKeys, this.SchemaKeyAliases)
+                !schemaOk
             ){
                 this.validation_errors.push(this.$t('key_unknown_schema_path'));
             }

@@ -127,10 +127,16 @@ Vue.component('vue-custom-key-field', {
                 this.validation_errors.push(this.$t('key_must_not_contain_empty_parts'));
             }
 
-            for(let i=0;i<parts.length;i++){
-                if (parts[i].match(/^[a-zA-Z0-9:_-]+$/)==null){
+            if (typeof templateKeyHasValidSegments === 'function') {
+                if (!templateKeyHasValidSegments(key)) {
                     this.validation_errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
-                    break;
+                }
+            } else {
+                for(let i=0;i<parts.length;i++){
+                    if (parts[i].match(/^[a-zA-Z0-9:_-]+$/)==null){
+                        this.validation_errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
+                        break;
+                    }
                 }
             }
 
@@ -143,12 +149,20 @@ Vue.component('vue-custom-key-field', {
             if (
                 this.validation_errors.length === 0 &&
                 !this.IsStructuralNode &&
+                !(typeof isUiOnlySectionKeyName === 'function' && isUiOnlySectionKeyName(key)) &&
                 !this.TemplateIsCustom &&
                 !this.HasAdditionalPrefix &&
                 !this.IsExtensionField &&
                 this.SchemaFieldsLoaded &&
                 this.SchemaFieldKeys.length > 0 &&
-                !isAcceptedSchemaKey(key, this.SchemaFieldKeys, this.SchemaKeyAliases)
+                !(typeof isTemplateFieldAcceptedBySchema === 'function'
+                  ? isTemplateFieldAcceptedBySchema(
+                    this.field,
+                    this.$store.state.user_tree_items || [],
+                    this.SchemaFieldKeys,
+                    this.SchemaKeyAliases
+                  )
+                  : isAcceptedSchemaKey(key, this.SchemaFieldKeys, this.SchemaKeyAliases))
             ){
                 this.validation_errors.push(this.$t('key_unknown_schema_path'));
             }

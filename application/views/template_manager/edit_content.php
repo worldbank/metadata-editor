@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <div v-if="InvalidTemplateKeys && InvalidTemplateKeys.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
+    <div v-if="TemplateValidationIssues && TemplateValidationIssues.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
         <label class="mb-2 d-block">
             <v-icon color="warning">mdi-alert-circle</v-icon>
             <strong>{{$t("invalid_template_keys")}}:</strong>
@@ -123,14 +123,16 @@
         <div class="text-secondary font-small mb-2">{{$t("invalid_template_keys_help")}}</div>
         <div class="border bg-light p-3">
             <div
-                v-for="issue in InvalidTemplateKeys"
-                :key="issue.key + ':' + (issue.prop_key || '')"
+                v-for="issue in TemplateValidationIssues"
+                :key="issue.issue_type + ':' + issue.key + ':' + (issue.code || '') + ':' + issue.message"
                 class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-2"
                 style="padding: 8px; cursor: pointer;"
                 @click="selectTemplateNodeByKey(issue.select_key)"
             >
                 <div class="flex-grow-1">
                     <strong>{{issue.title || issue.key}}</strong>
+                    <span v-if="issue.issue_type === 'enum_mismatch'" class="badge badge-warning ml-2">{{$t("issue_type_enum_mismatch")}}</span>
+                    <span v-else-if="issue.issue_type === 'invalid_key'" class="badge badge-secondary ml-2">{{$t("issue_type_invalid_key")}}</span>
                     <div class="text-secondary font-small" style="font-size: 0.875rem;">{{issue.key}}</div>
                     <div class="text-danger font-small mt-1" style="font-size: 0.75rem;">{{issue.message}}</div>
                 </div>

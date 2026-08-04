@@ -65,6 +65,27 @@ class Metadata_helper
 	{
 		if ($type=='timeseries' || $type=='indicator'){
 			$database_id=get_array_nested_value($metadata,'series_description/database_id');
+
+			if ($database_id === null || $database_id === '') {
+				$databases = get_array_nested_value($metadata, 'series_description/databases');
+				if (is_array($databases) && count($databases) > 0) {
+					foreach ($databases as $db) {
+						if (!is_array($db)) {
+							continue;
+						}
+						if (!empty($db['is_primary']) && isset($db['id']) && $db['id'] !== '') {
+							$database_id = $db['id'];
+							break;
+						}
+					}
+					if ($database_id === null || $database_id === '') {
+						$first = $databases[0];
+						if (is_array($first) && isset($first['id']) && $first['id'] !== '') {
+							$database_id = $first['id'];
+						}
+					}
+				}
+			}
 			
 			$output=array(
 				'database_id'=>$database_id
@@ -194,9 +215,162 @@ class Metadata_helper
 
 		return $str;
 	}
-    
-    
+
+	/**
+	 * Geospatial bounding polygon coordinates: schema expects [[lon, lat], ...].
+	 * Legacy editor rows may use {value: [lon, lat]}; normalize before validation/persist.
+	 */
+	public function normalize_geospatial_metadata_for_schema($metadata)
+	{
+		if (!is_array($metadata)) {
+			return $metadata;
+		}
+
+		return $this->transform_geospatial_bounding_polygon_coordinates($metadata, 'normalize');
+	}
+
+	/**
+	 * Convert legacy coordinate shapes to [[lon, lat], ...] for the coordinate_pairs field.
+	 */
+	public function prepare_geospatial_metadata_for_editor($metadata)
+	{
+		if (!is_array($metadata)) {
+			return $metadata;
+		}
+
+		return $this->transform_geospatial_bounding_polygon_coordinates($metadata, 'denormalize');
+	}
+
+	private function transform_geospatial_bounding_polygon_coordinates($metadata, $mode)
+	{
+		if (!isset($metadata['description']) || !is_array($metadata['description'])) {
+			return $metadata;
+		}
+
+		$identification = $metadata['description']['identificationInfo'] ?? null;
+		if (!is_array($identification)) {
+			return $metadata;
+		}
+
+		if (isset($identification['extent'])) {
+			$this->transform_geospatial_extent_geographic_elements($metadata['description']['identificationInfo'], $mode);
+			return $metadata;
+		}
+
+		foreach ($metadata['description']['identificationInfo'] as $index => $info) {
+			if (is_array($info)) {
+				$this->transform_geospatial_extent_geographic_elements($metadata['description']['identificationInfo'][$index], $mode);
+			}
+		}
+
+		return $metadata;
+	}
+
+	private function transform_geospatial_extent_geographic_elements(&$identificationInfo, $mode)
+	{
+		if (!isset($identificationInfo['extent']['geographicElement']) || !is_array($identificationInfo['extent']['geographicElement'])) {
+			return;
+		}
+
+		foreach ($identificationInfo['extent']['geographicElement'] as $geo_index => $element) {
+			if (!is_array($element) || !isset($element['geographicBoundingPolygon']['polygon'])) {
+				continue;
+			}
+
+			$polygons = &$identificationInfo['extent']['geographicElement'][$geo_index]['geographicBoundingPolygon']['polygon'];
+			if (!is_array($polygons)) {
+				continue;
+			}
+
+			foreach ($polygons as $ring_index => $ring) {
+				if (!is_array($ring)) {
+					continue;
+				}
+
+				if ($mode === 'normalize' && isset($ring['type']) && $ring['type'] === 'line') {
+					$polygons[$ring_index]['type'] = 'lineString';
+				}
+
+				if (!isset($ring['coordinates'])) {
+					continue;
+				}
+
+				$polygons[$ring_index]['coordinates'] = $this->transform_geospatial_coordinate_list(
+					$ring['coordinates'],
+					$mode
+				);
+			}
+		}
+	}
+
+	private function transform_geospatial_coordinate_list($coordinates, $mode)
+	{
+		if (!is_array($coordinates)) {
+			return $coordinates;
+		}
+
+		if ($mode === 'normalize') {
+			$normalized = array();
+			foreach ($coordinates as $item) {
+				if (is_array($item) && array_key_exists('value', $item) && is_array($item['value'])) {
+					$normalized[] = $this->coerce_geospatial_coordinate_pair($item['value']);
+				} elseif (is_array($item) && (isset($item['longitude']) || isset($item['latitude']))) {
+					$normalized[] = $this->coerce_geospatial_coordinate_pair(array(
+						$item['longitude'] ?? '',
+						$item['latitude'] ?? '',
+					));
+				} elseif ($this->is_geospatial_coordinate_pair($item)) {
+					$normalized[] = $this->coerce_geospatial_coordinate_pair($item);
+				}
+			}
+			return $normalized;
+		}
+
+		if ($mode === 'denormalize') {
+			$converted = array();
+			foreach ($coordinates as $item) {
+				if ($this->is_geospatial_coordinate_pair($item)) {
+					$converted[] = $this->coerce_geospatial_coordinate_pair($item);
+				} elseif (is_array($item) && array_key_exists('value', $item) && is_array($item['value'])) {
+					$converted[] = $this->coerce_geospatial_coordinate_pair($item['value']);
+				} elseif (is_array($item) && (isset($item['longitude']) || isset($item['latitude']))) {
+					$converted[] = $this->coerce_geospatial_coordinate_pair(array(
+						$item['longitude'] ?? '',
+						$item['latitude'] ?? '',
+					));
+				}
+			}
+			return $converted;
+		}
+
+		return $coordinates;
+	}
+
+	private function is_geospatial_coordinate_pair($item)
+	{
+		if (!is_array($item) || array_key_exists('value', $item)) {
+			return false;
+		}
+
+		$values = array_values($item);
+		return count($values) >= 2;
+	}
+
+	private function coerce_geospatial_coordinate_pair(array $pair)
+	{
+		$values = array_slice(array_values($pair), 0, 2);
+		$result = array();
+
+		foreach ($values as $value) {
+			if (is_numeric($value)) {
+				$result[] = $value + 0;
+			} else {
+				$result[] = $value;
+			}
+		}
+
+		return $result;
+	}
 
 
-
-}
+} 

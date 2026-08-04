@@ -35,9 +35,16 @@ Vue.component('repeated-field', {
         },
         update: function (index, value)
         {
-            /*if (Array.isArray(this.local[index])){
-                this.local[index] = {};
-            }*/
+            if (this.field && (this.field.display_type === 'number' || this.field.display_type === 'integer')) {
+                if (value === '' || value === null) {
+                    value = '';
+                } else {
+                    const num = Number(value);
+                    if (!Number.isNaN(num)) {
+                        value = num;
+                    }
+                }
+            }
 
             this.local[index] = value;
             this.$emit('input', JSON.parse(JSON.stringify(this.local)));            
@@ -70,7 +77,8 @@ Vue.component('repeated-field', {
                             v-slot="{ errors }"                                
                             >
                         
-                        <input type="text"
+                        <input :type="(field && (field.display_type === 'number' || field.display_type === 'integer')) ? 'number' : 'text'"
+                            step="any"
                             :value="local[index]"
                             @input="update(index,$event.target.value)"
                             class="form-control form-control-sm"

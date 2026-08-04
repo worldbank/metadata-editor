@@ -145,6 +145,7 @@
             echo $this->load->view("metadata_editor/vue-login-component.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-bounding-box.js",null,true);
+            echo $this->load->view("metadata_editor/fields/vue-field-coordinate-pairs.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-spreadmetadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-main-component.js",null,true);
@@ -458,7 +459,7 @@
                     "variable.var_qstn_postqtxt",
                     "variable.var_forward",
                     "variable.var_backward",                    
-                    "variable.var_qstn_ivuinstr",
+                    "variable.var_qstn_ivulnstr",
                     "variable.var_universe",
                     "variable.var_txt",
                     "variable.var_codinstr",
@@ -476,7 +477,7 @@
                     "variable.var_qstn_postqtxt",
                     "variable.var_forward",
                     "variable.var_backward",                    
-                    "variable.var_qstn_ivuinstr",
+                    "variable.var_qstn_ivulnstr",
                     "variable.var_universe",
                     "variable.var_txt",
                     "variable.var_codinstr",

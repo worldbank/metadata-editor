@@ -288,7 +288,7 @@
                                     "key": "abbr",
                                     "title": "Abreviatura",
                                     "type": "string",
-                                    "prop_key": "study_desc.production_statement.producers.abbreviation",
+                                    "prop_key": "study_desc.production_statement.producers.abbr",
                                     "help_text": "La abreviatura oficial de la organización mencionada en \"Nombre\".",
                                     "display_type": "text"
                                 },
@@ -1380,81 +1380,6 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "participants": {
-                                        "title": "Participantes",
-                                        "type": "array",
-                                        "props": [
-                                            {
-                                                "key": "name",
-                                                "title": "Nombre",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.participants.name",
-                                                "help_text": "Nombre de la persona u organización participante.",
-                                                "display_type": "text"
-                                            },
-                                            {
-                                                "key": "affiliation",
-                                                "title": "Afiliación",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.participants.affiliation",
-                                                "help_text": "Afiliación de la persona u organización mencionada en \"Nombre\".",
-                                                "display_type": "text"
-                                            },
-                                            {
-                                                "key": "role",
-                                                "title": "Rol",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.participants.role",
-                                                "help_text": "Rol específico (participación) de la persona u organización mencionada en \"Nombre\".",
-                                                "display_type": "textarea"
-                                            }
-                                        ],
-                                        "prop_key": "study_desc.study_development.development_activity.participants",
-                                        "help_text": "Una lista de participantes (personas u organizaciones) en la actividad. Este es un conjunto repetible de elementos; cada participante se puede documentar por separado."
-                                    },
-                                    "resources": {
-                                        "title": "Recursos",
-                                        "type": "array",
-                                        "_ddi_xpath": "stdyDscr.studyDevelopment.developmentActivity.resource",
-                                        "props": [
-                                            {
-                                                "key": "name",
-                                                "title": "Nombre",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.resources.name",
-                                                "help_text": "El nombre del recurso.",
-                                                "display_type": "text"
-                                            },
-                                            {
-                                                "key": "origin",
-                                                "title": "Origen",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.resources.origin",
-                                                "help_text": "El origen del recurso mencionado en \"Nombre\".",
-                                                "display_type": "text"
-                                            },
-                                            {
-                                                "key": "characteristics",
-                                                "title": "Características",
-                                                "type": "string",
-                                                "prop_key": "study_desc.study_development.development_activity.resources.characteristics",
-                                                "help_text": "Las características del recurso mencionado en \"Nombre\".",
-                                                "display_type": "textarea"
-                                            }
-                                        ],
-                                        "prop_key": "study_desc.study_development.development_activity.resources",
-                                        "help_text": "Una descripción de las fuentes de datos y otros recursos utilizados para implementar la actividad."
-                                    },
-                                    "outcome": {
-                                        "title": "Resultado de la actividad",
-                                        "type": "string",
-                                        "prop_key": "study_desc.study_development.development_activity.outcome",
-                                        "help_text": "Una breve descripción del resultado principal de la actividad.",
-                                        "display_type": "textarea"
-                                    },
-                                    "prop_key": "study_desc.study_development.development_activity.undefined"
-                                },
-                                {
                                     "key": "participants",
                                     "title": "Participantes",
                                     "type": "array",
@@ -1879,7 +1804,7 @@
                                             "type": "string",
                                             "title": "ID del formulario",
                                             "help_text": "El “ID del formulario” indica el número o ID del formulario de permisos especiales que el usuario debe completar.",
-                                            "prop_key": "study_desc.study_access.dataset_use.spec_perm.form_id",
+                                            "prop_key": "study_desc.data_access.dataset_use.spec_perm.form_id",
                                             "display_type": "text"
                                         }
                                     ]
@@ -1896,50 +1821,44 @@
                                     "key": "study_desc.data_access.dataset_use.contact",
                                     "title": "Contactos",
                                     "type": "array",
-                                    "help_text": "Los usuarios de los datos pueden necesitar más aclaraciones e información sobre los términos de uso y las condiciones para acceder a los datos. Este conjunto de elementos se utiliza para identificar a las personas de contacto que pueden actuar como personas de recurso ante problemas o preguntas planteados por la comunidad de usuarios.",
-                                    "items": [
+                                    "props": [
                                         {
-                                            "type": "section",
-                                            "title": "Contacto",
-                                            "props": [
-                                                {
-                                                    "key": "name",
-                                                    "title": "Nombre",
-                                                    "type": "string",
-                                                    "prop_key": "study_desc.data_access.dataset_use.contact.name",
-                                                    "help_text": "Nombre de la persona. Tenga en cuenta que en algunos casos, podría ser mejor proporcionar un título\/función que el nombre real de la persona. Tenga en cuenta que las personas no permanecen para siempre en su puesto.",
-                                                    "display_type": "text"
-                                                },
-                                                {
-                                                    "key": "affiliation",
-                                                    "title": "Afiliación",
-                                                    "type": "string",
-                                                    "prop_key": "study_desc.data_access.dataset_use.contact.affiliation",
-                                                    "help_text": "Afiliación de la persona mencionada en \"Nombre\".",
-                                                    "display_type": "text"
-                                                },
-                                                {
-                                                    "key": "uri",
-                                                    "title": "URL",
-                                                    "type": "string",
-                                                    "prop_key": "study_desc.data_access.dataset_use.contact.uri",
-                                                    "help_text": "URL de la persona; puede ser la URL de la organización a la que pertenece la persona.",
-                                                    "rules": {
-                                                        "is_uri": true
-                                                    },
-                                                    "display_type": "text"
-                                                },
-                                                {
-                                                    "key": "email",
-                                                    "title": "Correo electrónico",
-                                                    "type": "string",
-                                                    "prop_key": "study_desc.data_access.dataset_use.contact.email",
-                                                    "help_text": "El elemento de correo electrónico se utiliza para indicar una dirección de correo electrónico para la persona de contacto mencionada en el nombre. Idealmente, se debe proporcionar una dirección de correo electrónico genérica. Es fácil configurar un servidor de correo de tal manera que todos los mensajes enviados a la dirección de correo electrónico genérica se reenvíen automáticamente a algunos miembros del personal.",
-                                                    "display_type": "text"
-                                                }
-                                            ]
+                                            "key": "name",
+                                            "title": "Nombre",
+                                            "type": "string",
+                                            "prop_key": "study_desc.data_access.dataset_use.contact.name",
+                                            "help_text": "Nombre de la persona. Tenga en cuenta que en algunos casos, podría ser mejor proporcionar un título/función que el nombre real de la persona. Tenga en cuenta que las personas no permanecen para siempre en su puesto.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Afiliación",
+                                            "type": "string",
+                                            "prop_key": "study_desc.data_access.dataset_use.contact.affiliation",
+                                            "help_text": "Afiliación de la persona mencionada en \"Nombre\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "study_desc.data_access.dataset_use.contact.uri",
+                                            "help_text": "URL de la persona; puede ser la URL de la organización a la que pertenece la persona.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "email",
+                                            "title": "Correo electrónico",
+                                            "type": "string",
+                                            "prop_key": "study_desc.data_access.dataset_use.contact.email",
+                                            "help_text": "El elemento de correo electrónico se utiliza para indicar una dirección de correo electrónico para la persona de contacto mencionada en el nombre. Idealmente, se debe proporcionar una dirección de correo electrónico genérica.",
+                                            "display_type": "text"
                                         }
-                                    ]
+                                    ],
+                                    "help_text": "Los usuarios de los datos pueden necesitar más aclaraciones e información sobre los términos de uso y las condiciones para acceder a los datos. Este conjunto de elementos se utiliza para identificar a las personas de contacto que pueden actuar como personas de recurso ante problemas o preguntas planteados por la comunidad de usuarios."
                                 },
                                 {
                                     "key": "study_desc.data_access.dataset_use.cit_req",
@@ -1972,7 +1891,7 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "study_desc.data_access.dataset_use.notes",
+                                    "key": "study_desc.data_access.notes",
                                     "type": "string",
                                     "title": "Notas",
                                     "help_text": "Cualquier información adicional relacionada con el acceso a los datos que no esté contenida en los elementos de metadatos específicos proporcionados en la sección \"Acceso y uso de datos\".",
@@ -2610,6 +2529,24 @@
                             "display_type": "text"
                         },
                         {
+                            "key": "variable.is_key",
+                            "title": "Variable clave",
+                            "type": "integer",
+                            "help_text": "Este elemento indica si la variable es una variable clave (valor \"1\") o no (valor \"0\"). Las variables clave se utilizan para identificar registros en un archivo de datos.",
+                            "default": 0,
+                            "enum": [
+                                {
+                                    "code": "0",
+                                    "label": "No es una variable clave"
+                                },
+                                {
+                                    "code": "1",
+                                    "label": "Variable clave"
+                                }
+                            ],
+                            "display_type": "dropdown"
+                        },
+                        {
                             "key": "variable.var_wgt",
                             "title": "Es ponderador (factor)",
                             "type": "integer",
@@ -2697,7 +2634,7 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "variable.var_qstn_ivuinstr",
+                                    "key": "variable.var_qstn_ivulnstr",
                                     "title": "Instrucciones del encuestador",
                                     "type": "string",
                                     "help_text": "Instrucciones específicas para la persona que realiza una entrevista. El contenido normalmente se ingresará copiando\/pegando las instrucciones del manual del entrevistador (o de la aplicación CAPI). En los casos en que las mismas instrucciones se relacionen con varias variables, repita la misma información en los metadatos para todas estas variables.",
@@ -3190,10 +3127,153 @@
             ]
         },
         {
-            "key": "additional_container",
-            "title": "Campos adicionales",
             "type": "section_container",
-            "items": []
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Procedencia",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Procedencia",
+                    "type": "section",
+                    "help_text": "La información de procedencia documenta el origen de los metadatos.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositorio original",
+                            "type": "section",
+                            "help_text": "Información sobre el repositorio original donde se crearon los metadatos.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nombre del repositorio",
+                                    "type": "string",
+                                    "help_text": "Nombre del repositorio original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "URL del repositorio original o del conjunto de datos.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador del conjunto de datos",
+                                    "type": "string",
+                                    "help_text": "Identificador del conjunto de datos en el repositorio original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "Identificador de objeto digital (DOI) del conjunto de datos en el repositorio original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título del conjunto de datos",
+                                    "type": "string",
+                                    "help_text": "Título del conjunto de datos en el repositorio original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Fecha de publicación (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "Fecha en que se publicó el conjunto de datos en el repositorio original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Información adicional sobre el repositorio original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositorio fuente",
+                            "type": "section",
+                            "help_text": "Información sobre el repositorio fuente del cual se obtuvieron los metadatos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositorios fuente",
+                                    "type": "nested_array",
+                                    "help_text": "Información sobre el repositorio fuente del cual se obtuvieron los metadatos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nombre del repositorio",
+                                            "type": "string",
+                                            "help_text": "Nombre del repositorio fuente.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "URL del repositorio fuente o del conjunto de datos.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador del conjunto de datos",
+                                            "type": "string",
+                                            "help_text": "Identificador del conjunto de datos en el repositorio fuente.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título del conjunto de datos",
+                                            "type": "string",
+                                            "help_text": "Título del conjunto de datos en el repositorio fuente.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Fecha de adquisición (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "Fecha en que se adquirieron los metadatos del repositorio fuente.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de adquisición",
+                                            "type": "string",
+                                            "help_text": "Modo de adquisición de los metadatos (p. ej. OAI-PMH, API, entrada manual)."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Información adicional sobre el repositorio fuente."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

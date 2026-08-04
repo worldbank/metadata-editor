@@ -926,7 +926,8 @@ class Schema_registry
                 'title' => isset($field['title']) ? $field['title'] : '',
                 'description' => isset($field['description']) ? $field['description'] : '',
                 'type' => isset($field['type']) ? $field['type'] : '',
-                'required' => !empty($field['required'])
+                'required' => !empty($field['required']),
+                'enum' => (isset($field['enum']) && is_array($field['enum'])) ? $field['enum'] : null,
             );
         }
 
