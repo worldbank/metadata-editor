@@ -252,7 +252,81 @@ class Schema_registry
             }
         }
 
+        $this->load_transitive_schema_ref_documents($documents, $schema_dir);
+
         return $documents;
+    }
+
+    /**
+     * Load sibling JSON schema files referenced via $ref from already-loaded documents.
+     */
+    private function load_transitive_schema_ref_documents(array &$documents, $schema_dir)
+    {
+        $pending = array_keys($documents);
+
+        while (!empty($pending)) {
+            $filename = array_shift($pending);
+            if (!isset($documents[$filename])) {
+                continue;
+            }
+
+            foreach ($this->collect_json_file_refs($documents[$filename]) as $ref_file) {
+                if (isset($documents[$ref_file])) {
+                    continue;
+                }
+
+                $path = unix_path($schema_dir . '/' . $ref_file);
+                if (!is_file($path)) {
+                    continue;
+                }
+
+                $content = file_get_contents($path);
+                if ($content === false) {
+                    continue;
+                }
+
+                $decoded = json_decode($content, true);
+                if ($decoded === null) {
+                    continue;
+                }
+
+                $documents[$ref_file] = $decoded;
+                $pending[] = $ref_file;
+            }
+        }
+    }
+
+    /**
+     * @param array|mixed $node
+     * @return string[] Basenames like foo-schema.json
+     */
+    private function collect_json_file_refs($node)
+    {
+        $refs = array();
+
+        if (!is_array($node)) {
+            return $refs;
+        }
+
+        foreach ($node as $key => $value) {
+            if ($key === '$ref' && is_string($value)) {
+                $target = trim(explode('#', $value, 2)[0]);
+                if ($target === '' || strpos($target, '#') === 0 || preg_match('#^https?://#i', $target)) {
+                    continue;
+                }
+                $target = str_replace('\\', '/', $target);
+                $target = basename($target);
+                if (preg_match('/^[a-zA-Z0-9_-]+\.json$/', $target)) {
+                    $refs[] = $target;
+                }
+            } elseif (is_array($value)) {
+                foreach ($this->collect_json_file_refs($value) as $ref) {
+                    $refs[] = $ref;
+                }
+            }
+        }
+
+        return array_values(array_unique($refs));
     }
 
     /**

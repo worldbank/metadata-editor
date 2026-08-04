@@ -815,8 +815,8 @@ INSERT INTO metadata_schemas
    schema_files,metadata_options,alias,created)
 VALUES
   ('microdata','Microdata (DDI 2.5)','IHSN','Microdata schema based on DDI CodeBook 2.5',
-   1,'active','', 'microdata-schema.json',
-   '["ddi-schema.json", "datacite-schema.json", "provenance-schema.json", "datafile-schema.json", "variable-schema.json", "variable-group-schema.json"]',
+   1,'active','', 'survey-schema.json',
+   '["project-schema.json", "ddi-schema.json", "datacite-schema.json", "provenance-schema.json", "datafile-schema.json", "variable-schema.json", "variable-group-schema.json"]',
    '{"core_fields":{"idno":"study_desc.title_statement.idno","title":"study_desc.title_statement.title"},"derived_fields":{"countries":"study_desc.study_info.nation[*].name","year_start":"study_desc.study_info.coll_dates[0].start","year_end":"study_desc.study_info.coll_dates[0].end"}}',
    'survey',
    UNIX_TIMESTAMP()),
