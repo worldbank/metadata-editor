@@ -74,16 +74,16 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
     }
 
     /**
-     * Login user from OIDC
+     * Login user from OIDC by internal user id
      */
-    protected function login_user_from_oidc($email)
+    protected function login_user_by_id($user_id)
     {
-        if (empty($email)) {
+        if (empty($user_id)) {
             return FALSE;
         }
 
         $query = $this->ci->db->select('username,email, id, password')
-            ->where("email", $email)
+            ->where('id', (int) $user_id)
             ->where($this->ci->ion_auth->_extra_where)
             ->where('active', 1)
             ->get($this->ci->config->item('tables')['users']);
@@ -95,9 +95,8 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
             $this->ci->session->set_userdata('email',  $result->email);
             $this->ci->session->set_userdata('username',  $result->username);
             $this->ci->session->set_userdata('user_id',  $result->id);
-            $this->ci->session->set_userdata('id',  $result->id);  // Also set 'id' for compatibility
+            $this->ci->session->set_userdata('id',  $result->id);
 
-            // Log the login
             $this->ci->db_logger->write_log('login', $result->email);
             
             return TRUE;
@@ -107,7 +106,94 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
     }
 
     /**
+     * Login user from OIDC (legacy — prefer login_user_by_id)
+     */
+    protected function login_user_from_oidc($email)
+    {
+        if (empty($email)) {
+            return FALSE;
+        }
+
+        $user = $this->ci->ion_auth_model->get_user_by_email_normalized($email);
+        if (!$user) {
+            return FALSE;
+        }
+        return $this->login_user_by_id($user->id);
+    }
+
+    /**
+     * Resolve OIDC claims to a local user, link identity, and create session.
+     *
+     * @param array $claims
+     * @param array $user_data from mapClaimsToUserData
+     * @return int user id
+     * @throws Exception
+     */
+    protected function complete_oidc_authentication($claims, $user_data)
+    {
+        $this->ci->load->library('Oidc_user_resolver');
+
+        if (empty($user_data['email'])) {
+            throw new Exception('Email not found in OIDC claims');
+        }
+
+        $resolved = $this->ci->oidc_user_resolver->resolve_for_oidc($claims, $user_data['email']);
+
+        if ($resolved['status'] === 'error') {
+            throw new Exception($this->ci->oidc_user_resolver->error_message_for_code($resolved['error']));
+        }
+
+        if ($resolved['status'] === 'found') {
+            $this->ci->oidc_user_resolver->link_oidc_identity(
+                $resolved['user']->id,
+                $resolved['identity'],
+                $user_data['email']
+            );
+            if (!$this->login_user_by_id($resolved['user']->id)) {
+                throw new Exception('Failed to create user session');
+            }
+            return (int) $resolved['user']->id;
+        }
+
+        if ($resolved['status'] === 'register') {
+            if (empty($this->oidc_config['auto_register'])) {
+                throw new Exception('User not found and auto-registration is disabled');
+            }
+            $user_id = $this->register_user_from_oidc($user_data);
+            if (!$user_id) {
+                throw new Exception('Registration failed');
+            }
+            $this->ci->oidc_user_resolver->link_oidc_identity(
+                $user_id,
+                $resolved['identity'],
+                $user_data['email']
+            );
+            if (!$this->login_user_by_id($user_id)) {
+                throw new Exception('Failed to create user session after registration');
+            }
+            return (int) $user_id;
+        }
+
+        throw new Exception('User not found and auto-registration is disabled');
+    }
+
+    /**
+     * Password login with federated email / domain equivalence resolution.
+     *
+     * @param string $posted_email
+     * @param string $password
+     * @param bool $remember
+     * @return bool
+     */
+    protected function attempt_password_login_with_resolver($posted_email, $password, $remember = false)
+    {
+        $this->ci->load->library('Oidc_user_resolver');
+        return $this->ci->oidc_user_resolver->attempt_password_login($posted_email, $password, $remember);
+    }
+
+    /**
      * Register user from OIDC claims
+     * @return int|false user id
      */
     protected function register_user_from_oidc($user_data)
     {
@@ -134,6 +220,8 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
         if ($user_id) {
             $this->ci->ion_auth->set_user_default_roles($user_id);
         }
+
+        return $user_id ? (int) $user_id : false;
     }
 
     /**

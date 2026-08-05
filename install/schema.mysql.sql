@@ -124,9 +124,14 @@ CREATE TABLE `users` (
   `last_login` int NOT NULL,
   `active` tinyint(3) DEFAULT NULL,
   `authtype` varchar(40) DEFAULT NULL,
+  `identity_issuer` varchar(255) DEFAULT NULL,
+  `identity_namespace` varchar(255) NOT NULL DEFAULT '',
+  `identity_subject` varchar(255) DEFAULT NULL,
+  `identity_subject_claim` varchar(64) DEFAULT NULL,
   `otp_code` varchar(45) DEFAULT NULL,
   `otp_expiry` int DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_federated_identity` (`identity_issuer`,`identity_namespace`,`identity_subject`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1035,6 +1040,21 @@ CREATE TABLE `codelist_items_labels` (
   UNIQUE KEY `uq_codelist_item_language` (`codelist_item_id`,`language`),
   KEY `idx_language` (`language`),
   CONSTRAINT `fk_codelist_items_labels_item` FOREIGN KEY (`codelist_item_id`) REFERENCES `codelist_items` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `editor_templates_codelists` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `template_id` int NOT NULL COMMENT 'FK -> editor_templates.id',
+  `field_path` varchar(500) NOT NULL COMMENT 'prop_key or dotted field key',
+  `codelist_id` bigint NOT NULL COMMENT 'FK -> codelists.id',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_template_field` (`template_id`, `field_path`),
+  KEY `idx_codelist_id` (`codelist_id`),
+  CONSTRAINT `fk_editor_templates_codelists_template`
+    FOREIGN KEY (`template_id`) REFERENCES `editor_templates` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_editor_templates_codelists_codelist`
+    FOREIGN KEY (`codelist_id`) REFERENCES `codelists` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

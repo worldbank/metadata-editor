@@ -106,6 +106,16 @@ $config['oidc_auth'] = array(
         'last_name' => 'family_name',          // OIDC family_name claim → local last_name
         'username' => 'preferred_username',     // OIDC preferred_username → local username (falls back to email if not present)
     ),
+
+    // Federated user identity (stored in users.identity_* columns)
+    // subject_claim: ID token claim used as identity_subject (e.g. oid for Azure, sub for generic OIDC)
+    // namespace_claim: optional org/tenant claim → identity_namespace (e.g. tid for Entra, hd for Google Workspace); null to omit
+    'user_identity' => array(
+        'subject_claim' => 'oid',
+        'namespace_claim' => 'tid',
+    ),
+
+    // email_domain_equivalence: configure in application/config/auth.php (global, not OIDC-specific)
     
     // Behavior settings
     'auto_register' => true,  // Auto-create users from OIDC claims if they don't exist

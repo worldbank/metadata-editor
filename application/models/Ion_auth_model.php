@@ -347,10 +347,11 @@ class Ion_auth_model extends CI_Model
 	    {
 	        return FALSE;
 	    }
-		   
-	    return $this->db->where('email', $email)
-	    	->where($this->ion_auth->_extra_where)
-			->count_all_results($this->tables['users']) > 0;
+
+	    $CI =& get_instance();
+	    $CI->config->load('auth');
+	    $CI->load->library('Oidc_user_resolver');
+	    return $CI->oidc_user_resolver->registration_email_is_taken($email);
 	}
 	
 	/**
@@ -382,14 +383,18 @@ class Ion_auth_model extends CI_Model
 	    {
 	        return FALSE;
 		}
-		
-		$user=$this->get_userinfo_by_email($email);
 
-		if(!$user){
-			return FALSE;
+		$user = $this->get_user_by_email_normalized($email);
+		if (!$user) {
+			$user = $this->db->where('email', $email)
+				->where($this->ion_auth->_extra_where)
+				->get($this->tables['users'])
+				->row();
 		}
 
-		$user=(object)$user;
+		if (!$user) {
+			return FALSE;
+		}
 
 		if ((int) $user->active !== 1) {
 			return FALSE;
@@ -404,7 +409,11 @@ class Ion_auth_model extends CI_Model
 			
 		$this->forgotten_password_code = $key;
 		$this->db->where($this->ion_auth->_extra_where);
-		$result=$this->db->update($this->tables['users'], array('forgotten_password_code' => $key), array('email' => $email));		
+		$result=$this->db->update(
+			$this->tables['users'],
+			array('forgotten_password_code' => $key),
+			array('id' => (int) $user->id)
+		);
 		return $result;
 	}
 	
@@ -886,6 +895,114 @@ class Ion_auth_model extends CI_Model
 	{
 		$this->db->where('email', $email);
 		return $this->db->get("users")->row_array();
+	}
+
+	/**
+	 * Active user row from users table (no meta join).
+	 *
+	 * @param int $id
+	 * @return object|null
+	 */
+	public function get_user_row($id)
+	{
+		$this->db->where('id', (int) $id);
+		$this->db->where('active', 1);
+		if (isset($this->ion_auth->_extra_where)) {
+			$this->db->where($this->ion_auth->_extra_where);
+		}
+		return $this->db->get($this->tables['users'])->row();
+	}
+
+	public function get_user_by_email_normalized($email)
+	{
+		$email = strtolower(trim((string) $email));
+		if ($email === '') {
+			return null;
+		}
+		$this->db->where('LOWER(email) = ' . $this->db->escape($email), null, false);
+		$this->db->where('active', 1);
+		if (isset($this->ion_auth->_extra_where)) {
+			$this->db->where($this->ion_auth->_extra_where);
+		}
+		$this->db->limit(1);
+		return $this->db->get($this->tables['users'])->row();
+	}
+
+	public function get_user_by_federated_identity($issuer, $namespace, $subject)
+	{
+		$issuer = rtrim((string) $issuer, '/');
+		$subject = (string) $subject;
+		if ($issuer === '' || $subject === '') {
+			return null;
+		}
+		$this->db->where('identity_issuer', $issuer);
+		$this->db->where('identity_namespace', (string) $namespace);
+		$this->db->where('identity_subject', $subject);
+		$this->db->where('active', 1);
+		if (isset($this->ion_auth->_extra_where)) {
+			$this->db->where($this->ion_auth->_extra_where);
+		}
+		$this->db->limit(1);
+		return $this->db->get($this->tables['users'])->row();
+	}
+
+	/**
+	 * @param string $local_part normalized lowercase
+	 * @param array $domains lowercase domain names
+	 * @return array of user rows
+	 */
+	public function find_users_by_local_part_in_domains($local_part, $domains)
+	{
+		$local_part = strtolower(trim((string) $local_part));
+		if ($local_part === '' || empty($domains)) {
+			return array();
+		}
+		$domain_esc = array();
+		foreach ($domains as $d) {
+			$domain_esc[] = $this->db->escape(strtolower(trim((string) $d)));
+		}
+		$this->db->where(
+			'LOWER(SUBSTRING_INDEX(email, "@", 1)) = ' . $this->db->escape($local_part),
+			null,
+			false
+		);
+		$this->db->where(
+			'LOWER(SUBSTRING_INDEX(email, "@", -1)) IN (' . implode(',', $domain_esc) . ')',
+			null,
+			false
+		);
+		$this->db->where('active', 1);
+		if (isset($this->ion_auth->_extra_where)) {
+			$this->db->where($this->ion_auth->_extra_where);
+		}
+		return $this->db->get($this->tables['users'])->result();
+	}
+
+	public function set_user_federated_identity($user_id, $issuer, $namespace, $subject, $subject_claim, $email = null)
+	{
+		$data = array(
+			'identity_issuer' => rtrim((string) $issuer, '/'),
+			'identity_namespace' => (string) $namespace,
+			'identity_subject' => (string) $subject,
+			'identity_subject_claim' => (string) $subject_claim,
+		);
+		if ($email !== null && $email !== '') {
+			$data['email'] = strtolower(trim($email));
+		}
+		if (isset($this->ion_auth->_extra_where)) {
+			$this->db->where($this->ion_auth->_extra_where);
+		}
+		$this->db->where('id', (int) $user_id);
+		return $this->db->update($this->tables['users'], $data);
+	}
+
+	/**
+	 * @param int $id
+	 * @return object|null alias for get_user_row
+	 */
+	public function get_user_by_id($id)
+	{
+		return $this->get_user_row($id);
 	}
 
 	/**

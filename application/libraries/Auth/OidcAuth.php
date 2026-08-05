@@ -73,7 +73,11 @@ class OidcAuth extends OidcAuthBase implements AuthInterface {
                 }
             }
 
-            if ($this->ci->ion_auth->login($this->ci->input->post('email'), $this->ci->input->post('password'), $remember)) //if the login is successful
+            if ($this->attempt_password_login_with_resolver(
+                $this->ci->input->post('email'),
+                $this->ci->input->post('password'),
+                $remember
+            ))
             {
                 //log
                 $this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
@@ -232,6 +236,7 @@ class OidcAuth extends OidcAuthBase implements AuthInterface {
             $code = null;
             $state = null;
             $id_token = null;
+            $tokens = null;
             
             if ($this->oidc_config['response_mode'] === 'form_post') {
                 $code = $this->ci->input->post('code');
@@ -298,26 +303,8 @@ class OidcAuth extends OidcAuthBase implements AuthInterface {
             
             // Map claims to user data
             $user_data = $this->mapClaimsToUserData($claims);
-            
-            if (empty($user_data['email'])) {
-                throw new Exception('Email not found in OIDC claims');
-            }
-            
-            // Check if user exists
-            $user_info = $this->ci->ion_auth_model->get_user_by_email($user_data['email'])->row_array();
-            
-            if (is_array($user_info) && count($user_info) > 0) {
-                // User exists - log them in
-                $this->login_user_from_oidc($user_data['email']);
-            } else {
-                // User doesn't exist - register if auto_register is enabled
-                if (isset($this->oidc_config['auto_register']) && $this->oidc_config['auto_register']) {
-                    $this->register_user_from_oidc($user_data);
-                    $this->login_user_from_oidc($user_data['email']);
-                } else {
-                    throw new Exception('User not found and auto-registration is disabled');
-                }
-            }
+
+            $this->complete_oidc_authentication($claims, $user_data);
             
             // Check for popup mode
             $popup_mode = $this->ci->session->userdata('oidc_popup_mode');

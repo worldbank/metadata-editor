@@ -60,6 +60,46 @@ $config['zero_auth'] = array(
     'allowed_hosts' => array('localhost', '127.0.0.1'),
 );
 
+/*
+|--------------------------------------------------------------------------
+| Org email domain equivalence (global — all auth drivers)
+|--------------------------------------------------------------------------
+|
+| During phased email-domain / UPN migration, treat listed domains as the
+| same organization when resolving a login email to a user account. The
+| local-part (before @) must match; only the domain may differ.
+|
+| Applies to password login, forgot password, self-registration, and OIDC SSO when
+| linking by email. 
+|
+| Parameters:
+|
+|   domains
+|     Symmetric list of org domains (e.g. demo.org, example.com). Cross-domain
+|     matching only considers users whose email domain is in this list.
+|
+|   local_part_cross_domain
+|     If true, when exact email fails, find users with the same local-part
+|     and a domain in domains. 
+|
+|   require_unique_local_part
+|     If true, cross-domain match requires exactly one user; otherwise login
+|     fails (ambiguous duplicate accounts). Recommended when duplicates exist.
+|
+| Cross-domain matching applies whether or not the account is already linked
+| via OIDC, so password login with an old org domain still resolves after SSO.
+|
+*/
+$config['email_domain_equivalence'] = array(
+    'enabled' => false,
+    'domains' => array(
+        // 'demo.org',
+        // 'example.com',
+    ),
+    'local_part_cross_domain' => true,
+    'require_unique_local_part' => true,
+);
+
 // Load OIDC configuration file - config/auth_oidc.php
 $auth_oidc_file = APPPATH . 'config/auth_oidc.php';
 if (file_exists($auth_oidc_file)) {

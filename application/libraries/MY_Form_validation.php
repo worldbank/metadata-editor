@@ -201,13 +201,20 @@ class MY_Form_validation extends CI_Form_validation {
     //check if the email address exists in db
 	function check_user_email_exists($email)
 	{
-		$user_data=$this->CI->ion_auth->get_user_by_email($email);
+		$this->CI->config->load('auth');
+		$this->CI->load->library('Oidc_user_resolver');
+		$status = $this->CI->oidc_user_resolver->check_registration_email($email);
 
-		if ($user_data)
-		{
+		if ($status === Oidc_user_resolver::REGISTRATION_EMAIL_AMBIGUOUS) {
+			$this->set_message('check_user_email_exists', t('login_ambiguous_email'));
+			return FALSE;
+		}
+
+		if ($status === Oidc_user_resolver::REGISTRATION_EMAIL_TAKEN) {
 			$this->set_message('check_user_email_exists', t('callback_email_exists'));
 			return FALSE;
 		}
+
 		return TRUE;
     }
     

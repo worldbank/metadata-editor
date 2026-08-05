@@ -24,6 +24,8 @@ class DefaultAuth implements AuthInterface
 		$this->ci->lang->load('general');
 		$this->ci->lang->load('users');
 
+		$this->ci->config->load('auth');
+
 		$this->ci->load->driver('captcha_lib');
 
       	//$this->output->enable_profiler(TRUE);
@@ -195,7 +197,12 @@ class DefaultAuth implements AuthInterface
 			}
 
 
-        	if ($this->ci->ion_auth->login($this->ci->input->post('email'), $this->ci->input->post('password'), $remember)) //if the login is successful
+        	$this->ci->load->library('Oidc_user_resolver');
+        	if ($this->ci->oidc_user_resolver->attempt_password_login(
+        		$this->ci->input->post('email'),
+        		$this->ci->input->post('password'),
+        		$remember
+        	))
 			{
 				//log
 				$this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
@@ -295,9 +302,10 @@ class DefaultAuth implements AuthInterface
 		//$this->ci->form_validation->set_rules($this->ci->captcha_lib->get_question_field(), t('captcha'), 'trim|required|callback_validate_captcha');
 
         if ($this->ci->form_validation->run() == true) { //check to see if the user is logging in
-        	if ($this->ci->ion_auth->login(
+        	$this->ci->load->library('Oidc_user_resolver');
+        	if ($this->ci->oidc_user_resolver->attempt_password_login(
 					$this->ci->input->post('email'), 
-					$this->ci->input->post('password'), $remember=true)) //if the login is successful
+					$this->ci->input->post('password'), $remember=true))
 			{
 				//success
 				$this->json_response($data=array(
@@ -425,10 +433,14 @@ class DefaultAuth implements AuthInterface
 	    }
 	    else
 		{
-	        //run the forgotten password method to email an activation code to the user
-			$forgotten = $this->ci->ion_auth->forgotten_password($this->ci->input->post('email'));
+	        $this->ci->load->library('Oidc_user_resolver');
+			$forgotten = $this->ci->oidc_user_resolver->attempt_forgot_password($this->ci->input->post('email'));
 
-			if ($forgotten) //if there were no errors
+			if ($forgotten === null) {
+	            redirect("auth/forgot_password", 'refresh');
+			}
+
+			if ($forgotten)
 			{
 				//$this->ci->session->set_flashdata('message', $this->message);
 	            //redirect("auth/login", 'refresh'); //we should display a confirmation page here instead of the login page

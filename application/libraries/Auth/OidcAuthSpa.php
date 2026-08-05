@@ -69,7 +69,11 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
                 }
             }
 
-            if ($this->ci->ion_auth->login($this->ci->input->post('email'), $this->ci->input->post('password'), $remember)) //if the login is successful
+            if ($this->attempt_password_login_with_resolver(
+                $this->ci->input->post('email'),
+                $this->ci->input->post('password'),
+                $remember
+            ))
             {
                 //log
                 $this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
@@ -274,34 +278,8 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
             // Map claims to user data
             $user_data = $this->mapClaimsToUserData($claims);
             
-            if (empty($user_data['email'])) {
-                throw new Exception('Email not found in OIDC claims');
-            }
-            
-            // Check if user exists
-            $user_info = $this->ci->ion_auth_model->get_user_by_email($user_data['email'])->row_array();
-            
-            if (is_array($user_info) && count($user_info) > 0) {
-                // User exists - log them in (create PHP session)
-                $login_success = $this->login_user_from_oidc($user_data['email']);
-                if (!$login_success) {
-                    throw new Exception('Failed to create user session');
-                }
-                $user_id = $user_info['id'];
-            } else {
-                // User doesn't exist - register if auto_register is enabled
-                if (isset($this->oidc_config['auto_register']) && $this->oidc_config['auto_register']) {
-                    $this->register_user_from_oidc($user_data);
-                    $login_success = $this->login_user_from_oidc($user_data['email']);
-                    if (!$login_success) {
-                        throw new Exception('Failed to create user session after registration');
-                    }
-                    $user_info = $this->ci->ion_auth_model->get_user_by_email($user_data['email'])->row_array();
-                    $user_id = $user_info['id'];
-                } else {
-                    throw new Exception('User not found and auto-registration is disabled');
-                }
-            }
+            $user_id = $this->complete_oidc_authentication($claims, $user_data);
+            $user_info = $this->ci->ion_auth_model->get_user_row($user_id);
             
             // Store ID token in session for logout if needed
             if (isset($this->oidc_config['logout_endpoint']) && $this->oidc_config['logout_endpoint']) {
@@ -318,8 +296,8 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
                 'expires_in' => isset($tokens['expires_in']) ? $tokens['expires_in'] : null,
                 'user' => array(
                     'id' => $user_id,
-                    'email' => $user_data['email'],
-                    'username' => isset($user_data['username']) ? $user_data['username'] : $user_data['email'],
+                    'email' => $user_info ? $user_info->email : $user_data['email'],
+                    'username' => $user_info ? $user_info->username : (isset($user_data['username']) ? $user_data['username'] : $user_data['email']),
                     'first_name' => isset($user_data['first_name']) ? $user_data['first_name'] : '',
                     'last_name' => isset($user_data['last_name']) ? $user_data['last_name'] : '',
                 )
