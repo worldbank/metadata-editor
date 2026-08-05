@@ -27,11 +27,6 @@ Vue.component('data-structure-csv-bootstrap', {
             codelistCache: {},
             codelistPickerDialog: false,
             codelistPickerMappingColumn: null,
-            codelistPickerSearch: '',
-            codelistPickerList: [],
-            codelistPickerLoading: false,
-            codelistPickerTotal: 0,
-            codelistPickerRequestSeq: 0,
             applyPayloadPreview: null,
             applyLoading: false,
             componentNameMaxLength: 100
@@ -201,17 +196,13 @@ Vue.component('data-structure-csv-bootstrap', {
                 label_only_columns: vm.labelOnlyColumnsSummary
             };
         },
-        codelistPickerHeaders: function () {
-            return [
-                { text: 'Title', value: 'title', sortable: false },
-                { text: 'Name', value: 'name', sortable: false, width: '140px' },
-                { text: 'Agency', value: 'agency', sortable: false, width: '100px' },
-                { text: 'Version', value: 'version', sortable: false, width: '90px' }
-            ];
-        },
         codelistPickerSubtitle: function () {
             var mapping = this.getCodelistPickerMapping();
             return mapping ? mapping.csv_column : '';
+        },
+        codelistPickerHighlightId: function () {
+            var mapping = this.getCodelistPickerMapping();
+            return mapping && mapping.codelist_id ? mapping.codelist_id : null;
         }
     },
     watch: {
@@ -228,23 +219,11 @@ Vue.component('data-structure-csv-bootstrap', {
         }
     },
     mounted: function () {
-        var vm = this;
-        vm.loadCodelistPickerDebounced = _.debounce(function () {
-            vm.loadCodelistPickerList();
-        }, 300);
-        vm.bootstrapPage();
-    },
-    beforeDestroy: function () {
-        if (this.loadCodelistPickerDebounced && this.loadCodelistPickerDebounced.cancel) {
-            this.loadCodelistPickerDebounced.cancel();
-        }
+        this.bootstrapPage();
     },
     methods: {
         apiBase: function () {
             return ((typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '') + '/api/data_structures';
-        },
-        codelistsApiBase: function () {
-            return ((typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '') + '/api/codelists';
         },
         bootstrapPage: function () {
             this.resetWizard();
@@ -827,90 +806,12 @@ Vue.component('data-structure-csv-bootstrap', {
             if (!mapping) {
                 return;
             }
-            if (this.loadCodelistPickerDebounced && this.loadCodelistPickerDebounced.cancel) {
-                this.loadCodelistPickerDebounced.cancel();
-            }
             this.codelistPickerMappingColumn = mapping.csv_column;
-            this.codelistPickerSearch = '';
-            this.codelistPickerList = [];
-            this.codelistPickerTotal = 0;
-            this.codelistPickerLoading = false;
             this.codelistPickerDialog = true;
-            this.loadCodelistPickerList();
         },
         closeCodelistPicker: function () {
-            if (this.loadCodelistPickerDebounced && this.loadCodelistPickerDebounced.cancel) {
-                this.loadCodelistPickerDebounced.cancel();
-            }
-            this.codelistPickerRequestSeq += 1;
             this.codelistPickerDialog = false;
             this.codelistPickerMappingColumn = null;
-            this.codelistPickerSearch = '';
-            this.codelistPickerList = [];
-            this.codelistPickerTotal = 0;
-            this.codelistPickerLoading = false;
-        },
-        onCodelistPickerSearchInput: function () {
-            if (!this.codelistPickerDialog) {
-                return;
-            }
-            if (this.loadCodelistPickerDebounced) {
-                this.loadCodelistPickerDebounced();
-            } else {
-                this.loadCodelistPickerList();
-            }
-        },
-        loadCodelistPickerList: function () {
-            var vm = this;
-            var requestId = ++vm.codelistPickerRequestSeq;
-            vm.codelistPickerLoading = true;
-            var params = {
-                page: 1,
-                per_page: 200,
-                order_by: 'name',
-                order_dir: 'ASC',
-                exclude_archived: 1
-            };
-            var q = (vm.codelistPickerSearch || '').trim();
-            if (q.length >= 1) {
-                params.search = q;
-            }
-            axios.get(vm.codelistsApiBase(), { params: params, timeout: 30000 })
-                .then(function (res) {
-                    vm.codelistPickerLoading = false;
-                    if (requestId !== vm.codelistPickerRequestSeq || !vm.codelistPickerDialog) {
-                        return;
-                    }
-                    if (res.data && res.data.status === 'success') {
-                        vm.codelistPickerList = res.data.codelists || [];
-                        vm.codelistPickerTotal = res.data.total != null ? res.data.total : vm.codelistPickerList.length;
-                        vm.codelistPickerList.forEach(function (cl) { vm.cacheCodelist(cl); });
-                    } else {
-                        vm.codelistPickerList = [];
-                        vm.codelistPickerTotal = 0;
-                        var msg = (res.data && res.data.message) ? res.data.message : 'Could not load codelists.';
-                        if (typeof EventBus !== 'undefined') {
-                            EventBus.$emit('onFail', msg);
-                        }
-                    }
-                })
-                .catch(function (err) {
-                    vm.codelistPickerLoading = false;
-                    if (requestId !== vm.codelistPickerRequestSeq) {
-                        return;
-                    }
-                    vm.codelistPickerList = [];
-                    vm.codelistPickerTotal = 0;
-                    var msg = 'Could not load codelists.';
-                    if (err.code === 'ECONNABORTED') {
-                        msg = 'Codelist search timed out. Try a shorter search term.';
-                    } else if (err.response && err.response.data && err.response.data.message) {
-                        msg = err.response.data.message;
-                    }
-                    if (typeof EventBus !== 'undefined') {
-                        EventBus.$emit('onFail', msg);
-                    }
-                });
         },
         selectCodelistFromPicker: function (cl) {
             var mapping = this.getCodelistPickerMapping();
@@ -928,13 +829,6 @@ Vue.component('data-structure-csv-bootstrap', {
             }
             mapping.codelist_id = null;
             mapping.codelist_display = '';
-        },
-        codelistPickerRowClass: function (item) {
-            var mapping = this.getCodelistPickerMapping();
-            if (mapping && mapping.codelist_id && item && item.id === mapping.codelist_id) {
-                return 'ds-csv-codelist-pick-row--selected';
-            }
-            return '';
         },
         buildValidationReport: function () {
             var vm = this;
@@ -1465,75 +1359,13 @@ Vue.component('data-structure-csv-bootstrap', {
                 </v-card-actions>
             </v-card>
 
-            <v-dialog v-model="codelistPickerDialog" max-width="760" persistent content-class="ds-csv-codelist-picker-dialog">
-                <v-card class="ds-csv-codelist-picker-card">
-                    <v-card-title class="text-subtitle-1 py-3 flex-shrink-0">
-                        Link global codelist
-                        <span v-if="codelistPickerSubtitle" class="text-caption grey--text ml-2">({{ codelistPickerSubtitle }})</span>
-                        <v-spacer></v-spacer>
-                        <v-btn icon small @click="closeCodelistPicker"><v-icon>mdi-close</v-icon></v-btn>
-                    </v-card-title>
-                    <v-divider></v-divider>
-                    <div class="ds-csv-codelist-picker-body">
-                        <div class="ds-csv-codelist-picker-search mb-4">
-                            <v-text-field
-                                v-model="codelistPickerSearch"
-                                dense outlined hide-details clearable
-                                prepend-inner-icon="mdi-magnify"
-                                append-icon="mdi-arrow-right"
-                                placeholder="Search by title, name, or agency…"
-                                @keyup.enter="loadCodelistPickerList()"
-                                @click:append="loadCodelistPickerList()"
-                                @click:clear="loadCodelistPickerList()"
-                                @input="onCodelistPickerSearchInput"
-                            ></v-text-field>
-                        </div>
-                        <div class="ds-csv-codelist-picker-table-area">
-                            <div class="ds-csv-codelist-picker-count text-caption grey--text">
-                                <span v-if="codelistPickerLoading">Loading…</span>
-                                <span v-else>
-                                    Showing {{ codelistPickerList.length }}<span v-if="codelistPickerTotal > codelistPickerList.length"> of {{ codelistPickerTotal }}</span> codelist(s)
-                                </span>
-                            </div>
-                            <div class="ds-csv-codelist-picker-table-wrap elevation-1">
-                                <v-data-table
-                                    :headers="codelistPickerHeaders"
-                                    :items="codelistPickerList"
-                                    :items-per-page="-1"
-                                    item-key="id"
-                                    dense
-                                    hide-default-footer
-                                    disable-sort
-                                    mobile-breakpoint="0"
-                                    class="ds-csv-codelist-pick-table"
-                                    @click:row="selectCodelistFromPicker"
-                                >
-                                    <template v-slot:item.title="{ item }">
-                                        <span class="text-caption">{{ item.title || item.name || '—' }}</span>
-                                    </template>
-                                    <template v-slot:item.name="{ item }">
-                                        <code class="text-caption">{{ item.name }}</code>
-                                    </template>
-                                    <template v-slot:item.agency="{ item }">
-                                        <span class="text-caption">{{ item.agency || '—' }}</span>
-                                    </template>
-                                    <template v-slot:item.version="{ item }">
-                                        <span class="text-caption">{{ item.version || '—' }}</span>
-                                    </template>
-                                    <template v-slot:no-data>
-                                        <div class="text-caption grey--text pa-4 text-center">No codelists found.</div>
-                                    </template>
-                                </v-data-table>
-                            </div>
-                        </div>
-                    </div>
-                    <v-divider></v-divider>
-                    <v-card-actions class="pa-3 flex-shrink-0">
-                        <v-spacer></v-spacer>
-                        <v-btn text small @click="closeCodelistPicker">Cancel</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+            <global-codelist-picker-dialog
+                v-model="codelistPickerDialog"
+                :subtitle="codelistPickerSubtitle"
+                :highlight-id="codelistPickerHighlightId"
+                @select="selectCodelistFromPicker"
+                @cancel="closeCodelistPicker"
+            ></global-codelist-picker-dialog>
         </div>
     `
 });

@@ -376,13 +376,14 @@
         :key="ActiveNode.prop_key" 
         :parent="propParentNode"
         v-model="ActiveNode"
+        @vocab-change="markDirty"
     ></prop-edit>
 </div>
 
 <template v-if="ActiveNode && ActiveNode.type!=='section_container' && ActiveNode.type!=='section' && !ActiveNodeIsProp && !ActiveNodeIsInsideNestedArray && ActiveNode.key">
     <v-tabs background-color="transparent" class="mb-5" :key="ActiveNode.key">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">{{$t("display")}}</v-tab>
-        <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
+        <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeVocabConfigured"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
         <v-tab v-if="!ActiveArrayNodeIsNested || (ActiveNode && isControlField(ActiveNode.type) == true)"><span v-if="ActiveNode && ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("default")}}</v-tab>
         <v-tab v-if="ActiveNode && isControlField(ActiveNode.type)"><span v-if="ActiveNode && ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("validation_rules")}}</v-tab>
         <v-tab>{{$t("json")}}</v-tab>
@@ -439,53 +440,18 @@
             <template >
             <div class="mb-3" >
                 <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
-                <div class="bg-white border " style="max-height:300px;overflow:auto;">
+                <div class="template-controlled-vocabulary-panel">
 
 
-                    <template v-if="!ActiveNodeControlledVocabColumns"> 
-
-                        <div>
-
-                            <div class="m-3">
-                                <div>{{$t("enum_store_options_label")}}:</div>
-
-                                <v-select
-                                    style="max-width:300px;"
-                                    v-model="ActiveNodeEnumStoreColumn"
-                                    :items="enum_store_options"
-                                    :item-text="item => item.label"
-                                    :item-value="item => item.value"
-                                    dense 
-                                    outlined
-                                    clearable
-                                    label=""
-                                    :disabled="!isEditable"
-                                ></v-select>
-                            </div>
-                        </div>
-
-                        <table-grid-component
-                            v-if="ActiveNode && ActiveNode.key"
-                            :key="ActiveNode.key"
-                            :columns="ActiveNodeSimpleControlledVocabColumns" 
-                            v-model="ActiveNodeEnum"
-                            @update:value="EnumUpdate"
-                            class="border m-2 pb-2"
-                        ></table-grid-component>
-                         
-                    </template>
-                    <template v-else>
-
-                        <table-grid-component
-                            v-if="ActiveNode && ActiveNode.key"
-                            :key="ActiveNode.key"
-                            :columns="ActiveNodeControlledVocabColumns" 
-                            v-model="ActiveNodeEnum"
-                            @update:value="EnumUpdate"
-                            class="border m-2 pb-2"
-                        ></table-grid-component>
-                        
-                    </template>
+                    <template-controlled-vocabulary
+                        v-if="ActiveNode && ActiveNode.key && ActiveNode.type !== 'template_root' && ActiveNode.type !== 'template_description'"
+                        :key="ActiveNode.key + '-cv'"
+                        :field-node="ActiveNode"
+                        :schema-field="ActiveNodeSchemaField"
+                        :data-type="TemplateDataType"
+                        :disabled="!isEditable"
+                        @change="markDirty"
+                    ></template-controlled-vocabulary>
                 </div>
 
             </div>

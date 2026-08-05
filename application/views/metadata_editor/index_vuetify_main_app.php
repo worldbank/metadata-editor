@@ -192,6 +192,10 @@
 
             //nested
             echo $this->load->view("metadata_editor/vue-nested-section-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-global-field-enum-util.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-global-registry-scalar-field-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-table-grid-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-input-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-array-component.js",null,true);
 
@@ -211,7 +215,6 @@
             echo $this->load->view("metadata_editor/vue-summary-sharing-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-thumbnail-component.js",null,true);
 
-            echo $this->load->view("metadata_editor/vue-table-grid-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-section-subsection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-repeated-field-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-section-component.js",null,true);
@@ -221,7 +224,6 @@
             echo $this->load->view("metadata_editor/vue-dialog-weight-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-replace-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-feature-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-page-preview-component.js",null,true);
@@ -265,6 +267,7 @@
             echo $this->load->view("metadata_editor/vue-geospatial-feature-description-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-indicator-dsd-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-global-codelist-codes-grid-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-global-codelist-preview-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-import-component.js",null,true);
@@ -401,16 +404,19 @@
 
             console.log("route path",route_path);
 
+            // On refresh, template is not loaded yet — do not strip the hash route.
+            if (!store.state.app_bootstrap_complete) {
+                next();
+                return;
+            }
+
             if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview') {
                 next({ path: '/', replace: true });
                 return;
             }
-            
-            if (!store.state.treeActiveNode){
-                console.log("no active node");
-                if (store.getters.getTemplateItemByKey(route_path)){
-                    store.commit('tree_active_node_path',route_path);
-                }
+
+            if (to.path.startsWith('/study/')) {
+                store.dispatch('syncActiveNodeFromRoute', to);
             }
 
             next();
@@ -446,6 +452,7 @@
                 project_version_info:null,
                 template_structure_valid: false,
                 template_isloading: false,
+                app_bootstrap_complete: false,
                 variables_loaded:false,
                 variables_isloading:false,
                 variables_active_tab:"documentation",
@@ -603,6 +610,12 @@
                                         found=true;
                                     }
                                 }
+                                if (!found && items[i].props && Array.isArray(items[i].props)){
+                                    item=findTemplateByItemKey(items[i].props,key);
+                                    if (item){
+                                        found=true;
+                                    }
+                                }
                             }
                             i++;                        
                         }
@@ -613,7 +626,7 @@
                         return null;
                     }
                     let items=store.state.formTemplate.template.items;
-                    let item=findTemplateByItemKey(items,route_path);
+                    let item=findTemplateByItemKey(items, key);
 
                     return item;
                 },
@@ -634,6 +647,24 @@
                 }
             },
             actions: {               
+                syncActiveNodeFromRoute: function(context, route) {
+                    if (!route || !route.path || route.path.indexOf('/study/') !== 0) {
+                        return;
+                    }
+                    if (!store.state.template_structure_valid) {
+                        return;
+                    }
+                    var nodeKey = route.params && route.params.element_id
+                        ? route.params.element_id
+                        : route.path.replace(/^\/study\/?/, '').split('/').filter(Boolean)[0];
+                    if (!nodeKey) {
+                        return;
+                    }
+                    var item = context.getters.getTemplateItemByKey(nodeKey);
+                    if (item) {
+                        context.commit('tree_active_node_path', nodeKey);
+                    }
+                },
                 async initData({commit},options) {
                     store.state.project_isloading=true;
                     store.state.template_isloading=true;

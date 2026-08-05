@@ -73,7 +73,7 @@
     <template v-if="prop.type!=='section' && prop.type!=='section_container'">
         <v-tabs background-color="transparent" class="mb-5" :key="prop.prop_key">
             <v-tab  v-if="isField(prop.type) || prop.type=='simple_array'">{{$t("display")}}</v-tab>
-            <v-tab><span v-if="prop.enum && prop.enum.length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
+            <v-tab><span v-if="(prop.enum && prop.enum.length>0) || (prop.vocabulary_source==='global' && prop.global_codelist_id)"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
             <v-tab>{{$t("default")}}<span v-if="prop.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
             <v-tab v-if="isField(prop.type)"><span v-if="prop.rules && Object.keys(prop.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("validation_rules")}}</v-tab>
             <v-tab>{{$t("json")}}</v-tab>
@@ -111,63 +111,30 @@
                 <template>
                 <div class="mb-3" >
                     <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
-                    <div class="border bg-white" style="max-height:300px;overflow:auto;">
+                    <div class="template-controlled-vocabulary-panel">
 
-                        <template v-if="isField(prop.type) || prop.type=='simple_array'">                                                    
-                            
-                            <div>
-                                <div class="m-3">
-                                    <div>{{$t("enum_store_options_label")}}:</div>
+                        <template v-if="isField(prop.type) || prop.type=='simple_array' || isFlatObjectArrayProp(prop)">
 
-                                    <v-select
-                                        style="max-width:300px;"
-                                        v-model="PropEnumStoreColumn"
-                                        :items="enum_store_options"
-                                        :item-text="item => item.label"
-                                        :item-value="item => item.value"
-                                        dense 
-                                        outlined
-                                        clearable
-                                        label=""
-                                    ></v-select>
-                                </div>
-                            </div>
-
-                            <table-grid-component
-                                :key="prop.key"
-                                :columns="SimpleControlledVocabColumns" 
-                                v-model="PropEnum"
-                                @update:value="EnumListUpdate"
-                                class="border m-2 pb-2"
-                            ></table-grid-component>
-
-                            <div class="mx-3 mb-3">
-                                <div class="text-muted font-small" v-if="schemaFieldForProp && schemaFieldForProp.enum && schemaFieldForProp.enum.length">
-                                    <strong>{{$t("schema_enum_hint_title")}}:</strong>
-                                    <span class="ml-1">{{ schemaEnumAllowedLabel }}</span>
-                                </div>
-                                <div class="text-muted font-small" v-else-if="$store.state.schema_fields_loaded && prop.prop_key">
-                                    {{$t("schema_enum_no_field")}}
-                                </div>
-                                <div v-if="propEnumSchemaWarnings.length" class="mt-2">
-                                    <div v-for="badCode in propEnumSchemaWarnings" :key="'enum-warn-' + badCode" class="text-danger font-small">
-                                        {{ $t("enum_code_not_in_schema", { code: badCode, allowed: schemaEnumAllowedLabel }) }}
-                                    </div>
-                                </div>
-                            </div>
+                            <template-controlled-vocabulary
+                                :field-node="prop"
+                                :schema-field="schemaFieldForProp"
+                                :data-type="TemplateDataType()"
+                                @change="$emit('vocab-change')"
+                            ></template-controlled-vocabulary>
 
                         </template>
-                        <template v-else>
+                        <template v-else-if="prop.type === 'array' && prop.props && prop.props.length">
                             
                             <table-grid-component
                                 :key="prop.key"
                                 :columns="prop.props" 
                                 v-model="PropEnum"
                                 @update:value="EnumListUpdate"
-                                class="border m-2 pb-2"
+                                class="border pb-2 template-cv-inline-grid"
                             ></table-grid-component>
                             
                         </template>
+
                     </div>
 
                 </div>

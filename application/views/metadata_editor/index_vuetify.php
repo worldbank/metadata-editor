@@ -14,7 +14,22 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="<?php echo base_url();?>vue-app/assets/leaflet.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <style>[v-cloak]{display:none !important;}</style>
+  <style>[v-cloak]{display:none !important;}
+  .global-registry-scalar-field-input--picker input,
+  .global-registry-scalar-field-input--picker .v-input__slot { cursor: pointer; }
+  /* Clear, then picker, then issues — dots stay rightmost inside the field */
+  .global-registry-scalar-field-input .v-input__append-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .global-registry-scalar-field-input--picker .v-input__append-inner .v-input__icon--clear {
+    order: 1;
+  }
+  .global-registry-scalar-field-input .v-input__append-inner > span.d-inline-flex {
+    order: 2;
+  }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -209,6 +224,8 @@
         await this.$store.dispatch('initData',{dataset_id:this.dataset_id});
         await this.$store.dispatch('initTreeItems');
         this.init_tree_data();
+        await this.$store.dispatch('syncActiveNodeFromRoute', this.$route);
+        this.$store.state.app_bootstrap_complete = true;
 
         let vm=this;
 
@@ -520,6 +537,9 @@
         },
         $route(to, from) {
           this.setTreeActiveNode(to.path);
+          if (to.path.startsWith('/study/')) {
+            this.$store.dispatch('syncActiveNodeFromRoute', to);
+          }
         },
         ProjectMetadata: 
         {

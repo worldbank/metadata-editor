@@ -201,6 +201,9 @@ Vue.component('prop-edit', {
 
         return false;
       },
+      isFlatObjectArrayProp: function (prop) {
+        return typeof isFlatObjectArrayField === 'function' && isFlatObjectArrayField(prop);
+      },
       EnumListUpdate: function(e) {
         if (Array.isArray(e)){
           this.$set(this.prop, "enum", e);

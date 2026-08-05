@@ -4,7 +4,6 @@ Vue.component("form-input", {
   data: function () {
     return {};
   },
-  mounted: function () {},
   computed: {
     isFieldReadOnly() {
       if (!this.$store.getters.getUserHasEditAccess) {
@@ -66,7 +65,8 @@ Vue.component("form-input", {
           return this.local;
         }
         
-        const enumItem = this.field.enum.find(
+        const enumList = this.dropdownEnumList;
+        const enumItem = enumList.find(
           (code) => code.code === this.getEnumCodeFromLabel(this.local)
         );
 
@@ -123,6 +123,30 @@ Vue.component("form-input", {
     isRequired() {
       return !!(this.field && (this.field.is_required || this.field.required));
     },
+    fieldUsesGlobalScalarEnum: function () {
+      return (
+        typeof fieldUsesGlobalScalarCodelist === "function" &&
+        fieldUsesGlobalScalarCodelist(this.field)
+      );
+    },
+    arrayTableEnums: function () {
+      if (!this.field || this.field.type !== "array") {
+        return this.field && this.field.enum ? this.field.enum : [];
+      }
+      if (
+        typeof fieldVocabularySourceGlobal === "function" &&
+        fieldVocabularySourceGlobal(this.field)
+      ) {
+        return [];
+      }
+      return this.field.enum || [];
+    },
+    dropdownEnumList: function () {
+      if (this.fieldUsesGlobalScalarEnum) {
+        return [];
+      }
+      return Array.isArray(this.field.enum) ? this.field.enum : [];
+    },
   },
   template: `
             <div class="form-input-field mt-3" :class="'form-input-' + field.type"  >
@@ -159,7 +183,7 @@ Vue.component("form-input", {
                         <table-grid-component 
                             v-model="local" 
                             :columns="field.props"
-                            :enums="field.enum" 
+                            :enums="arrayTableEnums" 
                             :field="field"
                             class="border elevation-1"
                             >
@@ -341,8 +365,8 @@ Vue.component("form-input", {
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
                                 <span v-if="isRequired" class="required-label"> * </span>
                             </label>
+                            <span class="small ml-1" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" aria-label="Help"><i class="far fa-question-circle"></i></span>
                         </div>
-                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                         
                         <validation-provider 
@@ -356,9 +380,19 @@ Vue.component("form-input", {
                             <span v-if="errors[0]" class="field-error">{{errors[0]}}</span>
                         </validation-provider>
                         
+                        <global-registry-scalar-field
+                            v-if="fieldUsesGlobalScalarEnum"
+                            :value="local"
+                            @input="local = $event"
+                            :field="field"
+                            :project-id="projectId"
+                            :disabled="isFieldReadOnly"
+                            :allow-custom="true"
+                        ></global-registry-scalar-field>
                         <v-combobox
+                            v-else
                             v-model="fieldEnumByCode"
-                            :items="field.enum"
+                            :items="dropdownEnumList"
                             item-text="label"
                             item-value="code"
                             :return-object="false"
@@ -382,8 +416,8 @@ Vue.component("form-input", {
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
                                 <span v-if="isRequired" class="required-label"> * </span>
                             </label>
+                            <span class="small ml-1" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" aria-label="Help"><i class="far fa-question-circle"></i></span>
                         </div>
-                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>                        
                         
                         <validation-provider 
@@ -394,9 +428,19 @@ Vue.component("form-input", {
                             :name="field.title"
                             >
                             <input type="hidden" v-model="local" />
+                            <global-registry-scalar-field
+                                v-if="fieldUsesGlobalScalarEnum"
+                                :value="local"
+                                @input="local = $event"
+                                :field="field"
+                                :project-id="projectId"
+                                :disabled="isFieldReadOnly"
+                                :allow-custom="false"
+                            ></global-registry-scalar-field>
                             <v-select
+                                v-else
                                 v-model="fieldEnumByCode"
-                                :items="field.enum"  
+                                :items="dropdownEnumList"  
                                 item-text="label"
                                 item-value="code"                            
                                 label=""
@@ -458,7 +502,8 @@ Vue.component("form-input", {
             </div>  `,
   methods: {
     findEnumByCode: function (code) {
-      return _.find(this.field.enum, { code: code });
+      var enumList = this.dropdownEnumList;
+      return _.find(enumList, { code: code });
     },
     getEnumCodeFromLabel: function (label) {
       //code is enclosed in [] e.g. label [code]

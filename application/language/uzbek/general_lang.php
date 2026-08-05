@@ -148,6 +148,10 @@ $lang['logout']='Chiqish';
 $lang['translate']="Tarjima qilish";
 $lang['site_configurations']="Sayt sozlamalari";
 $lang['apply']="Qo'llash";
+$lang['pick_from_codelist']="Kodlar ro'yxatidan tanlash";
+$lang['pick_from_list']="Ro'yxatdan tanlash";
+$lang['global_codelist_custom_placeholder']="Matn kiriting";
+$lang['global_codelist_custom_hint']="Qiymat kiriting yoki kodlar ro'yxatidan tanlash uchun ro'yxat belgisidan foydalaning.";
 $lang['None']="Hech qanday";
 
 $lang['add']="Qo'shish";

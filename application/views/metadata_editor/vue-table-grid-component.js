@@ -78,6 +78,37 @@ Vue.component('table-grid-component', {
             }
 
             return false;
+        },
+        showEnumPicker: function () {
+            if (this.isFieldReadOnly) {
+                return false;
+            }
+            if (this.enums && this.enums.length > 0) {
+                return true;
+            }
+            if (
+                typeof fieldVocabularySourceGlobal !== 'function'
+                || !this.field
+                || !fieldVocabularySourceGlobal(this.field)
+            ) {
+                return false;
+            }
+            var registryId = typeof fieldGlobalCodelistRegistryId === 'function'
+                ? fieldGlobalCodelistRegistryId(this.field)
+                : null;
+            if (!registryId) {
+                return false;
+            }
+            if (
+                typeof isFlatObjectArrayField === 'function'
+                && isFlatObjectArrayField(this.field)
+            ) {
+                var map = typeof getGlobalCodelistPropMap === 'function'
+                    ? getGlobalCodelistPropMap(this.field)
+                    : {};
+                return !!(map.code && map.label);
+            }
+            return false;
         }
     },
     methods:{
@@ -122,11 +153,29 @@ Vue.component('table-grid-component', {
         addEnum: function(){
             this.dialog_enum_selection=true;
         },
-        onEnumSelection: function(selection){            
-            for(i=0;i<selection.length;i++){
-                this.local.push(JSON.parse(JSON.stringify(selection[i])));
+        isRowEmpty: function (row) {
+            if (!row || typeof row !== 'object') {
+                return true;
             }
-            this.$emit('input', JSON.parse(JSON.stringify(this.local))); 
+            var keys = this.columnKeys;
+            for (var i = 0; i < keys.length; i++) {
+                var v = row[keys[i]];
+                if (v !== undefined && v !== null && String(v).trim() !== '') {
+                    return false;
+                }
+            }
+            return true;
+        },
+        onEnumSelection: function (selection) {
+            var rows = Array.isArray(this.value) ? JSON.parse(JSON.stringify(this.value)) : [];
+            var self = this;
+            rows = rows.filter(function (r) {
+                return !self.isRowEmpty(r);
+            });
+            for (var i = 0; i < selection.length; i++) {
+                rows.push(JSON.parse(JSON.stringify(selection[i])));
+            }
+            this.$emit('input', rows);
         },
         update: function (index, key, value, column_data_type='text')
         {
@@ -400,7 +449,7 @@ Vue.component('table-grid-component', {
                         </span>
                     </th>
                     <th scope="col">
-                    <span class="float-right" v-show="enums" v-if="!isFieldReadOnly">
+                    <span class="float-right" v-show="showEnumPicker">
                     <v-btn
                             light
                             icon
@@ -485,6 +534,7 @@ Vue.component('table-grid-component', {
             <vue-dialog-enum-selection-component
                 v-model="dialog_enum_selection"
                 :columns="columns"
+                :field="field"
                 @selection="onEnumSelection($event)"
                 :enums="enums"
             >

@@ -331,6 +331,25 @@ class Codelists_model extends CI_Model {
     }
 
     /**
+     * Editor template field bindings (editor_templates_codelists).
+     *
+     * @param int $codelist_id
+     * @return int
+     */
+    public function count_template_codelist_refs($codelist_id)
+    {
+        $codelist_id = (int) $codelist_id;
+        if ($codelist_id <= 0) {
+            return 0;
+        }
+
+        $ci =& get_instance();
+        $ci->load->model('Editor_templates_codelists_model');
+
+        return $ci->Editor_templates_codelists_model->count_by_codelist_id($codelist_id);
+    }
+
+    /**
      * @param string $agency
      * @param string $name
      * @return int
@@ -1099,6 +1118,17 @@ class Codelists_model extends CI_Model {
                 . ' data structure component'
                 . ($dsd_refs === 1 ? '' : 's')
                 . '. Remove the codelist from those components or delete the structures first.'
+            );
+        }
+
+        $template_refs = $this->count_template_codelist_refs($id);
+        if ($template_refs > 0) {
+            throw new Exception(
+                'This codelist cannot be deleted because it is referenced by '
+                . $template_refs
+                . ' editor template field'
+                . ($template_refs === 1 ? '' : 's')
+                . '. Remove the global codelist binding from those templates first.'
             );
         }
 

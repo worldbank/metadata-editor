@@ -64,6 +64,7 @@ class Editor_template_model extends ci_model {
 		$this->init_core_templates();
 		$this->ci->load->model('Template_acl_model');
 		$this->ci->load->model('Edit_history_model');
+		$this->ci->load->model('Editor_templates_codelists_model');
 		$this->ci->load->library('Metadata_change_log');
 		$this->ci->load->library('Audit_log');
 		$this->Edit_history_model=$this->ci->Edit_history_model;
@@ -784,6 +785,7 @@ class Editor_template_model extends ci_model {
 		}
 
 		if (isset($update_arr['template'])){
+			$this->assert_template_vocabulary_valid($update_arr['template']);
 			// Only encode if it's not already a JSON string
 			if (!is_string($update_arr['template'])){
 				$update_arr['template']= json_encode($update_arr['template']);
@@ -826,6 +828,10 @@ class Editor_template_model extends ci_model {
 			'update',
 			$changed_by
 		);
+
+		if (isset($update_arr['template'])) {
+			$this->sync_template_codelist_refs($template_id, $after_template);
+		}
 
 		return $result;
 	}
@@ -923,8 +929,18 @@ class Editor_template_model extends ci_model {
 			$data['data_type']=$this->canonical_data_type($data['data_type']);
 		}
 
-		$this->db->insert('editor_templates', $data); 		
-		return $this->db->insert_id();
+		if (isset($data['template'])) {
+			$this->assert_template_vocabulary_valid($data['template']);
+		}
+
+		$this->db->insert('editor_templates', $data);
+		$insert_id = (int) $this->db->insert_id();
+
+		if ($insert_id > 0 && isset($data['template'])) {
+			$this->sync_template_codelist_refs($insert_id, $data['template']);
+		}
+
+		return $insert_id;
 	}
 
 
@@ -1523,6 +1539,50 @@ class Editor_template_model extends ci_model {
 		$this->db->delete('edit_history');
 
 		$this->clear_default_template_by_uid($template_uid);
+	}
+
+	/**
+	 * Validate global vocabulary settings before persisting template JSON.
+	 *
+	 * @param array|string|null $template_payload
+	 * @throws Exception
+	 */
+	private function assert_template_vocabulary_valid($template_payload)
+	{
+		if ($template_payload === null || $template_payload === '') {
+			return;
+		}
+		require_once APPPATH . 'libraries/Editor_template_vocabulary_validate.php';
+		Editor_template_vocabulary_validate::assert_valid_template_or_throw($template_payload);
+	}
+
+	/**
+	 * Rebuild editor_templates_codelists from template JSON (global vocabulary fields).
+	 *
+	 * @param int         $template_id
+	 * @param array|string|null $template_payload
+	 */
+	private function sync_template_codelist_refs($template_id, $template_payload)
+	{
+		$template_id = (int) $template_id;
+		if ($template_id <= 0) {
+			return;
+		}
+
+		if (!$this->ci->Editor_templates_codelists_model->table_exists()) {
+			return;
+		}
+
+		require_once APPPATH . 'libraries/Editor_template_codelist_util.php';
+		$refs = Editor_template_codelist_util::collect_global_codelist_refs($template_payload);
+
+		try {
+			$this->ci->Editor_templates_codelists_model->replace_for_template($template_id, $refs);
+		} catch (Exception $e) {
+			log_message('error', 'sync_template_codelist_refs failed for template_id '
+				. $template_id . ': ' . $e->getMessage());
+			throw $e;
+		}
 	}
 
 	private function log_template_audit_event($template, $action, $user_id=null, array $extra=array())

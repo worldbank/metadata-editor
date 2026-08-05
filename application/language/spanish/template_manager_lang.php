@@ -39,6 +39,20 @@ $lang['available_items']="Elementos disponibles";
 $lang['controlled_vocabulary']="Vocabulario controlado";
 $lang['missing_section_containers']="Contenedores de sección faltantes";
 $lang['add_missing_section_containers_help']="Haga clic en el icono de agregar para agregar un contenedor de sección a su plantilla";
+$lang['vocabulary_type']="Tipo de lista de códigos";
+$lang['vocabulary_type_custom']="Lista personalizada";
+$lang['vocabulary_type_registry']="Lista del registro";
+$lang['vocabulary_source_mode_custom']="Lista personalizada definida en esta plantilla.";
+$lang['vocabulary_source_mode_registry']="Los códigos se cargan desde el catálogo compartido del registro.";
+$lang['vocabulary_source_schema_enum_only']="Este campo está restringido por un enum fijo del esquema. Use solo una lista personalizada.";
+$lang['vocabulary_source_path_required']="Establezca una ruta de esquema (prop_key) en este campo antes de vincular una lista del registro.";
+$lang['vocabulary_switch_to_global_title']="¿Cambiar a lista del registro?";
+$lang['vocabulary_switch_to_global_message']="La lista de códigos personalizada se eliminará de la plantilla. Los códigos provendrán de la lista del registro que vincule. ¿Continuar?";
+$lang['global_codelist_column_mappings']="Asignación de columnas";
+$lang['global_codelist_map_registry_code']="Código del registro → columna";
+$lang['global_codelist_map_registry_label']="Etiqueta del registro → columna";
+$lang['global_codelist_array_map_hint']="Al editar metadatos, cada código del registro seleccionado añade una fila completa según estas columnas.";
+$lang['global_codelist_array_store_hint']="Cada fila de metadatos guarda el objeto completo (todas las columnas).";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/spanish/template_manager_lang.php */

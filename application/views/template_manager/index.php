@@ -68,6 +68,162 @@
     .font-small{
       font-size:small;
     }
+
+    .global-codelist-picker-card {
+      max-height: 85vh;
+      overflow: hidden;
+    }
+    .global-codelist-picker-dialog.v-dialog {
+      overflow: hidden;
+    }
+    .global-codelist-picker-dialog .global-codelist-picker-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .global-codelist-picker-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .global-codelist-picker-search {
+      padding: 16px 20px 12px;
+      flex-shrink: 0;
+    }
+    .global-codelist-picker-search .v-input {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .global-codelist-picker-content {
+      padding-top: 0;
+      min-height: 0;
+    }
+    .global-codelist-picker-table-wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow: auto;
+    }
+    .global-codelist-picker-table-wrap .global-codelist-picker-table.v-data-table {
+      box-shadow: none !important;
+    }
+    .global-codelist-picker-table tbody tr {
+      cursor: pointer;
+    }
+    .global-codelist-picker-row--selected {
+      background: #e8f4ea !important;
+    }
+    .global-codelist-picker-actions {
+      gap: 8px;
+    }
+    .global-codelist-picker-pending-label {
+      max-width: 42%;
+      min-width: 0;
+    }
+    .global-codelist-picker-dialog .global-codelist-picker-actions {
+      background: #fff;
+    }
+    .global-codelist-picker-dialog .global-codelist-picker-cancel-btn {
+      color: rgba(0, 0, 0, 0.87) !important;
+    }
+    .global-codelist-picker-dialog .global-codelist-picker-confirm-btn.theme--light.v-btn {
+      background-color: #1976d2 !important;
+      color: #fff !important;
+    }
+    .global-codelist-picker-dialog .global-codelist-picker-confirm-btn.theme--light.v-btn.v-btn--disabled {
+      background-color: rgba(0, 0, 0, 0.12) !important;
+      color: rgba(0, 0, 0, 0.38) !important;
+    }
+    .template-cv-switch-global-dialog .template-cv-switch-global-cancel-btn {
+      color: rgba(0, 0, 0, 0.87) !important;
+    }
+    .template-cv-switch-global-dialog .template-cv-switch-global-confirm-btn.theme--light.v-btn {
+      background-color: #1976d2 !important;
+      color: #fff !important;
+    }
+    .global-codelist-codes-grid-search {
+      padding: 0 2px;
+    }
+    .global-codelist-codes-grid {
+      padding: 12px 14px;
+    }
+    .global-codelist-codes-grid-table-wrap {
+      overflow: visible;
+    }
+    .global-codelist-codes-grid-table-wrap .global-codelist-codes-grid-table.v-data-table {
+      box-shadow: none !important;
+    }
+    .global-codelist-codes-grid-title-link {
+      color: #1976d2;
+      text-decoration: none;
+    }
+    .global-codelist-codes-grid-title-link:hover {
+      text-decoration: underline;
+    }
+
+    .template-controlled-vocabulary-panel {
+      padding: 16px 18px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+    }
+    .template-controlled-vocabulary-panel .template-controlled-vocabulary {
+      padding: 0;
+    }
+    .template-controlled-vocabulary-panel .global-codelist-link-summary {
+      margin-bottom: 0;
+    }
+    .global-codelist-link-summary-actions .v-btn {
+      min-width: 0;
+    }
+    .global-codelist-link-summary-text {
+      min-width: 0;
+    }
+    .template-controlled-vocabulary-panel .global-codelist-codes-grid,
+    .template-controlled-vocabulary-panel .global-codelist-link-field-codes {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+    .template-controlled-vocabulary-panel .template-cv-inline-grid {
+      margin: 8px 0 0;
+    }
+    .template-controlled-vocabulary-panel .template-cv-schema-hints {
+      padding-top: 4px;
+    }
+    .template-controlled-vocabulary .v-input {
+      max-width: 100%;
+    }
+    .template-cv-field-label {
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      font-size: small;
+    }
+    .template-cv-type-select.v-text-field,
+    .template-cv-store-select.v-text-field {
+      font-size: small;
+    }
+    .template-cv-type-select .v-select__selection,
+    .template-cv-store-select .v-select__selection {
+      font-size: small;
+    }
+    .template-cv-source-state-hint,
+    .template-cv-source-hint {
+      font-size: small;
+      line-height: 1.4;
+    }
+    .template-cv-top-row {
+      font-size: small;
+    }
+    .template-cv-type-col,
+    .template-cv-store-col {
+      padding-top: 2px;
+    }
+    @media (min-width: 960px) {
+      .template-cv-type-col,
+      .template-cv-store-col {
+        padding-top: 4px;
+      }
+    }
     
     .search-field {
       font-size: 0.875rem;
@@ -792,14 +948,18 @@
       return node.is_additional === true || node.is_additional === 1 || node.is_additional === '1';
     }
 
-    <?php echo include_once("vue-field-key-component.js"); ?>
-    <?php echo include_once("vue-field-custom-key-component.js"); ?>
-    <?php echo include_once("vue-prop-key-component.js"); ?>
-    <?php echo include_once("vue-tree-component.js"); ?>
-    <?php echo include_once("vue-tree-field-component.js"); ?>
-    <?php echo include_once("vue-table-grid-component.js"); ?>
-    <?php echo include_once("vue-validation-rules-component.js"); ?>
-    <?php echo include_once("vue-prop-edit-component.js"); ?>
+    <?php include_once __DIR__ . '/vue-field-key-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-field-custom-key-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-prop-key-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-tree-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-tree-field-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-table-grid-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-validation-rules-component.js'; ?>
+    <?php include_once __DIR__ . '/../metadata_editor/vue-global-field-enum-util.js'; ?>
+    <?php include_once __DIR__ . '/../metadata_editor/vue-global-codelist-picker-components.js'; ?>
+    <?php include_once __DIR__ . '/../metadata_editor/vue-global-codelist-codes-grid-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-template-controlled-vocabulary-component.js'; ?>
+    <?php include_once __DIR__ . '/vue-prop-edit-component.js'; ?>
 
 
     const translation_messages = {
@@ -2729,6 +2889,35 @@
             return 0;
           }
           return this.ActiveNode.enum.length;
+        },
+        ActiveNodeVocabConfigured() {
+          if (!this.ActiveNode) {
+            return false;
+          }
+          if (String(this.ActiveNode.vocabulary_source || '').toLowerCase() === 'global') {
+            var gid = parseInt(this.ActiveNode.global_codelist_id, 10);
+            return !isNaN(gid) && gid > 0;
+          }
+          return this.ActiveNodeEnumCount > 0;
+        },
+        ActiveNodeSchemaField() {
+          if (!this.ActiveNode || this.TemplateIsCustom) {
+            return null;
+          }
+          const schemaKeys = this.$store.state.schema_field_keys || [];
+          const aliases = this.$store.state.schema_key_aliases || {};
+          let path = typeof resolveTemplatePropSchemaPath === 'function'
+            ? resolveTemplatePropSchemaPath(
+                this.ActiveNode,
+                this.$store.state.user_tree_items || [],
+                schemaKeys,
+                aliases
+              )
+            : (this.ActiveNode.prop_key || this.ActiveNode.key);
+          if (!path) {
+            return null;
+          }
+          return this.$store.getters.getSchemaFieldByDottedKey(path);
         },
         ActiveNodeHasAdditionalPrefix(){
             if (!this.ActiveNode) return false;

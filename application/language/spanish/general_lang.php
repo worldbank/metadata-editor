@@ -148,6 +148,10 @@ $lang['logout']='Cerrar sesión';
 $lang['translate']="Traducir";
 $lang['site_configurations']="Configuraciones del sitio";
 $lang['apply']="Aplicar";
+$lang['pick_from_codelist']="Elegir del catálogo de códigos";
+$lang['pick_from_list']="Elegir de la lista";
+$lang['global_codelist_custom_placeholder']="Introducir texto";
+$lang['global_codelist_custom_hint']="Escriba un valor o use el icono de lista para elegir del catálogo de códigos.";
 $lang['None']="Ninguno";
 
 $lang['add']="Agregar";

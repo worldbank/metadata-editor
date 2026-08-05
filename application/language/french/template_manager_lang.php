@@ -38,6 +38,20 @@ $lang['changed_at']="Mis à jour le";
 $lang['changed_by']="Dernière mise à jour par";
 $lang['missing_section_containers']="Conteneurs de section manquants";
 $lang['add_missing_section_containers_help']="Cliquez sur l'icône d'ajout pour ajouter un conteneur de section à votre modèle";
+$lang['vocabulary_type']="Type de liste de codes";
+$lang['vocabulary_type_custom']="Liste personnalisée";
+$lang['vocabulary_type_registry']="Liste du registre";
+$lang['vocabulary_source_mode_custom']="Liste personnalisée définie dans ce modèle.";
+$lang['vocabulary_source_mode_registry']="Les codes sont chargés depuis le catalogue partagé du registre.";
+$lang['vocabulary_source_schema_enum_only']="Ce champ est limité par une énumération fixe du schéma. Utilisez uniquement une liste personnalisée.";
+$lang['vocabulary_source_path_required']="Définissez un chemin de schéma (prop_key) sur ce champ avant de lier une liste du registre.";
+$lang['vocabulary_switch_to_global_title']="Passer à la liste du registre ?";
+$lang['vocabulary_switch_to_global_message']="La liste de codes personnalisée sera supprimée du modèle. Les codes proviendront de la liste du registre que vous lierez. Continuer ?";
+$lang['global_codelist_column_mappings']="Correspondance des colonnes";
+$lang['global_codelist_map_registry_code']="Code registre → colonne";
+$lang['global_codelist_map_registry_label']="Libellé registre → colonne";
+$lang['global_codelist_array_map_hint']="Lors de l'édition des métadonnées, chaque code du registre ajoute une ligne complète selon ces colonnes.";
+$lang['global_codelist_array_store_hint']="Chaque ligne de métadonnées enregistre l'objet complet (toutes les colonnes).";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/french/template_manager_lang.php */

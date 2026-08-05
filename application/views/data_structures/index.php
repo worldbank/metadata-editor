@@ -436,6 +436,73 @@
             z-index: 2;
             background: #fafafa;
         }
+        .global-codelist-picker-card {
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            overflow: hidden;
+        }
+        .global-codelist-picker-dialog.v-dialog {
+            overflow: hidden;
+        }
+        .global-codelist-picker-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .global-codelist-picker-search {
+            padding: 16px 20px 12px;
+            flex-shrink: 0;
+        }
+        .global-codelist-picker-search .v-input {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .global-codelist-picker-content {
+            min-height: 0;
+        }
+        .global-codelist-picker-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: none;
+            overflow: auto;
+        }
+        .global-codelist-picker-table-wrap .global-codelist-picker-table.v-data-table {
+            box-shadow: none !important;
+        }
+        .global-codelist-picker-table tbody tr {
+            cursor: pointer;
+        }
+        .global-codelist-picker-row--selected {
+            background: #e8f4ea !important;
+        }
+        .global-codelist-picker-actions {
+            gap: 8px;
+        }
+        .global-codelist-picker-pending-label {
+            max-width: 42%;
+            min-width: 0;
+        }
+        .global-codelist-picker-dialog .global-codelist-picker-actions {
+            background: #fff;
+        }
+        .global-codelist-picker-dialog .global-codelist-picker-cancel-btn {
+            color: rgba(0, 0, 0, 0.87) !important;
+        }
+        .global-codelist-picker-dialog .global-codelist-picker-confirm-btn.theme--light.v-btn {
+            background-color: #1976d2 !important;
+            color: #fff !important;
+        }
+        .global-codelist-picker-dialog .global-codelist-picker-confirm-btn.theme--light.v-btn.v-btn--disabled {
+            background-color: rgba(0, 0, 0, 0.12) !important;
+            color: rgba(0, 0, 0, 0.38) !important;
+        }
+        .global-codelist-codes-grid-search {
+            padding: 0 2px;
+        }
+        .global-codelist-codes-grid-table-wrap {
+            overflow: auto;
+        }
         .ds-copy-component-card {
             display: flex;
             flex-direction: column;
@@ -665,6 +732,8 @@
             echo $this->load->view('metadata_editor/vue-data-structure-validation-panel-component.js', null, true);
             echo $this->load->view('metadata_editor/vue-data-structure-view-component.js', null, true);
             echo $this->load->view('metadata_editor/vue-data-structure-edit-component.js', null, true);
+            echo $this->load->view('metadata_editor/vue-global-codelist-picker-components.js', null, true);
+            echo $this->load->view('metadata_editor/vue-global-codelist-codes-grid-component.js', null, true);
             echo $this->load->view('metadata_editor/vue-data-structure-csv-bootstrap-component.js', null, true);
             echo $this->load->view('editor_common/global-site-header-component.js', null, true);
             echo $this->load->view('editor_common/main-navigation-tabs-component.js', null, true);

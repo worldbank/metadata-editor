@@ -5,21 +5,22 @@ Vue.component('form-main', {
         return {
         }
     },
-    created() {        
-        this.field=this.activeSection;
-    },
     methods:{
         activeFormFieldDisplayType()
         {
-            if (this.field.display_type){
-                return this.field.display_type;
+            const field = this.activeSection;
+            if (!field) {
+                return '';
+            }
+            if (field.display_type){
+                return field.display_type;
             }
 
-            if (_.includes(['text','string','integer','boolean','number'],this.field.display_type)){
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
                 return 'text';
             }            
             
-            return this.field.type;
+            return field.type;
         },
         localValue: function(key)
         {
@@ -48,13 +49,15 @@ Vue.component('form-main', {
         },
         formField()
         {
-            return this.field;
-        },
-        formTextFieldStyle(){            
-            return this.$store.state.formTextFieldStyle;
+            return this.activeSection;
         },
         localColumns(){
-            return this.field.items;
+            const field = this.activeSection;
+            return field && field.items ? field.items : [];
+        },
+        
+        formTextFieldStyle(){            
+            return this.$store.state.formTextFieldStyle;
         },
         
         
@@ -62,6 +65,11 @@ Vue.component('form-main', {
     template: `
         <div class="metadata-form p-3 pt-5 mb-3" >
 
+            <div v-if="!activeSection" class="text-muted font-small py-3">
+                {{ $t('select_form_section') || 'Select a section from the tree.' }}
+            </div>
+
+            <template v-else>
             <!-- form-section -->
             <div v-if="activeFormFieldDisplayType()=='section_container'"  class="form-section m-3" >
                 <v-form-preview                         
@@ -108,6 +116,8 @@ Vue.component('form-main', {
                     @input="update(formField.key, $event)"
                 ></form-input>   
             </div>
+
+            </template>
 
         </div>
     `

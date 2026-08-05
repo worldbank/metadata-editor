@@ -163,6 +163,10 @@ $lang['logout']='Logout';
 $lang['translate']="Translate";
 $lang['site_configurations']="Site configurations";
 $lang['apply']="Apply";
+$lang['pick_from_codelist']="Pick from codelist";
+$lang['pick_from_list']="Pick from list";
+$lang['global_codelist_custom_placeholder']="Enter text";
+$lang['global_codelist_custom_hint']="Type a value or use the list icon to pick from the codelist.";
 $lang['None']="None";
 
 $lang['add']="Add";
