@@ -155,6 +155,7 @@
             
             echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-resource-dctype-utils.js",null,true);
+            echo $this->load->view("metadata_editor/vue-editor-project-modules-util.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-resumable-chunk-uploader.js",null,true);
@@ -413,6 +414,20 @@
             if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview') {
                 next({ path: '/', replace: true });
                 return;
+            }
+
+            if (store.state.project_type === 'geospatial' && typeof EditorProjectModulesUtil !== 'undefined') {
+                var templateRoot = EditorProjectModulesUtil.getTemplateRootFromFormTemplate(store.state.formTemplate);
+                if (to.path.startsWith('/geospatial-features') && templateRoot
+                    && !EditorProjectModulesUtil.isModuleVisible(templateRoot, 'feature_catalogue')) {
+                    next({ path: '/', replace: true });
+                    return;
+                }
+                if (to.path.startsWith('/geospatial-gallery') && templateRoot
+                    && !EditorProjectModulesUtil.isModuleVisible(templateRoot, 'geospatial_gallery')) {
+                    next({ path: '/', replace: true });
+                    return;
+                }
             }
 
             if (to.path.startsWith('/study/')) {

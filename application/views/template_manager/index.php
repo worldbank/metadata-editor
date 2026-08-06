@@ -320,6 +320,7 @@
     let user_template = <?php echo $user_template; ?>;
     let template_icon_url = <?php echo json_encode(isset($template_icon_url) ? $template_icon_url : null); ?>;
     let user_has_edit_access = <?php echo json_encode(isset($user_has_edit_access) ? $user_has_edit_access : false); ?>;
+    let editor_project_modules = <?php echo json_encode(isset($editor_project_modules) ? $editor_project_modules : array(), JSON_HEX_APOS | JSON_HEX_TAG); ?>;
   </script>
 
   <div id="app" data-app>
@@ -1214,6 +1215,7 @@
           deep_link_ready: false,
           treeSearchQuery: '',
           user_has_edit_access: user_has_edit_access,
+          editor_project_modules: typeof editor_project_modules !== 'undefined' ? editor_project_modules : [],
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -2601,6 +2603,56 @@
           }
           return '';
         },
+        isEditorProjectModuleVisible: function(module) {
+          if (!module || !module.id) {
+            return true;
+          }
+          const template = this.UserTemplate;
+          if (!template) {
+            return true;
+          }
+          const mods = template.editor_modules;
+          if (!mods || !mods[module.id] || typeof mods[module.id] !== 'object') {
+            return true;
+          }
+          return mods[module.id].show_in_editor !== false;
+        },
+        setEditorProjectModuleVisible: function(module, visible) {
+          if (!module || !module.id || !this.isEditable) {
+            return;
+          }
+          const template = this.UserTemplate;
+          if (!template) {
+            return;
+          }
+
+          if (!template.editor_modules) {
+            this.$set(template, 'editor_modules', {});
+          }
+          if (visible) {
+            if (template.editor_modules[module.id]) {
+              this.$delete(template.editor_modules[module.id], 'show_in_editor');
+              if (Object.keys(template.editor_modules[module.id]).length === 0) {
+                this.$delete(template.editor_modules, module.id);
+              }
+            }
+            if (template.editor_modules && Object.keys(template.editor_modules).length === 0) {
+              this.$delete(template, 'editor_modules');
+            }
+          } else {
+            this.$set(template.editor_modules, module.id, { show_in_editor: false });
+          }
+          this.markDirty();
+        },
+        editorProjectModuleLabel: function(module) {
+          if (module && module.label_key) {
+            const t = this.$t(module.label_key);
+            if (t && t !== module.label_key) {
+              return t;
+            }
+          }
+          return module && module.id ? module.id : '';
+        },
         filterTreeItems: function(items, searchQuery) {
           if (!items || !Array.isArray(items)) {
             return [];
@@ -2750,6 +2802,9 @@
         },
         TemplateDataType() {
           return this.user_template_info.data_type;
+        },
+        applicableEditorProjectModules: function() {
+          return this.editor_project_modules || [];
         },
         UserTemplateClone(){
           return JSON.parse(JSON.stringify(this.UserTemplate));

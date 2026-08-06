@@ -4688,11 +4688,16 @@
                     ]
                 },
                 {
-                    "key": "description.feature_catalogue_section",
+                    "type": "section_container",
+                    "key": "feature_catalogue_container",
                     "title": "Feature catalogue",
-                    "type": "section",
                     "is_custom": true,
                     "items": [
+                        {
+                            "key": "description.feature_catalogue_section",
+                            "title": "Feature catalogue",
+                            "type": "section",
+                            "items": [
                         {
                             "key": "description.feature_catalogue.name",
                             "title": "Name",
@@ -5038,6 +5043,8 @@
                         }
                     ],
                     "help_text": "A Feature Catalogue defines the types of features and their attributes used in a dataset. It describes the content and structure of geographic features, enabling consistency, interoperability, and understanding when sharing or using data."
+                        }
+                    ]
                 }
             ]
         },

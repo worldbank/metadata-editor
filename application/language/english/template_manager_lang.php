@@ -68,6 +68,10 @@ $lang['global_codelist_array_store_hint']="Each metadata row stores the full obj
 $lang['key_edit']="Edit key";
 $lang['key_edit_warning']="Changing a key can break the template mapping to the schema. Use a valid schema path or additional.* for custom fields.";
 $lang['key_unknown_schema_path']="Key does not match a schema field";
+$lang['project_editor_modules']="Project editor modules";
+$lang['project_editor_modules_help']="Control which optional areas appear when editing a project with this template. All modules are shown by default; only explicit settings here hide them.";
+$lang['editor_module_feature_catalogue']="Feature catalogue";
+$lang['editor_module_geospatial_gallery']="Image gallery";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/english/template_manager_lang.php */

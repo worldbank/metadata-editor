@@ -562,6 +562,18 @@
         }
       },
       methods:{
+        projectEditorTemplateRoot: function() {
+          if (typeof EditorProjectModulesUtil === 'undefined') {
+            return null;
+          }
+          return EditorProjectModulesUtil.getTemplateRootFromFormTemplate(this.$store.state.formTemplate);
+        },
+        isProjectModuleVisible: function(moduleId) {
+          if (typeof EditorProjectModulesUtil === 'undefined') {
+            return true;
+          }
+          return EditorProjectModulesUtil.isModuleVisible(this.projectEditorTemplateRoot(), moduleId);
+        },
         loadSchemaCoreMappings: function(){
           if (!this.dataset_type){
             this.schema_core_fields = { idno:[], title:[] };
@@ -935,21 +947,24 @@
           }
 
           if (this.dataset_type=='geospatial'){
-            tree_data.push({
-              title: this.$t('feature_catalogue'),
-              type: 'geospatial-features',
-              file: 'database',
-              key:'feature-catalogue',
-              items:this.GeospatialFeatures
-            });
+            if (this.isProjectModuleVisible('feature_catalogue')) {
+              tree_data.push({
+                title: this.$t('feature_catalogue'),
+                type: 'geospatial-features',
+                file: 'database',
+                key:'feature-catalogue',
+                items:this.GeospatialFeatures
+              });
+            }
 
-            tree_data.push({
-              title: this.$t('image_gallery'),
-              type: 'geospatial-gallery',
-              file: 'database',
-              key:'geospatial-gallery'
-            });
-
+            if (this.isProjectModuleVisible('geospatial_gallery')) {
+              tree_data.push({
+                title: this.$t('image_gallery'),
+                type: 'geospatial-gallery',
+                file: 'database',
+                key:'geospatial-gallery'
+              });
+            }
           }
 
           if (this.dataset_type=='indicator' || this.dataset_type=='timeseries'){

@@ -4699,11 +4699,16 @@
                     ]
                 },
                 {
-                    "key": "description.feature_catalogue_section",
+                    "type": "section_container",
+                    "key": "feature_catalogue_container",
                     "title": "Catálogo de funciones",
-                    "type": "section",
                     "is_custom": true,
                     "items": [
+                        {
+                            "key": "description.feature_catalogue_section",
+                            "title": "Catálogo de funciones",
+                            "type": "section",
+                            "items": [
                         {
                             "key": "description.feature_catalogue.name",
                             "title": "Nombre",
@@ -5049,6 +5054,8 @@
                         }
                     ],
                     "help_text": "Un catálogo de características define los tipos de características y sus atributos utilizados en un conjunto de datos. Describe el contenido y la estructura de las características geográficas, lo que permite coherencia, interoperabilidad y comprensión al compartir o utilizar datos."
+                        }
+                    ]
                 }
             ]
         },

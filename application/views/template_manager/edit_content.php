@@ -79,6 +79,32 @@
         </v-row>
     </div>
 
+    <div v-if="applicableEditorProjectModules.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
+        <label class="mb-2 d-block">
+            <v-icon color="primary">mdi-view-dashboard-outline</v-icon>
+            <strong>{{$t('project_editor_modules')}}:</strong>
+        </label>
+        <div class="text-secondary font-small mb-2">{{$t('project_editor_modules_help')}}</div>
+        <div class="border bg-light p-3">
+            <div
+                v-for="module in applicableEditorProjectModules"
+                :key="module.id"
+                class="border-bottom pb-1 mb-1"
+                style="padding: 2px 0;"
+            >
+                <v-switch
+                    :input-value="isEditorProjectModuleVisible(module)"
+                    @change="setEditorProjectModuleVisible(module, $event)"
+                    :label="editorProjectModuleLabel(module)"
+                    hide-details
+                    :disabled="!isEditable"
+                    class="mt-0 mb-0"
+                    dense
+                ></v-switch>
+            </div>
+        </div>
+    </div>
+
     <div v-if="MissingSectionContainers && MissingSectionContainers.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
         <label for="name" class="mb-2 d-block">
             

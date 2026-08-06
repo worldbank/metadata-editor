@@ -53,6 +53,10 @@ $lang['global_codelist_map_registry_code']="Código del registro → columna";
 $lang['global_codelist_map_registry_label']="Etiqueta del registro → columna";
 $lang['global_codelist_array_map_hint']="Al editar metadatos, cada código del registro seleccionado añade una fila completa según estas columnas.";
 $lang['global_codelist_array_store_hint']="Cada fila de metadatos guarda el objeto completo (todas las columnas).";
+$lang['project_editor_modules']="Módulos del editor de proyecto";
+$lang['project_editor_modules_help']="Controla qué áreas opcionales aparecen al editar un proyecto con esta plantilla. Todo se muestra por defecto; solo la configuración explícita aquí las oculta.";
+$lang['editor_module_feature_catalogue']="Catálogo de entidades";
+$lang['editor_module_geospatial_gallery']="Galería de imágenes";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/spanish/template_manager_lang.php */

@@ -52,6 +52,10 @@ $lang['global_codelist_map_registry_code']="Reestr kodi → ustun";
 $lang['global_codelist_map_registry_label']="Reestr yorlig'i → ustun";
 $lang['global_codelist_array_map_hint']="Metadatalarni tahrirlashda tanlangan har bir reestr kodi ushbu ustunlar bo'yicha to'liq qator qo'shadi.";
 $lang['global_codelist_array_store_hint']="Har bir metadata qatori to'liq obyektni (barcha ustunlar) saqlaydi.";
+$lang['project_editor_modules']="Loyiha muharriri modullari";
+$lang['project_editor_modules_help']="Ushbu shablon bilan loyiha tahrirlanganda qaysi ixtiyoriy bo'limlar ko'rinishini boshqaring. Barchasi odatda yoqilgan; faqat bu yerda aniq o'chirish yashiradi.";
+$lang['editor_module_feature_catalogue']="Ob'ekt katalogi";
+$lang['editor_module_geospatial_gallery']="Rasm galereyasi";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/uzbek/template_manager_lang.php */

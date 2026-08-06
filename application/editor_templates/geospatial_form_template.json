@@ -8111,11 +8111,16 @@
                     ]
                 },
                 {
-                    "key": "description.feature_catalogue_section",
+                    "type": "section_container",
+                    "key": "feature_catalogue_container",
                     "title": "Feature catalogue",
-                    "type": "section",
                     "is_custom": true,
                     "items": [
+                        {
+                            "key": "description.feature_catalogue_section",
+                            "title": "Feature catalogue",
+                            "type": "section",
+                            "items": [
                         {
                             "key": "description.feature_catalogue.name",
                             "title": "Name",
@@ -8565,6 +8570,8 @@
                                 }
                             ],
                             "help_text": "One or more feature type(s) defined in the Feature catalogue. The definition of several feature types can be considered when targeting various forms of a dataset (e.g., simplified vs. complete set of attributes, raw vs. aggregated, etc.) In practice, a simple ISO 19110 feature catalogue will reference one feature type describing the unique dataset structure. "
+                        }
+                    ]
                         }
                     ]
                 }

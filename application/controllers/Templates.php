@@ -86,13 +86,18 @@ class Templates extends MY_Controller {
 			$template_icon_url = $this->schema_registry->get_schema_icon_full_url($user_template['data_type']);
 		}
 
+		$this->load->library('Editor_project_modules');
+		$data_type = isset($user_template['data_type']) ? $user_template['data_type'] : null;
+		$editor_project_modules = Editor_project_modules::modules_for_data_type($data_type);
+
 		$options=array(
 			'user_template_info'=>$user_template,
 			'core_template'=>$core_template,
 			'user_template'=>$user_template,
 			'translations'=>$this->lang->language,
 			'template_icon_url'=>$template_icon_url,
-			'user_has_edit_access'=>$user_has_edit_access
+			'user_has_edit_access'=>$user_has_edit_access,
+			'editor_project_modules'=>$editor_project_modules,
 		);
 
 		unset($options['user_template_info']['template']);

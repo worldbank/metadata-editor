@@ -52,6 +52,10 @@ $lang['global_codelist_map_registry_code']="Code registre → colonne";
 $lang['global_codelist_map_registry_label']="Libellé registre → colonne";
 $lang['global_codelist_array_map_hint']="Lors de l'édition des métadonnées, chaque code du registre ajoute une ligne complète selon ces colonnes.";
 $lang['global_codelist_array_store_hint']="Chaque ligne de métadonnées enregistre l'objet complet (toutes les colonnes).";
+$lang['project_editor_modules']="Modules de l'éditeur de projet";
+$lang['project_editor_modules_help']="Choisissez les zones optionnelles visibles lors de l'édition d'un projet avec ce modèle. Tout est affiché par défaut ; seuls les réglages explicites ici les masquent.";
+$lang['editor_module_feature_catalogue']="Catalogue d'entités";
+$lang['editor_module_geospatial_gallery']="Galerie d'images";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/french/template_manager_lang.php */
