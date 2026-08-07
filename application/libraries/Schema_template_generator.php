@@ -117,6 +117,7 @@ class Schema_template_generator
         // Ensure templates have at least one section_container or section for template manager compatibility
         // If no top-level containers exist, wrap all items in a default section_container
         $items = $this->ensure_section_container($items, $title);
+        $items = $this->normalize_section_container_structure($items);
 
         return array(
             'type' => 'template',
@@ -124,6 +125,97 @@ class Schema_template_generator
             'description' => $description,
             'items' => $items
         );
+    }
+
+    /**
+     * Ensure fields are nested under section folders, not directly under section_container.
+     *
+     * @param array $items Template items (top-level or nested)
+     * @return array Normalized items
+     */
+    protected function normalize_section_container_structure($items)
+    {
+        if (!is_array($items) || empty($items)) {
+            return $items;
+        }
+
+        $normalized = array();
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                $normalized[] = $item;
+                continue;
+            }
+
+            if (!empty($item['items']) && is_array($item['items'])) {
+                $item['items'] = $this->normalize_section_container_structure($item['items']);
+            }
+
+            if (isset($item['type']) && $item['type'] === 'section_container' && !empty($item['items'])) {
+                $item['items'] = $this->wrap_loose_fields_in_section_folders(
+                    $item['items'],
+                    isset($item['key']) ? $item['key'] : 'container',
+                    isset($item['title']) ? $item['title'] : 'Fields'
+                );
+                $item['items'] = $this->normalize_section_container_structure($item['items']);
+            }
+
+            $normalized[] = $item;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Move non-structural children of a section_container into section nodes.
+     *
+     * @param array $items Direct children of a section_container
+     * @param string $container_key Container key (for generated section keys)
+     * @param string $container_title Container title (for generated section titles)
+     * @return array Child list with only section / section_container entries
+     */
+    protected function wrap_loose_fields_in_section_folders($items, $container_key, $container_title)
+    {
+        $structural = array('section' => true, 'section_container' => true);
+        $result = array();
+        $loose_batch = array();
+        $section_index = 0;
+
+        $flush_loose = function () use (&$loose_batch, &$result, $container_key, $container_title, &$section_index) {
+            if (empty($loose_batch)) {
+                return;
+            }
+            $section_title = $container_title !== '' ? $container_title : 'Fields';
+            $suffix = $section_index === 0 ? '.__fields_section' : '.__fields_section_' . $section_index;
+            $section_index++;
+            $result[] = array(
+                'type' => 'section',
+                'key' => $container_key . $suffix,
+                'title' => $section_title,
+                'help_text' => '',
+                'expanded' => true,
+                'items' => $loose_batch
+            );
+            $loose_batch = array();
+        };
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                $loose_batch[] = $item;
+                continue;
+            }
+
+            $type = isset($item['type']) ? $item['type'] : '';
+            if ($type !== '' && isset($structural[$type])) {
+                $flush_loose();
+                $result[] = $item;
+            } else {
+                $loose_batch[] = $item;
+            }
+        }
+
+        $flush_loose();
+
+        return $result;
     }
 
     /**

@@ -2368,6 +2368,45 @@
 
           return true;
         },
+        collectDirectFieldsUnderSectionContainer: function(items, issues) {
+          if (!items || !Array.isArray(items)) {
+            return;
+          }
+
+          const structural = {
+            section: true,
+            section_container: true
+          };
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item) {
+              continue;
+            }
+
+            if (item.type === 'section_container' && item.items && Array.isArray(item.items)) {
+              for (let j = 0; j < item.items.length; j++) {
+                const child = item.items[j];
+                if (!child) {
+                  continue;
+                }
+                if (!child.type || !structural[child.type]) {
+                  issues.push({
+                    container_key: item.key,
+                    container_title: item.title || item.key,
+                    field_key: child.key,
+                    field_title: child.title || child.key,
+                    select_key: child.key || child.prop_key,
+                    message: this.$t('field_directly_under_section_container_message')
+                  });
+                }
+              }
+              this.collectDirectFieldsUnderSectionContainer(item.items, issues);
+            } else if (item.items && Array.isArray(item.items)) {
+              this.collectDirectFieldsUnderSectionContainer(item.items, issues);
+            }
+          }
+        },
         collectInvalidTemplateKeys: function(items, issues, seenKeys) {
           if (!items || !Array.isArray(items)) {
             return;
@@ -3133,6 +3172,12 @@
           return coreContainers.filter(container => 
             container.key && !userContainerKeys.includes(container.key)
           );
+        },
+        FieldsDirectlyUnderSectionContainer() {
+          const issues = [];
+          const items = this.UserTreeItems || (this.UserTemplate && this.UserTemplate.items) || [];
+          this.collectDirectFieldsUnderSectionContainer(items, issues);
+          return issues;
         },
         InvalidTemplateKeys() {
           const issues = [];

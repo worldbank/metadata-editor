@@ -141,6 +141,35 @@
         </div>
     </div>
 
+    <div v-if="FieldsDirectlyUnderSectionContainer && FieldsDirectlyUnderSectionContainer.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
+        <label class="mb-2 d-block">
+            <v-icon color="warning">mdi-alert-circle</v-icon>
+            <strong>{{$t("fields_directly_under_section_container")}}:</strong>
+        </label>
+        <div class="text-secondary font-small mb-2">{{$t("fields_directly_under_section_container_help")}}</div>
+        <div class="border bg-light p-3">
+            <div
+                v-for="issue in FieldsDirectlyUnderSectionContainer"
+                :key="'direct-field:' + issue.container_key + ':' + issue.field_key"
+                class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-2"
+                style="padding: 8px; cursor: pointer;"
+                @click="selectTemplateNodeByKey(issue.select_key)"
+            >
+                <div class="flex-grow-1">
+                    <strong>{{issue.field_title || issue.field_key}}</strong>
+                    <div class="text-secondary font-small" style="font-size: 0.875rem;">{{issue.field_key}}</div>
+                    <div class="text-secondary font-small" style="font-size: 0.8125rem;">
+                        {{issue.container_title || issue.container_key}}
+                    </div>
+                    <div class="text-danger font-small mt-1" style="font-size: 0.75rem;">{{issue.message}}</div>
+                </div>
+                <div>
+                    <v-icon color="#007bff" title="Open field">mdi-chevron-right</v-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div v-if="TemplateValidationIssues && TemplateValidationIssues.length > 0" class="mb-3 p-2 elevation-2 border" style="background-color: #fff;">
         <label class="mb-2 d-block">
             <v-icon color="warning">mdi-alert-circle</v-icon>
