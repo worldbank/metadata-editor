@@ -213,7 +213,7 @@ class Schema_template_generator
 
     protected function build_field($schema, $path, $name, $is_required = false)
     {
-        return array(
+        $field = array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => $this->normalize_type($schema),
@@ -221,6 +221,9 @@ class Schema_template_generator
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($schema)
         );
+        $this->apply_schema_vocabulary($field, $schema);
+
+        return $field;
     }
 
     protected function build_array_field($schema, $path, $name, $depth, $is_required = false)
@@ -263,7 +266,7 @@ class Schema_template_generator
 
     protected function build_simple_array_field($schema, $path, $name, $is_required, $items_schema)
     {
-        return array(
+        $field = array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => 'simple_array',
@@ -271,6 +274,9 @@ class Schema_template_generator
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($items_schema)
         );
+        $this->apply_schema_vocabulary($field, $items_schema);
+
+        return $field;
     }
 
     /**
@@ -349,7 +355,7 @@ class Schema_template_generator
     {
         $prop_path = $this->join_key($base_path, $column_key);
 
-        return array(
+        $prop = array(
             'key' => $column_key,
             'title' => $title !== null ? $title : $this->resolve_title($items_schema, $column_key),
             'type' => 'simple_array',
@@ -358,6 +364,9 @@ class Schema_template_generator
             'help_text' => isset($items_schema['description']) ? $items_schema['description'] : '',
             'display_type' => $this->resolve_display_type($items_schema)
         );
+        $this->apply_schema_vocabulary($prop, $items_schema);
+
+        return $prop;
     }
 
     protected function resolve_object_array_template_type($props)
@@ -384,7 +393,7 @@ class Schema_template_generator
         $kind = $this->classify_array_items_schema($items_schema);
 
         if ($kind === 'primitive') {
-            return array(
+            $prop = array(
                 'key' => $name,
                 'title' => $this->resolve_title($array_schema, $name),
                 'type' => 'simple_array',
@@ -393,6 +402,9 @@ class Schema_template_generator
                 'help_text' => isset($array_schema['description']) ? $array_schema['description'] : '',
                 'display_type' => $this->resolve_display_type($items_schema)
             );
+            $this->apply_schema_vocabulary($prop, $items_schema);
+
+            return $prop;
         }
 
         if ($kind === 'object') {
@@ -476,7 +488,7 @@ class Schema_template_generator
                     continue;
                 }
 
-                $props[] = array(
+                $prop = array(
                     'key' => $name,
                     'title' => $this->resolve_title($child, $name),
                     'type' => $this->normalize_type($child),
@@ -485,12 +497,69 @@ class Schema_template_generator
                     'help_text' => isset($child['description']) ? $child['description'] : '',
                     'display_type' => $this->resolve_display_type($child)
                 );
+                $this->apply_schema_vocabulary($prop, $child);
+                $props[] = $prop;
             }
 
             return $props;
         }
 
         return $props;
+    }
+
+    /**
+     * Copy JSON Schema enum into template controlled vocabulary metadata.
+     */
+    protected function apply_schema_vocabulary(array &$field, array $schema)
+    {
+        $enum = $this->build_template_enum($schema);
+        if ($enum === null) {
+            return;
+        }
+
+        $field['display_type'] = 'dropdown-custom';
+        $field['enum'] = $enum;
+        $field['enum_store_column'] = 'code';
+    }
+
+    protected function schema_has_enum($schema)
+    {
+        return isset($schema['enum']) && is_array($schema['enum']) && count($schema['enum']) > 0;
+    }
+
+    /**
+     * @return array<int, array{code: string, label: string}>|null
+     */
+    protected function build_template_enum($schema)
+    {
+        if (!$this->schema_has_enum($schema)) {
+            return null;
+        }
+
+        $entries = array();
+        foreach ($schema['enum'] as $value) {
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+            if (is_bool($value)) {
+                $code = $value ? 'true' : 'false';
+            } else {
+                $code = (string)$value;
+            }
+            $entries[] = array(
+                'code' => $code,
+                'label' => $this->enum_label_from_value($code),
+            );
+        }
+
+        return count($entries) > 0 ? $entries : null;
+    }
+
+    protected function enum_label_from_value($code)
+    {
+        $spaced = preg_replace('/([a-z])([A-Z])/', '$1 $2', (string)$code);
+
+        return $this->humanize($spaced);
     }
 
     protected function resolve_title($schema, $fallback)
@@ -504,6 +573,10 @@ class Schema_template_generator
 
     protected function resolve_display_type($schema)
     {
+        if ($this->schema_has_enum($schema)) {
+            return 'dropdown-custom';
+        }
+
         $type = $this->normalize_type($schema);
 
         switch ($type) {
@@ -516,9 +589,6 @@ class Schema_template_generator
             default:
                 if (isset($schema['format']) && in_array($schema['format'], array('date', 'date-time'), true)) {
                     return 'text';
-                }
-                if (isset($schema['enum']) && is_array($schema['enum']) && count($schema['enum']) > 0) {
-                    return 'select';
                 }
                 return 'text';
         }
