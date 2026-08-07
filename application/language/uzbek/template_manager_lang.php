@@ -2,6 +2,10 @@
 
 $lang['template_manager']="Shablon menejeri";
 $lang['import_template']="Shablonni import qilish";
+$lang['import_template_uid_in_use_warning']="Bu shablon UID allaqachon ishlatilmoqda. Ushbu shablonni import qilish uchun quyidagi variant orqali yangi UID dan foydalaning.";
+$lang['import_template_assign_new_uid_checkbox']="Shablon uchun yangi UID dan foydalanish";
+$lang['import_template_uid_conflict_enable_checkbox']="Bu shablon UID allaqachon ishlatilmoqda. «Shablon uchun yangi UID dan foydalanish» ni tanlang va qayta import qiling.";
+$lang['import_template_success_new_uid']="Muvaffaqiyatli import qilindi. UID {original_uid} dan {new_uid} ga o'zgartirildi.";
 $lang['no_templates_found']="Hech qanday shablon topilmadi!";
 $lang['click_on_sidebar_to_edit']="Tahrirlashni boshlash uchun yon panelda elementni bosing!";
 $lang['click_to_edit']="Tahrirlashni boshlash uchun elementni bosing!";

@@ -838,6 +838,13 @@ class Editor_template_model extends ci_model {
 
 	function create_template($options)
 	{
+		$on_uid_conflict = isset($options['on_uid_conflict']) ? $options['on_uid_conflict'] : 'fail';
+		unset($options['on_uid_conflict']);
+
+		if (!in_array($on_uid_conflict, array('fail', 'assign_new_uid'), true)) {
+			throw new Exception("Invalid on_uid_conflict value. Allowed: fail, assign_new_uid");
+		}
+
 		$template_options=array();
 
 		$remove_fields=array(
@@ -874,18 +881,33 @@ class Editor_template_model extends ci_model {
 
 		$template_options['data_type']=$this->canonical_data_type($template_options['data_type']);
 
-		if (!isset($template_options['uid'])){
+		$uid_reassigned = false;
+		$original_uid = null;
+
+		if (!isset($template_options['uid']) || $template_options['uid'] === '') {
 			$template_options["uid"]=nada_random_hash();
 		}
-		else{
-			$deleted_template=$this->get_soft_deleted_template_by_uid($template_options['uid']);
-			if ($deleted_template){
-				require_once APPPATH.'libraries/Template_uid_conflict_exception.php';
-				throw new Template_uid_conflict_exception($template_options['uid'], $deleted_template);
-			}
+		else {
+			$requested_uid = $template_options['uid'];
+			$conflict = $this->get_uid_conflict_status($requested_uid);
 
-			if ($this->check_uid_exists_active($template_options['uid'])){
-				throw new Exception("Template with UID already exists");
+			if ($on_uid_conflict === 'assign_new_uid') {
+				if (!$conflict['exists']) {
+					throw new Exception("assign_new_uid is only allowed when the template UID already exists.");
+				}
+				$original_uid = $requested_uid;
+				$template_options['uid'] = nada_random_hash();
+				$uid_reassigned = true;
+			}
+			else if ($conflict['exists']) {
+				if ($conflict['status'] === 'deleted') {
+					$deleted_template = $this->get_soft_deleted_template_by_uid($requested_uid);
+					require_once APPPATH.'libraries/Template_uid_conflict_exception.php';
+					throw new Template_uid_conflict_exception($requested_uid, is_array($deleted_template) ? $deleted_template : array());
+				}
+
+				require_once APPPATH.'libraries/Template_uid_active_conflict_exception.php';
+				throw new Template_uid_active_conflict_exception($requested_uid);
 			}
 		}
 
@@ -901,7 +923,14 @@ class Editor_template_model extends ci_model {
 			$template_options["changed"]=date("U");
 		}
 
-		return $this->insert($template_options);
+		$insert_id = $this->insert($template_options);
+
+		return array(
+			'id' => $insert_id,
+			'uid' => $template_options['uid'],
+			'uid_reassigned' => $uid_reassigned,
+			'original_uid' => $original_uid,
+		);
 	}
 	
 	

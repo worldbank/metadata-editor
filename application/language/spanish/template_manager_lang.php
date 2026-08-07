@@ -2,6 +2,10 @@
 
 $lang['template_manager']="Administrador de plantillas";
 $lang['import_template']="Importar plantilla";
+$lang['import_template_uid_in_use_warning']="Este UID de plantilla ya está en uso. Para importar esta plantilla, seleccione la opción siguiente para usar un nuevo UID.";
+$lang['import_template_assign_new_uid_checkbox']="Usar nuevo UID para la plantilla";
+$lang['import_template_uid_conflict_enable_checkbox']="Este UID de plantilla ya está en uso. Seleccione « Usar nuevo UID para la plantilla » e importe de nuevo.";
+$lang['import_template_success_new_uid']="Importado correctamente. El UID cambió de {original_uid} a {new_uid}.";
 $lang['no_templates_found']="¡No se encontraron plantillas!";
 $lang['click_on_sidebar_to_edit']="¡Haz clic en un elemento en la barra lateral para comenzar a editar!";
 $lang['click_to_edit']="¡Haz clic en un elemento para comenzar a editar!";

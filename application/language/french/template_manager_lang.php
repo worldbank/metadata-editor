@@ -2,6 +2,10 @@
 
 $lang['template_manager']="Gestionnaire de modèles";
 $lang['import_template']="Importer un modèle";
+$lang['import_template_uid_in_use_warning']="Cet UID de modèle est déjà utilisé. Pour importer ce modèle, sélectionnez l'option ci-dessous pour utiliser un nouvel UID.";
+$lang['import_template_assign_new_uid_checkbox']="Utiliser un nouvel UID pour le modèle";
+$lang['import_template_uid_conflict_enable_checkbox']="Cet UID de modèle est déjà utilisé. Sélectionnez « Utiliser un nouvel UID pour le modèle » et réessayez l'import.";
+$lang['import_template_success_new_uid']="Import réussi. L'UID a été changé de {original_uid} à {new_uid}.";
 $lang['no_templates_found']="Aucun modèle n'a été trouvé !";
 $lang['click_on_sidebar_to_edit']="Cliquez sur un élément de la barre latérale pour commencer l'édition !";
 $lang['click_to_edit']="Cliquez sur un élément pour commencer l'édition !";

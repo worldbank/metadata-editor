@@ -2,6 +2,7 @@
 
 require(APPPATH.'/libraries/MY_REST_Controller.php');
 require_once(APPPATH.'libraries/Template_uid_conflict_exception.php');
+require_once(APPPATH.'libraries/Template_uid_active_conflict_exception.php');
 
 class Templates extends MY_REST_Controller
 {
@@ -298,12 +299,23 @@ class Templates extends MY_REST_Controller
 
 			$output=array(
 				'status'=>'success',
-				'template'=>$result
+				'template'=>$result,
+				'uid_reassigned'=>!empty($result['uid_reassigned']),
+				'original_uid'=>isset($result['original_uid']) ? $result['original_uid'] : null,
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Template_uid_conflict_exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'code'=>$e->get_conflict_code(),
+				'message'=>$e->getMessage(),
+				'conflict'=>$e->get_conflict_data(),
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_CONFLICT);
+		}
+		catch(Template_uid_active_conflict_exception $e){
 			$error_output=array(
 				'status'=>'failed',
 				'code'=>$e->get_conflict_code(),

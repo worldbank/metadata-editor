@@ -62,6 +62,71 @@
   font-size: 14px;
   text-transform: uppercase;
 }
+
+.import-template-dialog .import-template-field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 4px;
+}
+
+.import-template-dialog .v-card__text {
+  padding-top: 16px !important;
+}
+
+.import-template-dialog .import-template-summary {
+  background-color: #f5f7fa;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.import-template-dialog .import-template-summary strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.import-template-dialog .import-template-uid-options {
+  margin-top: 8px;
+  padding: 0;
+}
+
+.import-template-dialog .import-template-uid-warning {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.import-template-dialog .import-template-uid-warning .v-icon {
+  color: #ef6c00 !important;
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-top: 2px;
+}
+
+.import-template-dialog .import-template-uid-warning-text {
+  color: #e65100;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.import-template-dialog .import-template-uid-checkbox {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.import-template-dialog .import-template-uid-checkbox .v-label {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.import-template-dialog .import-template-error-alert .v-alert__content {
+  font-size: 0.875rem;
+}
 </style>
 
 <body class="layout-top-nav">
@@ -310,49 +375,109 @@
       </div>    
     </div>
 
-  </v-app>
-
     <template class="import-template">
       <div class="text-center">
-        <v-dialog v-model="dialog_import_template" width="500">
-
-          <v-card>
-            <v-card-title class="text-h5 grey lighten-2">
+        <v-dialog
+          v-model="dialog_import_template"
+          width="520"
+          :key="dialog_import_template_key"
+          :persistent="import_template_loading"
+          @click:outside="onImportTemplateDialogOutsideClick"
+        >
+          <v-card class="import-template-dialog">
+            <v-card-title class="text-h6 grey lighten-3 py-3">
               {{$t('import_template')}}
             </v-card-title>
 
-            <v-card-text>
-              <div>
-                <div class="file-group form-field mb-3">
-                  <label class="l" for="customFile">
-                    <span>{{$t('select_file')}}: [JSON] </span>
-                  </label>
-                  <input type="file" accept="application/json" class="form-control p-1" @change="handleTemplateUpload( $event )">
+            <v-card-text class="pb-2">
+              <div class="mb-3">
+                <div class="import-template-field-label">{{$t('select_file')}} (JSON)</div>
+                <v-file-input
+                  accept=".json,application/json"
+                  label=""
+                  truncate-length="50"
+                  dense
+                  outlined
+                  hide-details
+                  v-model="import_template_file"
+                  prepend-icon=""
+                  prepend-inner-icon="mdi-file-upload"
+                  :disabled="import_template_loading"
+                ></v-file-input>
+              </div>
+
+              <v-alert
+                v-if="import_parse_error"
+                type="error"
+                dense
+                outlined
+                text
+                color="error"
+                icon="mdi-alert-circle-outline"
+                class="mb-3 import-template-error-alert"
+              >
+                {{import_parse_error}}
+              </v-alert>
+
+              <div
+                v-if="importJSON && !import_parse_error"
+                class="import-template-summary mb-3"
+              >
+                <div v-if="importJSON.name"><strong>{{$t('name')}}:</strong> {{importJSON.name}}</div>
+                <div v-if="importJSON.data_type"><strong>{{$t('data_type')}}:</strong> {{importJSON.data_type}}</div>
+                <div v-if="importJSON.uid"><strong>{{$t('template_uid')}}:</strong> {{importJSON.uid}}</div>
+              </div>
+
+              <div
+                v-if="importJSON && importJSON.uid && import_uid_in_use && !import_parse_error"
+                class="import-template-uid-options mb-2"
+              >
+                <div class="import-template-uid-warning">
+                  <v-icon small>mdi-alert-circle-outline</v-icon>
+                  <span class="import-template-uid-warning-text">{{$t('import_template_uid_in_use_warning')}}</span>
                 </div>
 
-                <div v-if="!importJSON && templateFile" style="color:red;">{{$t('invalid_file_failed_to_read')}}</div>
-
+                <v-checkbox
+                  v-model="import_assign_new_uid"
+                  :disabled="import_template_loading"
+                  hide-details
+                  color="primary"
+                  class="import-template-uid-checkbox ml-1"
+                  :label="$t('import_template_assign_new_uid_checkbox')"
+                ></v-checkbox>
               </div>
+
+              <v-alert
+                v-if="import_api_error"
+                type="error"
+                dense
+                outlined
+                text
+                color="error"
+                icon="mdi-alert-circle-outline"
+                class="mt-2 import-template-error-alert"
+              >
+                {{import_api_error}}
+              </v-alert>
             </v-card-text>
 
             <v-divider></v-divider>
 
-            <v-card-actions>
+            <v-card-actions class="px-4 py-3">
               <v-spacer></v-spacer>
-
-              <v-btn :disabled="!importJSON" small color="primary" text @click="importTemplate">
-                {{$t('import')}}
-              </v-btn>
-              <v-btn small text @click="dialog_import_template = false">
+              <v-btn color="grey darken-1" text @click="closeImportTemplateDialog" :disabled="import_template_loading">
                 {{$t('cancel')}}
               </v-btn>
-
+              <v-btn color="primary" depressed @click="importTemplate" :loading="import_template_loading" :disabled="!importJSON || import_template_loading || !!import_parse_error">
+                {{$t('import')}}
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
       </div>
     </template>
 
+  </v-app>
 
     <template>
       <v-menu
@@ -554,10 +679,16 @@
         dialog_uuid_template:false,
         search_keywords: '',
         dialog_import_template: false,
+        dialog_import_template_key: 0,
+        import_template_file: null,
+        import_parse_error: null,
+        import_api_error: null,
+        import_template_loading: false,
+        import_uid_in_use: false,
+        import_assign_new_uid: false,
         template_import_errors:[],
         dialog_import: {},
-        templateFile: '',
-        importJSON: '',
+        importJSON: null,
         showTemplateMenu: false,        
         menu_x: 0,
         menu_y: 0,
@@ -618,6 +749,14 @@
         }
       },
       watch: {
+        import_template_file: function() {
+          this.onImportTemplateFileChange();
+        },
+        import_assign_new_uid: function() {
+          if (this.import_assign_new_uid) {
+            this.import_api_error = null;
+          }
+        },
         list_view: function(newValue) {
           this.syncListViewToUrl(newValue);
           if (newValue === 'deleted') {
@@ -1130,6 +1269,9 @@
           if (data.code === 'TEMPLATE_UID_DELETED' && data.message) {
             return data.message;
           }
+          if (data.code === 'TEMPLATE_UID_ACTIVE' && data.message) {
+            return data.message;
+          }
           if (data.message) {
             return data.message;
           }
@@ -1139,43 +1281,151 @@
           return fallback;
         },
         showImportTemplateDialog: function(){
+          this.resetImportTemplateDialogState();
           this.dialog_import_template=true;
-          this.template_import_errors=[];
+        },
+        resetImportTemplateDialogState: function() {
+          this.import_template_file = null;
+          this.importJSON = null;
+          this.import_parse_error = null;
+          this.import_api_error = null;
+          this.import_template_loading = false;
+          this.import_uid_in_use = false;
+          this.import_assign_new_uid = false;
+          this.template_import_errors = [];
+        },
+        closeImportTemplateDialog: function() {
+          if (this.import_template_loading) {
+            return;
+          }
+          this.dialog_import_template = false;
+          this.dialog_import_template_key++;
+          this.resetImportTemplateDialogState();
+        },
+        onImportTemplateDialogOutsideClick: function() {
+          if (this.import_template_loading) {
+            return;
+          }
+          this.closeImportTemplateDialog();
+        },
+        onImportTemplateFileChange: function() {
+          this.import_parse_error = null;
+          this.import_api_error = null;
+          this.importJSON = null;
+          this.import_uid_in_use = false;
+          this.import_assign_new_uid = false;
+
+          if (!this.import_template_file) {
+            return;
+          }
+
+          const vm = this;
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const parsed = JSON.parse(e.target.result);
+              if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                vm.import_parse_error = vm.$t('invalid_file_failed_to_read');
+                return;
+              }
+              vm.importJSON = parsed;
+              vm.preflightImportTemplateUid();
+            } catch (err) {
+              vm.import_parse_error = vm.$t('invalid_file_failed_to_read');
+            }
+          };
+          reader.onerror = function() {
+            vm.import_parse_error = vm.$t('invalid_file_failed_to_read');
+          };
+          reader.readAsText(this.import_template_file);
+        },
+        preflightImportTemplateUid: function() {
+          const uid = this.importJSON && this.importJSON.uid;
+          if (!uid) {
+            this.import_uid_in_use = false;
+            this.import_assign_new_uid = false;
+            return;
+          }
+          const vm = this;
+          axios.get(CI.site_url + '/api/templates/uid/' + encodeURIComponent(uid))
+            .then(function(response) {
+              vm.import_uid_in_use = !!(response.data && response.data.found);
+              if (!vm.import_uid_in_use) {
+                vm.import_assign_new_uid = false;
+              }
+            })
+            .catch(function() {
+              vm.import_uid_in_use = false;
+              vm.import_assign_new_uid = false;
+            });
+        },
+        isImportTemplateUidConflictError: function(error) {
+          if (!error || !error.response) {
+            return false;
+          }
+          const data = error.response.data;
+          if (error.response.status === 409) {
+            return true;
+          }
+          if (data && (data.code === 'TEMPLATE_UID_DELETED' || data.code === 'TEMPLATE_UID_ACTIVE')) {
+            return true;
+          }
+          return false;
+        },
+        resolveImportOnUidConflict: function() {
+          if (this.import_uid_in_use && this.import_assign_new_uid) {
+            return 'assign_new_uid';
+          }
+          return 'fail';
+        },
+        runImportTemplateCreate: function(onUidConflict) {
+          const vm = this;
+          if (!vm.importJSON) {
+            return Promise.reject(new Error('missing payload'));
+          }
+          const payload = Object.assign({}, vm.importJSON, {
+            on_uid_conflict: onUidConflict || 'fail',
+          });
+          const url = CI.site_url + '/api/templates/create';
+          vm.import_template_loading = true;
+          vm.import_api_error = null;
+          vm.template_import_errors = [];
+
+          return axios.post(url, payload).then(function(response) {
+            return response;
+          }).catch(function(error) {
+            throw error;
+          }).finally(function() {
+            vm.import_template_loading = false;
+          });
+        },
+        handleImportTemplateSuccess: function(response) {
+          const vm = this;
+          vm.loadTemplates();
+          const data = response && response.data ? response.data : {};
+          const template = data.template || {};
+          alert(vm.$t('imported_successfully'));
+          vm.closeImportTemplateDialog();
+          if (template.uid) {
+            window.open(CI.site_url + '/templates/edit/' + template.uid);
+          }
         },
         importTemplate: function() {
-          let formData = this.importJSON;
-
-          vm = this;
-          this.template_import_errors = [];
-          let url = CI.site_url + '/api/templates/create'
-
-          axios.post(url,
-              formData, {}
-            ).then(function(response) {
-              vm.loadTemplates();
-              alert(vm.$t("imported_successfully"));
-              vm.dialog_import_template = false;
+          const vm = this;
+          vm.runImportTemplateCreate(vm.resolveImportOnUidConflict())
+            .then(function(response) {
+              vm.handleImportTemplateSuccess(response);
             })
             .catch(function(error) {
-              console.log("failed", error);
-              alert(vm.getApiErrorMessage(error));
+              if (vm.isImportTemplateUidConflictError(error)) {
+                vm.import_uid_in_use = true;
+                vm.import_api_error = vm.$t('import_template_uid_conflict_enable_checkbox');
+              } else {
+                vm.import_api_error = vm.getApiErrorMessage(error);
+              }
               vm.template_import_errors = error;
             });
         },
-        handleTemplateUpload(event) {
-          this.templateFile = event.target.files[0];
-          if (!this.templateFile) return;
-          this.readFile(this.templateFile); //results are stored in this.importJSON
-        },
-        readFile(file) {
-          let vm = this;
-          let reader = new FileReader();
-          reader.onload = e => {
-            console.log(e.target.result);
-            vm.importJSON = JSON.parse(e.target.result);
-          };
-          reader.readAsText(file);
-        }
       }
     })
 

@@ -2,6 +2,10 @@
 
 $lang['template_manager']="Template manager";
 $lang['import_template']="Import template";
+$lang['import_template_uid_in_use_warning']="This template UID is already in use. To import this template, select the option below to use a new UID.";
+$lang['import_template_assign_new_uid_checkbox']="Use new UID for the template";
+$lang['import_template_uid_conflict_enable_checkbox']="This template UID is already in use. Select \"Use new UID for the template\" and import again.";
+$lang['import_template_success_new_uid']="Imported successfully. UID was changed from {original_uid} to {new_uid}.";
 $lang['no_templates_found']="No templates were found!";
 $lang['click_on_sidebar_to_edit']="Click on an item on sidebar to start editing!";
 $lang['click_to_edit']="Click on an item to start editing!";
