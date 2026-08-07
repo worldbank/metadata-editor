@@ -140,6 +140,7 @@
             echo $this->load->view("editor_common/global-site-header-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-project-export-json-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-validation-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-template-defaults-util.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-apply-defaults-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-toast-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-login-component.js",null,true);

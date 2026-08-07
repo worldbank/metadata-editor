@@ -302,6 +302,12 @@ $lang['update_empty_fields']="Update only empty fields";
 $lang['update_all_fields']="Update all fields (overwrite existing values)";
 $lang['items_updated']="Items updated";
 $lang['no_items_updated']="No items updated";
+$lang['apply_template_defaults_short']="Apply defaults";
+$lang['template_defaults_pending_hint']="Template defaults are available for empty fields.";
+$lang['template_defaults_preview_heading']="Fields to update";
+$lang['template_defaults_preview_empty']="No fields will be updated with the current option.";
+$lang['template_defaults_will_overwrite']="will overwrite";
+$lang['template_defaults_save_after_apply']="Save the project to keep these changes.";
 $lang['Change log']="Change log";
 
 $lang['include_private_fields']="Include private fields";

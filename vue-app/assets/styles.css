@@ -1299,6 +1299,27 @@ tr .action-buttons-hover {
     background:#e9edf8;
 }
 
+.template-defaults-alert {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.template-defaults-alert .v-icon {
+    color: #f57c00 !important;
+}
+
+.template-defaults-alert-link {
+    min-width: 0 !important;
+    height: auto !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.template-defaults-alert-link:hover {
+    text-decoration: underline;
+}
+
 
 /* Geospatial Feature Characteristics - Row Selection */
 .geospatial-feature-characteristics .selected-row {

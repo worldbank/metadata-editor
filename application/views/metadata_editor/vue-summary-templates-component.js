@@ -64,9 +64,31 @@ Vue.component('summary-templates-component', {
         },
         templateStructureInvalid(){
             return !this.$store.state.template_structure_valid;
+        },
+        pendingEmptyTemplateDefaultsCount(){
+            if (typeof TemplateDefaultsUtil === 'undefined') {
+                return 0;
+            }
+            return TemplateDefaultsUtil.countPendingEmptyDefaults(
+                this.ProjectTemplate,
+                this.ProjectMetadata
+            );
+        },
+        showTemplateDefaultsReminder(){
+            return this.isProjectEditable
+                && !this.templateStructureInvalid
+                && this.pendingEmptyTemplateDefaultsCount > 0;
+        },
+        showTemplateDefaultsApplyButton(){
+            return this.isProjectEditable && !this.templateStructureInvalid;
         }
     },
     methods:{
+        openApplyTemplateDefaults: function(){
+            if (typeof vue_app !== 'undefined' && vue_app.templateApplyDefaults) {
+                vue_app.templateApplyDefaults();
+            }
+        },
         momentDate(date) {
             return moment.utc(date).local().format("YYYY-MM-DD HH:mm:ss");
           },
@@ -128,13 +150,41 @@ Vue.component('summary-templates-component', {
             <div class="summary-templates-component">
 
                 <v-card class="project-template-selection mb-3" >
-                    <v-card-title>
-                        <h6>{{$t("Template")}}</h6>
+                    <v-card-title class="d-flex justify-space-between align-center py-3">
+                        <h6 class="mb-0">{{$t("Template")}}</h6>
+                        <v-btn
+                            v-if="showTemplateDefaultsApplyButton"
+                            text
+                            small
+                            color="primary"
+                            @click="openApplyTemplateDefaults"
+                        >
+                            {{ $t('apply_template_defaults_short') }}
+                        </v-btn>
                     </v-card-title>
 
                     <v-card-text>
                         <v-alert v-if="templateStructureInvalid" type="error" dense outlined class="mb-3">
                             {{ $t('template_structure_invalid') }}
+                        </v-alert>
+
+                        <v-alert
+                            v-if="showTemplateDefaultsReminder"
+                            color="amber lighten-4"
+                            dense
+                            icon="mdi-checkbox-multiple-marked-circle"
+                            class="mb-3 template-defaults-alert"
+                        >
+                            <span>{{ $t('template_defaults_pending_hint') }}</span>
+                            <v-btn
+                                text
+                                small
+                                color="grey darken-4"
+                                class="ml-1 template-defaults-alert-link px-1"
+                                @click="openApplyTemplateDefaults"
+                            >
+                                {{ $t('apply_template_defaults_short') }}
+                            </v-btn>
                         </v-alert>
 
                         <div class="font-weight-bold">{{$t('project_template')}}:</div>
