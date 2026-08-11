@@ -165,9 +165,13 @@ var TemplateDefaultsUtil = (function () {
         }
 
         function walkTemplate(item, meta) {
-            var skipSelf = item.hasOwnProperty('is_custom');
+            // Custom sections (variables, data files, etc.) are not study metadata;
+            // skip the whole subtree, matching template validation.
+            if (item.hasOwnProperty('is_custom')) {
+                return;
+            }
 
-            if (!skipSelf && fieldHasDefault(item)) {
+            if (fieldHasDefault(item)) {
                 var value = _.get(meta, item.key, null);
                 var item_key = item.hasOwnProperty('prop_key') ? item.prop_key : item.key;
 
