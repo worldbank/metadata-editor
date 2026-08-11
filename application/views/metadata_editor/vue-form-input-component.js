@@ -48,12 +48,7 @@ Vue.component("form-input", {
       set: function (value) {
         let list = [];
         _.forEach(value, (code) => {
-          let enumCode = this.findEnumByCode(code);
-          if (enumCode) {
-            list.push(enumCode.label + " [" + enumCode.code + "]");
-          } else {
-            list.push(code);
-          }
+          list.push(this.storeEnumValue(code));
         });
         this.local = list;
       },
@@ -75,40 +70,7 @@ Vue.component("form-input", {
         return enumItem || this.local;
       },
       set: function (value) {
-
-        let enum_store_column = this.field.enum_store_column;
-
-        if (!enum_store_column) {
-          enum_store_column = "both";
-        }
-
-        //if enum_store_column is both, store the code and label
-        if (enum_store_column == "both") {
-          let code = this.findEnumByCode(value);
-
-          if (code) {
-            this.local = code.label + " [" + code.code + "]";
-          } else {
-            this.local = value;
-          }
-        }
-        else if (enum_store_column == "code") {
-          let code = this.findEnumByCode(value);
-          if (code) {
-            this.local = code.code;
-          } else {
-            this.local = value;
-          }
-        }
-        else if (enum_store_column == "label") {
-          let code = this.findEnumByCode(value);
-          if (code) {
-            this.local = code.label;
-          } else {
-            this.local = value;
-          }
-        }
-        
+        this.local = this.storeEnumValue(value);
       },
     },
     formTextFieldStyle() {
@@ -502,8 +464,33 @@ Vue.component("form-input", {
             </div>  `,
   methods: {
     findEnumByCode: function (code) {
+      if (code && typeof code === "object") {
+        if (Object.prototype.hasOwnProperty.call(code, "code")) {
+          code = code.code;
+        } else if (Object.prototype.hasOwnProperty.call(code, "value")) {
+          code = code.value;
+        }
+      }
+
       var enumList = this.dropdownEnumList;
       return _.find(enumList, { code: code });
+    },
+    storeEnumValue: function (value) {
+      var enumItem = this.findEnumByCode(value);
+      if (typeof formatScalarEnumStoredValue === "function") {
+        return formatScalarEnumStoredValue(this.field, enumItem, value);
+      }
+      if (!enumItem) {
+        return value;
+      }
+      var mode = this.field.enum_store_column || "both";
+      if (mode === "code") {
+        return enumItem.code;
+      }
+      if (mode === "label") {
+        return enumItem.label;
+      }
+      return enumItem.label + " [" + enumItem.code + "]";
     },
     getEnumCodeFromLabel: function (label) {
       //code is enclosed in [] e.g. label [code]
