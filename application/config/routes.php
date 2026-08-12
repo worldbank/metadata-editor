@@ -97,8 +97,9 @@ $route['api/editor/versions/(.*)'] = "api/versions/$1";
 $route['api/editor/compare'] = "api/compare";
 $route['api/editor/compare/(.*)'] = "api/compare/$1";
 
-// Core schema JSON for OpenAPI / ReDoc (application/schemas/)
+// Core schema JSON + dynamic OpenAPI YAML for ReDoc (application/schemas/)
 $route['openapi_schema/(:any)'] = 'schema_openapi/serve/$1';
+$route['openapi_spec'] = 'schema_openapi/spec';
 
 //schemas page
 $route['schemas'] = "schemas/index";
