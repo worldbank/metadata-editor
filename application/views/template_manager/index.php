@@ -447,17 +447,17 @@
                   </div>
 
                   <!--additional (not allowed directly under section_container) -->
-                  <div class="mt-5" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array')) || TemplateIsAdminMeta || TemplateIsCustom)">
+                  <div class="mt-5" v-if="TemplateSupportsAdditionalFields && (!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array')) || TemplateIsAdminMeta || TemplateIsCustom)">
                     <v-icon title="Add custom field" v-if="ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='array' || ActiveNode.type=='nested_array') && isEditable" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
                     <v-icon title="Add custom field" v-else class="disabled-button-color">mdi-text-box-plus-outline</v-icon>
                   </div>
 
-                  <div class="mt-1" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
+                  <div class="mt-1" v-if="TemplateSupportsAdditionalFields && (!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
                     <v-icon title="Add custom Array field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && isEditable" class="additional-item"  @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
                     <v-icon title="Add custom Array field" v-else class="disabled-button-color">mdi-table-large-plus</v-icon>
                   </div>
 
-                  <div class="mt-1" v-if="(!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
+                  <div class="mt-1" v-if="TemplateSupportsAdditionalFields && (!ActiveNode || !ActiveNode.is_custom) && ((ActiveNode && (ActiveNode.type=='section' || ActiveNode.type=='nested_array')) || (TemplateIsCustom && ActiveNode && ActiveNode.type!='array'))">
                     <v-icon title="Add custom NestedArray field" v-if="ActiveNode && ActiveNode.type!='array' && (ActiveNode.type=='section' || ActiveNode.type=='nested_array') && isEditable" class="additional-item"  @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>
                     <v-icon title="Add custom NestedArray field" v-else class="disabled-button-color">mdi-file-tree</v-icon>
                   </div>
@@ -1470,12 +1470,28 @@
           const seconds = String(date.getSeconds()).padStart(2, '0');
           return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         },
+        stripAdditionalContainer: function(template){
+          if (!template || !Array.isArray(template.items)) {
+            return;
+          }
+          const idx = template.items.findIndex(item => item && item.key == 'additional_container');
+          if (idx !== -1) {
+            template.items.splice(idx, 1);
+          }
+        },
         init_template: function(){
-          //check if user template includes additional container and add if not
-
           let user_template = this.$store.state.user_template;
 
-          //search for additional_container
+          if (!this.TemplateSupportsAdditionalFields) {
+            this.stripAdditionalContainer(user_template);
+            this.stripAdditionalContainer(this.$store.state.core_template);
+            return;
+          }
+
+          if (!user_template || !Array.isArray(user_template.items)) {
+            return;
+          }
+
           let additional_container = user_template.items.find(item => item.key == 'additional_container');
 
           if (!additional_container) {
@@ -1920,6 +1936,9 @@
           return pathPrefix ? `${pathPrefix}.${baseKey}` : baseKey;
         },
         addAdditionalField: function() {
+          if (!this.TemplateSupportsAdditionalFields) {
+            return false;
+          }
           console.log("addAdditionalField");
           let parentNode = this.ActiveNode;
           if (!parentNode) {
@@ -1985,6 +2004,9 @@
           this.markDirty();
         },
         addAdditionalFieldArray: function() {
+          if (!this.TemplateSupportsAdditionalFields) {
+            return false;
+          }
           let parentNode = this.ActiveNode;
           if (!parentNode) {
             return false;
@@ -2040,6 +2062,9 @@
           //store.commit('activeCoreNode', {});
         },
         addAdditionalFieldNestedArray: function() {
+          if (!this.TemplateSupportsAdditionalFields) {
+            return false;
+          }
           let parentNode = this.ActiveNode;
           if (!parentNode) {
             return false;
@@ -2841,6 +2866,12 @@
         },
         TemplateDataType() {
           return this.user_template_info.data_type;
+        },
+        TemplateSupportsAdditionalFields() {
+          // Types whose records cannot store template-defined extra fields.
+          // Add a data_type here to hide Additional Fields and custom-field actions.
+          const unsupported = ['resource'];
+          return unsupported.indexOf(this.TemplateDataType) === -1;
         },
         applicableEditorProjectModules: function() {
           return this.editor_project_modules || [];

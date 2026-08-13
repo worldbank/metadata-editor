@@ -854,7 +854,7 @@ class Editor_resource_model extends ci_model {
 	function get_dcformat_label_by_code($dcformat)
 	{
 		$codes=array(
-			'application/x-compressed'=>'Compressed, Generic []',
+			'application/x-compressed'=>'Compressed, Generic',
 			'application/zip'=>'Compressed, ZIP',
 			'application/x-cspro'=>'Data, CSPro',
 			'application/dbase'=>'Data, dBase',
@@ -1168,6 +1168,14 @@ class Editor_resource_model extends ci_model {
 			$rdf.='<rdf:label><![CDATA['.$row->title.']]></rdf:label>';
 			$rdf.='<dc:title><![CDATA['.$row->title.']]></dc:title>';
 			
+			if (!empty($row->subtitle))
+			{
+				$rdf.='<dcterms:alternative><![CDATA['.$row->subtitle.']]></dcterms:alternative>';
+			}
+			if (!empty($row->id_number))
+			{
+				$rdf.='<dc:identifier><![CDATA['.$row->id_number.']]></dc:identifier>';
+			}
 			if ($row->author)
 			{
 				$rdf.='<dc:creator><![CDATA['.$row->author.']]></dc:creator>';
@@ -1195,6 +1203,10 @@ class Editor_resource_model extends ci_model {
 			if ($row->country)
 			{
 				$rdf.='<dcterms:spatial><![CDATA['.$row->country.']]></dcterms:spatial>';
+			}
+			if (!empty($row->subjects))
+			{
+				$rdf.='<dc:subject><![CDATA['.$row->subjects.']]></dc:subject>';
 			}	
 			if ($row->description)
 			{

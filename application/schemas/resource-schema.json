@@ -26,6 +26,18 @@
       "description": "Title"
     },
 
+    "subtitle": {
+      "type": "string",
+      "title": "Subtitle",
+      "description": "Subtitle"
+    },
+
+    "id_number": {
+      "type": "string",
+      "title": "ID number",
+      "description": "Unique identifier for the resource (ISBN, DOI, or catalog ID)"
+    },
+
     "author": {
       "type": "string",
       "description": "Author"
@@ -44,6 +56,12 @@
     "language": {
       "type": "string",
       "description": "Language"
+    },
+
+    "subjects": {
+      "type": "string",
+      "title": "Subjects",
+      "description": "Keywords or subject terms describing the resource"
     },
 
     "contributor": {

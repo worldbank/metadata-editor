@@ -90,8 +90,94 @@
                             "key": "dcformat",
                             "title": "Format de la resource",
                             "type": "string",
-                            "help_text": "Le format du fichier de ressources.",
-                            "display_type": "text"
+                            "enum": [
+                                {
+                                    "code": "application/x-compressed",
+                                    "label": "Compressé, générique"
+                                },
+                                {
+                                    "code": "application/zip",
+                                    "label": "Compressé, ZIP"
+                                },
+                                {
+                                    "code": "application/x-cspro",
+                                    "label": "Données, CSPro"
+                                },
+                                {
+                                    "code": "application/dbase",
+                                    "label": "Données, dBase"
+                                },
+                                {
+                                    "code": "application/msaccess",
+                                    "label": "Données, Microsoft Access"
+                                },
+                                {
+                                    "code": "application/x-sas",
+                                    "label": "Données, SAS"
+                                },
+                                {
+                                    "code": "application/x-spss",
+                                    "label": "Données, SPSS"
+                                },
+                                {
+                                    "code": "application/x-stata",
+                                    "label": "Données, Stata"
+                                },
+                                {
+                                    "code": "text",
+                                    "label": "Document, générique"
+                                },
+                                {
+                                    "code": "text/html",
+                                    "label": "Document, HTML"
+                                },
+                                {
+                                    "code": "application/msexcel",
+                                    "label": "Document, Microsoft Excel"
+                                },
+                                {
+                                    "code": "application/mspowerpoint",
+                                    "label": "Document, Microsoft PowerPoint"
+                                },
+                                {
+                                    "code": "application/msword",
+                                    "label": "Document, Microsoft Word"
+                                },
+                                {
+                                    "code": "application/pdf",
+                                    "label": "Document, PDF"
+                                },
+                                {
+                                    "code": "application/postscript",
+                                    "label": "Document, Postscript"
+                                },
+                                {
+                                    "code": "text/plain",
+                                    "label": "Document, texte brut"
+                                },
+                                {
+                                    "code": "text/wordperfect",
+                                    "label": "Document, WordPerfect"
+                                },
+                                {
+                                    "code": "image/gif",
+                                    "label": "Image, GIF"
+                                },
+                                {
+                                    "code": "image/jpeg",
+                                    "label": "Image, JPEG"
+                                },
+                                {
+                                    "code": "image/png",
+                                    "label": "Image, PNG"
+                                },
+                                {
+                                    "code": "image/tiff",
+                                    "label": "Image, TIFF"
+                                }
+                            ],
+                            "help_text": "Le format du fichier. Sélectionnez une valeur dans le vocabulaire contrôlé.",
+                            "display_type": "dropdown"
                         },
                         {
                             "key": "title",
@@ -99,6 +185,20 @@
                             "type": "string",
                             "help_text": "Le titre de la ressource.",
                             "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subtitle",
+                            "title": "Sous-titre",
+                            "type": "string",
+                            "help_text": "Un titre secondaire pour la ressource, le cas échéant.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "id_number",
+                            "title": "Identifiant",
+                            "type": "string",
+                            "help_text": "Un identifiant unique pour la ressource (ISBN, DOI ou identifiant de catalogue).",
                             "display_type": "text"
                         },
                         {
@@ -123,1209 +223,1217 @@
                             "enum": [
                                 {
                                     "code": "AFG",
-                                    "name": "Afghanistan"
+                                    "label": "Afghanistan"
                                 },
                                 {
                                     "code": "AFE",
-                                    "name": "Afrique de l'Est et du Sud"
+                                    "label": "Afrique de l'Est et du Sud"
                                 },
                                 {
                                     "code": "AFW",
-                                    "name": "Afrique de l'Ouest et centrale"
+                                    "label": "Afrique de l'Ouest et centrale"
                                 },
                                 {
                                     "code": "NAF",
-                                    "name": "Afrique du Nord"
+                                    "label": "Afrique du Nord"
                                 },
                                 {
                                     "code": "ZAF",
-                                    "name": "Afrique du Sud"
+                                    "label": "Afrique du Sud"
                                 },
                                 {
                                     "code": "AFR",
-                                    "name": "Afrique subsaharienne"
+                                    "label": "Afrique subsaharienne"
                                 },
                                 {
                                     "code": "SSF",
-                                    "name": "Afrique subsaharienne"
+                                    "label": "Afrique subsaharienne"
                                 },
                                 {
                                     "code": "CAA",
-                                    "name": "Afrique subsaharienne (classification IFC)"
+                                    "label": "Afrique subsaharienne (classification IFC)"
                                 },
                                 {
                                     "code": "DSS",
-                                    "name": "Afrique subsaharienne (pays éligibles IDA)"
+                                    "label": "Afrique subsaharienne (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "BSS",
-                                    "name": "Afrique subsaharienne (pays IBRD uniquement)"
+                                    "label": "Afrique subsaharienne (pays IBRD uniquement)"
                                 },
                                 {
                                     "code": "TSS",
-                                    "name": "Afrique subsaharienne (pays IDA & IBRD)"
+                                    "label": "Afrique subsaharienne (pays IDA & IBRD)"
                                 },
                                 {
                                     "code": "SXZ",
-                                    "name": "Afrique subsaharienne (sauf Afrique du Sud)"
+                                    "label": "Afrique subsaharienne (sauf Afrique du Sud)"
                                 },
                                 {
                                     "code": "SSA",
-                                    "name": "Afrique subsaharienne (sauf revenu élevé)"
+                                    "label": "Afrique subsaharienne (sauf revenu élevé)"
                                 },
                                 {
                                     "code": "XZN",
-                                    "name": "Afrique subsaharienne sauf Afrique du Sud et Nigéria"
+                                    "label": "Afrique subsaharienne sauf Afrique du Sud et Nigéria"
                                 },
                                 {
                                     "code": "ALB",
-                                    "name": "Albanie"
+                                    "label": "Albanie"
                                 },
                                 {
                                     "code": "DZA",
-                                    "name": "Algérie"
+                                    "label": "Algérie"
                                 },
                                 {
                                     "code": "DEU",
-                                    "name": "Allemagne"
+                                    "label": "Allemagne"
                                 },
                                 {
                                     "code": "ASM",
-                                    "name": "American Samoa"
+                                    "label": "American Samoa"
                                 },
                                 {
                                     "code": "NAC",
-                                    "name": "Amérique du Nord"
+                                    "label": "Amérique du Nord"
                                 },
                                 {
                                     "code": "LCN",
-                                    "name": "Amérique latine & Caraïbes "
+                                    "label": "Amérique latine & Caraïbes "
                                 },
                                 {
                                     "code": "BLA",
-                                    "name": "Amerique latine & Caraïbes (pays IBRD uniquement)"
+                                    "label": "Amerique latine & Caraïbes (pays IBRD uniquement)"
                                 },
                                 {
                                     "code": "LAC",
-                                    "name": "Amérique latine & Caraïbes (sauf revenus élevés)"
+                                    "label": "Amérique latine & Caraïbes (sauf revenus élevés)"
                                 },
                                 {
                                     "code": "CLA",
-                                    "name": "Amérique latine et Caraïbes (classification IFC )"
+                                    "label": "Amérique latine et Caraïbes (classification IFC )"
                                 },
                                 {
                                     "code": "DLA",
-                                    "name": "Amérique latine et Caraïbes (pays éligibles IDA)"
+                                    "label": "Amérique latine et Caraïbes (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "TLA",
-                                    "name": "Amérique latine et Caraïbes (pays IDA & IBRD)"
+                                    "label": "Amérique latine et Caraïbes (pays IDA & IBRD)"
                                 },
                                 {
                                     "code": "AND",
-                                    "name": "Andorre"
+                                    "label": "Andorre"
                                 },
                                 {
                                     "code": "AGO",
-                                    "name": "Angola"
+                                    "label": "Angola"
                                 },
                                 {
                                     "code": "ATG",
-                                    "name": "Antigua and Barbuda"
+                                    "label": "Antigua and Barbuda"
                                 },
                                 {
                                     "code": "SAU",
-                                    "name": "Arabie saoudite"
+                                    "label": "Arabie saoudite"
                                 },
                                 {
                                     "code": "ARG",
-                                    "name": "Argentine"
+                                    "label": "Argentine"
                                 },
                                 {
                                     "code": "ARM",
-                                    "name": "Arménie"
+                                    "label": "Arménie"
                                 },
                                 {
                                     "code": "ABW",
-                                    "name": "Aruba"
+                                    "label": "Aruba"
                                 },
                                 {
                                     "code": "EAS",
-                                    "name": "Asie de l'Est & Pacifique"
+                                    "label": "Asie de l'Est & Pacifique"
                                 },
                                 {
                                     "code": "DEA",
-                                    "name": "Asie de l'Est & Pacifique (pays éligibles IDA)"
+                                    "label": "Asie de l'Est & Pacifique (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "BEA",
-                                    "name": "Asie de l'Est & Pacifique (pays IBRD uniquement)"
+                                    "label": "Asie de l'Est & Pacifique (pays IBRD uniquement)"
                                 },
                                 {
                                     "code": "TEA",
-                                    "name": "Asie de l'Est & Pacifique (pays IDA & IBRD)"
+                                    "label": "Asie de l'Est & Pacifique (pays IDA & IBRD)"
                                 },
                                 {
                                     "code": "EAP",
-                                    "name": "Asie de l'Est & Pacifique (sauf haut revenu)"
+                                    "label": "Asie de l'Est & Pacifique (sauf haut revenu)"
                                 },
                                 {
                                     "code": "CEA",
-                                    "name": "Asie de l'Est et Pacifique (classification IFC )"
+                                    "label": "Asie de l'Est et Pacifique (classification IFC )"
                                 },
                                 {
                                     "code": "SAS",
-                                    "name": "Asie du Sud"
+                                    "label": "Asie du Sud"
                                 },
                                 {
                                     "code": "CSA",
-                                    "name": "Asie du Sud (classification IFC) "
+                                    "label": "Asie du Sud (classification IFC) "
                                 },
                                 {
                                     "code": "TSA",
-                                    "name": "Asie du Sud (IDA & IBRD)"
+                                    "label": "Asie du Sud (IDA & IBRD)"
                                 },
                                 {
                                     "code": "DSA",
-                                    "name": "Asie du Sud (pays éligibles IDA)"
+                                    "label": "Asie du Sud (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "AUS",
-                                    "name": "Australie"
+                                    "label": "Australie"
                                 },
                                 {
                                     "code": "OSS",
-                                    "name": "Autres petits états"
+                                    "label": "Autres petits états"
                                 },
                                 {
                                     "code": "AUT",
-                                    "name": "Autriche"
+                                    "label": "Autriche"
                                 },
                                 {
                                     "code": "AZE",
-                                    "name": "Azerbaijan"
+                                    "label": "Azerbaijan"
                                 },
                                 {
                                     "code": "BHS",
-                                    "name": "Bahamas"
+                                    "label": "Bahamas"
                                 },
                                 {
                                     "code": "BHR",
-                                    "name": "Bahrein"
+                                    "label": "Bahrein"
                                 },
                                 {
                                     "code": "BGD",
-                                    "name": "Bangladesh"
+                                    "label": "Bangladesh"
                                 },
                                 {
                                     "code": "BRB",
-                                    "name": "Barbade"
+                                    "label": "Barbade"
                                 },
                                 {
                                     "code": "BLR",
-                                    "name": "Bélarus"
+                                    "label": "Bélarus"
                                 },
                                 {
                                     "code": "BEL",
-                                    "name": "Belgique"
+                                    "label": "Belgique"
                                 },
                                 {
                                     "code": "BLZ",
-                                    "name": "Belize"
+                                    "label": "Belize"
                                 },
                                 {
                                     "code": "BEN",
-                                    "name": "Bénin"
+                                    "label": "Bénin"
                                 },
                                 {
                                     "code": "BMU",
-                                    "name": "Bermudes"
+                                    "label": "Bermudes"
                                 },
                                 {
                                     "code": "BTN",
-                                    "name": "Bhoutan"
+                                    "label": "Bhoutan"
                                 },
                                 {
                                     "code": "BOL",
-                                    "name": "Bolivie"
+                                    "label": "Bolivie"
                                 },
                                 {
                                     "code": "BIH",
-                                    "name": "Bosnie-Herzégovine"
+                                    "label": "Bosnie-Herzégovine"
                                 },
                                 {
                                     "code": "BWA",
-                                    "name": "Botswana"
+                                    "label": "Botswana"
                                 },
                                 {
                                     "code": "BRA",
-                                    "name": "Brésil"
+                                    "label": "Brésil"
                                 },
                                 {
                                     "code": "BRN",
-                                    "name": "Brunéi Darussalam"
+                                    "label": "Brunéi Darussalam"
                                 },
                                 {
                                     "code": "BGR",
-                                    "name": "Bulgarie"
+                                    "label": "Bulgarie"
                                 },
                                 {
                                     "code": "BFA",
-                                    "name": "Burkina Faso"
+                                    "label": "Burkina Faso"
                                 },
                                 {
                                     "code": "BDI",
-                                    "name": "Burundi"
+                                    "label": "Burundi"
                                 },
                                 {
                                     "code": "CPV",
-                                    "name": "Cabo Verde"
+                                    "label": "Cabo Verde"
                                 },
                                 {
                                     "code": "KHM",
-                                    "name": "Cambodge"
+                                    "label": "Cambodge"
                                 },
                                 {
                                     "code": "CMR",
-                                    "name": "Cameroun"
+                                    "label": "Cameroun"
                                 },
                                 {
                                     "code": "CAN",
-                                    "name": "Canada"
+                                    "label": "Canada"
                                 },
                                 {
                                     "code": "CHL",
-                                    "name": "Chili"
+                                    "label": "Chili"
                                 },
                                 {
                                     "code": "CHN",
-                                    "name": "Chine"
+                                    "label": "Chine"
                                 },
                                 {
                                     "code": "HKG",
-                                    "name": "Chine, RAS de Hong Kong"
+                                    "label": "Chine, RAS de Hong Kong"
                                 },
                                 {
                                     "code": "CYP",
-                                    "name": "Chypre"
+                                    "label": "Chypre"
                                 },
                                 {
                                     "code": "COL",
-                                    "name": "Colombie"
+                                    "label": "Colombie"
                                 },
                                 {
                                     "code": "COM",
-                                    "name": "Comores"
+                                    "label": "Comores"
                                 },
                                 {
                                     "code": "COG",
-                                    "name": "Congo, République"
+                                    "label": "Congo, République"
                                 },
                                 {
                                     "code": "COD",
-                                    "name": "Congo, République démocratique"
+                                    "label": "Congo, République démocratique"
                                 },
                                 {
                                     "code": "KOR",
-                                    "name": "Corée, République de"
+                                    "label": "Corée, République de"
                                 },
                                 {
                                     "code": "PRK",
-                                    "name": "Corée, République démocratique de"
+                                    "label": "Corée, République démocratique de"
                                 },
                                 {
                                     "code": "CRI",
-                                    "name": "Costa Rica"
+                                    "label": "Costa Rica"
                                 },
                                 {
                                     "code": "CIV",
-                                    "name": "Côte d'Ivoire"
+                                    "label": "Côte d'Ivoire"
                                 },
                                 {
                                     "code": "HRV",
-                                    "name": "Croatie"
+                                    "label": "Croatie"
                                 },
                                 {
                                     "code": "CUB",
-                                    "name": "Cuba"
+                                    "label": "Cuba"
                                 },
                                 {
                                     "code": "CUW",
-                                    "name": "Curaçao"
+                                    "label": "Curaçao"
                                 },
                                 {
                                     "code": "DNK",
-                                    "name": "Danemark"
+                                    "label": "Danemark"
                                 },
                                 {
                                     "code": "LTE",
-                                    "name": "Dividende démographique tardif"
+                                    "label": "Dividende démographique tardif"
                                 },
                                 {
                                     "code": "DJI",
-                                    "name": "Djibouti"
+                                    "label": "Djibouti"
                                 },
                                 {
                                     "code": "DMA",
-                                    "name": "Dominique"
+                                    "label": "Dominique"
                                 },
                                 {
                                     "code": "EGY",
-                                    "name": "Egypte, République arabe d'"
+                                    "label": "Egypte, République arabe d'"
                                 },
                                 {
                                     "code": "SLV",
-                                    "name": "El Salvador"
+                                    "label": "El Salvador"
                                 },
                                 {
                                     "code": "ARE",
-                                    "name": "Emirats arabes unis"
+                                    "label": "Emirats arabes unis"
                                 },
                                 {
                                     "code": "ECU",
-                                    "name": "Equateur"
+                                    "label": "Equateur"
                                 },
                                 {
                                     "code": "ERI",
-                                    "name": "Erythrée"
+                                    "label": "Erythrée"
                                 },
                                 {
                                     "code": "ESP",
-                                    "name": "Espagne"
+                                    "label": "Espagne"
                                 },
                                 {
                                     "code": "EST",
-                                    "name": "Estonie"
+                                    "label": "Estonie"
                                 },
                                 {
                                     "code": "SWZ",
-                                    "name": "Eswatini"
+                                    "label": "Eswatini"
                                 },
                                 {
                                     "code": "USA",
-                                    "name": "Etats-Unis"
+                                    "label": "Etats-Unis"
                                 },
                                 {
                                     "code": "ETH",
-                                    "name": "Ethiopie"
+                                    "label": "Ethiopie"
                                 },
                                 {
                                     "code": "ECS",
-                                    "name": "Europe & Asie centrale"
+                                    "label": "Europe & Asie centrale"
                                 },
                                 {
                                     "code": "DEC",
-                                    "name": "Europe & Asie centrale (pays éligibles IDA)"
+                                    "label": "Europe & Asie centrale (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "BEC",
-                                    "name": "Europe & Asie centrale (pays IBRD uniquement)"
+                                    "label": "Europe & Asie centrale (pays IBRD uniquement)"
                                 },
                                 {
                                     "code": "TEC",
-                                    "name": "Europe & Asie centrale (pays IDA & IBRD)"
+                                    "label": "Europe & Asie centrale (pays IDA & IBRD)"
                                 },
                                 {
                                     "code": "ECA",
-                                    "name": "Europe & Asie centrale (sauf haut revenu)"
+                                    "label": "Europe & Asie centrale (sauf haut revenu)"
                                 },
                                 {
                                     "code": "CEB",
-                                    "name": "Europe centrale et pays baltes"
+                                    "label": "Europe centrale et pays baltes"
                                 },
                                 {
                                     "code": "CEU",
-                                    "name": "Europe et Asie centrale (classification IFC )"
+                                    "label": "Europe et Asie centrale (classification IFC )"
                                 },
                                 {
                                     "code": "LIC",
-                                    "name": "Faible revenu"
+                                    "label": "Faible revenu"
                                 },
                                 {
                                     "code": "RUS",
-                                    "name": "Fédération de Russie"
+                                    "label": "Fédération de Russie"
                                 },
                                 {
                                     "code": "FJI",
-                                    "name": "Fiji"
+                                    "label": "Fiji"
                                 },
                                 {
                                     "code": "FIN",
-                                    "name": "Finlande"
+                                    "label": "Finlande"
                                 },
                                 {
                                     "code": "FRA",
-                                    "name": "France"
+                                    "label": "France"
                                 },
                                 {
                                     "code": "GAB",
-                                    "name": "Gabon"
+                                    "label": "Gabon"
                                 },
                                 {
                                     "code": "GMB",
-                                    "name": "Gambie"
+                                    "label": "Gambie"
                                 },
                                 {
                                     "code": "GEO",
-                                    "name": "Georgie"
+                                    "label": "Georgie"
                                 },
                                 {
                                     "code": "GHA",
-                                    "name": "Ghana"
+                                    "label": "Ghana"
                                 },
                                 {
                                     "code": "GIB",
-                                    "name": "Gibraltar"
+                                    "label": "Gibraltar"
                                 },
                                 {
                                     "code": "GRC",
-                                    "name": "Grèce"
+                                    "label": "Grèce"
                                 },
                                 {
                                     "code": "GRD",
-                                    "name": "Grenade"
+                                    "label": "Grenade"
                                 },
                                 {
                                     "code": "GRL",
-                                    "name": "Groenland"
+                                    "label": "Groenland"
                                 },
                                 {
                                     "code": "GUM",
-                                    "name": "Guam"
+                                    "label": "Guam"
                                 },
                                 {
                                     "code": "GTM",
-                                    "name": "Guatemala"
+                                    "label": "Guatemala"
                                 },
                                 {
                                     "code": "GIN",
-                                    "name": "Guinée"
+                                    "label": "Guinée"
                                 },
                                 {
                                     "code": "GNQ",
-                                    "name": "Guinée équatoriale"
+                                    "label": "Guinée équatoriale"
                                 },
                                 {
                                     "code": "GNB",
-                                    "name": "Guinée-Bissau"
+                                    "label": "Guinée-Bissau"
                                 },
                                 {
                                     "code": "GUY",
-                                    "name": "Guyane"
+                                    "label": "Guyane"
                                 },
                                 {
                                     "code": "HTI",
-                                    "name": "Haïti"
+                                    "label": "Haïti"
                                 },
                                 {
                                     "code": "HND",
-                                    "name": "Honduras"
+                                    "label": "Honduras"
                                 },
                                 {
                                     "code": "HUN",
-                                    "name": "Hongrie"
+                                    "label": "Hongrie"
                                 },
                                 {
                                     "code": "IBD",
-                                    "name": "IBRD uniquement"
+                                    "label": "IBRD uniquement"
                                 },
                                 {
                                     "code": "IBB",
-                                    "name": "IBRD, y compris mélange"
+                                    "label": "IBRD, y compris mélange"
                                 },
                                 {
                                     "code": "IDB",
-                                    "name": "IDA "
+                                    "label": "IDA "
                                 },
                                 {
                                     "code": "IBT",
-                                    "name": "IDA & IBRD total"
+                                    "label": "IDA & IBRD total"
                                 },
                                 {
                                     "code": "IDA",
-                                    "name": "IDA total"
+                                    "label": "IDA total"
                                 },
                                 {
                                     "code": "IDX",
-                                    "name": "IDA uniquement"
+                                    "label": "IDA uniquement"
                                 },
                                 {
                                     "code": "IMN",
-                                    "name": "Ile de Man"
+                                    "label": "Ile de Man"
                                 },
                                 {
                                     "code": "CHI",
-                                    "name": "Iles anglo-normandes"
+                                    "label": "Iles anglo-normandes"
                                 },
                                 {
                                     "code": "CYM",
-                                    "name": "Iles Cayman "
+                                    "label": "Iles Cayman "
                                 },
                                 {
                                     "code": "FRO",
-                                    "name": "Iles Féroé "
+                                    "label": "Iles Féroé "
                                 },
                                 {
                                     "code": "MHL",
-                                    "name": "Iles Marshall "
+                                    "label": "Iles Marshall "
                                 },
                                 {
                                     "code": "SLB",
-                                    "name": "Iles Salomon "
+                                    "label": "Iles Salomon "
                                 },
                                 {
                                     "code": "TCA",
-                                    "name": "Iles Turks et Caicos "
+                                    "label": "Iles Turks et Caicos "
                                 },
                                 {
                                     "code": "VIR",
-                                    "name": "Iles Vierges (U.S.)"
+                                    "label": "Iles Vierges (U.S.)"
                                 },
                                 {
                                     "code": "VGB",
-                                    "name": "Iles Vierges britanniques"
+                                    "label": "Iles Vierges britanniques"
                                 },
                                 {
                                     "code": "IND",
-                                    "name": "Inde"
+                                    "label": "Inde"
                                 },
                                 {
                                     "code": "IDN",
-                                    "name": "Indonésie"
+                                    "label": "Indonésie"
                                 },
                                 {
                                     "code": "IRN",
-                                    "name": "Iran, République islamique d'"
+                                    "label": "Iran, République islamique d'"
                                 },
                                 {
                                     "code": "IRQ",
-                                    "name": "Iraq"
+                                    "label": "Iraq"
                                 },
                                 {
                                     "code": "IRL",
-                                    "name": "Irlande"
+                                    "label": "Irlande"
                                 },
                                 {
                                     "code": "ISL",
-                                    "name": "Islande"
+                                    "label": "Islande"
                                 },
                                 {
                                     "code": "ISR",
-                                    "name": "Israël"
+                                    "label": "Israël"
                                 },
                                 {
                                     "code": "ITA",
-                                    "name": "Italie"
+                                    "label": "Italie"
                                 },
                                 {
                                     "code": "JAM",
-                                    "name": "Jamaique"
+                                    "label": "Jamaique"
                                 },
                                 {
                                     "code": "JPN",
-                                    "name": "Japon"
+                                    "label": "Japon"
                                 },
                                 {
                                     "code": "JOR",
-                                    "name": "Jordanie"
+                                    "label": "Jordanie"
                                 },
                                 {
                                     "code": "KAZ",
-                                    "name": "Kazakhstan"
+                                    "label": "Kazakhstan"
                                 },
                                 {
                                     "code": "KEN",
-                                    "name": "Kenya"
+                                    "label": "Kenya"
                                 },
                                 {
                                     "code": "KIR",
-                                    "name": "Kiribati"
+                                    "label": "Kiribati"
                                 },
                                 {
                                     "code": "XKX",
-                                    "name": "Kosovo"
+                                    "label": "Kosovo"
                                 },
                                 {
                                     "code": "KWT",
-                                    "name": "Koweït"
+                                    "label": "Koweït"
                                 },
                                 {
                                     "code": "LVA",
-                                    "name": "Latvie"
+                                    "label": "Latvie"
                                 },
                                 {
                                     "code": "LSO",
-                                    "name": "Lesotho"
+                                    "label": "Lesotho"
                                 },
                                 {
                                     "code": "LBN",
-                                    "name": "Liban"
+                                    "label": "Liban"
                                 },
                                 {
                                     "code": "LBR",
-                                    "name": "Libéria"
+                                    "label": "Libéria"
                                 },
                                 {
                                     "code": "LBY",
-                                    "name": "Libye"
+                                    "label": "Libye"
                                 },
                                 {
                                     "code": "LIE",
-                                    "name": "Liechtenstein"
+                                    "label": "Liechtenstein"
                                 },
                                 {
                                     "code": "LTU",
-                                    "name": "Lituanie"
+                                    "label": "Lituanie"
                                 },
                                 {
                                     "code": "LUX",
-                                    "name": "Luxembourg"
+                                    "label": "Luxembourg"
                                 },
                                 {
                                     "code": "MKD",
-                                    "name": "Macédoine du Nord"
+                                    "label": "Macédoine du Nord"
                                 },
                                 {
                                     "code": "MDG",
-                                    "name": "Madagascar"
+                                    "label": "Madagascar"
                                 },
                                 {
                                     "code": "MYS",
-                                    "name": "Malaisie"
+                                    "label": "Malaisie"
                                 },
                                 {
                                     "code": "MWI",
-                                    "name": "Malawi"
+                                    "label": "Malawi"
                                 },
                                 {
                                     "code": "MDV",
-                                    "name": "Maldives"
+                                    "label": "Maldives"
                                 },
                                 {
                                     "code": "MLI",
-                                    "name": "Mali"
+                                    "label": "Mali"
                                 },
                                 {
                                     "code": "MLT",
-                                    "name": "Malte"
+                                    "label": "Malte"
                                 },
                                 {
                                     "code": "MNP",
-                                    "name": "Mariannes"
+                                    "label": "Mariannes"
                                 },
                                 {
                                     "code": "MAR",
-                                    "name": "Maroc"
+                                    "label": "Maroc"
                                 },
                                 {
                                     "code": "MUS",
-                                    "name": "Maurice"
+                                    "label": "Maurice"
                                 },
                                 {
                                     "code": "MRT",
-                                    "name": "Mauritanie"
+                                    "label": "Mauritanie"
                                 },
                                 {
                                     "code": "OED",
-                                    "name": "Membres OECD "
+                                    "label": "Membres OECD "
                                 },
                                 {
                                     "code": "MEX",
-                                    "name": "Mexique"
+                                    "label": "Mexique"
                                 },
                                 {
                                     "code": "FSM",
-                                    "name": "Micronésie, Etats fédérés de"
+                                    "label": "Micronésie, Etats fédérés de"
                                 },
                                 {
                                     "code": "MDA",
-                                    "name": "Moldavie"
+                                    "label": "Moldavie"
                                 },
                                 {
                                     "code": "MCO",
-                                    "name": "Monaco"
+                                    "label": "Monaco"
                                 },
                                 {
                                     "code": "WLD",
-                                    "name": "Monde"
+                                    "label": "Monde"
                                 },
                                 {
                                     "code": "ARB",
-                                    "name": "Monde arabe"
+                                    "label": "Monde arabe"
                                 },
                                 {
                                     "code": "MNG",
-                                    "name": "Mongolie"
+                                    "label": "Mongolie"
                                 },
                                 {
                                     "code": "MNE",
-                                    "name": "Monténégro"
+                                    "label": "Monténégro"
                                 },
                                 {
                                     "code": "MDE",
-                                    "name": "Moyen Orient (en développement)"
+                                    "label": "Moyen Orient (en développement)"
                                 },
                                 {
                                     "code": "DMN",
-                                    "name": "Moyen orient & Afrique du Nord (pays éligibles IDA)"
+                                    "label": "Moyen orient & Afrique du Nord (pays éligibles IDA)"
                                 },
                                 {
                                     "code": "BMN",
-                                    "name": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)"
+                                    "label": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)"
                                 },
                                 {
                                     "code": "MEA",
-                                    "name": "Moyen Orient et Afrique du Nord"
+                                    "label": "Moyen Orient et Afrique du Nord"
                                 },
                                 {
                                     "code": "CME",
-                                    "name": "Moyen Orient et Afrique du Nord (classification IFC )"
+                                    "label": "Moyen Orient et Afrique du Nord (classification IFC )"
                                 },
                                 {
                                     "code": "TMN",
-                                    "name": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)"
+                                    "label": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)"
                                 },
                                 {
                                     "code": "MNA",
-                                    "name": "Moyen Orient et Afrique du Nord (sauf revenu élevé)"
+                                    "label": "Moyen Orient et Afrique du Nord (sauf revenu élevé)"
                                 },
                                 {
                                     "code": "MOZ",
-                                    "name": "Mozambique"
+                                    "label": "Mozambique"
                                 },
                                 {
                                     "code": "MMR",
-                                    "name": "Myanmar"
+                                    "label": "Myanmar"
                                 },
                                 {
                                     "code": "NAM",
-                                    "name": "Namibie"
+                                    "label": "Namibie"
                                 },
                                 {
                                     "code": "NRU",
-                                    "name": "Nauru"
+                                    "label": "Nauru"
                                 },
                                 {
                                     "code": "NPL",
-                                    "name": "Népal"
+                                    "label": "Népal"
                                 },
                                 {
                                     "code": "NIC",
-                                    "name": "Nicaragua"
+                                    "label": "Nicaragua"
                                 },
                                 {
                                     "code": "NER",
-                                    "name": "Niger"
+                                    "label": "Niger"
                                 },
                                 {
                                     "code": "NGA",
-                                    "name": "Nigéria"
+                                    "label": "Nigéria"
                                 },
                                 {
                                     "code": "INX",
-                                    "name": "Non classifié"
+                                    "label": "Non classifié"
                                 },
                                 {
                                     "code": "NOR",
-                                    "name": "Norvège"
+                                    "label": "Norvège"
                                 },
                                 {
                                     "code": "NCL",
-                                    "name": "Nouvelle Calédonie"
+                                    "label": "Nouvelle Calédonie"
                                 },
                                 {
                                     "code": "NZL",
-                                    "name": "Nouvelle Zélande"
+                                    "label": "Nouvelle Zélande"
                                 },
                                 {
                                     "code": "OMN",
-                                    "name": "Oman"
+                                    "label": "Oman"
                                 },
                                 {
                                     "code": "UZB",
-                                    "name": "Ouzbékistan"
+                                    "label": "Ouzbékistan"
                                 },
                                 {
                                     "code": "PAK",
-                                    "name": "Pakistan"
+                                    "label": "Pakistan"
                                 },
                                 {
                                     "code": "PLW",
-                                    "name": "Palau"
+                                    "label": "Palau"
                                 },
                                 {
                                     "code": "PAN",
-                                    "name": "Panama"
+                                    "label": "Panama"
                                 },
                                 {
                                     "code": "PNG",
-                                    "name": "Papouasie Nouvelle Guinée"
+                                    "label": "Papouasie Nouvelle Guinée"
                                 },
                                 {
                                     "code": "PRY",
-                                    "name": "Paraguay"
+                                    "label": "Paraguay"
                                 },
                                 {
                                     "code": "SST",
-                                    "name": "Patits états"
+                                    "label": "Patits états"
                                 },
                                 {
                                     "code": "NRS",
-                                    "name": "Pays d'Afrique subsaharienne pauvres en resources"
+                                    "label": "Pays d'Afrique subsaharienne pauvres en resources"
                                 },
                                 {
                                     "code": "RRS",
-                                    "name": "Pays d'Afrique subsaharienne riches en resources"
+                                    "label": "Pays d'Afrique subsaharienne riches en resources"
                                 },
                                 {
                                     "code": "EAR",
-                                    "name": "Pays de dividende démographique précoce "
+                                    "label": "Pays de dividende démographique précoce "
                                 },
                                 {
                                     "code": "FCS",
-                                    "name": "Pays en situation fragile ou de conflit"
+                                    "label": "Pays en situation fragile ou de conflit"
                                 },
                                 {
                                     "code": "BHI",
-                                    "name": "Pays IBRD à haut revenu"
+                                    "label": "Pays IBRD à haut revenu"
                                 },
                                 {
                                     "code": "FXS",
-                                    "name": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne"
+                                    "label": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne"
                                 },
                                 {
                                     "code": "DSF",
-                                    "name": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile"
+                                    "label": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile"
                                 },
                                 {
                                     "code": "DNS",
-                                    "name": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile"
+                                    "label": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile"
                                 },
                                 {
                                     "code": "DFS",
-                                    "name": "Pays IDA en situation fragile"
+                                    "label": "Pays IDA en situation fragile"
                                 },
                                 {
                                     "code": "DNF",
-                                    "name": "Pays IDA non classifiés en situation fragile"
+                                    "label": "Pays IDA non classifiés en situation fragile"
                                 },
                                 {
                                     "code": "NXS",
-                                    "name": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne"
+                                    "label": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne"
                                 },
                                 {
                                     "code": "LDC",
-                                    "name": "Pays les moins développés: classification NU"
+                                    "label": "Pays les moins développés: classification NU"
                                 },
                                 {
                                     "code": "HPC",
-                                    "name": "Pays très endettés (HIPC)"
+                                    "label": "Pays très endettés (HIPC)"
                                 },
                                 {
                                     "code": "NLD",
-                                    "name": "Pays-Bas"
+                                    "label": "Pays-Bas"
                                 },
                                 {
                                     "code": "PER",
-                                    "name": "Pérou"
+                                    "label": "Pérou"
                                 },
                                 {
                                     "code": "CSS",
-                                    "name": "Petits états des Caraïbes"
+                                    "label": "Petits états des Caraïbes"
                                 },
                                 {
                                     "code": "PSS",
-                                    "name": "Petits états insulaires du Pacifique"
+                                    "label": "Petits états insulaires du Pacifique"
                                 },
                                 {
                                     "code": "PHL",
-                                    "name": "Philippines"
+                                    "label": "Philippines"
                                 },
                                 {
                                     "code": "POL",
-                                    "name": "Pologne"
+                                    "label": "Pologne"
                                 },
                                 {
                                     "code": "PYF",
-                                    "name": "Polynésie française"
+                                    "label": "Polynésie française"
                                 },
                                 {
                                     "code": "PRI",
-                                    "name": "Porto Rico"
+                                    "label": "Porto Rico"
                                 },
                                 {
                                     "code": "PRT",
-                                    "name": "Portugal"
+                                    "label": "Portugal"
                                 },
                                 {
                                     "code": "PST",
-                                    "name": "Post-dividende démographique "
+                                    "label": "Post-dividende démographique "
                                 },
                                 {
                                     "code": "PRE",
-                                    "name": "Pré-dividende démographique "
+                                    "label": "Pré-dividende démographique "
                                 },
                                 {
                                     "code": "QAT",
-                                    "name": "Qatar"
+                                    "label": "Qatar"
                                 },
                                 {
                                     "code": "MAC",
-                                    "name": "Région adminisrative spéciale de Macao, Chine"
+                                    "label": "Région adminisrative spéciale de Macao, Chine"
                                 },
                                 {
                                     "code": "SYR",
-                                    "name": "République arabe syrienne"
+                                    "label": "République arabe syrienne"
                                 },
                                 {
                                     "code": "CAF",
-                                    "name": "République centrafricaine"
+                                    "label": "République centrafricaine"
                                 },
                                 {
                                     "code": "LAO",
-                                    "name": "République démocratique populaire lao"
+                                    "label": "République démocratique populaire lao"
                                 },
                                 {
                                     "code": "DOM",
-                                    "name": "République dominicaine"
+                                    "label": "République dominicaine"
                                 },
                                 {
                                     "code": "KGZ",
-                                    "name": "République kirgize"
+                                    "label": "République kirgize"
                                 },
                                 {
                                     "code": "SVK",
-                                    "name": "République slovaque"
+                                    "label": "République slovaque"
                                 },
                                 {
                                     "code": "CZE",
-                                    "name": "République tchèque"
+                                    "label": "République tchèque"
                                 },
                                 {
                                     "code": "HIC",
-                                    "name": "Revenu élevé"
+                                    "label": "Revenu élevé"
                                 },
                                 {
                                     "code": "LMY",
-                                    "name": "Revenu faible et intermédiaire"
+                                    "label": "Revenu faible et intermédiaire"
                                 },
                                 {
                                     "code": "MIC",
-                                    "name": "Revenu intermédiaire"
+                                    "label": "Revenu intermédiaire"
                                 },
                                 {
                                     "code": "LMC",
-                                    "name": "Revenu intermédiaire, tranche inférieure"
+                                    "label": "Revenu intermédiaire, tranche inférieure"
                                 },
                                 {
                                     "code": "UMC",
-                                    "name": "Revenu intermédiaire, tranche supérieure"
+                                    "label": "Revenu intermédiaire, tranche supérieure"
                                 },
                                 {
                                     "code": "ROU",
-                                    "name": "Roumanie"
+                                    "label": "Roumanie"
                                 },
                                 {
                                     "code": "GBR",
-                                    "name": "Royaume Uni"
+                                    "label": "Royaume Uni"
                                 },
                                 {
                                     "code": "RWA",
-                                    "name": "Rwanda"
+                                    "label": "Rwanda"
                                 },
                                 {
                                     "code": "SMR",
-                                    "name": "Saint-Marin"
+                                    "label": "Saint-Marin"
                                 },
                                 {
                                     "code": "WSM",
-                                    "name": "Samoa"
+                                    "label": "Samoa"
                                 },
                                 {
                                     "code": "STP",
-                                    "name": "Sao Tomé et Principe"
+                                    "label": "Sao Tomé et Principe"
                                 },
                                 {
                                     "code": "SEN",
-                                    "name": "Sénégal"
+                                    "label": "Sénégal"
                                 },
                                 {
                                     "code": "SRB",
-                                    "name": "Serbie"
+                                    "label": "Serbie"
                                 },
                                 {
                                     "code": "SYC",
-                                    "name": "Seychelles"
+                                    "label": "Seychelles"
                                 },
                                 {
                                     "code": "SLE",
-                                    "name": "Sierra Leone"
+                                    "label": "Sierra Leone"
                                 },
                                 {
                                     "code": "SGP",
-                                    "name": "Singapour"
+                                    "label": "Singapour"
                                 },
                                 {
                                     "code": "SXM",
-                                    "name": "Sint Maarten (Dutch part)"
+                                    "label": "Sint Maarten (Dutch part)"
                                 },
                                 {
                                     "code": "SVN",
-                                    "name": "Slovénie"
+                                    "label": "Slovénie"
                                 },
                                 {
                                     "code": "SOM",
-                                    "name": "Somalie"
+                                    "label": "Somalie"
                                 },
                                 {
                                     "code": "SDN",
-                                    "name": "Soudan"
+                                    "label": "Soudan"
                                 },
                                 {
                                     "code": "SSD",
-                                    "name": "Soudan du Sud"
+                                    "label": "Soudan du Sud"
                                 },
                                 {
                                     "code": "LKA",
-                                    "name": "Sri Lanka"
+                                    "label": "Sri Lanka"
                                 },
                                 {
                                     "code": "KNA",
-                                    "name": "St. Kitts et Nevis"
+                                    "label": "St. Kitts et Nevis"
                                 },
                                 {
                                     "code": "LCA",
-                                    "name": "St. Lucie"
+                                    "label": "St. Lucie"
                                 },
                                 {
                                     "code": "MAF",
-                                    "name": "St. Martin (partie française)"
+                                    "label": "St. Martin (partie française)"
                                 },
                                 {
                                     "code": "VCT",
-                                    "name": "St. Vincent et Grenadines"
+                                    "label": "St. Vincent et Grenadines"
                                 },
                                 {
                                     "code": "SWE",
-                                    "name": "Suède"
+                                    "label": "Suède"
                                 },
                                 {
                                     "code": "CHE",
-                                    "name": "Suisse"
+                                    "label": "Suisse"
                                 },
                                 {
                                     "code": "SUR",
-                                    "name": "Surinam"
+                                    "label": "Surinam"
                                 },
                                 {
                                     "code": "TWN",
-                                    "name": "Taiwan, Chine"
+                                    "label": "Taiwan, Chine"
                                 },
                                 {
                                     "code": "TJK",
-                                    "name": "Tajikistan"
+                                    "label": "Tajikistan"
                                 },
                                 {
                                     "code": "TZA",
-                                    "name": "Tanzanie"
+                                    "label": "Tanzanie"
                                 },
                                 {
                                     "code": "TCD",
-                                    "name": "Tchad"
+                                    "label": "Tchad"
                                 },
                                 {
                                     "code": "THA",
-                                    "name": "Thailande"
+                                    "label": "Thailande"
                                 },
                                 {
                                     "code": "TLS",
-                                    "name": "Timor-Leste"
+                                    "label": "Timor-Leste"
                                 },
                                 {
                                     "code": "TGO",
-                                    "name": "Togo"
+                                    "label": "Togo"
                                 },
                                 {
                                     "code": "TON",
-                                    "name": "Tonga"
+                                    "label": "Tonga"
                                 },
                                 {
                                     "code": "TTO",
-                                    "name": "Trinidad et Tobago"
+                                    "label": "Trinidad et Tobago"
                                 },
                                 {
                                     "code": "TUN",
-                                    "name": "Tunisie"
+                                    "label": "Tunisie"
                                 },
                                 {
                                     "code": "TKM",
-                                    "name": "Turkménistan"
+                                    "label": "Turkménistan"
                                 },
                                 {
                                     "code": "TUR",
-                                    "name": "Turquie"
+                                    "label": "Turquie"
                                 },
                                 {
                                     "code": "TUV",
-                                    "name": "Tuvalu"
+                                    "label": "Tuvalu"
                                 },
                                 {
                                     "code": "UGA",
-                                    "name": "Uganda"
+                                    "label": "Uganda"
                                 },
                                 {
                                     "code": "UKR",
-                                    "name": "Ukraine"
+                                    "label": "Ukraine"
                                 },
                                 {
                                     "code": "EUU",
-                                    "name": "Union Européenne"
+                                    "label": "Union Européenne"
                                 },
                                 {
                                     "code": "URY",
-                                    "name": "Uruguay"
+                                    "label": "Uruguay"
                                 },
                                 {
                                     "code": "VUT",
-                                    "name": "Vanuatu"
+                                    "label": "Vanuatu"
                                 },
                                 {
                                     "code": "VEN",
-                                    "name": "Vénézuela, RB"
+                                    "label": "Vénézuela, RB"
                                 },
                                 {
                                     "code": "VNM",
-                                    "name": "Viet Nam"
+                                    "label": "Viet Nam"
                                 },
                                 {
                                     "code": "PSE",
-                                    "name": "West Bank et Gaza"
+                                    "label": "West Bank et Gaza"
                                 },
                                 {
                                     "code": "YEM",
-                                    "name": "Yémen, Rép. du"
+                                    "label": "Yémen, Rép. du"
                                 },
                                 {
                                     "code": "ZMB",
-                                    "name": "Zambie"
+                                    "label": "Zambie"
                                 },
                                 {
                                     "code": "ZWE",
-                                    "name": "Zimbabwe"
+                                    "label": "Zimbabwe"
                                 },
                                 {
                                     "code": "EMU",
-                                    "name": "Zone Euro "
+                                    "label": "Zone Euro "
                                 }
                             ],
-                            "help_text": "Le nom du pays, si la ressource est spécifique à un pays. S'il y en a plusieurs, entrez les noms de pays séparés par un \";\".",
-                            "display_type": "text"
+                            "help_text": "Le pays auquel la ressource se rapporte, sélectionné dans la liste. Si plusieurs pays s'appliquent, sélectionnez une région plus large ou le pays principal.",
+                            "enum_store_column": "label",
+                            "display_type": "dropdown"
                         },
                         {
                             "key": "language",
                             "title": "Langue",
                             "type": "string",
                             "help_text": "Le nom de la langue. S'il y en a plusieurs, entrez les noms de langue séparés par un \";\".",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subjects",
+                            "title": "Sujets",
+                            "type": "string",
+                            "help_text": "Mots-clés ou termes de sujet décrivant la ressource. S'il y en a plusieurs, séparez-les par un « ; ».",
                             "display_type": "text"
                         },
                         {

@@ -82,22 +82,6 @@
                                 {
                                     "code": "web",
                                     "label": "Web Site"
-                                },
-                                {
-                                    "code": "final",
-                                    "label": "Final"
-                                },
-                                {
-                                    "code": "repro",
-                                    "label": "Reproducible research"
-                                },
-                                {
-                                    "code": "doc/sampling",
-                                    "label": "Sampling"
-                                },
-                                {
-                                    "code": "doc/fnl",
-                                    "label": "Final document"
                                 }
                             ],
                             "display_type": "dropdown"
@@ -106,9 +90,94 @@
                             "key": "dcformat",
                             "title": "Resource format",
                             "type": "string",
-                            "enum": [],
-                            "help_text": "The resource file format. ",
-                            "display_type": "text"
+                            "enum": [
+                                {
+                                    "code": "application/x-compressed",
+                                    "label": "Compressed, Generic"
+                                },
+                                {
+                                    "code": "application/zip",
+                                    "label": "Compressed, ZIP"
+                                },
+                                {
+                                    "code": "application/x-cspro",
+                                    "label": "Data, CSPro"
+                                },
+                                {
+                                    "code": "application/dbase",
+                                    "label": "Data, dBase"
+                                },
+                                {
+                                    "code": "application/msaccess",
+                                    "label": "Data, Microsoft Access"
+                                },
+                                {
+                                    "code": "application/x-sas",
+                                    "label": "Data, SAS"
+                                },
+                                {
+                                    "code": "application/x-spss",
+                                    "label": "Data, SPSS"
+                                },
+                                {
+                                    "code": "application/x-stata",
+                                    "label": "Data, Stata"
+                                },
+                                {
+                                    "code": "text",
+                                    "label": "Document, Generic"
+                                },
+                                {
+                                    "code": "text/html",
+                                    "label": "Document, HTML"
+                                },
+                                {
+                                    "code": "application/msexcel",
+                                    "label": "Document, Microsoft Excel"
+                                },
+                                {
+                                    "code": "application/mspowerpoint",
+                                    "label": "Document, Microsoft PowerPoint"
+                                },
+                                {
+                                    "code": "application/msword",
+                                    "label": "Document, Microsoft Word"
+                                },
+                                {
+                                    "code": "application/pdf",
+                                    "label": "Document, PDF"
+                                },
+                                {
+                                    "code": "application/postscript",
+                                    "label": "Document, Postscript"
+                                },
+                                {
+                                    "code": "text/plain",
+                                    "label": "Document, Plain"
+                                },
+                                {
+                                    "code": "text/wordperfect",
+                                    "label": "Document, WordPerfect"
+                                },
+                                {
+                                    "code": "image/gif",
+                                    "label": "Image, GIF"
+                                },
+                                {
+                                    "code": "image/jpeg",
+                                    "label": "Image, JPEG"
+                                },
+                                {
+                                    "code": "image/png",
+                                    "label": "Image, PNG"
+                                },
+                                {
+                                    "code": "image/tiff",
+                                    "label": "Image, TIFF"
+                                }
+                            ],
+                            "help_text": "The resource file format. Select a value from the controlled vocabulary.",
+                            "display_type": "dropdown"
                         },
                         {
                             "key": "title",
@@ -117,6 +186,22 @@
                             "enum": [],
                             "help_text": "The title of the resource.",
                             "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subtitle",
+                            "title": "Subtitle",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "A secondary title for the resource, if applicable.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "id_number",
+                            "title": "ID number",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "A unique identifier for the resource (for example an ISBN, DOI, or catalog ID).",
                             "display_type": "text"
                         },
                         {
@@ -1338,8 +1423,9 @@
                                     "label": "Zimbabwe"
                                 }
                             ],
-                            "help_text": "The country name, if the resource is specific to a country. If more than one, enter the country names separated with a “;”.",
-                            "display_type": "text"
+                            "help_text": "The country the resource is specific to, selected from the list. If more than one country applies, select a broader region or the primary country.",
+                            "enum_store_column": "label",
+                            "display_type": "dropdown"
                         },
                         {
                             "key": "language",
@@ -1347,6 +1433,14 @@
                             "type": "string",
                             "enum": [],
                             "help_text": "The language name. If more than one, enter the language names separated with a “;”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subjects",
+                            "title": "Subjects",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Keywords or subject terms describing the resource. If more than one, separate with a ';'.",
                             "display_type": "text"
                         },
                         {
@@ -1408,12 +1502,6 @@
                     ]
                 }
             ]
-        },
-        {
-            "key": "additional_container",
-            "title": "Additional Fields",
-            "type": "section_container",
-            "items": []
         }
     ]
 }

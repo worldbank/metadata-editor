@@ -2697,8 +2697,17 @@ paths:
                 dctype:
                   description: Resource type
                   type: string
+                dcformat:
+                  description: Resource file format
+                  type: string
                 title:
                   description: Resource title
+                  type: string
+                subtitle:
+                  description: Resource subtitle
+                  type: string
+                id_number:
+                  description: Unique identifier for the resource (ISBN, DOI, or catalog ID)
                   type: string
                 author:
                   type: string
@@ -2707,6 +2716,9 @@ paths:
                 country:
                   type: string
                 language:
+                  type: string
+                subjects:
+                  description: Keywords or subject terms describing the resource
                   type: string
                 contributor:
                   type: string
@@ -2792,8 +2804,17 @@ paths:
                 dctype:
                   description: Resource type
                   type: string
+                dcformat:
+                  description: Resource file format
+                  type: string
                 title:
                   description: Resource title
+                  type: string
+                subtitle:
+                  description: Resource subtitle
+                  type: string
+                id_number:
+                  description: Unique identifier for the resource (ISBN, DOI, or catalog ID)
                   type: string
                 author:
                   type: string
@@ -2802,6 +2823,9 @@ paths:
                 country:
                   type: string
                 language:
+                  type: string
+                subjects:
+                  description: Keywords or subject terms describing the resource
                   type: string
                 contributor:
                   type: string
