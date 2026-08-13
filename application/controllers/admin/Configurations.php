@@ -287,33 +287,7 @@ class Configurations extends MY_Controller {
 	*/
 	function _init_default_configs()
 	{
-		//get a list of configurations key/values
-		$config_defaults=APPPATH.'/config/config.defaults.php';
-		
-		if (file_exists($config_defaults))
-		{
-				include $config_defaults;
-		}
-		else
-		{
-			return FALSE;
-		}
-		
-		if (is_array($config) && count($config) >0)
-		{
-			//load settings from db
-			$settings=$this->Configurations_model->get_config_array();
-			
-			foreach($config as $key=>$value)
-			{
-				//Config not found in db
-				if (!array_key_exists($key,$settings))
-				{
-					//add configuration to db
-					$this->Configurations_model->add($key, $value);
-				}				
-			}
-		}
+		$this->site_configurations->seed_missing_defaults();
 	}
 	
 	/**

@@ -180,6 +180,7 @@ if (!function_exists('site_feature_enabled')) {
 
 	/**
 	 * Whether a site feature module is enabled (issues, data_structures, schemas, tags).
+	 * Missing keys match config.defaults.php (enabled). Explicit '0'/false hides the UI.
 	 */
 	function site_feature_enabled($feature)
 	{
@@ -197,7 +198,7 @@ if (!function_exists('site_feature_enabled')) {
 		$ci =& get_instance();
 		$value = $ci->config->item($key_map[$feature]);
 
-		if ($value === false || $value === 0 || $value === '0' || $value === 'false' || $value === null) {
+		if ($value === false || $value === 0 || $value === '0' || $value === 'false') {
 			return false;
 		}
 
