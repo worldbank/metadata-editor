@@ -42,8 +42,8 @@ class ImportProject extends MY_REST_Controller
 	{
 		try {
 			$user_id = $this->get_api_user_id();
-			$type = $this->input->post('type');
-			$upload_id = $this->normalize_upload_id($this->input->post('upload_id'));
+			$type = $this->post_field('type');
+			$upload_id = $this->normalize_upload_id($this->post_field('upload_id'));
 
 			if (!$type) {
 				throw new Exception("TYPE not specified");
@@ -84,10 +84,10 @@ class ImportProject extends MY_REST_Controller
 			$this->ensure_project_import_memory_limit();
 
 			$user_id=$this->get_api_user_id();
-			$type=$this->input->post('type');
-			$idno=$this->input->post('idno');
-			$upload_id = $this->normalize_upload_id($this->input->post('upload_id'));
-			$on_idno_conflict = $this->normalize_on_idno_conflict($this->input->post('on_idno_conflict'));
+			$type=$this->post_field('type');
+			$idno=$this->post_field('idno');
+			$upload_id = $this->normalize_upload_id($this->post_field('upload_id'));
+			$on_idno_conflict = $this->normalize_on_idno_conflict($this->post_field('on_idno_conflict'));
 			$has_file = isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']);
 
 			if (!$type){
@@ -190,7 +190,7 @@ class ImportProject extends MY_REST_Controller
 
 				if ($file_ext=='xml'){
 					if (in_array($options['type'],array('survey','microdata'))){
-						$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
+						$result=$this->Editor_model->import_ddi_from_path($sid, $uploaded_filepath, $parseOnly=false, $options);
 						$this->link_data_files($sid);
 					}
 					else if ($options['type']=='geospatial'){
@@ -278,7 +278,12 @@ class ImportProject extends MY_REST_Controller
 			}
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
-			$result=$this->Editor_model->importDDI($sid);
+			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file(
+				'xml',
+				'file',
+				null
+			);
+			$result=$this->Editor_model->import_ddi_from_path($sid, $uploaded_filepath);
 
 			$output=array(
 				'status'=>'success'
@@ -478,6 +483,21 @@ class ImportProject extends MY_REST_Controller
 		if (!in_array($extension, $allowed, true)) {
 			throw new Exception("Unsupported file type: " . $extension);
 		}
+	}
+
+	private function post_field($key)
+	{
+		$value = $this->input->post($key);
+		if ($value !== null && $value !== false && $value !== '') {
+			return $value;
+		}
+
+		$rest_value = $this->post($key);
+		if ($rest_value !== null && $rest_value !== '') {
+			return $rest_value;
+		}
+
+		return $value;
 	}
 
 	private function normalize_upload_id($upload_id)

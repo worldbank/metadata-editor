@@ -815,7 +815,7 @@ class Editor extends MY_REST_Controller
 
 			if ($file_ext=='xml'){
 				if ($project['type']=='survey' || $project['type']=='microdata'){
-					$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
+					$result=$this->Editor_model->import_ddi_from_path($sid, $uploaded_filepath, $parseOnly=false, $options);
 				}
 			}else{
 				$this->load->library('ImportJsonMetadata');

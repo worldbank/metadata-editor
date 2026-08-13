@@ -1612,46 +1612,13 @@ class Editor_model extends CI_Model {
 	 */
 	function importDDI($sid, $parseOnly=false, $options=array())
 	{
-		//temporary folder
-		$temp_upload_folder='datafiles/tmp';
-			
-		if (!file_exists($temp_upload_folder)){
-			@mkdir($temp_upload_folder, 0777, true);
-		}
-		
-		if (!file_exists($temp_upload_folder)){
-			show_error('DATAFILES-TEMP-FOLDER-NOT-SET');
+		$this->load->model('Editor_resource_model');
+		$uploaded_ddi_path = $this->Editor_resource_model->upload_temporary_file('xml', 'file', null);
+
+		if (!file_exists($uploaded_ddi_path)) {
+			throw new Exception("Failed to upload file");
 		}
 
-		//upload class configurations for DDI
-		$config['upload_path'] 	 = $temp_upload_folder;
-		$config['overwrite'] 	 = FALSE;
-		$config['encrypt_name']	 = TRUE;
-		$config['allowed_types'] = 'xml';
-
-		$this->load->library('upload', $config);
-
-		//name of the field for file upload
-		$file_field_name='file';
-		
-		//process uploaded ddi file
-		$ddi_upload_result=$this->upload->do_upload($file_field_name);
-
-		$uploaded_ddi_path=NULL;
-
-		//ddi upload failed
-		if (!$ddi_upload_result){
-			$error = $this->upload->display_errors();
-			throw new Exception($error);
-		}
-		else //successful upload
-		{
-			//get uploaded file information
-			$uploaded_ddi_path = $this->upload->data();
-			$uploaded_ddi_path=$uploaded_ddi_path['full_path'];
-		}
-
-		// Use centralized import method
 		return $this->import_ddi_from_path($sid, $uploaded_ddi_path, $parseOnly, $options);
 	}
 
@@ -1668,6 +1635,10 @@ class Editor_model extends CI_Model {
 	 */
 	function import_ddi_from_path($sid, $ddi_file_path, $parseOnly=false, $options=array())
 	{
+		if (!is_string($ddi_file_path) || $ddi_file_path === '' || !file_exists($ddi_file_path)) {
+			throw new Exception("DDI file not found");
+		}
+
 		$parser_params=array(
 			'file_type'=>'survey',
 			'file_path'=>$ddi_file_path

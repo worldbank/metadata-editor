@@ -1101,20 +1101,23 @@ paths:
         from the package metadata.
       operationId: importProject
       requestBody:
+        required: true
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
+              required:
+                - type
               properties:
                 type:
                   description: "Project type e.g. microdata, document, table, timeseries, etc "
                   type: string
                 file:
-                  description: Project file (XML, JSON, JSONL or package zip) — legacy single upload
+                  description: Project file (XML, JSON, JSONL or package zip). Mutually exclusive with upload_id.
                   type: string
                   format: binary
                 upload_id:
-                  description: Completed resumable upload ID (mutually exclusive with file)
+                  description: Completed resumable upload ID from POST /api/uploads/*. Mutually exclusive with file.
                   type: string
                 idno:
                   description: Optional project IDNO (rare; ZIP packages normally use manifest IDNO)
@@ -1125,9 +1128,28 @@ paths:
                   enum:
                     - fail
                     - assign_new_idno
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
               required:
                 - type
-        required: true
+                - upload_id
+              properties:
+                type:
+                  description: "Project type e.g. microdata, document, table, timeseries, etc "
+                  type: string
+                upload_id:
+                  description: Completed resumable upload ID from POST /api/uploads/*
+                  type: string
+                idno:
+                  description: Optional project IDNO (rare; ZIP packages normally use manifest IDNO)
+                  type: string
+                on_idno_conflict:
+                  description: "ZIP duplicate IDNO handling: fail (default) or assign_new_idno"
+                  type: string
+                  enum:
+                    - fail
+                    - assign_new_idno
       responses:
         "200":
           description: successful operation
