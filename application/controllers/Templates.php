@@ -33,7 +33,16 @@ class Templates extends MY_Controller {
 
 	function edit($uid)
 	{
-		
+		try {
+			$this->editor_acl->has_access('template_manager', 'view');
+		} catch (Exception $e) {
+			try {
+				$this->editor_acl->user_has_template_access($uid, 'view');
+			} catch (Exception $denied) {
+				$this->editor_acl->has_access_or_die('template_manager', 'view');
+			}
+		}
+
 		$this->template->set_template('blank');		
 		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
