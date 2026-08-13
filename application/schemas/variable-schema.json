@@ -32,7 +32,10 @@
 			]
 		},
 		"var_dcml": {
-			"type": "string",
+			"type": [
+				"string",
+				"number"
+			],
 			"title": "Variable decimal points",
 			"description": "Number of decimal points in the variable"
 		},
@@ -149,7 +152,10 @@
 				"type": "object",
 				"properties": {
 					"value": {
-						"type": "string",
+						"type": [
+							"string",
+							"number"
+						],
 						"title": "Value"
 					},
 					"label": {
