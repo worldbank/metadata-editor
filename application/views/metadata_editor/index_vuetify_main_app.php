@@ -317,7 +317,17 @@
         const DatafileExplorer = {props: ['file_id'],template: '<div><data-explorer-host :file_id="file_id" /></div>' }
         const DatafileImport = {template: '<div><datafile-import/></div>' }
         const Variables ={props: ['file_id'],template: '<div><variables/></div>'}
-        const VariableGroups ={template: '<div><variable-groups /> </div>'}
+        const VariableGroups ={
+            template: '<div><variable-groups ref="variableGroups" /></div>',
+            beforeRouteLeave: function (to, from, next) {
+                var child = this.$refs.variableGroups;
+                if (child && typeof child.showUnsavedMessage === 'function' && !child.showUnsavedMessage()){
+                    next(false);
+                    return;
+                }
+                next();
+            }
+        }
         //const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
         const ResourcesComp =VueExternalResources;
         const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}

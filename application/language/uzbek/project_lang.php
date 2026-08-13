@@ -466,6 +466,18 @@ $lang['variable_categories'] = 'O\'zgaruvchi kategoriyalari';
 $lang['variable_questions'] = 'O\'zgaruvchi savollari';
 $lang['variable_weights'] = 'O\'zgaruvchi vaznlari';
 $lang['variable_groups'] = 'O\'zgaruvchi guruhlari';
+$lang['new_variable_group'] = 'Yangi guruh';
+$lang['no_variable_groups'] = 'O\'zgaruvchi guruhlari yo\'q. Yaratish uchun + tugmasini bosing.';
+$lang['delete_variable_group_confirm'] = 'Ushbu o\'zgaruvchi guruhi va uning kichik guruhlari o\'chirilsinmi?';
+$lang['remove_variable_from_group_confirm'] = 'Ushbu o\'zgaruvchi guruhdan olib tashlansinmi?';
+$lang['select_variables'] = 'O\'zgaruvchilarni tanlash';
+$lang['variable_selection'] = 'O\'zgaruvchilarni tanlash';
+$lang['variable_selection_hint'] = 'Tanlash uchun qatorni bosing. Oraliqni tanlash uchun Shift+bosish.';
+$lang['all_data_files'] = 'Barcha ma\'lumot fayllari';
+$lang['move_up'] = 'Yuqoriga';
+$lang['move_down'] = 'Pastga';
+$lang['concepts'] = 'Tushunchalar';
+$lang['failed_to_save_changes'] = 'O\'zgarishlarni saqlashda xatolik';
 
 // Data storage options
 $lang['Store data'] = "Ma'lumotlarni saqlash";

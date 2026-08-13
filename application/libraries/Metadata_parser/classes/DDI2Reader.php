@@ -52,7 +52,10 @@ class DDI2Reader
                 '@varGrp' => 'variable_groups',
                 '@var' => 'variables',
                 'labl' => 'label',
-                'defntn' => 'definition'
+                'defntn' => 'definition',
+                'txt' => 'txt',
+                'universe' => 'universe',
+                'notes' => 'notes'
             )
         );
 
@@ -873,12 +876,72 @@ class DDI2Reader
                 $output=array();
                 $var_grp= $this->get_child_elements_array($xml_obj, $parent_path,$output);
 
-                $groups[]=$var_grp['codeBook/dataDscr/varGrp'][0];
+                $row=isset($var_grp['codeBook/dataDscr/varGrp'][0]) ? $var_grp['codeBook/dataDscr/varGrp'][0] : array();
+                $concepts=self::extract_vargrp_concepts($xml_obj);
+                if ($concepts !== array()) {
+                    $row['concepts']=$concepts;
+                }
+                $groups[]=$row;
             }
         }
 
         $this->xml_reader->close();
         return $groups;
+    }
+
+    /**
+     * Repeating varGrp/concept children. Flattened table cols cannot hold these.
+     *
+     * @param SimpleXMLElement $xml_obj
+     * @return array
+     */
+    public static function extract_vargrp_concepts($xml_obj)
+    {
+        $out = array();
+        if (!$xml_obj instanceof SimpleXMLElement) {
+            return $out;
+        }
+
+        $nodes = $xml_obj->xpath('*[local-name()="concept"]');
+        if ($nodes === false) {
+            return $out;
+        }
+
+        foreach ($nodes as $child) {
+            $row = array(
+                'concept' => trim((string) $child),
+                'vocab' => self::xml_attr($child, 'vocab'),
+                'uri' => self::xml_attr($child, 'vocabURI'),
+            );
+            if ($row['uri'] === '') {
+                $row['uri'] = self::xml_attr($child, 'uri');
+            }
+            if ($row['concept'] === '' && $row['vocab'] === '' && $row['uri'] === '') {
+                continue;
+            }
+            $out[] = $row;
+        }
+
+        return $out;
+    }
+
+    private static function xml_attr($node, $name)
+    {
+        foreach ($node->attributes() as $att_name => $att_value) {
+            if ((string) $att_name === $name) {
+                return (string) $att_value;
+            }
+        }
+
+        foreach ($node->getNamespaces(true) as $uri) {
+            foreach ($node->attributes($uri) as $att_name => $att_value) {
+                if ((string) $att_name === $name) {
+                    return (string) $att_value;
+                }
+            }
+        }
+
+        return '';
     }
 
 

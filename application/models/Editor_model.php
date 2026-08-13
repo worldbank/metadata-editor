@@ -1804,10 +1804,9 @@ class Editor_model extends CI_Model {
 			return $output;
 		}
 
-		/*
-        //import variable groups
-        $this->create_update_variable_groups($sid,$parser->get_variable_groups());
-		*/
+		$this->load->model('Editor_variable_groups_model');
+		$groups=$parser->get_variable_groups();
+		$this->Editor_variable_groups_model->import_from_interchange($sid, is_array($groups) ? $groups : array());
 	
 		return $output;
 		

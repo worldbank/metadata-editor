@@ -491,7 +491,41 @@ class Project_versions
 			throw new Exception("FAILED_TO_COPY_VARIABLE_GROUPS: " . $db_error['message']);
 		}
 
+		$this->ci->load->model('Editor_variable_groups_model');
+		$this->ci->Editor_variable_groups_model->remap_variable_uids(
+			$target_sid,
+			$this->variable_uid_map($source_sid, $target_sid)
+		);
+
 		return $result;
+	}
+
+	/**
+	 * Map source variable UIDs to the UIDs created by copy_project_variables().
+	 *
+	 * @param int $source_sid
+	 * @param int $target_sid
+	 * @return array old_uid => new_uid
+	 */
+	function variable_uid_map($source_sid, $target_sid)
+	{
+		$sql = 'SELECT s.uid AS old_uid, t.uid AS new_uid
+			FROM editor_variables s
+			INNER JOIN editor_variables t
+				ON t.sid = ?
+				AND t.fid <=> s.fid
+				AND t.vid <=> s.vid
+				AND t.name <=> s.name
+				AND t.sort_order <=> s.sort_order
+			WHERE s.sid = ?';
+
+		$rows = $this->ci->db->query($sql, array($target_sid, $source_sid))->result_array();
+		$map = array();
+		foreach ($rows as $row) {
+			$map[(int) $row['old_uid']] = (int) $row['new_uid'];
+		}
+
+		return $map;
 	}
 
 	/**

@@ -218,6 +218,8 @@ $lang['publish_export_failed']="Project export failed";
 $lang['metadata_publishing_failed']="Failed to publish project metadata";
 $lang['metadata_publishing_updated_successfully']="Project metadata updated successfully";
 $lang['metadata_published_with_idno']="Published to NADA with study IDNO: ";
+$lang['metadata_published_via_ddi_fallback']="Published via DDI/XML because JSON publish failed. JSON may include fields not carried by DDI — review the catalog error below.";
+$lang['metadata_json_publish_error']="JSON publish error";
 $lang['thumbnail_publishing_failed']="Failed to publish thumbnail";
 $lang['publish_external_resources_heading']="External resources";
 $lang['catalog_preview_link_note']="Catalog URL (study must be published for the link to work)";
@@ -554,6 +556,18 @@ $lang['variable_categories'] = 'Variable categories';
 $lang['variable_questions'] = 'Variable questions';
 $lang['variable_weights'] = 'Variable weights';
 $lang['variable_groups'] = 'Variable groups';
+$lang['new_variable_group'] = 'New group';
+$lang['no_variable_groups'] = 'You do not have any variable groups. Use + to create one.';
+$lang['delete_variable_group_confirm'] = 'Delete this variable group and its subgroups?';
+$lang['remove_variable_from_group_confirm'] = 'Remove this variable from the group?';
+$lang['select_variables'] = 'Select variables';
+$lang['variable_selection'] = 'Variable selection';
+$lang['variable_selection_hint'] = 'Click a row to select. Shift-click to select a range.';
+$lang['all_data_files'] = 'All data files';
+$lang['move_up'] = 'Move up';
+$lang['move_down'] = 'Move down';
+$lang['concepts'] = 'Concepts';
+$lang['failed_to_save_changes'] = 'Failed to save changes';
 
 // Data storage options
 $lang['Store data'] = "Store data";

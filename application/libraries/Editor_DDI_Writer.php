@@ -16,7 +16,9 @@ class Editor_DDI_Writer
         $this->ci =& get_instance();
         $this->ci->load->model('Editor_datafile_model');
         $this->ci->load->model("Editor_variable_model");
+        $this->ci->load->model("Editor_variable_groups_model");
         $this->ci->load->library("project_json_writer");
+        $this->ci->load->library("Variable_groups_tree");
     }
 
 
@@ -222,17 +224,15 @@ class Editor_DDI_Writer
         $writer->startElement('dataDscr');
         $writer->writeRaw("\n");
 
-        /* //todo
-        //variable groups
-        $var_groups=$this->ci->Variable_group_model->select_all($id);
-        foreach($var_groups as $var_group){
+        //pre-load UID->VID mapping
+        $this->uid_vid_cache = $this->ci->Editor_variable_model->uid_vid_list($id);
+
+        $tree = $this->ci->Editor_variable_groups_model->select_all($id);
+        $var_groups = Variable_groups_tree::flatten_for_export($tree, $this->uid_vid_cache);
+        foreach ($var_groups as $var_group) {
             $writer->writeRaw($this->get_vargroup_desc_xml($var_group));
             $writer->writeRaw("\n");
         }
-        */
-
-        //pre-load UID->VID mapping
-        $this->uid_vid_cache = $this->ci->Editor_variable_model->uid_vid_list($id);
 
         //variables — stream each <var> directly to XMLWriter (no ArrayToXml per variable)
         foreach($this->ci->Editor_variable_model->chunk_reader_generator($id) as $variable){
@@ -730,12 +730,12 @@ class Editor_DDI_Writer
         $output->set([
             '_attributes'=>[
                 'ID'=>$vargrp['vgid'],
-                'type'=>$vargrp['group_type'],
+                'type'=>Variable_groups_tree::to_ddi_group_type($vargrp['group_type']),
                 'var'=>$vargrp['variables'],
+                'varGrp'=>$vargrp['variable_groups'],
             ],
             'labl'=>$vargrp['label'],
             'txt'=>$vargrp['txt'],
-            //'concept'=>$vargrp['concept'],//repeated - not supported
             'defntn'=>$vargrp['definition'],
             'universe'=>$vargrp['universe'],
             'notes'=>$vargrp['notes']            
@@ -743,8 +743,52 @@ class Editor_DDI_Writer
         
         $output = $this->remove_empty($output->all());
         $result = new Spatie\ArrayToXml\ArrayToXml($output,'varGrp');
-        $result=$result->prettify()->toDom();
-        return ($result->saveXML($result->documentElement));
+        $dom=$result->prettify()->toDom();
+        self::append_vargrp_concepts($dom, isset($data['concepts']) ? $data['concepts'] : array());
+        return ($dom->saveXML($dom->documentElement));
+    }
+
+    /**
+     * Append repeating DDI concept children. ArrayToXml cannot emit these.
+     *
+     * @param DOMDocument $dom
+     * @param mixed $concepts
+     */
+    public static function append_vargrp_concepts($dom, $concepts)
+    {
+        if (!$dom instanceof DOMDocument) {
+            return;
+        }
+
+        $root = $dom->documentElement;
+        if (!$root) {
+            return;
+        }
+
+        foreach ((array) $concepts as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $text = isset($row['concept']) ? (string) $row['concept'] : '';
+            $vocab = isset($row['vocab']) ? (string) $row['vocab'] : '';
+            $uri = isset($row['uri']) ? (string) $row['uri'] : '';
+            if ($text === '' && $vocab === '' && $uri === '') {
+                continue;
+            }
+
+            $el = $dom->createElement('concept');
+            if ($text !== '') {
+                $el->appendChild($dom->createTextNode($text));
+            }
+            if ($vocab !== '') {
+                $el->setAttribute('vocab', $vocab);
+            }
+            if ($uri !== '') {
+                $el->setAttribute('vocabURI', $uri);
+            }
+            $root->appendChild($el);
+        }
     }
 
     //is weight variable?

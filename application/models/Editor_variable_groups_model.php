@@ -5,6 +5,7 @@ class editor_variable_groups_model extends CI_Model {
     {
         parent::__construct();
         $this->load->model("Editor_model");
+        $this->load->library("Variable_groups_tree");
     }
 
     /**
@@ -22,19 +23,23 @@ class editor_variable_groups_model extends CI_Model {
      * 
      * Get all variable groups by dataset
      * 
+     * @param int $sid
+     * @param mixed $unused kept for callers that pass a second argument
+     * @return array
      */
-    function select_all($sid)
+    function select_all($sid, $unused=null)
     {
         $this->db->select("*");
         $this->db->where("sid",$sid);
         $result= $this->db->get("editor_variable_groups")->row_array();
 
-        if($result){
-            return $this->decode_metadata($result['metadata']);
+        if(!$result){
+            return array();
         }
-        
-    }
 
+        $decoded=$this->decode_metadata($result['metadata']);
+        return Variable_groups_tree::coerce($decoded);
+    }
 
 
 
@@ -59,7 +64,7 @@ class editor_variable_groups_model extends CI_Model {
     {
         $options=array(
             'sid'=>$sid,
-            'metadata'=>$this->encode_metadata($metadata)
+            'metadata'=>$this->encode_metadata(Variable_groups_tree::normalize($metadata))
         );
 
         $this->db->insert("editor_variable_groups",$options);
@@ -75,7 +80,7 @@ class editor_variable_groups_model extends CI_Model {
     public function update($sid,$metadata)
     {
         $options=array(            
-            'metadata'=>$this->encode_metadata($metadata)
+            'metadata'=>$this->encode_metadata(Variable_groups_tree::normalize($metadata))
         );
 
         $this->db->where("sid",$sid);
@@ -86,6 +91,7 @@ class editor_variable_groups_model extends CI_Model {
 
     function upsert($sid,$metadata)
     {
+        $metadata=Variable_groups_tree::normalize($metadata);
         $result=$this->check_exists($sid);
 
         if($result){
@@ -94,6 +100,79 @@ class editor_variable_groups_model extends CI_Model {
         else{
             $this->insert($sid,$metadata);
         }
+    }
+
+
+    /**
+     * Import DDI/JSON interchange (or a nested tree) and persist as UID storage.
+     * Empty input clears the project's groups.
+     *
+     * @param int $sid
+     * @param mixed $groups
+     */
+    function import_from_interchange($sid,$groups)
+    {
+        if(!is_array($groups) || $groups===array()){
+            $this->delete($sid);
+            return;
+        }
+
+        $this->load->model('Editor_variable_model');
+        $vid_to_uid=$this->Editor_variable_model->vid_uid_list($sid);
+        $tree=Variable_groups_tree::nest_from_import($groups,$vid_to_uid);
+
+        if($tree===array()){
+            $this->delete($sid);
+            return;
+        }
+
+        $this->upsert($sid,$tree);
+    }
+
+
+    /**
+     * Remove deleted variable UIDs from group membership.
+     *
+     * @param int $sid
+     * @param array $uid_list
+     */
+    function remove_variable_uids($sid,$uid_list)
+    {
+        if(!$this->check_exists($sid)){
+            return;
+        }
+
+        $updated=Variable_groups_tree::remove_uids($this->select_all($sid),$uid_list);
+        $this->write_metadata($sid,$updated);
+    }
+
+
+    /**
+     * Rewrite membership UIDs after a project/version copy.
+     *
+     * @param int $sid
+     * @param array $uid_map old_uid => new_uid
+     */
+    function remap_variable_uids($sid,$uid_map)
+    {
+        if(!$this->check_exists($sid)){
+            return;
+        }
+
+        $updated=Variable_groups_tree::remap_uids($this->select_all($sid),$uid_map);
+        $this->write_metadata($sid,$updated);
+    }
+
+
+    /**
+     * Persist a tree without re-validating (prune/remap of legacy rows).
+     */
+    private function write_metadata($sid,$metadata)
+    {
+        $this->db->where("sid",$sid);
+        $this->db->update("editor_variable_groups",array(
+            'metadata'=>$this->encode_metadata($metadata)
+        ));
     }
 
 
@@ -119,4 +198,4 @@ class editor_variable_groups_model extends CI_Model {
         return unserialize(base64_decode((string)$metadata_encoded));
 	}
 
-}    
+}

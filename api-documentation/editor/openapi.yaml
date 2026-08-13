@@ -660,9 +660,12 @@ paths:
       summary: Get project JSON
       description: >
         Get project metadata as JSON. For microdata/survey projects, the response
-        includes all variables by default. Use `exclude_variables=1` to omit
+        includes all variables by default and a `variable_groups` array in
+        interchange form (space-separated VIDs/VGIDs, matching
+        `variable-group-schema.json`). Use `exclude_variables=1` to omit
         variables from the response (useful when only study-level metadata is
-        needed, e.g. for comparison workflows).
+        needed, e.g. for comparison workflows). `variable_groups` is still
+        included when variables are omitted.
       operationId: singleProjectJSON
       parameters:
         - name: id
@@ -682,7 +685,8 @@ paths:
           description: >
             Exclude variables from the response. Only applicable to microdata/survey
             projects. When set to `1`, the `variables` array is omitted from the
-            JSON output. The `data_files` array is still included.
+            JSON output. The `data_files` and `variable_groups` arrays are still
+            included.
           required: false
           schema:
             type: integer
@@ -1034,6 +1038,148 @@ paths:
             application/json:
               schema:
                 type: object
+  "/variable_groups/{id}":
+    get:
+      tags:
+        - Microdata
+      summary: List variable groups
+      description: >
+        Return the editor-native variable group tree for a microdata/survey
+        project. Membership is `editor_variables.uid` integers. Hierarchy is
+        nested `variable_groups` objects, not DDI IDREF strings.
+        This is the shape the editor UI GET/POSTs. Project JSON export
+        (`/editor/json/{id}`) uses interchange rows instead (space-separated
+        VIDs/VGIDs).
+      operationId: listVariableGroups
+      parameters:
+        - name: id
+          in: path
+          description: Project ID (numeric)
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Nested variable group tree
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  variable_groups:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VariableGroupStored"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - Microdata
+      summary: Replace variable groups
+      description: >
+        Replace the project's variable group tree. Body must be the nested
+        storage shape (`vgid` required, `variables` unique positive UIDs,
+        nested `variable_groups` objects). DDI-style space-separated VID/VGID
+        strings are rejected. Empty array clears all groups.
+      operationId: replaceVariableGroups
+      parameters:
+        - name: id
+          in: path
+          description: Project ID (numeric)
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - variable_groups
+              properties:
+                variable_groups:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/VariableGroupStored"
+      responses:
+        "200":
+          description: Groups saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+        "400":
+          description: Validation failed (missing vgid, DDI strings, duplicate ids)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - ApiKeyAuth: []
+  "/import_metadata/{id}":
+    post:
+      tags:
+        - Microdata
+      summary: Import metadata into an existing project
+      description: >
+        Import JSON or DDI/XML into an existing project. For microdata DDI,
+        `options` is a comma-separated list of sections to apply.
+        When `variable_groups` is included, the project's group tree is
+        replaced from the DDI (VID membership is mapped to UIDs after
+        variables are imported). JSON import maps `variable_groups` when
+        the key is present (interchange rows or a nested tree).
+      operationId: importProjectMetadata
+      parameters:
+        - name: id
+          in: path
+          description: Project ID (numeric)
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  description: Metadata file (JSON or DDI/XML)
+                  type: string
+                  format: binary
+                options:
+                  description: >
+                    DDI only. Comma-separated sections to import.
+                    Allowed values: `document_description`, `study_description`,
+                    `data_files`, `variable_info`, `variable_documentation`,
+                    `variable_categories`, `variable_questions`,
+                    `variable_weights`, `variable_groups`, `import_new_data`.
+                  type: string
+                  example: study_description,variable_info,variable_groups
+      responses:
+        "200":
+          description: Import completed
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - ApiKeyAuth: []
   "/editor/sdmx/{id}":
     post:
       tags:
@@ -1098,7 +1244,9 @@ paths:
         Provide either a multipart `file` upload (legacy) or a completed resumable `upload_id`.
         For ZIP packages with a duplicate package IDNO, use `on_idno_conflict=assign_new_idno`
         to import as a new project with a generated internal IDNO while preserving study IDNO
-        from the package metadata.
+        from the package metadata. Microdata JSON/JSONL/DDI imports `variable_groups`
+        when present (interchange VID/VGID rows or a nested tree; membership is
+        mapped to variable UIDs after variables are imported).
       operationId: importProject
       requestBody:
         required: true
@@ -6066,6 +6214,134 @@ components:
       name: X-API-Key
       description: API key for authentication
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: failed
+        message:
+          type: string
+    VariableGroupConcept:
+      type: object
+      properties:
+        concept:
+          type: string
+          example: Age
+        vocab:
+          type: string
+          example: DDI
+        uri:
+          type: string
+          format: uri
+          example: https://example.org
+    VariableGroupStored:
+      type: object
+      description: >
+        Editor storage shape used by GET/POST `/variable_groups/{id}`.
+        Nested tree; membership is `editor_variables.uid` integers.
+      required:
+        - vgid
+      properties:
+        vgid:
+          type: string
+          maxLength: 45
+          example: VG1
+        group_type:
+          type: string
+          enum:
+            - subject
+            - section
+            - multiResp
+            - grid
+            - display
+            - repetition
+            - version
+            - iteration
+            - analysis
+            - pragmatic
+            - record
+            - file
+            - randomized
+            - other
+        label:
+          type: string
+        txt:
+          type: string
+        universe:
+          type: string
+        notes:
+          type: string
+        definition:
+          type: string
+        variables:
+          type: array
+          description: Variable UIDs (not DDI VIDs)
+          items:
+            type: integer
+          example: [1042, 1043]
+        concepts:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariableGroupConcept"
+        variable_groups:
+          type: array
+          description: Nested child groups
+          items:
+            $ref: "#/components/schemas/VariableGroupStored"
+    VariableGroupInterchange:
+      type: object
+      description: >
+        DDI/JSON export-import row (`variable-group-schema.json`).
+        `variables` and `variable_groups` are space-separated VID/VGID
+        strings. Hierarchy is rebuilt on import.
+      required:
+        - vgid
+      properties:
+        vgid:
+          type: string
+          maxLength: 45
+          example: VG1
+        group_type:
+          type: string
+          description: JSON/UI uses `multiResp`; DDI writes `multipleResp`
+          enum:
+            - subject
+            - section
+            - multiResp
+            - grid
+            - display
+            - repetition
+            - version
+            - iteration
+            - analysis
+            - pragmatic
+            - record
+            - file
+            - randomized
+            - other
+        label:
+          type: string
+        txt:
+          type: string
+        universe:
+          type: string
+        notes:
+          type: string
+        definition:
+          type: string
+        variables:
+          type: string
+          description: Space-separated VIDs (DDI `@var`)
+          example: V1 V2 V3
+        variable_groups:
+          type: string
+          description: Space-separated child VGIDs (DDI `@varGrp`)
+          example: VG2 VG5
+        concepts:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariableGroupConcept"
     MetadataChangePatchItem:
       type: object
       description: Single metadata change at a JSON Pointer path

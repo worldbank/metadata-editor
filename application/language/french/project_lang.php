@@ -484,6 +484,18 @@ $lang['variable_categories'] = 'Catégories de la variable';
 $lang['variable_questions'] = 'Questions de la variable';
 $lang['variable_weights'] = 'Poids de la variable';
 $lang['variable_groups'] = 'Groupes de la variable';
+$lang['new_variable_group'] = 'Nouveau groupe';
+$lang['no_variable_groups'] = 'Vous n\'avez aucun groupe de variables. Utilisez + pour en créer un.';
+$lang['delete_variable_group_confirm'] = 'Supprimer ce groupe de variables et ses sous-groupes ?';
+$lang['remove_variable_from_group_confirm'] = 'Retirer cette variable du groupe ?';
+$lang['select_variables'] = 'Sélectionner des variables';
+$lang['variable_selection'] = 'Sélection de variables';
+$lang['variable_selection_hint'] = 'Cliquez sur une ligne pour sélectionner. Maj+clic pour sélectionner une plage.';
+$lang['all_data_files'] = 'Tous les fichiers de données';
+$lang['move_up'] = 'Monter';
+$lang['move_down'] = 'Descendre';
+$lang['concepts'] = 'Concepts';
+$lang['failed_to_save_changes'] = 'Échec de l\'enregistrement des modifications';
 
 // Data storage options
 $lang['Store data'] = "Stocker les données";

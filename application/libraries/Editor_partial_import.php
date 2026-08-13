@@ -353,10 +353,10 @@ class Editor_partial_import
 		}
 
 
-		/*
-        //import variable groups
-        $this->create_update_variable_groups($sid,$parser->get_variable_groups());
-		*/
+		if (in_array('variable_groups', $import_options)){
+			$groups=$parser->get_variable_groups();
+			$this->ci->Editor_variable_groups_model->import_from_interchange($sid, is_array($groups) ? $groups : array());
+		}
 
 		$result=array();
 		if (!empty($variable_warnings)){

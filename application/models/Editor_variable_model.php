@@ -89,11 +89,16 @@ class Editor_variable_model extends ci_model {
         $this->db->where('sid',$sid);
         $this->db->where_in('uid',$uid_list);
         $this->db->delete('editor_variables');
-        return 
+        $result=
         [
             'rows'=>$this->db->affected_rows(),
             'query'=>$this->db->last_query()
         ];
+
+        $this->load->model('Editor_variable_groups_model');
+        $this->Editor_variable_groups_model->remove_variable_uids($sid,$uid_list);
+
+        return $result;
     }
 
 

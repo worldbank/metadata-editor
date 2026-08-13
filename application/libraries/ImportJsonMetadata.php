@@ -326,6 +326,8 @@ class ImportJsonMetadata
         
         // Stream process variables array in batches
         $this->stream_process_variables($sid, $json_file_path, $file_id_mappings, $validate);
+
+        $this->stream_process_variable_groups($sid, $json_file_path);
         
         return true;
     }
@@ -554,6 +556,7 @@ class ImportJsonMetadata
         $file_id_mappings = null;
         $project_type = null;
         $canonical_project_type = null;
+        $pending_variable_groups = null;
 
         try {
             while (($line = fgets($handle)) !== false) {
@@ -624,6 +627,9 @@ class ImportJsonMetadata
                             
                             // Import project metadata first
                             $project_data_for_import = $project_data_merged;
+                            if (array_key_exists('variable_groups', $project_data_merged)) {
+                                $pending_variable_groups = $project_data_merged['variable_groups'];
+                            }
                             unset($project_data_for_import['data_files']);
                             unset($project_data_for_import['variables']);
                             unset($project_data_for_import['variable_groups']);
@@ -685,6 +691,10 @@ class ImportJsonMetadata
             }
             // Clear batch
             $variable_batch = array();
+        }
+
+        if ($is_microdata_project && $pending_variable_groups !== null) {
+            $this->ci->Editor_variable_groups_model->import_from_interchange($sid, $pending_variable_groups);
         }
 
         // For non-survey/microdata projects, process project metadata
@@ -805,7 +815,8 @@ class ImportJsonMetadata
             unset($json_data['variables']);
         }
 
-        if (isset($json_data['variable_groups'])){
+        $has_variable_groups=array_key_exists('variable_groups',$json_data);
+        if ($has_variable_groups){
             $variable_groups=$json_data['variable_groups'];
             unset($json_data['variable_groups']);
         }
@@ -818,8 +829,9 @@ class ImportJsonMetadata
         //import variable metadata
         $this->import_variable_metadata($sid,$variables, $file_id_mappings, $validate);
 
-        //import variable groups
-        //$this->import_variable_groups($sid,$variable_groups, $validate);
+        if ($has_variable_groups){
+            $this->ci->Editor_variable_groups_model->import_from_interchange($sid,$variable_groups);
+        }
     }
     
     /**
@@ -979,6 +991,33 @@ class ImportJsonMetadata
             // If variables array doesn't exist, that's okay (some projects may not have variables)
             log_message('debug', 'No variables array found or error reading: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Stream variable_groups from JSON after variables are imported (VID -> UID).
+     * Missing key leaves existing groups unchanged.
+     */
+    private function stream_process_variable_groups($sid, $json_file_path)
+    {
+        require_once(APPPATH.'../vendor/autoload.php');
+
+        $groups = array();
+
+        try {
+            $items = Items::fromFile($json_file_path, array(
+                'decoder' => new ExtJsonDecoder(true),
+                'pointer' => '/variable_groups',
+            ));
+
+            foreach ($items as $group) {
+                $groups[] = $group;
+            }
+        } catch (Exception $e) {
+            log_message('debug', 'No variable_groups array found or error reading: ' . $e->getMessage());
+            return;
+        }
+
+        $this->ci->Editor_variable_groups_model->import_from_interchange($sid, $groups);
     }
     
     /**

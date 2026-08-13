@@ -672,7 +672,8 @@ CREATE TABLE `editor_variable_groups` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int DEFAULT NULL,
   `metadata` MEDIUMTEXT,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uidx_editor_variable_groups_sid` (`sid`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
