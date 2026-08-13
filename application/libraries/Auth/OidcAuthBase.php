@@ -274,32 +274,21 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
     }
 
     /**
-     * Validate state parameter consistently for both client types
+     * Validate state against the value stored in the PHP session.
+     * $client_type is unused; both confidential and public clients compare to session.
      */
     protected function validate_state($provided_state, $client_type = 'confidential')
     {
         if (!isset($this->oidc_config['validate_state']) || !$this->oidc_config['validate_state']) {
             return true;
         }
-        
-        $stored_state = null;
-        
-        if ($client_type === 'confidential') {
-            $stored_state = $this->ci->session->userdata('oidc_state');
-        } else {
-            // For public clients, state validation happens on frontend,
-            // but we should still validate it was passed correctly
-            if (empty($provided_state)) {
-                return false;
-            }
-            // Additional validation can be added here if needed
-            return true;
-        }
-        
+
+        $stored_state = $this->ci->session->userdata('oidc_state');
+
         if (empty($stored_state) || empty($provided_state)) {
             return false;
         }
-        
+
         return hash_equals($stored_state, $provided_state);
     }
     

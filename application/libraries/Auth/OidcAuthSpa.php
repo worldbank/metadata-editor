@@ -195,8 +195,12 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
             
             // Get authorization URL with PKCE
             $auth_url = $this->ci->oidcclient->getAuthorizationUrl($state, $nonce, $code_challenge, array(), $redirect_uri);
+
+            $this->ci->session->set_userdata('oidc_state', $state);
+            $this->ci->session->set_userdata('oidc_nonce', $nonce);
+            $this->ci->session->set_userdata('oidc_code_verifier', $code_verifier);
             
-            // Return JSON response for frontend
+            // Return JSON response for frontend (sessionStorage UX check; server validates from session)
             $response = array(
                 'auth_url' => $auth_url,
                 'code_verifier' => $code_verifier,
@@ -220,7 +224,7 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
     
     /**
      * API endpoint: Handle OIDC callback for SPA/public client
-     * Accepts code, state, and code_verifier from frontend
+     * Accepts code and state from frontend; PKCE verifier and nonce come from the session.
      * Returns JSON with tokens and user info
      */
     function oidc_callback_api()
@@ -236,34 +240,33 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
         try {
             $this->ci->load->library('OidcClient');
             
-            // Get parameters from POST/GET
             $code = $this->ci->input->post('code') ?: $this->ci->input->get('code');
             $state = $this->ci->input->post('state') ?: $this->ci->input->get('state');
-            $code_verifier = $this->ci->input->post('code_verifier') ?: $this->ci->input->get('code_verifier');
-            $nonce = $this->ci->input->post('nonce') ?: $this->ci->input->get('nonce');
+            $code_verifier = $this->ci->session->userdata('oidc_code_verifier');
+            $nonce = $this->ci->session->userdata('oidc_nonce');
             
-            // Validate required parameters
             if (empty($code)) {
                 throw new Exception('Authorization code is required');
-            }
-            if (empty($code_verifier)) {
-                throw new Exception('code_verifier is required for PKCE flow');
             }
             if (empty($state)) {
                 throw new Exception('State parameter is required');
             }
+            if (!$this->validate_state($state, 'public')) {
+                throw new Exception('Invalid state parameter - possible CSRF attack');
+            }
+            if (empty($code_verifier)) {
+                throw new Exception('Session expired. Please try logging in again.');
+            }
             if (empty($nonce)) {
-                throw new Exception('Nonce parameter is required');
+                throw new Exception('Session expired. Please try logging in again.');
             }
             
-            // Check for errors from provider
             $error = $this->ci->input->get('error') ?: $this->ci->input->post('error');
             if ($error) {
                 $error_description = $this->ci->input->get('error_description') ?: $this->ci->input->post('error_description');
                 throw new Exception('OIDC error: ' . $error . ($error_description ? ' - ' . $error_description : ''));
             }
             
-            // Exchange code for tokens using PKCE
             $tokens = $this->ci->oidcclient->exchangeCodeForTokens($code, $state, $code_verifier);
             
             if (empty($tokens['id_token'])) {
@@ -272,8 +275,11 @@ class OidcAuthSpa extends OidcAuthBase implements AuthInterface {
             
             $id_token = $tokens['id_token'];
             
-            // Validate ID token
             $claims = $this->ci->oidcclient->validateIdToken($id_token, $nonce);
+
+            $this->ci->session->unset_userdata('oidc_state');
+            $this->ci->session->unset_userdata('oidc_nonce');
+            $this->ci->session->unset_userdata('oidc_code_verifier');
             
             // Map claims to user data
             $user_data = $this->mapClaimsToUserData($claims);
