@@ -776,8 +776,20 @@ class Templates extends MY_REST_Controller
 			if (!isset($options['new_uid'])){
 				throw new Exception("Missing parameter for `new_uid`");
 			}
-			
-			$result=$this->Editor_template_model->replace_uid($options['old_uid'], $options['new_uid']);
+
+			$old_uid=$options['old_uid'];
+			$template=$this->Editor_template_model->get_template_by_uid($old_uid);
+
+			if (!$template){
+				throw new Exception("Template not found: ".$old_uid);
+			}
+
+			if (!empty($template['template_type']) && $template['template_type']!=='custom'){
+				throw new Exception("Read-only templates cannot have their UID changed.");
+			}
+
+			$this->editor_acl->user_can_manage_template($old_uid, $this->user);
+			$result=$this->Editor_template_model->replace_uid($old_uid, $options['new_uid']);
 
 			$response=array(
 				'status'=>'success',
