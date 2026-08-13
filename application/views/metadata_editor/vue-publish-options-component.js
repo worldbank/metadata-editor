@@ -235,6 +235,7 @@ Vue.component('publish-options', {
                 "metadata":{
                     "messages":[],
                     "errors":[],
+                    "warnings":[],
                 },
                 "thumbnail":{
                     "messages":[],
@@ -304,6 +305,50 @@ Vue.component('publish-options', {
                 return false;
             }
             return true;
+        },
+        /**
+         * When JSON create failed and NADA accepted DDI import, surface the JSON error.
+         */
+        buildDdiFallbackWarning: function (data) {
+            if (!data || typeof data !== 'object') {
+                return null;
+            }
+            var via = data._published_via || data.published_via;
+            var warningPayload = data._json_publish_warning || data.json_publish_warning;
+            if (via !== 'import_ddi' && !warningPayload) {
+                return null;
+            }
+            var summary = this.$te('metadata_published_via_ddi_fallback')
+                ? this.$t('metadata_published_via_ddi_fallback')
+                : 'Published via DDI/XML because JSON publish failed. JSON may include fields not carried by DDI — review the catalog error below.';
+            var out = {
+                summary: summary,
+                message: '',
+                httpStatus: null,
+                bodyFormat: null,
+                nada: null,
+                jsonDetail: null,
+                rawBody: ''
+            };
+            if (!warningPayload || typeof warningPayload !== 'object') {
+                return out;
+            }
+            out.message = typeof warningPayload.message === 'string' ? warningPayload.message : '';
+            var details = warningPayload.details && typeof warningPayload.details === 'object'
+                ? warningPayload.details
+                : null;
+            if (details) {
+                out.nada = details;
+                out.httpStatus = details.status != null ? details.status : null;
+                out.bodyFormat = details.body_format || null;
+                if (details.response_ != null) {
+                    out.jsonDetail = details.response_;
+                }
+                if (details.raw_body) {
+                    out.rawBody = details.raw_body;
+                }
+            }
+            return out;
         },
         saveUnsavedProjectIfNeeded: async function () {
             var root = this.$root;
@@ -696,6 +741,10 @@ Vue.component('publish-options', {
                     successMsg = vm.$t("metadata_published_with_idno") + data.dataset.idno;
                 }
                 vm.publish_responses.metadata.messages.push(successMsg);
+                var ddiWarning = vm.buildDdiFallbackWarning(data);
+                if (ddiWarning) {
+                    vm.publish_responses.metadata.warnings.push(ddiWarning);
+                }
                 return true;
             } catch (error) {
                 console.log("publishing project failed", error);
@@ -1860,11 +1909,28 @@ Vue.component('publish-options', {
                                             <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
                                         </div>    
                                     </div>
-                                    <div v-else-if="publish_responses.metadata.messages.length>0">
-                                        <div class="border m-1 text-success" v-for="(message, msg_index) in publish_responses.metadata.messages" :key="'pub-meta-msg-' + msg_index">
-                                            <span class="mdi mdi-check-circle text-success"></span> {{ message }}
+                                    <template v-else>
+                                        <div v-if="publish_responses.metadata.messages.length>0">
+                                            <div class="border m-1 text-success" v-for="(message, msg_index) in publish_responses.metadata.messages" :key="'pub-meta-msg-' + msg_index">
+                                                <span class="mdi mdi-check-circle text-success"></span> {{ message }}
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div v-if="publish_responses.metadata.warnings && publish_responses.metadata.warnings.length>0" class="mt-2">
+                                            <div class="border rounded border-warning p-2 mb-2 text-left text-body" v-for="(warn, warn_index) in publish_responses.metadata.warnings" :key="'pub-meta-warn-' + warn_index">
+                                                <div class="text-warning font-weight-bold">
+                                                    <span class="mdi mdi-alert"></span> {{ warn.summary }}
+                                                </div>
+                                                <div v-if="warn.message" class="small mt-1">
+                                                    <strong>{{ $te('metadata_json_publish_error') ? $t('metadata_json_publish_error') : 'JSON publish error' }}:</strong> {{ warn.message }}
+                                                </div>
+                                                <div v-if="warn.httpStatus != null" class="text-muted small">Catalog HTTP {{ warn.httpStatus }}</div>
+                                                <div v-if="warn.nada && warn.nada.api_url" class="text-muted small text-break">URL: {{ warn.nada.api_url }}</div>
+                                                <div v-if="warn.bodyFormat" class="text-muted small">Catalog response: {{ warn.bodyFormat }}</div>
+                                                <pre v-if="warn.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(warn.jsonDetail) }}</pre>
+                                                <pre v-if="warn.rawBody && warn.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ warn.rawBody }}</pre>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <div v-if="publish_selection_snapshot && publish_selection_snapshot.is_indicator_project && publish_selection_snapshot.publish_dsd" class="mt-3">

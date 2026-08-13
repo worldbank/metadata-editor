@@ -130,15 +130,34 @@ class Editor_publish_model extends ci_model {
 			$classified = $this->classify_catalog_error_body($response_text, $content_type);
 
 			if ($nada_dataset_type === 'survey' && !empty($import_ddi_url)) {
+				$json_error_summary = $this->summarize_catalog_error($classified, $resp->getStatusCode());
+				$json_error_details = $this->catalog_error_details_payload($classified, $resp, $catalog_url);
+
 				try {
-					return $this->publish_metadata_import_ddi($sid, $import_ddi_url, $catalog_api_key, $options);
+					$ddi_result = $this->publish_metadata_import_ddi($sid, $import_ddi_url, $catalog_api_key, $options);
+
+					// DDI succeeded — keep JSON failure visible so users can fix schema/field issues.
+					log_message(
+						'error',
+						'NADA JSON publish failed for project '.$sid.'; published via import_ddi. '.$json_error_summary
+					);
+
+					if (is_array($ddi_result)) {
+						$ddi_result['_published_via'] = 'import_ddi';
+						$ddi_result['_json_publish_warning'] = array(
+							'message' => $json_error_summary,
+							'details' => $json_error_details,
+						);
+					}
+
+					return $ddi_result;
 				} catch (Exception $ddi_ex) {
 					$ddi_details = ($ddi_ex instanceof ApiRequestException) ? $ddi_ex->getDetails() : null;
 					throw new ApiRequestException(
-						$this->summarize_catalog_error($classified, $resp->getStatusCode())
+						$json_error_summary
 							. ' | DDI import: ' . $ddi_ex->getMessage(),
 						array_merge(
-							$this->catalog_error_details_payload($classified, $resp, $catalog_url),
+							$json_error_details,
 							[
 								'ddi_fallback_error' => $ddi_ex->getMessage(),
 								'ddi_fallback_details' => $ddi_details,
