@@ -93,8 +93,7 @@
           "description": "Checksum value for the document using SHA-256",
           "type": "string"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "study_desc": {
       "type": "object",
@@ -1618,8 +1617,7 @@
       },
       "required": [
         "title_statement"
-      ],
-      "additionalProperties": false
+      ]
     }
   },
   "type": "object",
@@ -1650,8 +1648,7 @@
       "title": "Variable groups",
       "items": {
         "$ref": "variable-group-schema.json"
-      },
-      "additionalProperties": false
+      }
     }
   }
 }
