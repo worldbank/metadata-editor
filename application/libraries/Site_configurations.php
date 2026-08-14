@@ -8,6 +8,15 @@ class Site_configurations {
 	/** @var CI_Controller */
 	protected $ci;
 
+	/** @var string[] Config keys stored as JSON in the database */
+	protected $json_formatted = array(
+		'admin_allowed_ip',
+		'admin_allowed_hosts',
+		'supported_languages',
+		'default_user_roles',
+		'enabled_project_schemas',
+	);
+
 	/**
 	 * @return void
 	 */
@@ -17,27 +26,16 @@ class Site_configurations {
 		$this->ci->load->model('configurations_model');
 
 		$settings = $this->ci->configurations_model->load();
-
-		$json_formatted = array(
-			'admin_allowed_ip',
-			'admin_allowed_hosts',
-			'supported_languages',
-			'default_user_roles',
-			'enabled_project_schemas',
-		);
+		$existing_keys = array();
 
 		if ($settings) {
 			foreach ($settings as $setting) {
-				if (in_array($setting['name'], $json_formatted)) {
-					$decoded = json_decode($setting['value'], true);
-					if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-						$this->ci->config->set_item($setting['name'], $decoded);
-					}
-				} else {
-					$this->ci->config->set_item($setting['name'], $setting['value']);
-				}
+				$existing_keys[$setting['name']] = true;
+				$this->apply_config_item($setting['name'], $setting['value']);
 			}
 		}
+
+		$this->seed_missing_defaults($existing_keys);
 
 		$this->normalize_boolean_config('project_sharing');
 		$this->normalize_boolean_config('metadata_assessment_enabled');
@@ -47,6 +45,61 @@ class Site_configurations {
 		$this->normalize_boolean_config('tags_enabled');
 		$this->normalize_enabled_project_schemas();
 		$this->build_language_codes();
+	}
+
+	/**
+	 * Insert config.defaults.php keys that are not yet in the database, and apply them to CI config.
+	 * Missing feature flags (issues, data structures, schemas, tags) otherwise hide nav until Site Configurations is opened.
+	 *
+	 * @param array|null $existing_keys name => anything for keys already loaded from the database
+	 * @return void
+	 */
+	public function seed_missing_defaults($existing_keys = null)
+	{
+		$path = APPPATH.'config/config.defaults.php';
+		if (!is_file($path)) {
+			return;
+		}
+
+		include $path;
+
+		if (!isset($config) || !is_array($config) || count($config) === 0) {
+			return;
+		}
+
+		if ($existing_keys === null) {
+			$existing_keys = $this->ci->configurations_model->get_config_array();
+			if (!is_array($existing_keys)) {
+				$existing_keys = array();
+			}
+		}
+
+		foreach ($config as $key => $value) {
+			if (array_key_exists($key, $existing_keys)) {
+				continue;
+			}
+
+			$this->ci->configurations_model->add($key, $value);
+			$this->apply_config_item($key, $value);
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @param mixed  $value
+	 * @return void
+	 */
+	protected function apply_config_item($name, $value)
+	{
+		if (in_array($name, $this->json_formatted)) {
+			$decoded = json_decode($value, true);
+			if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+				$this->ci->config->set_item($name, $decoded);
+				return;
+			}
+		}
+
+		$this->ci->config->set_item($name, $value);
 	}
 
 	/**

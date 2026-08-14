@@ -186,6 +186,83 @@ class ImportPackage
 
 
     /**
+     * Normalize a package-relative path from info.json.
+     * Rejects absolute paths and parent-directory segments.
+     *
+     * @param string $relative
+     * @return string Unix-style relative path
+     */
+    private function normalize_package_relative_path($relative)
+    {
+        if (!is_string($relative)) {
+            throw new Exception("Unsafe path in package info.json");
+        }
+
+        $relative = str_replace('\\', '/', trim($relative));
+        if ($relative === '') {
+            throw new Exception("Unsafe path in package info.json");
+        }
+
+        if ($relative[0] === '/' || preg_match('#^[A-Za-z]:/#', $relative)) {
+            throw new Exception("Unsafe path in package info.json: " . $relative);
+        }
+
+        $parts = explode('/', $relative);
+        $normalized = array();
+        foreach ($parts as $part) {
+            if ($part === '' || $part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                throw new Exception("Unsafe path in package info.json: " . $relative);
+            }
+            $normalized[] = $part;
+        }
+
+        if (empty($normalized)) {
+            throw new Exception("Unsafe path in package info.json: " . $relative);
+        }
+
+        return implode('/', $normalized);
+    }
+
+    /**
+     * Resolve a package-relative file so it cannot escape $base_dir.
+     * Missing files return null (callers may fall back). Unsafe paths throw.
+     *
+     * @param string $base_dir Extracted project folder
+     * @param string $relative Path from info.json
+     * @return string|null Absolute path if the file exists inside $base_dir
+     */
+    private function resolve_package_file($base_dir, $relative)
+    {
+        if (!is_string($relative) || trim($relative) === '') {
+            return null;
+        }
+
+        $relative = $this->normalize_package_relative_path($relative);
+
+        $base_real = realpath($base_dir);
+        if ($base_real === false) {
+            throw new Exception("Project folder not found");
+        }
+
+        $candidate = $base_real . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        $resolved = realpath($candidate);
+        if ($resolved === false || !is_file($resolved)) {
+            return null;
+        }
+
+        $prefix = rtrim(str_replace('\\', '/', $base_real), '/') . '/';
+        $resolved_unix = str_replace('\\', '/', $resolved);
+        if (strpos($resolved_unix, $prefix) !== 0) {
+            throw new Exception("Unsafe path in package info.json: " . $relative);
+        }
+
+        return $resolved;
+    }
+
+    /**
      * Reject unsafe ZIP entry paths before extraction.
      *
      * @param string $zip_path
@@ -301,27 +378,27 @@ class ImportPackage
 
         // Try JSON first
         if (!empty($project_info['json_file'])){
-            $json_path = $project_path . '/' . $project_info['json_file'];
-            if (file_exists($json_path)){
+            $json_path = $this->resolve_package_file($project_path, $project_info['json_file']);
+            if ($json_path){
                 $metadata_file_path = $json_path;
                 $file_source = 'json_file';
                 log_message('info', "Using JSON metadata file: " . $json_path);
             }
             else {
-                log_message('info', "JSON file specified but not found: " . $json_path);
+                log_message('info', "JSON file specified but not found: " . $project_info['json_file']);
             }
         }
 
         // Fallback to XML if JSON not available
         if (!$metadata_file_path && !empty($project_info['xml_file'])){
-            $xml_path = $project_path . '/' . $project_info['xml_file'];
-            if (file_exists($xml_path)){
+            $xml_path = $this->resolve_package_file($project_path, $project_info['xml_file']);
+            if ($xml_path){
                 $metadata_file_path = $xml_path;
                 $file_source = 'xml_file';
                 log_message('info', "Falling back to XML metadata file: " . $xml_path);
             }
             else {
-                log_message('info', "XML file specified but not found: " . $xml_path);
+                log_message('info', "XML file specified but not found: " . $project_info['xml_file']);
             }
         }
 
@@ -358,27 +435,27 @@ class ImportPackage
 
         // Try RDF JSON first
         if (!empty($project_info['rdf_json_file'])){
-            $rdf_json_path = $project_path . '/' . $project_info['rdf_json_file'];
-            if (file_exists($rdf_json_path)){
+            $rdf_json_path = $this->resolve_package_file($project_path, $project_info['rdf_json_file']);
+            if ($rdf_json_path){
                 $rdf_file_path = $rdf_json_path;
                 $file_type = 'json';
                 log_message('info', "Using RDF JSON file: " . $rdf_json_path);
             }
             else {
-                log_message('info', "RDF JSON file specified but not found: " . $rdf_json_path);
+                log_message('info', "RDF JSON file specified but not found: " . $project_info['rdf_json_file']);
             }
         }
 
         // Fallback to RDF XML if RDF JSON not available
         if (!$rdf_file_path && !empty($project_info['rdf_xml_file'])){
-            $rdf_xml_path = $project_path . '/' . $project_info['rdf_xml_file'];
-            if (file_exists($rdf_xml_path)){
+            $rdf_xml_path = $this->resolve_package_file($project_path, $project_info['rdf_xml_file']);
+            if ($rdf_xml_path){
                 $rdf_file_path = $rdf_xml_path;
                 $file_type = 'xml';
                 log_message('info', "Falling back to RDF XML file: " . $rdf_xml_path);
             }
             else {
-                log_message('info', "RDF XML file specified but not found: " . $rdf_xml_path);
+                log_message('info', "RDF XML file specified but not found: " . $project_info['rdf_xml_file']);
             }
         }
 
@@ -428,6 +505,7 @@ class ImportPackage
         $thumbnail = isset($project_info['thumbnail']) ? $project_info['thumbnail'] : null;
 
         if ($thumbnail){
+            $thumbnail = $this->normalize_package_relative_path($thumbnail);
             $this->ci->Editor_model->set_project_options($sid, array(
                 'thumbnail' => $thumbnail
             ));
