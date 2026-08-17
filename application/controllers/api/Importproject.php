@@ -188,10 +188,10 @@ class ImportProject extends MY_REST_Controller
 					$import_package_options['preserve_project_idno'] = true;
 				}
 
+				$import_report = null;
 				if ($file_ext=='xml'){
 					if (in_array($options['type'],array('survey','microdata'))){
 						$result=$this->Editor_model->import_ddi_from_path($sid, $uploaded_filepath, $parseOnly=false, $options);
-						$this->link_data_files($sid);
 					}
 					else if ($options['type']=='geospatial'){
 						$this->load->library('Geospatial_import');
@@ -200,10 +200,11 @@ class ImportProject extends MY_REST_Controller
 					else{
 						throw new Exception("Unsupported file type");
 					}
+					$import_report = $this->write_sidecar_import_report($sid, $file_ext, $uploaded_filepath, $user_id);
 				}else if ($file_ext=='json' || $file_ext=='jsonl'){
 					$this->load->library('ImportJsonMetadata');
 					$result=$this->importjsonmetadata->import($sid,$uploaded_filepath,$validate=true,$options);
-					$this->link_data_files($sid);
+					$import_report = $this->write_sidecar_import_report($sid, $file_ext, $uploaded_filepath, $user_id);
 				}
 				else if ($file_ext=='zip')
 				{
@@ -211,6 +212,9 @@ class ImportProject extends MY_REST_Controller
 
 					if (!$idno_reassigned && isset($result['project_info']['idno'])){
 						$idno=$result['project_info']['idno'];
+					}
+					if (isset($result['import_report'])) {
+						$import_report = $result['import_report'];
 					}
 				}
 
@@ -235,9 +239,13 @@ class ImportProject extends MY_REST_Controller
 					'idno'=>$idno,
 					'study_idno'=>$study_idno,
 					'idno_reassigned'=>$idno_reassigned,
+					'open_import_report'=>true,
 				);
 				if ($package_idno !== '') {
 					$output['package_idno'] = $package_idno;
+				}
+				if ($import_report) {
+					$output['import_report'] = $this->summarize_import_report_for_response($import_report);
 				}
 
 				if ($file_ctx['cleanup_upload']) {
@@ -294,6 +302,121 @@ class ImportProject extends MY_REST_Controller
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * GET /api/importproject/report/{sid}
+	 */
+	function report_get($sid=null)
+	{
+		try {
+			$sid = (int) $sid;
+			if (!$sid) {
+				throw new Exception("Project ID is required");
+			}
+
+			$exists = $this->Editor_model->check_id_exists($sid);
+			if (!$exists) {
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid, 'view', $this->api_user());
+
+			$this->load->library('ImportPackage');
+			$report = $this->importpackage->load_import_report($sid);
+
+			if ($report === null) {
+				$this->set_response(array(
+					'status' => 'success',
+					'sid' => $sid,
+					'report' => null,
+				), REST_Controller::HTTP_OK);
+				return;
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'sid' => $sid,
+				'report' => $report,
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'message' => 'ERROR',
+				'errors' => $e->getMessage()
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * POST /api/importproject/retry_csv/{sid}
+	 *   file_id (required)
+	 */
+	function retry_csv_post($sid=null)
+	{
+		try {
+			$sid = (int) $sid;
+			if (!$sid) {
+				throw new Exception("Project ID is required");
+			}
+
+			$exists = $this->Editor_model->check_id_exists($sid);
+			if (!$exists) {
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid, 'edit', $this->api_user());
+
+			$file_id = $this->post_field('file_id');
+			if ($file_id === '' || $file_id === null) {
+				throw new Exception("file_id is required");
+			}
+
+			$this->load->library('ImportPackage');
+			$report = $this->importpackage->retry_generate_working_csv($sid, $file_id, $this->get_api_user_id());
+
+			$this->set_response(array(
+				'status' => 'success',
+				'sid' => $sid,
+				'report' => $report,
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'message' => 'ERROR',
+				'errors' => $e->getMessage()
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	private function write_sidecar_import_report($sid, $source, $uploaded_filepath, $user_id)
+	{
+		try {
+			$this->load->library('ImportPackage');
+			return $this->importpackage->write_basic_import_report(
+				$sid,
+				$source,
+				basename($uploaded_filepath),
+				$user_id
+			);
+		}
+		catch (Exception $e) {
+			log_message('error', 'Failed to write import report: ' . $e->getMessage());
+			return null;
+		}
+	}
+
+	private function summarize_import_report_for_response($report)
+	{
+		if (!is_array($report)) {
+			return null;
+		}
+
+		return array(
+			'overall_status' => isset($report['overall_status']) ? $report['overall_status'] : null,
+			'source' => isset($report['source']) ? $report['source'] : null,
+			'imported_at' => isset($report['imported_at']) ? $report['imported_at'] : null,
+		);
 	}
 
 	private function import_zip_package($sid, $zip_path, $options = array())

@@ -24,6 +24,9 @@ use JsonMachine\JsonDecoder\PassThruDecoder;
  */
 class ImportJsonMetadata
 {
+    const SKIP_DETAIL_LIMIT = 50;
+
+    private $import_stats = array();
 
 	/**
 	 * Constructor
@@ -43,7 +46,45 @@ class ImportJsonMetadata
         // Threshold for using streaming parser (10MB)
         $this->streaming_threshold = 5 * 1024 * 1024;
         $this->import_min_memory_bytes = 1024 * 1024 * 1024;
+        $this->reset_import_stats();
 	}
+
+    public function reset_import_stats()
+    {
+        $this->import_stats = array(
+            'data_files_seen' => 0,
+            'data_files_imported' => 0,
+            'data_files_skipped' => 0,
+            'data_files_skipped_detail' => array(),
+            'variables_seen' => 0,
+            'variables_imported' => 0,
+            'variables_skipped' => 0,
+            'variables_skipped_detail' => array(),
+            'variable_groups' => false,
+            'geospatial' => null,
+        );
+    }
+
+    public function get_import_stats()
+    {
+        return $this->import_stats;
+    }
+
+    private function record_skip($kind, $detail)
+    {
+        $count_key = $kind . '_skipped';
+        $detail_key = $kind . '_skipped_detail';
+        if (!isset($this->import_stats[$count_key])) {
+            $this->import_stats[$count_key] = 0;
+        }
+        $this->import_stats[$count_key]++;
+        if (!isset($this->import_stats[$detail_key]) || !is_array($this->import_stats[$detail_key])) {
+            $this->import_stats[$detail_key] = array();
+        }
+        if (count($this->import_stats[$detail_key]) < self::SKIP_DETAIL_LIMIT) {
+            $this->import_stats[$detail_key][] = $detail;
+        }
+    }
     
     /**
      * 
@@ -60,6 +101,7 @@ class ImportJsonMetadata
      */
     function import($sid,$file_path,$validate=true,$options=array())
     {
+        $this->reset_import_stats();
         $this->ensure_import_php_limits();
 
         // Validate file exists
@@ -831,6 +873,7 @@ class ImportJsonMetadata
 
         if ($has_variable_groups){
             $this->ci->Editor_variable_groups_model->import_from_interchange($sid,$variable_groups);
+            $this->import_stats['variable_groups'] = true;
         }
     }
     
@@ -1018,6 +1061,7 @@ class ImportJsonMetadata
         }
 
         $this->ci->Editor_variable_groups_model->import_from_interchange($sid, $groups);
+        $this->import_stats['variable_groups'] = true;
     }
     
     /**
@@ -1071,6 +1115,7 @@ class ImportJsonMetadata
             
             try {
                 $result = $this->import_feature_catalogue($sid, $feature_types, $user_id, $validate);
+                $this->import_stats['geospatial'] = $result;
                 log_message('info', "Geospatial feature catalogue import completed: " . json_encode($result));
             } catch (Exception $e) {
                 log_message('error', "Error importing feature catalogue: " . $e->getMessage());
@@ -1147,14 +1192,18 @@ class ImportJsonMetadata
 
         foreach($datafiles as $df_idx => $datafile)
         {
+            $this->import_stats['data_files_seen']++;
+
             // Validate required fields
             if (!isset($datafile['file_name'])){
                 log_message('error', "Datafile missing 'file_name' field. Skipping datafile.");
+                $this->record_skip('data_files', 'Missing file_name');
                 continue;
             }
 
             if (!isset($datafile['file_id'])){
                 log_message('error', "Datafile missing 'file_id' field. Skipping datafile: " . $datafile['file_name']);
+                $this->record_skip('data_files', 'Missing file_id: ' . $datafile['file_name']);
                 continue;
             }
 
@@ -1170,6 +1219,7 @@ class ImportJsonMetadata
                 }            
     
                 $this->ci->Editor_datafile_model->update($file_info['id'],$datafile);
+                $this->import_stats['data_files_imported']++;
             }
             else{
                 $file_id=$this->ci->Editor_datafile_model->generate_fileid($sid);
@@ -1181,6 +1231,7 @@ class ImportJsonMetadata
                 }
                 
                 $this->ci->Editor_datafile_model->insert($sid,$datafile);
+                $this->import_stats['data_files_imported']++;
             }
         }
         
@@ -1231,15 +1282,21 @@ class ImportJsonMetadata
         }
         
         foreach($variables as $var_idx => $variable){
+            $this->import_stats['variables_seen']++;
+
             // Validate variable has required fid field
             if (!isset($variable['fid'])){
-                log_message('error', "Variable missing 'fid' field. Skipping variable: " . (isset($variable['name']) ? $variable['name'] : 'unknown'));
+                $var_label = isset($variable['name']) ? $variable['name'] : 'unknown';
+                log_message('error', "Variable missing 'fid' field. Skipping variable: " . $var_label);
+                $this->record_skip('variables', 'Missing fid: ' . $var_label);
                 continue;
             }
 
             // Check if file_id mapping exists
             if (!isset($file_id_mappings[$variable['fid']])){
-                log_message('error', "File ID mapping not found for fid: " . $variable['fid'] . ". Skipping variable: " . (isset($variable['name']) ? $variable['name'] : 'unknown'));
+                $var_label = isset($variable['name']) ? $variable['name'] : 'unknown';
+                log_message('error', "File ID mapping not found for fid: " . $variable['fid'] . ". Skipping variable: " . $var_label);
+                $this->record_skip('variables', 'Unmapped fid ' . $variable['fid'] . ': ' . $var_label);
                 continue;
             }
 
@@ -1311,6 +1368,7 @@ class ImportJsonMetadata
                 //if not exists, insert
                 $this->ci->Editor_variable_model->insert($sid,$variable);
             }
+            $this->import_stats['variables_imported']++;
         }
     }
 

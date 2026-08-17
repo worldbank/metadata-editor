@@ -261,6 +261,7 @@
             echo $this->load->view("metadata_editor/vue-summary-templates-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-validation-report-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-import-report-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-features-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-feature-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-feature-import-component.js",null,true);
@@ -351,6 +352,7 @@
         const AdminMetadataHistory ={template: '<div><admin-metadata-history/></div>'}
         const SdmxCsvExport = {template: '<div><sdmx-csv-export-options/></div>'}
         const ValidationReport ={template: '<div><validation-report/></div>'}
+        const ImportReport ={template: '<div><import-report/></div>'}
         
         const AdminMetadataEdit= VueAdminMetadataEdit;
         //const MetadataTypeEditComp=VueMetadataTypeEdit;
@@ -399,6 +401,7 @@
             { path: '/change-log', component: ProjectHistory },
             { path: '/sdmx-csv-export', component: SdmxCsvExport },
             { path: '/validation-report', component: ValidationReport, name: 'validation-report', props: true },
+            { path: '/import-report', component: ImportReport, name: 'import-report' },
             { path: '/metadata-types', component: MetadataTypesComp, name:'metadata-types', props: true },
             { path: '/metadata-types/:type_id/change-log', component: AdminMetadataHistory, name:'admin-metadata-change-log', props: true },
             //{ path: '/metadata-types/:type_id', component: MetadataTypeEditComp, name:'metadata-type', props: true }
@@ -422,7 +425,7 @@
                 return;
             }
 
-            if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview') {
+            if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview' && to.path !== '/import-report') {
                 next({ path: '/', replace: true });
                 return;
             }

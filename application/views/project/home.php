@@ -1423,9 +1423,13 @@
             });
           }
         },
-        EditProject: function(id) 
+        EditProject: function(id, options)
         {
-          let window_ = window.open(CI.site_url + '/editor/edit/' + id, 'project-' + id);
+          let hash = (options && options.hash) ? options.hash : '';
+          if (hash && hash.charAt(0) !== '#') {
+            hash = '#' + hash;
+          }
+          let window_ = window.open(CI.site_url + '/editor/edit/' + id + hash, 'project-' + id);
           if (window_){
             window_.focus();
           }
@@ -2001,7 +2005,8 @@
             vm.loadProjects();
 
             if (response.data && response.data.sid) {
-              vm.EditProject(response.data.sid);
+              const openReport = response.data.open_import_report;
+              vm.EditProject(response.data.sid, openReport ? { hash: '/import-report' } : null);
             }
           } catch (e) {
             vm.import_file_errors = e;
