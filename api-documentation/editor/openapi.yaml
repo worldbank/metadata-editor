@@ -883,11 +883,11 @@ paths:
       security:
         - ApiKeyAuth: []
   "/editor/delete/{id}":
-    get:
+    post:
       tags:
         - Projects
       summary: Delete project by ID
-      description: Delete project
+      description: Delete a project by ID or IDNO. Requires project edit access.
       operationId: deleteProject
       parameters:
         - name: id
