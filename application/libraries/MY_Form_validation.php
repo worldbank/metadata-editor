@@ -119,6 +119,48 @@ class MY_Form_validation extends CI_Form_validation {
         $this->set_message('is_uri', t('The {field} field must contain a valid URL.'));
         return FALSE;
     }
+
+    /**
+     * Complete calendar date in YYYY-MM-DD.
+     *
+     * @param string $str
+     * @return bool
+     */
+    function iso_date($str)
+    {
+        if ($str === null || $str === '') {
+            return TRUE;
+        }
+        if (!class_exists('Project_validation', false)) {
+            $this->CI->load->library('Project_validation');
+        }
+        if (Project_validation::is_iso_date($str)) {
+            return TRUE;
+        }
+        $this->set_message('iso_date', t('The {field} field must be a date in YYYY-MM-DD format.'));
+        return FALSE;
+    }
+
+    /**
+     * ISO 8601 date allowing YYYY, YYYY-MM, or YYYY-MM-DD.
+     *
+     * @param string $str
+     * @return bool
+     */
+    function iso_date_partial($str)
+    {
+        if ($str === null || $str === '') {
+            return TRUE;
+        }
+        if (!class_exists('Project_validation', false)) {
+            $this->CI->load->library('Project_validation');
+        }
+        if (Project_validation::is_iso_date_partial($str)) {
+            return TRUE;
+        }
+        $this->set_message('iso_date_partial', t('The {field} field must be a date in YYYY, YYYY-MM, or YYYY-MM-DD format.'));
+        return FALSE;
+    }
 	
 	function set_error($message,$field=NULL)
 	{

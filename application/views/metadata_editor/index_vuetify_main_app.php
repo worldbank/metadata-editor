@@ -1163,6 +1163,36 @@
             message: 'Value must be a URL e.g. http://example.com'
         });
 
+        function isEmptyValidationValue(value) {
+            return value === null || value === undefined || value === '';
+        }
+
+        VeeValidate.extend('iso_date', {
+            validate(value) {
+                if (isEmptyValidationValue(value)) {
+                    return true;
+                }
+                if (typeof FieldValidationRulesUtil !== 'undefined') {
+                    return FieldValidationRulesUtil.isIsoDate(String(value));
+                }
+                return true;
+            },
+            message: 'The {_field_} field must be a date in YYYY-MM-DD format.'
+        });
+
+        VeeValidate.extend('iso_date_partial', {
+            validate(value) {
+                if (isEmptyValidationValue(value)) {
+                    return true;
+                }
+                if (typeof FieldValidationRulesUtil !== 'undefined') {
+                    return FieldValidationRulesUtil.isIsoDatePartial(String(value));
+                }
+                return true;
+            },
+            message: 'The {_field_} field must be a date in YYYY, YYYY-MM, or YYYY-MM-DD format.'
+        });
+
         //ignore validation if a required field is empty ('',null or undefined)
         VeeValidate.extend('required', {
             validate (value) {

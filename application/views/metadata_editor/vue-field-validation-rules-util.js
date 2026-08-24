@@ -80,7 +80,39 @@ var FieldValidationRulesUtil = (function () {
         return rules;
     }
 
+    function isIsoDate(value) {
+        if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return false;
+        }
+        var parts = value.split('-');
+        var year = Number(parts[0]);
+        var month = Number(parts[1]);
+        var day = Number(parts[2]);
+        if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31) {
+            return false;
+        }
+        var dt = new Date(Date.UTC(year, month - 1, day));
+        return dt.getUTCFullYear() === year && dt.getUTCMonth() === month - 1 && dt.getUTCDate() === day;
+    }
+
+    function isIsoDatePartial(value) {
+        if (typeof value !== 'string') {
+            return false;
+        }
+        if (/^\d{4}$/.test(value)) {
+            return Number(value) >= 1;
+        }
+        if (/^\d{4}-\d{2}$/.test(value)) {
+            var year = Number(value.slice(0, 4));
+            var month = Number(value.slice(5, 7));
+            return year >= 1 && month >= 1 && month <= 12;
+        }
+        return isIsoDate(value);
+    }
+
     return {
-        normalize: normalize
+        normalize: normalize,
+        isIsoDate: isIsoDate,
+        isIsoDatePartial: isIsoDatePartial
     };
 })();

@@ -617,7 +617,9 @@ class Project_validation
             'min' => 'min_length',
             'max' => 'max_length',
             'max_length' => 'max_length',
-            'min_length' => 'min_length'
+            'min_length' => 'min_length',
+            'iso_date' => 'iso_date',
+            'iso_date_partial' => 'iso_date_partial'
         );
 
         $normalize_and_map_rule = function ($rule) use ($rule_mapping) {
@@ -634,8 +636,7 @@ class Project_validation
                 $rule_value = $matches[2];
 
                 if ($rule_name === 'regex') {
-                    $delim = (strpos($rule_value, '/') === false) ? '/' : '#';
-                    return 'regex_match[' . $delim . $rule_value . $delim . ']';
+                    return self::regex_to_ci_rule($rule_value);
                 }
 
                 if (isset($rule_mapping[$rule_name])) {
@@ -682,6 +683,114 @@ class Project_validation
         });
 
         return implode('|', $mapped_rules);
+    }
+
+    /**
+     * Wrap a regex pattern as a CodeIgniter regex_match rule.
+     * Chooses a PCRE delimiter that is not present in the pattern.
+     *
+     * @param string $pattern Pattern without JS/PCRE delimiters
+     * @return string
+     */
+    public static function regex_to_ci_rule($pattern)
+    {
+        $pattern = (string) $pattern;
+        $delims = array('/', '#', '~', '%', '!', '@', ';');
+        foreach ($delims as $delim) {
+            if (strpos($pattern, $delim) === false) {
+                return 'regex_match[' . $delim . $pattern . $delim . ']';
+            }
+        }
+        return 'regex_match[{' . $pattern . '}]';
+    }
+
+    /**
+     * Merge field-level required / is_required into the field's rules object or pipe string.
+     * Does not strip an existing rules.required entry.
+     *
+     * @param array $item Template field or prop
+     * @return mixed
+     */
+    public static function merge_required_into_rules($item)
+    {
+        $rules = isset($item['rules']) ? $item['rules'] : array();
+        $is_required = !empty($item['is_required']) || !empty($item['required']);
+        if (!$is_required) {
+            return $rules;
+        }
+
+        if (is_string($rules)) {
+            $parts = array_values(array_filter(array_map('trim', explode('|', $rules)), function ($part) {
+                return $part !== '';
+            }));
+            foreach ($parts as $part) {
+                if ($part === 'required' || strpos($part, 'required:') === 0) {
+                    return implode('|', $parts);
+                }
+            }
+            array_unshift($parts, 'required');
+            return implode('|', $parts);
+        }
+
+        if (!is_array($rules) || $rules === array()) {
+            return array('required' => true);
+        }
+
+        if (self::is_associative_array($rules)) {
+            $rules['required'] = true;
+            return $rules;
+        }
+
+        foreach ($rules as $part) {
+            if ($part === 'required' || (is_string($part) && strpos($part, 'required:') === 0)) {
+                return $rules;
+            }
+        }
+        array_unshift($rules, 'required');
+        return $rules;
+    }
+
+    /**
+     * Complete calendar date YYYY-MM-DD.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function is_iso_date($value)
+    {
+        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return false;
+        }
+        $parts = explode('-', $value);
+        $year = (int) $parts[0];
+        $month = (int) $parts[1];
+        $day = (int) $parts[2];
+        if ($year < 1) {
+            return false;
+        }
+        return checkdate($month, $day, $year);
+    }
+
+    /**
+     * ISO 8601 date allowing YYYY, YYYY-MM, or YYYY-MM-DD.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function is_iso_date_partial($value)
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+        if (preg_match('/^\d{4}$/', $value)) {
+            return (int) $value >= 1;
+        }
+        if (preg_match('/^\d{4}-\d{2}$/', $value)) {
+            $year = (int) substr($value, 0, 4);
+            $month = (int) substr($value, 5, 2);
+            return $year >= 1 && $month >= 1 && $month <= 12;
+        }
+        return self::is_iso_date($value);
     }
 
     /**
@@ -734,7 +843,7 @@ class Project_validation
      */
     private function apply_template_field_rules($item, $field_key, $field_path, $value, &$issues, &$validation_report)
     {
-        $rules = isset($item['rules']) ? self::map_frontend_to_backend_rules($item['rules']) : '';
+        $rules = self::map_frontend_to_backend_rules(self::merge_required_into_rules($item));
         if ($rules === '') {
             return;
         }

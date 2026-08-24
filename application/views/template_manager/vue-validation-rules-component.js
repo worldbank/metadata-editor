@@ -7,67 +7,78 @@ Vue.component('validation-rules-component', {
             validation_rules:{
                 "required":{
                     "rule":"required",
-                    "description":"Must have a value",
+                    "label":"Required",
+                    "description":"Must have a value. Use the Required checkbox on the field instead of adding this rule.",
                     "param":false,
-                    "value_type":"regex"
+                    "addable":false
                 },
                 "regex":{
                     "rule":"regex",
-                    "description":"Regular expression - ",
+                    "label":"Regular expression",
+                    "description":"Value must match the pattern. Enter the pattern only, without slashes or flags. Use ^ and $ to match the whole value.",
                     "param":true,
-                    "value_type":"regex"
+                    "value_type":"regex",
+                    "placeholder":"^[A-Z0-9_-]+$",
+                    "hint":"Example: ^[A-Z0-9_-]+$  — do not wrap in /slashes/."
                 },
                 "min":{
                     "rule":"min",
-                    "description":"Minimum length of text",
+                    "label":"Minimum length",
+                    "description":"Minimum number of characters",
                     "param":true,
-                    "value_type":"integer"
+                    "value_type":"integer",
+                    "placeholder":"5"
                 },
                 "max":{
-                    "rule":"max_length",
-                    "description":"Maximum length of text",
+                    "rule":"max",
+                    "label":"Maximum length",
+                    "description":"Maximum number of characters",
                     "param":true,
-                    "value_type":"integer"
+                    "value_type":"integer",
+                    "placeholder":"80"
                 },
                 "alpha":{
                     "rule":"alpha",
-                    "description":"Allow only alphabets",
+                    "label":"Letters only",
+                    "description":"Allow only alphabetic characters",
                     "param":false
                 },
                 "alpha_num":{
                     "rule":"alpha_num",
-                    "description":"Allow only alphabets and numbers",
+                    "label":"Letters and numbers",
+                    "description":"Allow only alphabetic characters and numbers",
                     "param":false
                 },
                 "numeric":{
                     "rule":"numeric",
+                    "label":"Numeric",
                     "description":"Allow only numeric values",
                     "param":false
                 },
                 "is_uri":{
                     "rule":"is_uri",
+                    "label":"URL",
                     "description":"Must be a valid URL",
                     "param":false
                 },
-
-
-
+                "iso_date":{
+                    "rule":"iso_date",
+                    "label":"Date (YYYY-MM-DD)",
+                    "description":"Must be a complete calendar date, for example 2024-03-15",
+                    "param":false
+                },
+                "iso_date_partial":{
+                    "rule":"iso_date_partial",
+                    "label":"Date (YYYY, YYYY-MM, or YYYY-MM-DD)",
+                    "description":"Must be a year, year-month, or full date, for example 2024, 2024-03, or 2024-03-15",
+                    "param":false
+                }
             }
         }
     },
     created: function () {           
     },
     computed: {
-        /*local()
-        {
-            return this.value ? this.value : {};
-            if (this.isValidFormat(this.value)){
-                return this.value;
-            }
-            
-
-            return {};
-        },*/
         local:{
             get(){                
                 if (this.isValidFormat(this.value)){
@@ -81,18 +92,26 @@ Vue.component('validation-rules-component', {
         },
         ValidationRules()
         {
-            return this.validation_rules;            
-            /*let filtered_={};
-            let keys_=Object.keys(this.validation_rules);
-            for(i=0;i<keys_.length;i++)
-            {
-                if (!this.isRuleInUse(keys_[i])){
-                 filtered_[keys_[i]]=this.validation_rules[keys_[i]];
+            return this.validation_rules;
+        },
+        availableRuleItems()
+        {
+            let catalog = this.validation_rules;
+            let used = Object.keys(this.local);
+            return Object.keys(catalog).filter(function (key) {
+                if (catalog[key].addable === false) {
+                    return false;
                 }
-            }
-            console.log("filtered",filtered_);
-            return filtered_;
-            */
+                if (used.indexOf(key) !== -1) {
+                    return false;
+                }
+                return true;
+            }).map(function (key) {
+                return {
+                    value: key,
+                    text: catalog[key].label || catalog[key].rule || key
+                };
+            });
         }
     },
     methods:{
@@ -107,35 +126,51 @@ Vue.component('validation-rules-component', {
         update(key, value) {
             this.$emit('input', { ...this.value, [key]: value })
         },
-        validateRuleValue: function(idx)
+        looksLikeWrappedRegex: function(value)
         {
-            if (!this.field_data[idx]['rule']){
+            return /^\/.+\/[a-z]*$/i.test(String(value).trim());
+        },
+        isRuleParamValid: function(name, value)
+        {
+            let rule = this.validation_rules[name];
+            if (!rule || !rule.param) {
                 return true;
             }
-
-            let rule_key=this.field_data[idx]['rule'];
-            let rule=this.validation_rules[rule_key];
-            let value=this.field_data[idx]['value']
-
-            if (rule.value_type=='regex'){
+            if (value === '' || value === null || value === undefined) {
+                return true;
+            }
+            if (rule.value_type === 'regex') {
+                if (this.looksLikeWrappedRegex(value)) {
+                    return false;
+                }
                 try {
                     new RegExp(value);
                     return true;
-                } catch(e) {
+                } catch (e) {
                     return false;
-                }                
-            }
-            return true;
-
-        },
-        isRuleInUse: function(rule_key){
-            for(i=0;i<Object.keys(this.local).length;i++)
-            {
-                if (this.local["rule"]==rule_key){
-                    return true;
                 }
             }
-            return false;
+            if (rule.value_type === 'integer') {
+                return /^\d+$/.test(String(value));
+            }
+            return true;
+        },
+        ruleParamError: function(name, value)
+        {
+            if (this.isRuleParamValid(name, value)) {
+                return [];
+            }
+            let rule = this.validation_rules[name];
+            if (rule && rule.value_type === 'regex') {
+                if (this.looksLikeWrappedRegex(value)) {
+                    return ['Enter the pattern without wrapping slashes or flags'];
+                }
+                return ['This is not a valid regular expression'];
+            }
+            if (rule && rule.value_type === 'integer') {
+                return ['Enter a whole number of 0 or more'];
+            }
+            return ['Invalid value'];
         },
         ruleHasParam: function(rule){
             if (this.validation_rules[rule] && this.validation_rules[rule].param){
@@ -144,6 +179,12 @@ Vue.component('validation-rules-component', {
 
             return false;
         },
+        RuleLabel: function(rule){
+            if (this.validation_rules[rule] && this.validation_rules[rule].label){
+                return this.validation_rules[rule].label;
+            }
+            return rule;
+        },
         RuleDescription: function(rule){
             if (this.validation_rules[rule] && this.validation_rules[rule].description){
                 return this.validation_rules[rule].description;
@@ -151,13 +192,32 @@ Vue.component('validation-rules-component', {
 
             return '';
         },
+        RulePlaceholder: function(rule){
+            if (this.validation_rules[rule] && this.validation_rules[rule].placeholder){
+                return this.validation_rules[rule].placeholder;
+            }
+            return '';
+        },
+        RuleHint: function(rule){
+            if (this.validation_rules[rule] && this.validation_rules[rule].hint){
+                return this.validation_rules[rule].hint;
+            }
+            return '';
+        },
         remove: function (rule_name){
             Vue.delete(this.local, rule_name);
         },
         addRule: function ()
         {
+            if (!this.rule_selected || !this.validation_rules[this.rule_selected]) {
+                return;
+            }
+            if (this.validation_rules[this.rule_selected].addable === false) {
+                this.rule_selected='';
+                return;
+            }
             rule_info=this.validation_rules[this.rule_selected];
-            this.local[this.rule_selected]=rule_info.param==true ? '' : true;
+            Vue.set(this.local, this.rule_selected, rule_info.param==true ? '' : true);
             this.rule_selected='';
             this.$emit('update:value', this.local);
         }
@@ -172,7 +232,7 @@ Vue.component('validation-rules-component', {
                         <v-col cols="auto" class="flex-grow-1">
                             <v-select
                                 v-model="rule_selected"
-                                :items="Object.keys(ValidationRules).map(key => ({ value: key, text: ValidationRules[key].rule }))"
+                                :items="availableRuleItems"
                                 item-text="text"
                                 item-value="value"
                                 placeholder="Select rule"
@@ -199,7 +259,7 @@ Vue.component('validation-rules-component', {
                 <tbody>
                 <tr v-for="(value_, name, index) in local" :key="name">
                     <td>
-                        <div class="text-primary">{{name}}</div>
+                        <div class="text-primary">{{RuleLabel(name)}}</div>
                         <div class="text-secondary" style="font-size:small;margin-top:5px;">{{RuleDescription(name)}}</div>
                     </td>
                     <td>
@@ -207,9 +267,13 @@ Vue.component('validation-rules-component', {
                             <v-text-field
                                 :value="local[name]"
                                 @input="update(name, $event)"
+                                :placeholder="RulePlaceholder(name)"
+                                :hint="RuleHint(name)"
+                                :persistent-hint="!!RuleHint(name)"
+                                :error="!isRuleParamValid(name, local[name])"
+                                :error-messages="ruleParamError(name, local[name])"
                                 outlined
                                 dense
-                                hide-details
                                 class="mt-2"
                             ></v-text-field>
                         </div>

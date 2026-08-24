@@ -114,6 +114,47 @@ Vue.component('template-validation-component', {
             this.validateProject();
             this.projectValidationReport();
         },
+        fieldValidationRules: function(item) {
+            if (!item) {
+                return {};
+            }
+            if (typeof FieldValidationRulesUtil !== 'undefined') {
+                return FieldValidationRulesUtil.normalize(item, { addDataType: false });
+            }
+            var rules = item.rules;
+            if (!rules || (Array.isArray(rules) && rules.length === 0)) {
+                rules = {};
+            } else if (typeof rules === 'object' && !Array.isArray(rules)) {
+                rules = Object.assign({}, rules);
+            }
+            if (item.is_required || item.required) {
+                if (typeof rules === 'string') {
+                    if (rules.indexOf('required') === -1) {
+                        rules = rules ? ('required|' + rules) : 'required';
+                    }
+                } else if (Array.isArray(rules)) {
+                    if (rules.indexOf('required') === -1) {
+                        rules = ['required'].concat(rules);
+                    }
+                } else {
+                    rules.required = true;
+                }
+            }
+            return rules;
+        },
+        hasFieldValidationRules: function(item) {
+            var rules = this.fieldValidationRules(item);
+            if (!rules) {
+                return false;
+            }
+            if (typeof rules === 'string') {
+                return rules.trim() !== '';
+            }
+            if (Array.isArray(rules)) {
+                return rules.length > 0;
+            }
+            return Object.keys(rules).length > 0;
+        },
         navigateToValidationReport: function() {
             this.$router.push('/validation-report');
         },
@@ -170,10 +211,10 @@ Vue.component('template-validation-component', {
                     return;
                 }
 
-                if(item.hasOwnProperty("rules")){
+                if(vm.hasFieldValidationRules(item)){
                     let value=_.get(metadata, item.key, null);
 
-                    VeeValidate.validate(value, item.rules, {name:item.title}).then(result => {
+                    VeeValidate.validate(value, vm.fieldValidationRules(item), {name:item.title}).then(result => {
                         if (item.prop_key){
                             validation_report[item.prop_key]=result;
                             vm.validation_report.push({key:item.prop_key, item:item, result:result, value:value});
@@ -208,11 +249,11 @@ Vue.component('template-validation-component', {
             }
 
             function walkTemplateProp(item, metadata, item_path=null){
-                if(item.hasOwnProperty("rules")){
+                if(vm.hasFieldValidationRules(item)){
                     //for props metadata is single prop value
                     let value=metadata;                    
                     
-                    VeeValidate.validate(value, item.rules,{name:item.title}).then(result => {
+                    VeeValidate.validate(value, vm.fieldValidationRules(item),{name:item.title}).then(result => {
                         if (item.prop_key){
                             if (item_path!=null){
 
