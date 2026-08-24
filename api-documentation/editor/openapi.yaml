@@ -65,6 +65,8 @@ tags:
     description: Manage catalog connections
   - name: Issues
     description: Manage project metadata issues
+  - name: Validation
+    description: Project metadata schema, template, and variable validation reports
   - name: Jobs
     description: Background jobs
   - name: Codelists
@@ -129,6 +131,9 @@ x-tagGroups:
   - name: Issues
     tags:
       - Issues
+  - name: Validation
+    tags:
+      - Validation
   - name: Jobs
     tags:
       - Jobs
@@ -882,6 +887,44 @@ paths:
                     type: string
       security:
         - ApiKeyAuth: []
+  "/editor/validate/{id}":
+    get:
+      tags:
+        - Validation
+        - Projects
+      summary: Validate project metadata (pass/fail)
+      description: >
+        Validate saved project metadata against the JSON Schema for the project type.
+        For microdata/survey projects, also validates all variables against the variable schema.
+
+
+        Returns HTTP 200 with `{status: success}` when valid. Returns HTTP 400 with
+        schema errors when invalid. Template (form) rules are not applied; use
+        `GET /validation/{sid}/schema` and `GET /validation/{sid}/template` for
+        structured reports.
+      operationId: validateProject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Project ID or IDNO
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Metadata is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationSuccessStatus'
+        "400":
+          description: Schema validation failed or project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFailedErrors'
+      security:
+        - ApiKeyAuth: []
   "/editor/delete/{id}":
     post:
       tags:
@@ -1310,7 +1353,11 @@ paths:
       tags:
         - Microdata
       summary: Create Microdata
-      description: Create a new microdata project
+      description: >
+        Create a new microdata project. The body is the stored DDI document
+        (`survey-schema.json`) plus request-only fields (`project-schema.json`:
+        idno, collection_ids, template_uid) and optional overwrite. Request-only
+        fields are not persisted in the study metadata JSON.
       operationId: createSurvey
       requestBody:
         required: true
@@ -1319,7 +1366,7 @@ paths:
             schema:
               allOf:
                 - $ref: survey-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1421,7 +1468,7 @@ paths:
             schema:
               allOf:
                 - $ref: timeseries-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1471,7 +1518,7 @@ paths:
             schema:
               allOf:
                 - $ref: timeseries-db-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1521,7 +1568,7 @@ paths:
             schema:
               allOf:
                 - $ref: geospatial-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1571,7 +1618,7 @@ paths:
             schema:
               allOf:
                 - $ref: document-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1621,7 +1668,7 @@ paths:
             schema:
               allOf:
                 - $ref: table-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1671,7 +1718,7 @@ paths:
             schema:
               allOf:
                 - $ref: image-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1721,7 +1768,7 @@ paths:
             schema:
               allOf:
                 - $ref: video-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -1771,7 +1818,7 @@ paths:
             schema:
               allOf:
                 - $ref: script-schema.json
-                - $ref: "#/components/schemas/CreateProjectOverwrite"
+                - $ref: "#/components/schemas/CreateProjectRequestParams"
       responses:
         "200":
           description: successful operation
@@ -6114,32 +6161,352 @@ paths:
                     additionalProperties: true
       security:
         - ApiKeyAuth: []
+  "/validation/{sid}":
+    get:
+      tags:
+        - Validation
+      summary: Schema validation report (alias)
+      description: >
+        Alias of `GET /validation/{sid}/schema`. `{sid}` must be the numeric project ID
+        (these routes do not accept IDNO).
+      operationId: validationSchemaAlias
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      responses:
+        "200":
+          description: Schema validation report (HTTP 200 even when metadata is invalid)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaValidationEnvelope'
+        "400":
+          description: Project not found or request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/schema":
+    get:
+      tags:
+        - Validation
+      summary: Schema validation report
+      description: >
+        Validate saved project metadata against the JSON Schema for the project type.
+        Returns a structured issue list. HTTP 200 even when `validation.valid` is false.
+        Requires project view access.
+      operationId: validationSchema
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      responses:
+        "200":
+          description: Schema validation report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaValidationEnvelope'
+        "400":
+          description: Project not found or request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/template":
+    get:
+      tags:
+        - Validation
+      summary: Template rules validation report
+      description: >
+        Validate saved project metadata against the form template's field rules
+        (`required`, `regex`, `min`/`max`, `is_uri`, and so on).
+
+
+        By default uses the template assigned to the project. If none is assigned,
+        uses the default template for the project type (then the first core template),
+        matching the editor. Pass `template_uid` to validate against a different
+        template of the same data type without changing the project assignment.
+
+
+        HTTP 200 even when `validation.valid` is false. `validation.template_uid_source`
+        is `assigned`, `default`, `core`, or `override`. HTTP 400 when an override
+        `template_uid` is unknown or the template type does not match the project.
+      operationId: validationTemplate
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+        - name: template_uid
+          in: query
+          required: false
+          description: >
+            Template UID to validate against. Omit to use the project's assigned
+            template, or the type default if none is assigned.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Template validation report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateValidationEnvelope'
+        "400":
+          description: Override template not found, type mismatch, or project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/variables":
+    get:
+      tags:
+        - Validation
+      summary: Variable schema validation report
+      description: >
+        Validate microdata/survey project variables against the variable JSON Schema.
+        Not available for other project types (HTTP 400). Stops after `limit` issues.
+        `mode=light` only checks empty variable labels via SQL (no full schema decode).
+      operationId: validationVariables
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of issues to return (default 50, max 1000)
+          schema:
+            type: integer
+            default: 50
+            maximum: 1000
+        - name: mode
+          in: query
+          required: false
+          description: Use `light` for a fast empty-label check only
+          schema:
+            type: string
+            enum:
+              - light
+      responses:
+        "200":
+          description: Variables validation report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariablesValidationEnvelope'
+        "400":
+          description: Not a microdata project, or project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/extra_fields":
+    get:
+      tags:
+        - Validation
+      summary: Schema extra fields
+      description: >
+        List metadata fields that are not defined in the project type JSON Schema.
+        Requires project view access.
+      operationId: validationExtraFields
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      responses:
+        "200":
+          description: Extra fields report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraFieldsEnvelope'
+        "400":
+          description: Project not found or request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/template_extra_fields":
+    get:
+      tags:
+        - Validation
+      summary: Template extra fields
+      description: >
+        List metadata fields that are not present in the selected template.
+        Optional `template_uid` overrides the assigned template (same rules as
+        `GET /validation/{sid}/template`, including default-template fallback).
+      operationId: validationTemplateExtraFields
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+        - name: template_uid
+          in: query
+          required: false
+          description: Template UID to compare against. Omit to use the assigned or default template.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Template extra fields report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateExtraFieldsEnvelope'
+        "400":
+          description: Override template not found, type mismatch, or project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/move_to_additional":
+    post:
+      tags:
+        - Validation
+      summary: Move extra fields to additional
+      description: >
+        Move selected metadata paths into the `additional` object via JSON Patch.
+        Requires project edit access. Schema validation is skipped while applying the patch.
+      operationId: validationMoveToAdditional
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationPathsRequest'
+      responses:
+        "200":
+          description: Fields moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationMoveFieldsResponse'
+        "400":
+          description: Bad request or insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/remove_fields":
+    post:
+      tags:
+        - Validation
+      summary: Remove extra fields
+      description: >
+        Remove selected metadata paths via JSON Patch. Requires project edit access.
+        Schema validation is skipped while applying the patch.
+      operationId: validationRemoveFields
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationPathsRequest'
+      responses:
+        "200":
+          description: Fields removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationRemoveFieldsResponse'
+        "400":
+          description: Bad request or insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/fix_array_as_object":
+    post:
+      tags:
+        - Validation
+      summary: Fix array-as-object fields
+      description: >
+        Convert objects with numeric keys to arrays at the given JSON Pointer paths.
+        Requires project edit access. Schema validation is skipped while applying the patch.
+      operationId: validationFixArrayAsObject
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationPathsRequest'
+      responses:
+        "200":
+          description: Conversion applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationFixArrayResponse'
+        "400":
+          description: Bad request or insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
 
 components:
   requestBodies:
     timeseries-db-schema.json:
+      description: >
+        Stored timeseries-db document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: timeseries-db-schema.json
+            allOf:
+              - $ref: timeseries-db-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     survey-schema.json:
+      description: >
+        Stored microdata document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: survey-schema.json
+            allOf:
+              - $ref: survey-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     video-schema.json:
+      description: >
+        Stored video document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: video-schema.json
+            allOf:
+              - $ref: video-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     table-schema.json:
+      description: >
+        Stored table document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: table-schema.json
+            allOf:
+              - $ref: table-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     AddProjectsToCollection:
       content:
@@ -6148,34 +6515,64 @@ components:
             $ref: "#/components/schemas/AddProjectsToCollection"
       required: true
     timeseries-schema.json:
+      description: >
+        Stored timeseries document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: timeseries-schema.json
+            allOf:
+              - $ref: timeseries-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     geospatial-schema.json:
+      description: >
+        Stored geospatial document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: geospatial-schema.json
+            allOf:
+              - $ref: geospatial-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     document-schema.json:
+      description: >
+        Stored document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: document-schema.json
+            allOf:
+              - $ref: document-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     image-schema.json:
+      description: >
+        Stored image document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: image-schema.json
+            allOf:
+              - $ref: image-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     script-schema.json:
+      description: >
+        Stored script document plus request-only create/update fields
+        (idno, collection_ids, template_uid, overwrite). Request-only fields
+        are not persisted in metadata.
       content:
         application/json:
           schema:
-            $ref: script-schema.json
+            allOf:
+              - $ref: script-schema.json
+              - $ref: "#/components/schemas/CreateProjectRequestParams"
       required: true
     Collection:
       content:
@@ -6213,6 +6610,14 @@ components:
       in: header
       name: X-API-Key
       description: API key for authentication
+  parameters:
+    ValidationProjectSid:
+      name: sid
+      in: path
+      required: true
+      description: Numeric project ID. Custom `/validation/{sid}/...` routes match digits only and do not accept IDNO.
+      schema:
+        type: integer
   schemas:
     ErrorResponse:
       type: object
@@ -6222,6 +6627,272 @@ components:
           example: failed
         message:
           type: string
+    ValidationSuccessStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+    ValidationFailedErrors:
+      type: object
+      properties:
+        status:
+          type: string
+          example: failed
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ValidationIssue:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Issue class, e.g. validation_error, template_validation_error, array_as_object
+        property:
+          type: string
+        path:
+          type: string
+          description: JSON Pointer path
+        message:
+          type: string
+        label:
+          type: string
+        constraint:
+          type: string
+          nullable: true
+    SchemaValidationReport:
+      type: object
+      properties:
+        schema_uid:
+          type: string
+        valid:
+          type: boolean
+        type:
+          type: string
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+        error:
+          type: string
+          description: Present when the schema file could not be loaded
+    SchemaValidationEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        validation:
+          $ref: '#/components/schemas/SchemaValidationReport'
+    TemplateValidationReportItem:
+      type: object
+      properties:
+        field:
+          type: string
+        path:
+          type: string
+        title:
+          type: string
+        label:
+          type: string
+        value: {}
+        rules:
+          type: string
+        rules_applied:
+          type: array
+          items:
+            type: string
+        valid:
+          type: boolean
+        status:
+          type: string
+          enum:
+            - valid
+            - invalid
+        errors:
+          type: array
+          items:
+            type: string
+        error_count:
+          type: integer
+    TemplateValidationReport:
+      type: object
+      properties:
+        template_uid:
+          type: string
+          nullable: true
+        template_uid_source:
+          type: string
+          description: >
+            assigned = project template_uid, default = type default template,
+            core = first core template for the type, override = query param
+          enum:
+            - assigned
+            - default
+            - core
+            - override
+        valid:
+          type: boolean
+          nullable: true
+          description: >
+            true when template rules pass, false when they fail, null when
+            validation was not run (`error` is set)
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+        validation_report:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateValidationReportItem'
+        error:
+          type: string
+          description: Present when no usable template could be resolved for the project
+    TemplateValidationEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        validation:
+          $ref: '#/components/schemas/TemplateValidationReport'
+    VariablesValidationReport:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+        validated_count:
+          type: integer
+        total_issues:
+          type: integer
+        limit_reached:
+          type: boolean
+    VariablesValidationEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        validation:
+          $ref: '#/components/schemas/VariablesValidationReport'
+    ExtraField:
+      type: object
+      properties:
+        field:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+        value_preview: {}
+    ExtraFieldsEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        result:
+          type: object
+          properties:
+            schema_uid:
+              type: string
+            extra_fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtraField'
+            error:
+              type: string
+    TemplateExtraFieldsEnvelope:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        result:
+          type: object
+          properties:
+            template_uid:
+              type: string
+              nullable: true
+            template_uid_source:
+              type: string
+              enum:
+                - assigned
+                - default
+                - core
+                - override
+            extra_fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtraField'
+            error:
+              type: string
+    ValidationPathsRequest:
+      type: object
+      required:
+        - paths
+      properties:
+        paths:
+          type: array
+          description: JSON Pointer paths (e.g. /study_desc/title_statement/idno)
+          items:
+            type: string
+    ValidationMoveFieldsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        moved_fields:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ValidationRemoveFieldsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        removed_fields:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ValidationFixArrayResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        fixed_fields:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
     VariableGroupConcept:
       type: object
       properties:
@@ -6523,6 +7194,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TemplateRevisionHistoryEntry"
+    CreateProjectRequestParams:
+      description: >
+        Request-only fields for create/update. These are not stored in the
+        study metadata document. Project idno, collection_ids, and template_uid
+        are defined in project-schema.json. Nested study idno (for example
+        study_desc.title_statement.idno) remains in the type document schema.
+      allOf:
+        - $ref: project-schema.json
+        - $ref: "#/components/schemas/CreateProjectOverwrite"
     CreateProjectOverwrite:
       type: object
       properties:
@@ -6533,6 +7213,11 @@ components:
             If true and a project with the same idno already exists, overwrite its metadata
             in place instead of returning an error. The existing project must be the same type.
             Collection memberships and file attachments are preserved.
+        validate:
+          type: boolean
+          description: >
+            When true on update/patch, validate the stored document against JSON Schema
+            before saving. Create does not schema-validate the request body.
     Template:
       type: object
       properties:

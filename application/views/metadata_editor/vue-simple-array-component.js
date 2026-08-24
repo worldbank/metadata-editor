@@ -42,7 +42,7 @@ Vue.component('simple-array-component', {
                         <div>
 
                         <validation-provider 
-                                :rules="field.rules" 
+                                :rules="getValidationRules(field)" 
                                 :name="field.name"
                                 v-slot="{ errors }"                                
                                 >
@@ -87,6 +87,13 @@ Vue.component('simple-array-component', {
             }else{
                 return column.name
             }
+        },
+        getValidationRules: function(field)
+        {
+            if (typeof FieldValidationRulesUtil !== 'undefined') {
+                return FieldValidationRulesUtil.normalize(field);
+            }
+            return field && field.rules ? field.rules : {};
         }
     }
 })

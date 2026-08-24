@@ -1,15 +1,12 @@
 {
-  "$id": "https://ihsn.org/schemas/microdata/1.0.0",
+  "$id": "https://ihsn.org/schemas/microdata/1.1.0",
   "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "Microdata schema",
   "id": "survey-schema.json",
-  "version": "1.0.0",
-  "description": "Microdata schema based on DDI CodeBook 2.5",
+  "version": "1.1.0",
+  "description": "Stored microdata document based on DDI CodeBook 2.5. Create/update request parameters (idno, collection_ids, template_uid) are defined in project-schema.json and are not part of this document.",
   "type": "object",
   "allOf": [
-    {
-      "$ref": "project-schema.json"
-    },
     {
       "$ref": "ddi-schema.json"
     },

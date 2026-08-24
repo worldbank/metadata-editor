@@ -60,7 +60,7 @@ Vue.component('grid-component', {
                         <div>
 
                         <validation-provider 
-                                :rules="column.rules" 
+                                :rules="getValidationRules(column)" 
                                 :name="columnName(column,path)"
                                 v-slot="{ errors }"                                
                                 >
@@ -160,6 +160,13 @@ Vue.component('grid-component', {
             }            
             
             return field.type;
+        },
+        getValidationRules(column)
+        {
+            if (typeof FieldValidationRulesUtil !== 'undefined') {
+                return FieldValidationRulesUtil.normalize(column);
+            }
+            return column && column.rules ? column.rules : {};
         }
     }
 })

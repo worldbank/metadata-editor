@@ -43,7 +43,12 @@ class Schema_validator
                 /*foreach ($validator->getErrors() as $error) {
                     echo sprintf("[%s] %s\n", $error['property'], $error['message']);
                 }*/
-                throw new ValidationException("SCHEMA_VALIDATION_FAILED [{basename($schema_path)}]: ", $validator->getErrors());
+                $CI =& get_instance();
+                $CI->load->library('Project_validation');
+                throw new ValidationException(
+                    "SCHEMA_VALIDATION_FAILED [{basename($schema_path)}]: ",
+                    Project_validation::filter_redundant_json_schema_errors($validator->getErrors())
+                );
             }
         }
 

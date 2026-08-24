@@ -140,6 +140,7 @@
             echo $this->load->view("editor_common/global-site-header-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-project-export-json-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-validation-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-field-validation-rules-util.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-defaults-util.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-apply-defaults-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-toast-component.js",null,true);
@@ -1176,10 +1177,15 @@
 
         // Data type validation: checks for type mismatch (e.g., array/object where string expected)
         VeeValidate.extend('data_type', {
-            validate(value, [fieldType]) {
+            params: ['fieldType'],
+            validate(value, params) {
+                let fieldType = params;
+                if (Array.isArray(params)) {
+                    fieldType = params[0];
+                } else if (params && typeof params === 'object') {
+                    fieldType = params.fieldType;
+                }
 
-                // fieldType comes from field.type passed as parameter
-                
                 // Skip data_type validation for dropdown fields - they have their own validation through enum selection
                 // and the v-model may be an enum object for display purposes
                 if (fieldType === 'dropdown' || fieldType === 'dropdown-custom') {

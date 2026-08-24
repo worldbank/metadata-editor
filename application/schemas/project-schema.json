@@ -2,16 +2,15 @@
   "$id": "http://ihsn.org/schemas/editor/project",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Editor project parameters",
-  "description": "Common parameters for creating or updating a project",
+  "description": "Request-only parameters for creating or updating a project. These fields are not part of the stored study metadata document.",
   "type": "object",
   "properties": {
-    "idno":{
+    "idno": {
       "type": "string",
       "title": "Unique Identifier",
-      "description": "Unique identifier for the project. Leave it empty to auto-generate.",
+      "description": "Unique identifier for the project. Leave it empty to auto-generate. Study metadata uses the type-specific nested idno (for microdata: study_desc.title_statement.idno).",
       "pattern": "^[a-zA-Z0-9_\\-]+$"
     },
-
     "collection_ids": {
       "type": "array",
       "title": "Collection IDs",
@@ -24,5 +23,6 @@
       "type": "string",
       "title": "Template UID (Unique Identifier)",
       "description": "Template to be used for the project. If not provided, the default template will be used."
-    }  }
+    }
+  }
 }

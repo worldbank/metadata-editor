@@ -529,35 +529,13 @@ Vue.component("form-input", {
       return field.type;
     },
     /**
-     * Get validation rules including data type check
-     * @param {Object} field - The field object
-     * @returns {String} Combined validation rules string
+     * Template rules plus required/data_type, as a VeeValidate object.
      */
     getValidationRules(field) {
-      let rules = field.rules || '';
-
-      if (field.is_required || field.required) {
-        rules = rules ? `${rules}|required` : 'required';
+      if (typeof FieldValidationRulesUtil !== 'undefined') {
+        return FieldValidationRulesUtil.normalize(field);
       }
-      
-      // Determine the field type for validation
-      const displayType = this.fieldDisplayType(field);
-      let validationType = null;
-      
-      // Add data type validation for simple field types
-      const simpleTypes = ['text', 'string', 'textarea', 'number', 'integer'];
-      if (simpleTypes.includes(field.type)) {
-        validationType = field.type;
-      }
-      // Skip data type validation for dropdown fields - they have enum validation
-      // and v-model may contain enum objects for display purposes
-      
-      if (validationType) {
-        const typeRule = `data_type:${validationType}`;
-        rules = rules ? `${rules}|${typeRule}` : typeRule;
-      }
-      
-      return rules;
+      return field && field.rules ? field.rules : {};
     },
   },
 });

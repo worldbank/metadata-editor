@@ -25,6 +25,12 @@ Vue.component('v-form', {
             }            
             
             return field.type;
+        },
+        getValidationRules(field) {
+            if (typeof FieldValidationRulesUtil !== 'undefined') {
+                return FieldValidationRulesUtil.normalize(field);
+            }
+            return field && field.rules ? field.rules : {};
         }
     },
     created() {
@@ -144,7 +150,7 @@ Vue.component('v-form', {
                         </label>
                         
                         <validation-provider 
-                            :rules="item.rules" 
+                            :rules="getValidationRules(item)" 
                             :debounce=500
                             v-slot="{ errors }"                            
                             :name="item.title"
@@ -169,7 +175,7 @@ Vue.component('v-form', {
                         </label>
 
                         <validation-provider 
-                            :rules="item.rules" 
+                            :rules="getValidationRules(item)" 
                             :debounce=500
                             ref="form" 
                             v-slot="{ errors }"                            

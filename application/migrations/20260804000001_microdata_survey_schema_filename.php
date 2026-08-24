@@ -7,6 +7,9 @@ require_once(APPPATH . 'core/MY_Migration.php');
  * Point microdata registry at compositional survey-schema.json (replaces microdata-schema.json).
  *
  * Applies install/schema.mysql-update-microdata-survey-schema.sql.
+ * Also prepends project-schema.json for installs that still composed the
+ * request envelope into the stored document. That inject is reversed by
+ * 20260824100001_microdata_schema_drop_project_schema.
  */
 class Migration_Microdata_survey_schema_filename extends MY_Migration {
 

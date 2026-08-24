@@ -319,7 +319,9 @@ class Editor_model extends CI_Model {
 			'template_uid', 'version_number', 'version_created', 
 			'version_created_by', 'version_notes',
 			'attributes', 'metadata', 			
-			'partial_update', 'template_uid' 
+			'partial_update', 'template_uid',
+			// API request-only keys (not study metadata)
+			'collection_ids', 'overwrite', 'validate', 'sid'
 		);
 	}
 
@@ -922,10 +924,11 @@ class Editor_model extends CI_Model {
 		if ($validator->isValid()) {
 			return true;
 		} else {			
-			/*foreach ($validator->getErrors() as $error) {
-				echo sprintf("[%s] %s\n", $error['property'], $error['message']);
-			}*/
-			throw new ValidationException("SCHEMA_VALIDATION_FAILED [{$schema_type}]: ", $validator->getErrors());
+			$this->load->library('Project_validation');
+			throw new ValidationException(
+				"SCHEMA_VALIDATION_FAILED [{$schema_type}]: ",
+				Project_validation::filter_redundant_json_schema_errors($validator->getErrors())
+			);
 		}
 	}
 

@@ -59,6 +59,13 @@ Vue.component('repeated-field', {
         remove: function (index){
             this.local.splice(index,1);
             this.$emit('input', JSON.parse(JSON.stringify(this.local)));
+        },
+        getValidationRules: function(field)
+        {
+            if (typeof FieldValidationRulesUtil !== 'undefined') {
+                return FieldValidationRulesUtil.normalize(field);
+            }
+            return field && field.rules ? field.rules : {};
         }
     },  
     template: `
@@ -72,7 +79,7 @@ Vue.component('repeated-field', {
                     <div>
 
                     <validation-provider 
-                            :rules="field.rules" 
+                            :rules="getValidationRules(field)" 
                             :name="field.name"
                             v-slot="{ errors }"                                
                             >

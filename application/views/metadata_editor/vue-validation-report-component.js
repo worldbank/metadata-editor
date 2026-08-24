@@ -58,10 +58,74 @@ Vue.component('validation-report', {
             return this.fixableTypeMismatchIssues.length;
         },
         hasTemplateIssues() {
-            return this.template_validation && !this.template_validation.valid;
+            return this.templateValidationStatus === 'failed';
         },
         templateIssuesCount() {
             return this.template_validation && this.template_validation.issues ? this.template_validation.issues.length : 0;
+        },
+        templateValidationStatus() {
+            if (!this.template_validation) {
+                return null;
+            }
+            if (this.template_validation.error) {
+                return 'skipped';
+            }
+            if (this.template_validation.valid) {
+                return 'valid';
+            }
+            return 'failed';
+        },
+        templateValidationChipColor() {
+            if (this.templateValidationStatus === 'valid') {
+                return 'success';
+            }
+            if (this.templateValidationStatus === 'skipped') {
+                return 'warning';
+            }
+            return 'error';
+        },
+        templateValidationChipIcon() {
+            if (this.templateValidationStatus === 'valid') {
+                return 'mdi-check-circle';
+            }
+            if (this.templateValidationStatus === 'skipped') {
+                return 'mdi-alert';
+            }
+            return 'mdi-alert-circle';
+        },
+        templateValidationChipLabel() {
+            if (this.templateValidationStatus === 'valid') {
+                return this.$t('valid');
+            }
+            if (this.templateValidationStatus === 'skipped') {
+                return this.$t('skipped');
+            }
+            return this.$t('failed');
+        },
+        templateValidationErrorDisplay() {
+            const err = this.template_validation && this.template_validation.error;
+            if (!err) {
+                return '';
+            }
+            if (err === 'Project does not have a template assigned') {
+                return this.$t('project_has_no_template_assigned');
+            }
+            return err;
+        },
+        templateValidationSourceNote() {
+            if (!this.template_validation || this.template_validation.error) {
+                return '';
+            }
+            const source = this.template_validation.template_uid_source;
+            const uid = this.template_validation.template_uid;
+            const suffix = uid ? ' (' + uid + ')' : '';
+            if (source === 'default') {
+                return this.$t('using_default_template') + suffix;
+            }
+            if (source === 'core') {
+                return this.$t('using_core_template') + suffix;
+            }
+            return '';
         },
         templateValidationReport() {
             // Only return fields that were actually validated (valid or invalid), exclude skipped
@@ -1366,15 +1430,15 @@ Vue.component('validation-report', {
                                 <span>{{$t("template_validation")}}</span>
                                 <v-chip
                                     v-if="template_validation"
-                                    :color="template_validation.valid ? 'success' : 'error'"
+                                    :color="templateValidationChipColor"
                                     text-color="white"
                                     small
                                     class="ml-3"
                                 >
                                     <v-icon small left>
-                                        {{template_validation.valid ? 'mdi-check-circle' : 'mdi-alert-circle'}}
+                                        {{templateValidationChipIcon}}
                                     </v-icon>
-                                    {{template_validation.valid ? $t("valid") : $t("failed")}}
+                                    {{templateValidationChipLabel}}
                                 </v-chip>
                             </v-card-title>
                             <v-card-text>
@@ -1384,8 +1448,32 @@ Vue.component('validation-report', {
                                 </div>
 
                                 <div v-else-if="template_validation">
+                                    <div
+                                        v-if="templateValidationSourceNote"
+                                        class="text-caption text--secondary mb-3"
+                                    >
+                                        {{templateValidationSourceNote}}
+                                    </div>
+                                    <v-alert
+                                        v-if="templateValidationStatus === 'skipped'"
+                                        type="warning"
+                                        outlined
+                                        icon="mdi-alert"
+                                    >
+                                        {{templateValidationErrorDisplay}}
+                                    </v-alert>
+
+                                    <v-alert
+                                        v-else-if="templateValidationStatus === 'valid' && templateValidationReport.length === 0"
+                                        type="success"
+                                        outlined
+                                        icon="mdi-check-circle"
+                                    >
+                                        {{$t("no_template_validation_issues_found")}}
+                                    </v-alert>
+
                                     <!-- Complete Validation Report (All Fields) -->
-                                    <div v-if="templateValidationReport.length > 0">                                        
+                                    <div v-else-if="templateValidationReport.length > 0">
 
                                         <v-simple-table dense>
                                             <thead>
@@ -1479,6 +1567,15 @@ Vue.component('validation-report', {
                                             </tbody>
                                         </v-simple-table>
                                     </div>
+
+                                    <v-alert
+                                        v-else-if="templateValidationStatus === 'failed'"
+                                        type="error"
+                                        outlined
+                                        icon="mdi-alert-circle"
+                                    >
+                                        {{$t("failed")}}
+                                    </v-alert>
                                 </div>
 
                                 <div v-else-if="!loading" class="text-center py-4 text--secondary">
