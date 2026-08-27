@@ -58,11 +58,18 @@ class Pagepreview{
                 case 'string':
                 case 'boolean':
                 case 'integer':
+                case 'number':
+                case 'date':
+                case 'textarea':
+                case 'dropdown':
+                case 'dropdown-custom':
                     $output[]= $this->render_text($item);
                     break;
 
                 default:
-                    throw new Exception("not supported: ". $item['type']);
+                    // Display widgets and unknown scalar types must not abort PDF/HTML export
+                    $output[]= $this->render_text($item);
+                    break;
             }
         }
 
