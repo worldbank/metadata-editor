@@ -30,8 +30,10 @@ class PDF_Report{
 		//to use core fonts only - works only for latin languages
 		//$this->ci->load->library('my_mpdf',array('codepage'=>$codepage, 'mode'=>'c'));
 
-		// Set image resolution to 300 DPI
-		$this->ci->my_mpdf->img_dpi = 300;
+		$this->ci->my_mpdf->img_dpi = 96;
+		$this->ci->my_mpdf->simpleTables = true;
+		$this->ci->my_mpdf->curlTimeout = 5;
+		$this->ci->my_mpdf->curlExecutionTimeout = 5;
 
 		// Load language file for PDF reports - will be set in initialize method based on options
 		$this->ci->load->model("Editor_model");
@@ -40,7 +42,6 @@ class PDF_Report{
 		$this->ci->load->model("Editor_datafile_model"); 
 		$this->ci->load->helper('metadata_view_helper');
 		$this->ci->load->library('Latex_processor');
-		
     }
 
 	function initialize($sid, $options=array())
@@ -59,8 +60,10 @@ class PDF_Report{
 		$this->ci->load->library("html_report");
 		$this->html_report = new Html_report();
 		$this->html_report->project = $this->project;
-		
-		$template = $this->ci->Editor_template_model->resolve_template_for_project($this->project);
+		$this->html_report->pdf_mode = true;
+
+		$template = $this->resolve_pdf_template($this->project, $options);
+		$this->html_report->template = $template;
 		$this->html_report->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
 
 		// Store options for use in generate method
@@ -130,35 +133,53 @@ class PDF_Report{
 			foreach($data_files as $data_file) {
 				$total_variables += $this->ci->Editor_datafile_model->get_file_varcount($sid, $data_file['file_id']);
 			}
+			$include_variable_list = $this->option_enabled('include_variable_list', true);
+			$include_variable_details = $this->option_enabled('include_variable_details', true);
 
 			$data_file_count = 0;
 			foreach($data_files as $data_file){
 				set_time_limit(0);
+				$file_id = isset($data_file['file_id']) ? $data_file['file_id'] : '';
+				$file_varcount = $this->ci->Editor_datafile_model->get_file_varcount($sid, $file_id);
 				
 				// Force garbage collection only every 3 data files to reduce CPU usage
 				if ($data_file_count % 3 == 0) {
 					gc_collect_cycles();
 				}
 
-				//data file variable list
-				$mpdf->AddPage();
-				$mpdf->Bookmark($data_file['file_name'],0);
-				$mpdf->Bookmark(t("variable_list"),1);
-				$variables_html = $this->html_report->data_file_variables_list($sid, $data_file['file_id']);
-				$this->writeHTMLInChunks($mpdf, $variables_html);
-				
-				// Clear memory after processing each data file
-				unset($variables_html);
+				if (!$include_variable_list && !$include_variable_details) {
+					$data_file_count++;
+					continue;
+				}
 
-				//data file variables detailed - only if total variables < 1500
-				if ($total_variables < 1500) {
+				//data file variable list
+				if ($include_variable_list) {
 					$mpdf->AddPage();
+					$mpdf->Bookmark($data_file['file_name'],0);
+					$mpdf->Bookmark(t("variable_list"),1);
+					$variables_html = $this->html_report->data_file_variables_list($sid, $data_file['file_id']);
+					$this->writeHTMLInChunks($mpdf, $variables_html);
+					unset($variables_html);
+				}
+
+				//data file variables detailed - only if requested and total variables < 1500
+				if ($include_variable_details && $total_variables < 1500) {
+					$mpdf->AddPage();
+					if (!$include_variable_list) {
+						$mpdf->Bookmark($data_file['file_name'],0);
+					}
 					$mpdf->Bookmark(t("variable_description"),1);
-					$variables_detailed_html = $this->html_report->variables_detailed_html($sid, $data_file['file_id']);
-					$this->writeHTMLInChunks($mpdf, $variables_detailed_html);
-					
-					// Clear memory after processing detailed variables
-					unset($variables_detailed_html);
+					$batch_size = 25;
+					$offset = 0;
+					while ($offset < (int)$file_varcount) {
+						$variables_detailed_html = $this->html_report->variables_detailed_html($sid, $data_file['file_id'], $offset, $batch_size);
+						if ($variables_detailed_html === false || $variables_detailed_html === '') {
+							break;
+						}
+						$this->writeHTMLInChunks($mpdf, $variables_detailed_html);
+						unset($variables_detailed_html);
+						$offset += $batch_size;
+					}
 				}
 				
 				$data_file_count++;
@@ -202,7 +223,7 @@ class PDF_Report{
 		if (empty($html)) {
 			return;
 		}
-		
+
 		// If HTML is small enough, write it directly
 		if (strlen($html) <= $chunk_size) {
 			$mpdf->WriteHTML($html);
@@ -359,13 +380,14 @@ class PDF_Report{
 
 
 
-	function transform_variable($variable)
+	function transform_variable($variable, $vid_map=array())
 	{		
 		$sid=(int)$variable['sid'];
 		unset($variable['uid']);
 		unset($variable['sid']);
 
-		$var_catgry_labels=$this->get_indexed_variable_category_labels($variable["var_catgry_labels"]);
+		$cat_labels=isset($variable["var_catgry_labels"]) ? $variable["var_catgry_labels"] : array();
+		$var_catgry_labels=$this->get_indexed_variable_category_labels($cat_labels);
 
 		//process summary statistics
 		$sum_stats_options = isset($variable['sum_stats_options']) ? $variable['sum_stats_options'] : [];
@@ -424,10 +446,12 @@ class PDF_Report{
 			}
 		}
 
+		cap_variable_categories_for_report($variable, 500);
+
 		//add var_catgry labels
 		if (isset($variable['var_catgry']) && is_array($variable['var_catgry']) ){
 			foreach($variable['var_catgry'] as $idx=>$cat){
-				if (isset($var_catgry_labels[$cat['value']])){
+				if (isset($cat['value']) && isset($var_catgry_labels[$cat['value']])){
 					$variable['var_catgry'][$idx]['labl']=$var_catgry_labels[$cat['value']];
 				}
 			}
@@ -436,7 +460,12 @@ class PDF_Report{
 
 		//var_wgt_id field - replace UID with VID
 		if (isset($variable['var_wgt_id']) && $variable['var_wgt_id']!==''){
-			$variable['var_wgt_id']=$this->ci->Editor_variable_model->vid_by_uid($sid,$variable['var_wgt_id']);
+			$wgt_uid=$variable['var_wgt_id'];
+			if (isset($vid_map[$wgt_uid])) {
+				$variable['var_wgt_id']=$vid_map[$wgt_uid];
+			} else {
+				$variable['var_wgt_id']=$this->ci->Editor_variable_model->vid_by_uid($sid,$wgt_uid);
+			}
 		}
 
 		array_remove_empty($variable);
@@ -447,6 +476,9 @@ class PDF_Report{
 	function get_indexed_variable_category_labels($cat_labels)
 	{
 		$output=array();
+		if (!is_array($cat_labels)) {
+			return $output;
+		}
 		foreach($cat_labels as $cat){
 			if (isset($cat['labl']) && isset($cat['value'])){
 				$output[$cat['value']]=$cat['labl'];
@@ -456,7 +488,40 @@ class PDF_Report{
 		return $output;
 	}
 
+	private function resolve_pdf_template($project, $options)
+	{
+		$requested_uid = isset($options['template_uid']) ? $options['template_uid'] : null;
+		if (!empty($requested_uid)) {
+			$template = $this->ci->Editor_template_model->get_template_by_uid($requested_uid);
+			if ($template && isset($template['template']) && !(isset($template['is_deleted']) && $template['is_deleted'] == 1)) {
+				$template_type = isset($template['data_type']) ? $template['data_type'] : '';
+				$project_type = isset($project['type']) ? $project['type'] : '';
+				$microdata_types = array('survey', 'microdata');
+				$compatible = ($template_type === '')
+					|| ($template_type === $project_type)
+					|| (in_array($template_type, $microdata_types, true) && in_array($project_type, $microdata_types, true));
+				if ($compatible) {
+					return $template;
+				}
+			}
+		}
 
+		return $this->ci->Editor_template_model->resolve_template_for_project($project);
+	}
+
+	private function option_enabled($key, $default = true)
+	{
+		if (!isset($this->options[$key])) {
+			return $default;
+		}
+
+		$value = $this->options[$key];
+		if ($value === false || $value === 0 || $value === '0') {
+			return false;
+		}
+
+		return (int)$value === 1 || $value === true || $value === '1';
+	}
 
 }// END PDF_Report Class
 

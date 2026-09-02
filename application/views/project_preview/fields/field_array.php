@@ -68,7 +68,11 @@ $data= array_remove_empty($data);
                     $column['hide_field_title']=true;
                     $display_field=isset($template['display_field']) ? $template['display_field'] : '';
                 ?>
-                <?php  echo $this->load->view('project_preview/fields/field_array',array('data'=>isset($row[$column['key']]) ? $row[$column['key']] : [] ,'template'=>$column),true);?>
+                <?php  echo $this->load->view('project_preview/fields/field_array',array(
+                    'data'=>isset($row[$column['key']]) ? $row[$column['key']] : [] ,
+                    'template'=>$column,
+                    'pdf_mode'=>!empty($pdf_mode)
+                ),true);?>
             <?php else:?>
                 <?php echo isset($row[$column['key']]) ? html_escape($row[$column['key']]) : '';?>
             <?php endif;?>

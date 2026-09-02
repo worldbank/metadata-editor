@@ -35,7 +35,7 @@
     $stat_keys=array("var_intrvl","var_dcml","var_loc_start_pos","var_loc_end_pos","loc_width");
     ?>
         
-    <div style="width: 50%; float: left;">
+    <div>
         <?php foreach($stat_keys as $stat_key):?>
             <?php if (array_key_exists($stat_key,$variable) && $variable[$stat_key]!==null ):?>
             <?php $stat=$variable[$stat_key];?>
@@ -118,7 +118,15 @@
                         <?php if ($field == 'var_catgry' && is_array($variable[$field])): ?>
                             <?php 
                             $ci =& get_instance();
-                            echo $ci->load->view('project_preview/fields/field_variable_category', array('data' => $variable[$field], 'name' => $field, 'html_report' => $html_report), true); 
+                            echo $ci->load->view('project_preview/fields/field_variable_category', array(
+                                'data' => $variable[$field],
+                                'name' => $field,
+                                'html_report' => $html_report,
+                                'total_categories' => isset($variable['var_catgry_total']) ? $variable['var_catgry_total'] : null,
+                                'categories_hidden' => isset($variable['var_catgry_hidden']) ? $variable['var_catgry_hidden'] : null,
+                                'sum_cases_override' => isset($variable['var_catgry_sum_cases']) ? $variable['var_catgry_sum_cases'] : null,
+                                'sum_cases_wgtd_override' => isset($variable['var_catgry_sum_cases_wgtd']) ? $variable['var_catgry_sum_cases_wgtd'] : null
+                            ), true); 
                             ?>
                         <?php else: ?>
                             <?php echo nl2br(html_escape($variable[$field]));?>

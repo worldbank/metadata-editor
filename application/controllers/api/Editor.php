@@ -1204,10 +1204,13 @@ class Editor extends MY_REST_Controller
 	{		
 		try{
 			$sid=$this->get_sid($sid);
+
 			$exists=$this->Editor_model->check_id_exists($sid);
 			$include_private_fields=0;
 			$template_uid=null;
 			$include_external_resources=0;
+			$include_variable_list=1;
+			$include_variable_details=1;
 			$external_resource_ids=array();
 
 			if(!$exists){
@@ -1226,11 +1229,21 @@ class Editor extends MY_REST_Controller
 				$include_external_resources=1;
 			}
 
+			if ($this->input->get("include_variable_list") !== null){
+				$include_variable_list=((int)$this->input->get("include_variable_list")===1) ? 1 : 0;
+			}
+
+			if ($this->input->get("include_variable_details") !== null){
+				$include_variable_details=((int)$this->input->get("include_variable_details")===1) ? 1 : 0;
+			}
+
 			$this->editor_acl->user_has_project_access($sid,$permission='view', $user=$this->api_user());
 			$result=$this->Editor_model->generate_project_pdf($sid, $pdf_options=array(
 				'include_private_fields'=>$include_private_fields,
 				'template_uid'=>$template_uid,
-				'include_external_resources'=>$include_external_resources
+				'include_external_resources'=>$include_external_resources,
+				'include_variable_list'=>$include_variable_list,
+				'include_variable_details'=>$include_variable_details
 			));
 
 			$output=array(

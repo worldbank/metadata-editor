@@ -10,7 +10,9 @@ class Html_Report{
 	
 	private $ci;
 	public $project;
+	public $template;
 	public $template_translations;
+	public $pdf_mode = false;
 	
     //constructor
 	function __construct($params=NULL)
@@ -105,17 +107,24 @@ class Html_Report{
 	 */
 	 function project_metadata_html()
 	{
-		$template = $this->ci->Editor_template_model->resolve_template_for_project($this->project);
+		if (is_array($this->template) && isset($this->template['template'])) {
+			$template = $this->template;
+		} else {
+			$template = $this->ci->Editor_template_model->resolve_template_for_project($this->project);
+			$this->template = $template;
+		}
 
-		// Load template translations using existing function
-		$this->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
+		if (!is_array($this->template_translations) && isset($template['uid'])) {
+			$this->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
+		}
 		
-		$this->ci->pagepreview->initialize($this->project,$template['template']);
+		$this->ci->pagepreview->initialize($this->project,$template['template'], $this->pdf_mode);
 
 		$html=$this->ci->load->view('project_preview/index',
 			array(					
 				'project'=>$this->project,
-				'template'=>$template
+				'template'=>$template,
+				'pdf_mode'=>$this->pdf_mode
 			),true
 		);
 
@@ -166,7 +175,7 @@ class Html_Report{
 	 * @param string $uid - Variable UID
 	 * @return string HTML content
 	 */
-	public function variables_detailed_html($sid, $file_id)
+	public function variables_detailed_html($sid, $file_id, $offset=0, $limit=null)
 	{
 		$total_vars = $this->ci->Editor_datafile_model->get_file_varcount($sid, $file_id);
 
@@ -175,10 +184,22 @@ class Html_Report{
 		}
 		
 		$file_info = $this->ci->Editor_datafile_model->data_file_by_id($sid, $file_id);
-		$variables = $this->ci->Editor_variable_model->select_all($sid, $file_id, $metadata_detailed=true);
+		$variables = $this->ci->Editor_variable_model->select_all($sid, $file_id, $metadata_detailed=true, $offset, $limit);
+
+		if (empty($variables)) {
+			return false;
+		}
+
+		$wgt_uids = array();
+		foreach($variables as $variable){
+			if (isset($variable['var_wgt_id']) && $variable['var_wgt_id'] !== ''){
+				$wgt_uids[] = $variable['var_wgt_id'];
+			}
+		}
+		$vid_map = $this->ci->Editor_variable_model->vids_by_uids($sid, $wgt_uids);
 
 		foreach($variables as $idx => $variable){
-			$variables[$idx] = $this->transform_variable($variable);
+			$variables[$idx] = $this->transform_variable($variable, $vid_map);
 		}
 
 		return $this->variable_details($sid, $file_info, $variables);
@@ -196,13 +217,14 @@ class Html_Report{
 		return $content;
 	}
 
-	function transform_variable($variable)
+	function transform_variable($variable, $vid_map=array())
 	{		
 		$sid = (int)$variable['sid'];
 		unset($variable['uid']);
 		unset($variable['sid']);
 
-		$var_catgry_labels = $this->get_indexed_variable_category_labels($variable["var_catgry_labels"]);
+		$cat_labels = isset($variable['var_catgry_labels']) ? $variable['var_catgry_labels'] : array();
+		$var_catgry_labels = $this->get_indexed_variable_category_labels($cat_labels);
 
 		//process summary statistics
 		$sum_stats_options = isset($variable['sum_stats_options']) ? $variable['sum_stats_options'] : [];
@@ -261,10 +283,12 @@ class Html_Report{
 			}
 		}
 
+		cap_variable_categories_for_report($variable, 500);
+
 		//add var_catgry labels
 		if (isset($variable['var_catgry']) && is_array($variable['var_catgry']) ){
 			foreach($variable['var_catgry'] as $idx => $cat){
-				if (isset($var_catgry_labels[$cat['value']])){
+				if (isset($cat['value']) && isset($var_catgry_labels[$cat['value']])){
 					$variable['var_catgry'][$idx]['labl'] = $var_catgry_labels[$cat['value']];
 				}
 			}
@@ -272,7 +296,12 @@ class Html_Report{
 
 		//var_wgt_id field - replace UID with VID
 		if (isset($variable['var_wgt_id']) && $variable['var_wgt_id'] !== ''){
-			$variable['var_wgt_id'] = $this->ci->Editor_variable_model->vid_by_uid($sid, $variable['var_wgt_id']);
+			$wgt_uid = $variable['var_wgt_id'];
+			if (isset($vid_map[$wgt_uid])) {
+				$variable['var_wgt_id'] = $vid_map[$wgt_uid];
+			} else {
+				$variable['var_wgt_id'] = $this->ci->Editor_variable_model->vid_by_uid($sid, $wgt_uid);
+			}
 		}
 
 		array_remove_empty($variable);
@@ -282,6 +311,9 @@ class Html_Report{
 	function get_indexed_variable_category_labels($cat_labels)
 	{
 		$output = array();
+		if (!is_array($cat_labels)) {
+			return $output;
+		}
 		foreach($cat_labels as $cat){
 			if (isset($cat['labl']) && isset($cat['value'])){
 				$output[$cat['value']] = $cat['labl'];

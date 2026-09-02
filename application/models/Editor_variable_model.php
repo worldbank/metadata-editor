@@ -663,6 +663,33 @@ class Editor_variable_model extends ci_model {
         return false;
     }
 
+	function vids_by_uids($sid, $uids)
+	{
+		if (!is_array($uids)) {
+			$uids = array($uids);
+		}
+
+		$uids = array_values(array_unique(array_filter($uids, function ($uid) {
+			return $uid !== '' && $uid !== null;
+		})));
+
+		if (empty($uids)) {
+			return array();
+		}
+
+		$this->db->select('uid, vid');
+		$this->db->where('sid', $sid);
+		$this->db->where_in('uid', $uids);
+		$rows = $this->db->get('editor_variables')->result_array();
+
+		$map = array();
+		foreach ($rows as $row) {
+			$map[$row['uid']] = $row['vid'];
+		}
+
+		return $map;
+	}
+
 	function uid_by_vid($sid,$vid)
     {
         $this->db->select("uid");

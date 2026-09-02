@@ -197,8 +197,58 @@ if ( ! function_exists('render_var_category'))
     function render_var_category($name, $data)
     {
         $ci =& get_instance();
-        return $ci->load->view('metadata_templates/fields/field_var_category',array('name'=>$name, 'data'=>$data), TRUE);
+		return $ci->load->view('metadata_templates/fields/field_var_category',array('name'=>$name, 'data'=>$data), TRUE);
     }
+}
+
+
+if ( ! function_exists('cap_variable_categories_for_report'))
+{
+	/**
+	 * Limit categories kept on a variable for HTML/PDF reports.
+	 * Totals and case sums are stored so percentages still use the full distribution.
+	 */
+	function cap_variable_categories_for_report(&$variable, $limit = 500)
+	{
+		if (!isset($variable['var_catgry']) || !is_array($variable['var_catgry'])) {
+			return;
+		}
+
+		$total = count($variable['var_catgry']);
+		$sum_cases = 0;
+		$sum_cases_wgtd = 0;
+
+		foreach ($variable['var_catgry'] as $item) {
+			if (!isset($item['stats']) || !is_array($item['stats'])) {
+				continue;
+			}
+			$ismissing = isset($item['is_missing']) ? $item['is_missing'] : '';
+			if ($ismissing != '') {
+				continue;
+			}
+			foreach ($item['stats'] as $stat_row) {
+				if (!isset($stat_row['value']) || !is_numeric($stat_row['value'])) {
+					continue;
+				}
+				$wgtd = isset($stat_row['wgtd']) ? $stat_row['wgtd'] : '';
+				if ($wgtd === 'wgtd') {
+					$sum_cases_wgtd += $stat_row['value'];
+				} else {
+					$sum_cases += $stat_row['value'];
+				}
+			}
+		}
+
+		$variable['var_catgry_total'] = $total;
+		$variable['var_catgry_sum_cases'] = $sum_cases;
+		$variable['var_catgry_sum_cases_wgtd'] = $sum_cases_wgtd;
+		$variable['var_catgry_hidden'] = 0;
+
+		if ($total > $limit) {
+			$variable['var_catgry_hidden'] = $total - $limit;
+			$variable['var_catgry'] = array_values(array_slice($variable['var_catgry'], 0, $limit));
+		}
+	}
 }
 
 

@@ -15,6 +15,7 @@ if (!isset($data) || empty($data) || !is_array($data)){
  $name=$template['title'];
  $hide_field_title=false;
  $hide_column_headings=false;
+ $pdf_mode = !empty($pdf_mode);
 ?>
 
 
@@ -38,6 +39,18 @@ if (!isset($data) || empty($data) || !is_array($data)){
     endforeach;
   ?>
   <?php foreach($non_empty_rows as $idx=>$row):?>
+  <?php if ($pdf_mode): ?>
+  <div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #ccc;">
+    <h5 style="margin:0 0 8px 0;font-size:12pt;">
+      <?php if (isset($template['display_options']['header_fields'])):?>
+        <?php foreach($template['display_options']['header_fields'] as $header_field):?>
+          <?php echo isset($row[$header_field]) ? html_escape($row[$header_field]) : '';?>
+        <?php endforeach;?>
+      <?php else:?>
+        <?php echo html_escape($template['title']);?>
+      <?php endif;?>
+    </h5>
+  <?php else: ?>
   <div class="card">
     <div class="card-header-x card-heading bg-light border-bottom" id="heading-<?php echo str_replace(".","_",$template['key'].$idx);?>">
       <h5 class="mb-0">
@@ -57,6 +70,7 @@ if (!isset($data) || empty($data) || !is_array($data)){
 
     <div id="collapse-<?php echo str_replace(".","_",$template['key'].$idx);?>" class="collapse " aria-labelledby="headingOne" data-parent="#<?php echo str_replace(".","_",$template['key']);?>">
       <div class="card-body">
+  <?php endif; ?>
           <?php foreach($columns as $column):?>        
             <div>
                 <?php if (in_array($column['type'],array('array','nested_array','simple_array', 'section'))):?>
@@ -70,7 +84,11 @@ if (!isset($data) || empty($data) || !is_array($data)){
                             continue;
                         }
                     ?>
-                    <?php  echo $this->load->view('project_preview/fields/field_'.$column['type'],array('data'=>$item_data ,'template'=>$column),true);?>
+                    <?php  echo $this->load->view('project_preview/fields/field_'.$column['type'],array(
+                        'data'=>$item_data,
+                        'template'=>$column,
+                        'pdf_mode'=>$pdf_mode
+                    ),true);?>
                 <?php else:?>
                     <?php if(isset($row[$column['key']])):?>
                     <div class="mb-3">
@@ -80,10 +98,14 @@ if (!isset($data) || empty($data) || !is_array($data)){
                     <?php endif;?>    
                 <?php endif;?>
             </div>
-            <?php endforeach;?>        
+            <?php endforeach;?>
+  <?php if ($pdf_mode): ?>
+  </div>
+  <?php else: ?>
       </div>
     </div>
   </div>
+  <?php endif; ?>
   <?php endforeach;?>
   
 </div>

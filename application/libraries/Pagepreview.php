@@ -13,6 +13,7 @@ class Pagepreview{
     private $ci;
     private $metadata;
     private $template;
+    public $pdf_mode = false;
 	
 	function __construct()
 	{
@@ -20,10 +21,11 @@ class Pagepreview{
         $this->ci->load->helper("array");
     }
 
-    function initialize($metadata,$template)
+    function initialize($metadata,$template,$pdf_mode=false)
     {
         $this->metadata=$metadata;
         $this->template=$template;
+        $this->pdf_mode = (bool)$pdf_mode;
     }
 
     function render_html()
@@ -121,7 +123,11 @@ class Pagepreview{
             return false;
         }
 
-        return $this->ci->load->view('project_preview/fields/field_array_accordion',array('data'=>$value,'template'=>$item),true);
+        return $this->ci->load->view('project_preview/fields/field_array_accordion',array(
+            'data'=>$value,
+            'template'=>$item,
+            'pdf_mode'=>$this->pdf_mode
+        ),true);
     }
 
     private function render_array($item)
@@ -132,7 +138,11 @@ class Pagepreview{
             return false;
         }
 
-        return $this->ci->load->view('project_preview/fields/field_array',array('data'=>$value,'template'=>$item),true);
+        return $this->ci->load->view('project_preview/fields/field_array',array(
+            'data'=>$value,
+            'template'=>$item,
+            'pdf_mode'=>$this->pdf_mode
+        ),true);
     }
 
     private function render_simple_array($item)
@@ -143,7 +153,11 @@ class Pagepreview{
             return false;
         }
 
-        return $this->ci->load->view('project_preview/fields/field_simple_array',array('data'=>$value,'template'=>$item),true);
+        return $this->ci->load->view('project_preview/fields/field_simple_array',array(
+            'data'=>$value,
+            'template'=>$item,
+            'pdf_mode'=>$this->pdf_mode
+        ),true);
     }
     
     private function render_text($item)
@@ -154,7 +168,11 @@ class Pagepreview{
             return false;
         }
 
-        return $this->ci->load->view('project_preview/fields/field_text',array('data'=>$value,'template'=>$item),true);
+        return $this->ci->load->view('project_preview/fields/field_text',array(
+            'data'=>$value,
+            'template'=>$item,
+            'pdf_mode'=>$this->pdf_mode
+        ),true);
     }
 
 

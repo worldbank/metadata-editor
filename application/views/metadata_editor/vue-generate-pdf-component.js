@@ -9,7 +9,9 @@ Vue.component('generate-pdf', {
             available_templates:[],
             selected_template:'',
             include_private_fields:false,
-            include_external_resources:false
+            include_external_resources:false,
+            include_variable_list:true,
+            include_variable_details:true
         }
     },
     created: async function(){
@@ -33,6 +35,10 @@ Vue.component('generate-pdf', {
             }
             if (this.include_external_resources) {
                 params.append('include_external_resources', '1');
+            }
+            if (this.isMicrodataProject) {
+                params.append('include_variable_list', this.include_variable_list ? '1' : '0');
+                params.append('include_variable_details', this.include_variable_details ? '1' : '0');
             }
             
             if (params.toString()) {
@@ -116,6 +122,9 @@ Vue.component('generate-pdf', {
         ProjectType(){
             return this.$store.state.project_type;
         },
+        isMicrodataProject(){
+            return this.ProjectType === 'survey' || this.ProjectType === 'microdata';
+        },
         PdfLink()
         {
             return CI.base_url + '/api/editor/pdf/'+this.ProjectID;
@@ -176,6 +185,26 @@ Vue.component('generate-pdf', {
                                     :class="'normal-label'"
                                     class="mb-1"
                                 ></v-checkbox>
+
+                                <template v-if="isMicrodataProject">
+                                    <v-checkbox
+                                        v-model="include_variable_list"
+                                        :label="$t('include_variable_list')"
+                                        :hint="$t('include_variable_list_desc')"
+                                        persistent-hint
+                                        :class="'normal-label'"
+                                        class="mb-1"
+                                    ></v-checkbox>
+
+                                    <v-checkbox
+                                        v-model="include_variable_details"
+                                        :label="$t('include_variable_details')"
+                                        :hint="$t('include_variable_details_desc')"
+                                        persistent-hint
+                                        :class="'normal-label'"
+                                        class="mb-1"
+                                    ></v-checkbox>
+                                </template>
                             </v-card-text>
                         </v-card>
 
