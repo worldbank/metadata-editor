@@ -406,9 +406,7 @@ class ISO19139Reader
                     "description": "string"
                     }
                 ],
-                "maintenanceNote": [
-                    "string"
-                ],
+                "maintenanceNote": "string",
                 "contact": {
                     "individualName": "string",
                     "organisationName": "string",
@@ -427,7 +425,7 @@ class ISO19139Reader
         foreach ($nodes as $node) {
             $tmp= [
                 "maintenanceAndUpdateFrequency" => (string) $this->xpath_query('gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode/@codeListValue', $node),
-                "maintenanceNote" => (array) $this->xpath_query('gmd:maintenanceNote/gco:CharacterString', $node),                                
+                "maintenanceNote" => (string) $this->xpath_query('gmd:maintenanceNote/gco:CharacterString', $node),
             ];
 
             $tmp["updateScope"][] =[
@@ -887,7 +885,7 @@ class ISO19139Reader
         foreach ($nodes as $node) {
             $result = [
                 "maintenanceAndUpdateFrequency" => (string) $this->xpath_query('gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode/@codeListValue', $node),
-                "maintenanceNote" => (array) $this->xpath_query('gmd:maintenanceNote/gco:CharacterString', $node),
+                "maintenanceNote" => (string) $this->xpath_query('gmd:maintenanceNote/gco:CharacterString', $node),
             ];
         }
         
