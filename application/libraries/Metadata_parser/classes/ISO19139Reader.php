@@ -343,7 +343,7 @@ class ISO19139Reader
         }
 
         foreach ($presentationForm as $form) {
-            $result[] = (string) $this->xpath_query('gmd:MD_PresentationFormCode/@codeListValue', $form);
+            $result[] = (string) $this->xpath_query('gmd:CI_PresentationFormCode/@codeListValue', $form);
         }
         
         return $result;
