@@ -341,8 +341,8 @@ class ISO19139Writer
         //presentationForm [array]
         foreach ((array)$metadata['citation.presentationForm'] as $presentationForm) {
             $presentationFormNode = $ciCitation->addChild('gmd:presentationForm');
-            $presentationFormCode = $presentationFormNode->addChild('gmd:MD_PresentationFormCode', $presentationForm);
-            $presentationFormCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_PresentationFormCode');
+            $presentationFormCode = $presentationFormNode->addChild('gmd:CI_PresentationFormCode', $presentationForm);
+            $presentationFormCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode');
             $presentationFormCode->addAttribute('codeListValue', $presentationForm);
         }
 
