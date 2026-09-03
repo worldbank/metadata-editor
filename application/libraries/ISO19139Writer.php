@@ -27,7 +27,7 @@ class ISO19139Writer
         $characterSet = $this->xml->addChild('gmd:characterSet');
         $characterSetCode = $characterSet->addChild('gmd:MD_CharacterSetCode', $metadata['characterSet.codeListValue']);
         $characterSetCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode');
-        $characterSetCode->addAttribute('codeListValue', $metadata['characterSet.codeList']);
+        $characterSetCode->addAttribute('codeListValue', $metadata['characterSet.codeListValue']);
 
         //parentIdentifier
         $parentIdentifier = $this->xml->addChild('gmd:parentIdentifier');
@@ -573,7 +573,7 @@ class ISO19139Writer
             $characterSetNode = $dataIdentification->addChild('gmd:characterSet');
             $characterSetCode = $characterSetNode->addChild('gmd:MD_CharacterSetCode', $characterSet['codeListValue']);
             $characterSetCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode');
-            $characterSetCode->addAttribute('codeListValue', $characterSet['codeList']);
+            $characterSetCode->addAttribute('codeListValue', $characterSet['codeListValue']);
         }
 
 
@@ -720,7 +720,7 @@ class ISO19139Writer
         $ciResponsibleParty = $parentNode->addChild('gmd:CI_ResponsibleParty');
 
         //individualName
-        $individualName = $ciResponsibleParty->addChild('gmd:individualName', $contact['individualName']);
+        $individualName = $ciResponsibleParty->addChild('gmd:individualName');
         $individualName->addChild('gco:CharacterString', $contact['individualName'], 'http://www.isotc211.org/2005/gco');
 
         //organisationName
