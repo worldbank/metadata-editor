@@ -27,7 +27,7 @@ class ISO19139Writer
         $characterSet = $this->xml->addChild('gmd:characterSet');
         $characterSetCode = $characterSet->addChild('gmd:MD_CharacterSetCode', $metadata['characterSet.codeListValue']);
         $characterSetCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode');
-        $characterSetCode->addAttribute('codeListValue', $metadata['characterSet.codeList']);
+        $characterSetCode->addAttribute('codeListValue', $metadata['characterSet.codeListValue']);
 
         //parentIdentifier
         $parentIdentifier = $this->xml->addChild('gmd:parentIdentifier');
@@ -341,8 +341,8 @@ class ISO19139Writer
         //presentationForm [array]
         foreach ((array)$metadata['citation.presentationForm'] as $presentationForm) {
             $presentationFormNode = $ciCitation->addChild('gmd:presentationForm');
-            $presentationFormCode = $presentationFormNode->addChild('gmd:MD_PresentationFormCode', $presentationForm);
-            $presentationFormCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_PresentationFormCode');
+            $presentationFormCode = $presentationFormNode->addChild('gmd:CI_PresentationFormCode', $presentationForm);
+            $presentationFormCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode');
             $presentationFormCode->addAttribute('codeListValue', $presentationForm);
         }
 
@@ -573,7 +573,7 @@ class ISO19139Writer
             $characterSetNode = $dataIdentification->addChild('gmd:characterSet');
             $characterSetCode = $characterSetNode->addChild('gmd:MD_CharacterSetCode', $characterSet['codeListValue']);
             $characterSetCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode');
-            $characterSetCode->addAttribute('codeListValue', $characterSet['codeList']);
+            $characterSetCode->addAttribute('codeListValue', $characterSet['codeListValue']);
         }
 
 
@@ -720,12 +720,16 @@ class ISO19139Writer
         $ciResponsibleParty = $parentNode->addChild('gmd:CI_ResponsibleParty');
 
         //individualName
-        $individualName = $ciResponsibleParty->addChild('gmd:individualName', $contact['individualName']);
+        $individualName = $ciResponsibleParty->addChild('gmd:individualName');
         $individualName->addChild('gco:CharacterString', $contact['individualName'], 'http://www.isotc211.org/2005/gco');
 
         //organisationName
         $organisationName = $ciResponsibleParty->addChild('gmd:organisationName');
         $organisationName->addChild('gco:CharacterString', $contact['organisationName'], 'http://www.isotc211.org/2005/gco');
+
+        //positionName
+        $positionName = $ciResponsibleParty->addChild('gmd:positionName');
+        $positionName->addChild('gco:CharacterString', $contact['positionName'], 'http://www.isotc211.org/2005/gco');
         
         //role
         $role = $ciResponsibleParty->addChild('gmd:role');
@@ -736,8 +740,20 @@ class ISO19139Writer
         $contactInfo = $ciResponsibleParty->addChild('gmd:contactInfo');
         $ciContact = $contactInfo->addChild('gmd:CI_Contact');
 
+        $phone = $ciContact->addChild('gmd:phone');
+        $ciPhone = $phone->addChild('gmd:CI_Telephone');
+
+        $voice = $ciPhone->addChild('gmd:voice');
+        $voice->addChild('gco:CharacterString', $contact['contactInfo.phone.voice'], 'http://www.isotc211.org/2005/gco');
+
+        $facsimile = $ciPhone->addChild('gmd:facsimile');
+        $facsimile->addChild('gco:CharacterString', $contact['contactInfo.phone.facsimile'], 'http://www.isotc211.org/2005/gco');
+
         $address = $ciContact->addChild('gmd:address');
         $ciAddress = $address->addChild('gmd:CI_Address');
+
+        $deliveryPoint = $ciAddress->addChild('gmd:deliveryPoint');
+        $deliveryPoint->addChild('gco:CharacterString', $contact['contactInfo.address.deliveryPoint'], 'http://www.isotc211.org/2005/gco');
         
         $city=$ciAddress->addChild('gmd:city');
         $city->addChild('gco:CharacterString', $contact['contactInfo.address.city'], 'http://www.isotc211.org/2005/gco');
