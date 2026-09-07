@@ -411,10 +411,9 @@ class Geospatial_features_model extends CI_Model {
             return null;
         }
         
-        $westValues = array();
-        $eastValues = array();
-        $southValues = array();
-        $northValues = array();
+        $this->load->helper('gis');
+
+        $boxes = array();
         
         foreach ($result as $row) {
             $bounds = json_decode($row['bounds'], true);
@@ -432,39 +431,11 @@ class Geospatial_features_model extends CI_Model {
                 isset($bbox['eastBoundLongitude']) && 
                 isset($bbox['southBoundLatitude']) && 
                 isset($bbox['northBoundLatitude'])) {
-                
-                $west = floatval($bbox['westBoundLongitude']);
-                $east = floatval($bbox['eastBoundLongitude']);
-                $south = floatval($bbox['southBoundLatitude']);
-                $north = floatval($bbox['northBoundLatitude']);
-                
-                // Validate ranges
-                if ($west >= -180 && $west <= 180 && 
-                    $east >= -180 && $east <= 180 &&
-                    $south >= -90 && $south <= 90 &&
-                    $north >= -90 && $north <= 90 &&
-                    $west < $east &&
-                    $south < $north) {
-                    
-                    $westValues[] = $west;
-                    $eastValues[] = $east;
-                    $southValues[] = $south;
-                    $northValues[] = $north;
-                }
+                $boxes[] = $bbox;
             }
         }
-        
-        if (empty($westValues)) {
-            return null;
-        }
-        
-        // Calculate global bounds
-        return array(
-            'westBoundLongitude' => min($westValues),
-            'eastBoundLongitude' => max($eastValues),
-            'southBoundLatitude' => min($southValues),
-            'northBoundLatitude' => max($northValues)
-        );
+
+        return union_geographic_bounding_boxes($boxes);
     }
 
     /**

@@ -62,6 +62,11 @@ Vue.component('editor-bounding-box-field', {
             if (!west && !east && !south && !north) return '';
             
             return `West: ${west}, East: ${east}, South: ${south}, North: ${north}`;
+        },
+        crossesAntimeridian() {
+            const west = parseFloat(this.west);
+            const east = parseFloat(this.east);
+            return !isNaN(west) && !isNaN(east) && west > east;
         }
     },
     watch: {
@@ -106,6 +111,7 @@ Vue.component('editor-bounding-box-field', {
             this.east = _.get(this.value, opts.east) || '';
             this.south = _.get(this.value, opts.south) || '';
             this.north = _.get(this.value, opts.north) || '';
+            this.wrapCoordinateFields();
             
             // Update map if we have valid coordinates
             if (this.map && this.west && this.east && this.south && this.north) {
@@ -146,7 +152,7 @@ Vue.component('editor-bounding-box-field', {
                     zoom: 2,
                     minZoom: 1,
                     maxZoom: 10, // Limit max zoom to prevent excessive zooming
-                    worldCopyJump: false
+                    worldCopyJump: true
                 });
                 
                 // Add OpenStreetMap tiles (limit max zoom to match map settings)
@@ -367,8 +373,8 @@ Vue.component('editor-bounding-box-field', {
             
             if (isNaN(west) || isNaN(east) || isNaN(south) || isNaN(north)) return;
             
-            // Create bounds: [[south, west], [north, east]]
-            const bounds = [[south, west], [north, east]];
+            // Unwrap east when the ISO box crosses the antimeridian (west > east)
+            const bounds = BoundingBoxUtil.leafletBoundsFromIso(west, east, south, north);
             
             // Remove existing rectangle and corner markers
             this.removeRectangle();
@@ -578,13 +584,28 @@ Vue.component('editor-bounding-box-field', {
         updateCoordinatesFromBounds: function(bounds) {
             const southWest = bounds.getSouthWest();
             const northEast = bounds.getNorthEast();
+            const lng = BoundingBoxUtil.isoLongitudesFromUnwrapped(southWest.lng, northEast.lng);
             
-            this.west = southWest.lng.toFixed(6);
-            this.east = northEast.lng.toFixed(6);
+            this.west = lng.west.toFixed(6);
+            this.east = lng.east.toFixed(6);
             this.south = southWest.lat.toFixed(6);
             this.north = northEast.lat.toFixed(6);
             
             this.updateValue();
+        },
+        wrapCoordinateFields: function() {
+            if (this.west !== '' && this.west != null) {
+                const west = parseFloat(this.west);
+                if (!isNaN(west)) {
+                    this.west = BoundingBoxUtil.wrapLongitude(west).toFixed(6);
+                }
+            }
+            if (this.east !== '' && this.east != null) {
+                const east = parseFloat(this.east);
+                if (!isNaN(east)) {
+                    this.east = BoundingBoxUtil.wrapLongitude(east).toFixed(6);
+                }
+            }
         },
         updateValue: function() {
             // Get the original full-path options from field config
@@ -630,17 +651,12 @@ Vue.component('editor-bounding-box-field', {
             this.$emit('input', {});
         },
         saveBoundingBox: function() {
-            // Validate coordinates
+            this.wrapCoordinateFields();
+
             const west = parseFloat(this.west);
             const east = parseFloat(this.east);
             const south = parseFloat(this.south);
             const north = parseFloat(this.north);
-            
-            // Basic validation
-            if (this.west && this.east && (west >= east)) {
-                alert('West longitude must be less than East longitude');
-                return;
-            }
             
             if (this.south && this.north && (south >= north)) {
                 alert('South latitude must be less than North latitude');
@@ -863,7 +879,7 @@ Vue.component('editor-bounding-box-field', {
                                 dense
                                 :disabled="isFieldReadOnly"
                                 @input="onCoordinateChange"
-                                hint="Range: -180 to 180"
+                                hint="Range: -180 to 180. West may be greater than East across the dateline."
                                 persistent-hint
                             ></v-text-field>
                         </v-col>
@@ -879,11 +895,14 @@ Vue.component('editor-bounding-box-field', {
                                 dense
                                 :disabled="isFieldReadOnly"
                                 @input="onCoordinateChange"
-                                hint="Range: -180 to 180"
+                                hint="Range: -180 to 180. West may be greater than East across the dateline."
                                 persistent-hint
                             ></v-text-field>
                         </v-col>
                     </v-row>
+                    <div v-if="crossesAntimeridian" class="caption grey--text mb-3">
+                        This box crosses the antimeridian (dateline). West greater than East is valid.
+                    </div>
                     
                     <v-row>
                         <v-col cols="6">

@@ -37,6 +37,15 @@ Vue.component('geospatial-feature-edit', {
             }
             const bbox = this.form_data.metadata.layer_info.geographicBoundingBox;
             if (!bbox) return null;
+
+            if (typeof BoundingBoxUtil !== 'undefined') {
+                return BoundingBoxUtil.leafletBoundsFromIso(
+                    bbox.westBoundLongitude,
+                    bbox.eastBoundLongitude,
+                    bbox.southBoundLatitude,
+                    bbox.northBoundLatitude
+                );
+            }
             
             return [
                 [bbox.southBoundLatitude, bbox.westBoundLongitude], // Southwest

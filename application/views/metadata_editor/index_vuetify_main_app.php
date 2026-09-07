@@ -146,6 +146,7 @@
             echo $this->load->view("metadata_editor/vue-toast-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-login-component.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
+            echo $this->load->view("metadata_editor/vue-bounding-box-util.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-bounding-box.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-coordinate-pairs.js",null,true);
 
