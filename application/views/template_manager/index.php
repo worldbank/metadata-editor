@@ -1249,6 +1249,13 @@
             "latex": "LaTeX",
             "json": "JSON"
           },
+          field_date_formats: [
+            { value: "partial", text: "Partial date (YYYY, YYYY-MM, or YYYY-MM-DD)" },
+            { value: "date", text: "Date (YYYY-MM-DD)" },
+            { value: "year-month", text: "Year and month (YYYY-MM)" },
+            { value: "year", text: "Year (YYYY)" },
+            { value: "datetime", text: "Date and time (ISO 8601)" }
+          ],
           
           field_types: [
             "string",
@@ -2139,6 +2146,29 @@
         markDirty: function() {
           // Explicitly mark template as dirty when any field is modified
           this.is_dirty = true;
+        },
+        getNodeDateFormat: function(node) {
+          if (!node) {
+            return 'partial';
+          }
+          var fmt = node.display_options && node.display_options.format;
+          if (fmt === 'datetime_iso') {
+            return 'datetime';
+          }
+          if (['partial', 'date', 'year-month', 'year', 'datetime'].indexOf(fmt) !== -1) {
+            return fmt;
+          }
+          return 'partial';
+        },
+        setNodeDateFormat: function(node, fmt) {
+          if (!node) {
+            return;
+          }
+          if (!node.display_options) {
+            this.$set(node, 'display_options', {});
+          }
+          this.$set(node.display_options, 'format', fmt);
+          this.markDirty();
         },
         getNodeProps: function(node) {
 

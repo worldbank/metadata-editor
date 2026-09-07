@@ -118,6 +118,9 @@ $lang['unsaved_changed']="Saqlanmagan o'zgarishlar";
 $lang['field_content_format']="Kirish formati";
 $lang['field_content_format_help']="Matn, Markdown, LaTex, HTML. Standart Matn";
 
+$lang['field_date_format']="Sana formati";
+$lang['field_date_format_help']="Faqat ISO 8601. Standart: qisman sana (YYYY, YYYY-MM yoki YYYY-MM-DD).";
+
 
 $lang['enum_store_options_label']="Qiymat sifatida ishlatiladigan ustunni tanlang";
 

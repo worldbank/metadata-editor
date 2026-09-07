@@ -175,7 +175,7 @@ Vue.component("form-input", {
                             <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
                         </div>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
-                    <div v-if="fieldDisplayType(field)=='text' || fieldDisplayType(field)=='textarea' || fieldDisplayType(field)=='number' || fieldDisplayType(field)=='integer' " >
+                    <div v-if="fieldDisplayType(field)=='text' || fieldDisplayType(field)=='textarea' || fieldDisplayType(field)=='number' || fieldDisplayType(field)=='integer' || fieldDisplayType(field)=='date' " >
                         <repeated-field
                                 v-model=" local"
                                 :field="field"                            
@@ -185,7 +185,7 @@ Vue.component("form-input", {
                     <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">
                         <v-combobox
                             v-model="fieldEnumByCodeMultiple"
-                            :items="field.enum"
+                            :items="dropdownEnumList"
                             item-text="label"
                             item-value="code"
                             :return-object="false"
@@ -201,6 +201,13 @@ Vue.component("form-input", {
                             </template>
                         </v-combobox>
                         
+                    </div>
+                    <div v-else>
+                        <repeated-field
+                                v-model=" local"
+                                :field="field"
+                            >
+                        </repeated-field>
                     </div>
                     </div>
                 </div>

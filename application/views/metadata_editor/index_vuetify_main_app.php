@@ -1197,6 +1197,45 @@
             message: 'The {_field_} field must be a date in YYYY, YYYY-MM, or YYYY-MM-DD format.'
         });
 
+        VeeValidate.extend('iso_year', {
+            validate(value) {
+                if (isEmptyValidationValue(value)) {
+                    return true;
+                }
+                if (typeof FieldValidationRulesUtil !== 'undefined') {
+                    return FieldValidationRulesUtil.isIsoYear(String(value));
+                }
+                return true;
+            },
+            message: 'The {_field_} field must be a year in YYYY format.'
+        });
+
+        VeeValidate.extend('iso_year_month', {
+            validate(value) {
+                if (isEmptyValidationValue(value)) {
+                    return true;
+                }
+                if (typeof FieldValidationRulesUtil !== 'undefined') {
+                    return FieldValidationRulesUtil.isIsoYearMonth(String(value));
+                }
+                return true;
+            },
+            message: 'The {_field_} field must be a year and month in YYYY-MM format.'
+        });
+
+        VeeValidate.extend('iso_datetime', {
+            validate(value) {
+                if (isEmptyValidationValue(value)) {
+                    return true;
+                }
+                if (typeof FieldValidationRulesUtil !== 'undefined') {
+                    return FieldValidationRulesUtil.isIsoDateTime(String(value));
+                }
+                return true;
+            },
+            message: 'The {_field_} field must be a date and time in ISO 8601 format.'
+        });
+
         //ignore validation if a required field is empty ('',null or undefined)
         VeeValidate.extend('required', {
             validate (value) {

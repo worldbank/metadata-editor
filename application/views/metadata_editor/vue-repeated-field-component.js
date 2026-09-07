@@ -19,6 +19,9 @@ Vue.component('repeated-field', {
             }
         
             return value;
+        },
+        isDateDisplay(){
+            return this.field && this.field.display_type === 'date';
         }
     },
     methods:{
@@ -84,7 +87,14 @@ Vue.component('repeated-field', {
                             v-slot="{ errors }"                                
                             >
                         
-                        <input :type="(field && (field.display_type === 'number' || field.display_type === 'integer')) ? 'number' : 'text'"
+                        <editor-date-field
+                            v-if="isDateDisplay"
+                            :value="local[index]"
+                            :field="field"
+                            @input="update(index, $event)"
+                        ></editor-date-field>
+                        <input v-else
+                            :type="(field && (field.display_type === 'number' || field.display_type === 'integer')) ? 'number' : 'text'"
                             step="any"
                             :value="local[index]"
                             @input="update(index,$event.target.value)"

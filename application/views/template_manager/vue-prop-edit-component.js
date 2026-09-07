@@ -16,6 +16,13 @@ Vue.component('prop-edit', {
             "dropdown",
             "dropdown-custom"
           ],
+          field_date_formats: [
+            { value: "partial", text: "Partial date (YYYY, YYYY-MM, or YYYY-MM-DD)" },
+            { value: "date", text: "Date (YYYY-MM-DD)" },
+            { value: "year-month", text: "Year and month (YYYY-MM)" },
+            { value: "year", text: "Year (YYYY)" },
+            { value: "datetime", text: "Date and time (ISO 8601)" }
+          ],
           enum_store_options:[
             {
               "value":"both",
@@ -223,6 +230,28 @@ Vue.component('prop-edit', {
       RulesUpdate: function (e)
       {
         this.$set(this.prop, "rules", e);
+      },
+      getPropDateFormat: function() {
+        if (!this.prop) {
+          return 'partial';
+        }
+        var fmt = this.prop.display_options && this.prop.display_options.format;
+        if (fmt === 'datetime_iso') {
+          return 'datetime';
+        }
+        if (['partial', 'date', 'year-month', 'year', 'datetime'].indexOf(fmt) !== -1) {
+          return fmt;
+        }
+        return 'partial';
+      },
+      setPropDateFormat: function(fmt) {
+        if (!this.prop) {
+          return;
+        }
+        if (!this.prop.display_options) {
+          this.$set(this.prop, 'display_options', {});
+        }
+        this.$set(this.prop.display_options, 'format', fmt);
       },
       HasAdditionalPrefix(value){
         return value.indexOf('additional.')==0;

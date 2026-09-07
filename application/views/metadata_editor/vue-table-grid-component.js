@@ -373,6 +373,13 @@ Vue.component('table-grid-component', {
             }            
             
             return field.type;
+        },
+        gridColumnField(column)
+        {
+            if (this.isFieldReadOnly) {
+                return Object.assign({}, column, { is_readonly: true });
+            }
+            return column;
         }
     },  
     template: `
@@ -493,6 +500,13 @@ Vue.component('table-grid-component', {
                                     class="form-field-dropdown-custom"
                                     :disabled="isFieldReadOnly"
                                 ></v-combobox>
+                        </div>
+                        <div v-else-if="fieldDisplayType(column)=='date'">
+                            <editor-date-field
+                                :value="local[index][column.key]"
+                                :field="gridColumnField(column)"
+                                @input="update(index,column.key, $event)"
+                            ></editor-date-field>
                         </div>
                         <div v-else>
                             <input type="text"

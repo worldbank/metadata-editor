@@ -102,6 +102,14 @@ Vue.component('grid-component', {
                                     </option>
                                 </select>
                             </div>
+
+                            <div v-else-if="fieldDisplayType(column)=='date'">
+                                <editor-date-field
+                                    :value="field_data[index][column.key]"
+                                    :field="column"
+                                    @input="field_data[index][column.key] = $event"
+                                ></editor-date-field>
+                            </div>
                             
                             <div v-else>
                                 <input type="text"

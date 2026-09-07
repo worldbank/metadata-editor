@@ -161,6 +161,69 @@ class MY_Form_validation extends CI_Form_validation {
         $this->set_message('iso_date_partial', t('The {field} field must be a date in YYYY, YYYY-MM, or YYYY-MM-DD format.'));
         return FALSE;
     }
+
+    /**
+     * Four-digit year YYYY.
+     *
+     * @param string $str
+     * @return bool
+     */
+    function iso_year($str)
+    {
+        if ($str === null || $str === '') {
+            return TRUE;
+        }
+        if (!class_exists('Project_validation', false)) {
+            $this->CI->load->library('Project_validation');
+        }
+        if (Project_validation::is_iso_year($str)) {
+            return TRUE;
+        }
+        $this->set_message('iso_year', t('The {field} field must be a year in YYYY format.'));
+        return FALSE;
+    }
+
+    /**
+     * Year and month YYYY-MM.
+     *
+     * @param string $str
+     * @return bool
+     */
+    function iso_year_month($str)
+    {
+        if ($str === null || $str === '') {
+            return TRUE;
+        }
+        if (!class_exists('Project_validation', false)) {
+            $this->CI->load->library('Project_validation');
+        }
+        if (Project_validation::is_iso_year_month($str)) {
+            return TRUE;
+        }
+        $this->set_message('iso_year_month', t('The {field} field must be a year and month in YYYY-MM format.'));
+        return FALSE;
+    }
+
+    /**
+     * ISO 8601 date and time.
+     *
+     * @param string $str
+     * @return bool
+     */
+    function iso_datetime($str)
+    {
+        if ($str === null || $str === '') {
+            return TRUE;
+        }
+        if (!class_exists('Project_validation', false)) {
+            $this->CI->load->library('Project_validation');
+        }
+        if (Project_validation::is_iso_datetime($str)) {
+            return TRUE;
+        }
+        $this->set_message('iso_datetime', t('The {field} field must be a date and time in ISO 8601 format.'));
+        return FALSE;
+    }
 	
 	function set_error($message,$field=NULL)
 	{

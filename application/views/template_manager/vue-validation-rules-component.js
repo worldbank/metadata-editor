@@ -72,6 +72,24 @@ Vue.component('validation-rules-component', {
                     "label":"Date (YYYY, YYYY-MM, or YYYY-MM-DD)",
                     "description":"Must be a year, year-month, or full date, for example 2024, 2024-03, or 2024-03-15",
                     "param":false
+                },
+                "iso_year":{
+                    "rule":"iso_year",
+                    "label":"Year (YYYY)",
+                    "description":"Must be a four-digit year, for example 2024",
+                    "param":false
+                },
+                "iso_year_month":{
+                    "rule":"iso_year_month",
+                    "label":"Year and month (YYYY-MM)",
+                    "description":"Must be a year and month, for example 2024-03",
+                    "param":false
+                },
+                "iso_datetime":{
+                    "rule":"iso_datetime",
+                    "label":"Date and time (ISO 8601)",
+                    "description":"Must be an ISO 8601 date and time, for example 2024-03-15T10:00:00.000Z",
+                    "param":false
                 }
             }
         }

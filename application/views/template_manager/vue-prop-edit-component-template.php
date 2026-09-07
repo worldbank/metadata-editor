@@ -102,6 +102,20 @@
                         hide-details
                     ></v-select>
                 </div>
+                <div v-if="prop.display_type=='date'" class="mb-3">
+                    <label class="mb-1 d-block">{{$t('field_date_format')}}:</label>
+                    <div class="text-secondary font-small mb-2">{{$t('field_date_format_help')}}</div>
+                    <v-select
+                        :value="getPropDateFormat()"
+                        @change="setPropDateFormat($event)"
+                        :items="field_date_formats"
+                        item-text="text"
+                        item-value="value"
+                        outlined
+                        dense
+                        hide-details
+                    ></v-select>
+                </div>
                 <!--end display -->
 
             </v-tab-item>

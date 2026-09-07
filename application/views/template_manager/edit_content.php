@@ -487,6 +487,22 @@
                 ></v-select>
             </div>
 
+            <div v-if="ActiveNode.display_type=='date'" class="mb-3">
+                <label class="mb-1 d-block">{{$t("field_date_format")}}:</label>
+                <div class="text-secondary font-small mb-2">{{$t("field_date_format_help")}}</div>
+                <v-select
+                    :value="getNodeDateFormat(ActiveNode)"
+                    @change="setNodeDateFormat(ActiveNode, $event)"
+                    :items="field_date_formats"
+                    item-text="text"
+                    item-value="value"
+                    outlined
+                    dense
+                    hide-details
+                    :disabled="!isEditable"
+                ></v-select>
+            </div>
+
             <!--end display -->
         </v-tab-item>
 

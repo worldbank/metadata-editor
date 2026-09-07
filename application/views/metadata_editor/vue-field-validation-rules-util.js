@@ -77,10 +77,65 @@ var FieldValidationRulesUtil = (function () {
             rules.data_type = field.type;
         }
 
+        if (field.display_type === 'date' && !hasDateFormatRule(rules) && hasExplicitDateFormat(field)) {
+            rules[dateFormatRuleName(resolveDateFormat(field))] = true;
+        }
+
         return rules;
     }
 
-    function isIsoDate(value) {
+    function hasDateFormatRule(rules) {
+        return !!(rules.iso_date || rules.iso_date_partial || rules.iso_datetime || rules.iso_year || rules.iso_year_month);
+    }
+
+    function explicitDateFormat(field) {
+        var fmt = field && field.display_options && field.display_options.format;
+        if (fmt === 'datetime_iso') {
+            return 'datetime';
+        }
+        if (['partial', 'date', 'year-month', 'year', 'datetime'].indexOf(fmt) !== -1) {
+            return fmt;
+        }
+        return null;
+    }
+
+    function hasExplicitDateFormat(field) {
+        return explicitDateFormat(field) !== null;
+    }
+
+    function resolveDateFormat(field) {
+        return explicitDateFormat(field) || 'partial';
+    }
+
+    function dateFormatRuleName(format) {
+        switch (format) {
+            case 'date':
+                return 'iso_date';
+            case 'year-month':
+                return 'iso_year_month';
+            case 'year':
+                return 'iso_year';
+            case 'datetime':
+                return 'iso_datetime';
+            default:
+                return 'iso_date_partial';
+        }
+    }
+
+    function calendarDateFromValue(value) {
+        if (typeof value !== 'string') {
+            return null;
+        }
+        if (/^\d{4}-\d{2}-\d{2}T/.test(value)) {
+            return value.slice(0, 10);
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return value;
+        }
+        return null;
+    }
+
+    function isIsoDateStrict(value) {
         if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
             return false;
         }
@@ -95,24 +150,52 @@ var FieldValidationRulesUtil = (function () {
         return dt.getUTCFullYear() === year && dt.getUTCMonth() === month - 1 && dt.getUTCDate() === day;
     }
 
+    function isIsoDate(value) {
+        var date = calendarDateFromValue(value);
+        return date !== null && isIsoDateStrict(date);
+    }
+
+    function isIsoYear(value) {
+        return typeof value === 'string' && /^\d{4}$/.test(value) && Number(value) >= 1;
+    }
+
+    function isIsoYearMonth(value) {
+        if (typeof value !== 'string' || !/^\d{4}-\d{2}$/.test(value)) {
+            return false;
+        }
+        var year = Number(value.slice(0, 4));
+        var month = Number(value.slice(5, 7));
+        return year >= 1 && month >= 1 && month <= 12;
+    }
+
+    function isIsoDateTime(value) {
+        if (typeof value !== 'string') {
+            return false;
+        }
+        if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.test(value)) {
+            return false;
+        }
+        return isIsoDateStrict(value.slice(0, 10));
+    }
+
     function isIsoDatePartial(value) {
         if (typeof value !== 'string') {
             return false;
         }
-        if (/^\d{4}$/.test(value)) {
-            return Number(value) >= 1;
-        }
-        if (/^\d{4}-\d{2}$/.test(value)) {
-            var year = Number(value.slice(0, 4));
-            var month = Number(value.slice(5, 7));
-            return year >= 1 && month >= 1 && month <= 12;
+        if (isIsoYear(value) || isIsoYearMonth(value)) {
+            return true;
         }
         return isIsoDate(value);
     }
 
     return {
         normalize: normalize,
+        resolveDateFormat: resolveDateFormat,
+        dateFormatRuleName: dateFormatRuleName,
         isIsoDate: isIsoDate,
-        isIsoDatePartial: isIsoDatePartial
+        isIsoDatePartial: isIsoDatePartial,
+        isIsoYear: isIsoYear,
+        isIsoYearMonth: isIsoYearMonth,
+        isIsoDateTime: isIsoDateTime
     };
 })();

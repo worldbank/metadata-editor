@@ -112,6 +112,7 @@ Vue.component('nested-section-subsection', {
                                             fieldDisplayType(column)=='textarea' || 
                                             fieldDisplayType(column)=='dropdown' ||
                                             fieldDisplayType(column)=='dropdown-custom' ||
+                                            fieldDisplayType(column)=='date' ||
                                             fieldDisplayType(column)=='simple_array' ||
                                             column.type=='coordinate_pairs'
                                             "

@@ -128,6 +128,9 @@ $lang['unsaved_changed']="Unsaved changes";
 $lang['field_content_format']="Input format";
 $lang['field_content_format_help']="Text, Markdown, LaTex, HTML. Default is Text";
 
+$lang['field_date_format']="Date format";
+$lang['field_date_format_help']="ISO 8601 only. Default is partial date (YYYY, YYYY-MM, or YYYY-MM-DD).";
+
 
 $lang['enum_store_options_label']="Select column to use as value";
 

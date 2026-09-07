@@ -619,7 +619,10 @@ class Project_validation
             'max_length' => 'max_length',
             'min_length' => 'min_length',
             'iso_date' => 'iso_date',
-            'iso_date_partial' => 'iso_date_partial'
+            'iso_date_partial' => 'iso_date_partial',
+            'iso_year' => 'iso_year',
+            'iso_year_month' => 'iso_year_month',
+            'iso_datetime' => 'iso_datetime'
         );
 
         $normalize_and_map_rule = function ($rule) use ($rule_mapping) {
@@ -751,17 +754,146 @@ class Project_validation
     }
 
     /**
-     * Complete calendar date YYYY-MM-DD.
+     * Add the ISO date rule that matches display_options.format when the field is a date.
+     *
+     * @param mixed $rules
+     * @param array $item
+     * @return mixed
+     */
+    public static function merge_date_format_into_rules($rules, $item)
+    {
+        $format = self::explicit_date_format($item);
+        if ($format === null) {
+            return $rules;
+        }
+        $rule_name = self::date_format_rule_name($format);
+        $date_rules = array('iso_date', 'iso_date_partial', 'iso_year', 'iso_year_month', 'iso_datetime');
+
+        if (is_string($rules)) {
+            $parts = array_values(array_filter(array_map('trim', explode('|', $rules)), function ($part) {
+                return $part !== '';
+            }));
+            foreach ($parts as $part) {
+                $name = preg_match('/^(\w+)/', $part, $matches) ? $matches[1] : $part;
+                if (in_array($name, $date_rules, true)) {
+                    return implode('|', $parts);
+                }
+            }
+            $parts[] = $rule_name;
+            return implode('|', $parts);
+        }
+
+        if (!is_array($rules) || $rules === array()) {
+            return array($rule_name => true);
+        }
+
+        if (self::is_associative_array($rules)) {
+            foreach ($date_rules as $existing) {
+                if (!empty($rules[$existing])) {
+                    return $rules;
+                }
+            }
+            $rules[$rule_name] = true;
+            return $rules;
+        }
+
+        foreach ($rules as $part) {
+            $name = is_string($part) && preg_match('/^(\w+)/', $part, $matches) ? $matches[1] : $part;
+            if (in_array($name, $date_rules, true)) {
+                return $rules;
+            }
+        }
+        $rules[] = $rule_name;
+        return $rules;
+    }
+
+    /**
+     * Template date format. Unset display_options.format defaults to partial.
+     *
+     * @param array $item
+     * @return string|null
+     */
+    public static function explicit_date_format($item)
+    {
+        if (!is_array($item) || !isset($item['display_type']) || $item['display_type'] !== 'date') {
+            return null;
+        }
+        if (!isset($item['display_options']['format'])) {
+            return null;
+        }
+        $fmt = $item['display_options']['format'];
+        if ($fmt === 'datetime_iso') {
+            return 'datetime';
+        }
+        $allowed = array('partial', 'date', 'year-month', 'year', 'datetime');
+        if (!in_array($fmt, $allowed, true)) {
+            return null;
+        }
+        return $fmt;
+    }
+
+    public static function resolve_date_format($item)
+    {
+        if (!is_array($item) || !isset($item['display_type']) || $item['display_type'] !== 'date') {
+            return null;
+        }
+        $explicit = self::explicit_date_format($item);
+        return $explicit !== null ? $explicit : 'partial';
+    }
+
+    /**
+     * @param string $format
+     * @return string
+     */
+    public static function date_format_rule_name($format)
+    {
+        switch ($format) {
+            case 'date':
+                return 'iso_date';
+            case 'year-month':
+                return 'iso_year_month';
+            case 'year':
+                return 'iso_year';
+            case 'datetime':
+                return 'iso_datetime';
+            default:
+                return 'iso_date_partial';
+        }
+    }
+
+    /**
+     * YYYY-MM-DD from a date or ISO datetime string.
+     *
+     * @param mixed $value
+     * @return string|null
+     */
+    public static function calendar_date_from_value($value)
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})T/', $value, $matches)) {
+            return $matches[1];
+        }
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return $value;
+        }
+        return null;
+    }
+
+    /**
+     * Complete calendar date YYYY-MM-DD (also accepts a legacy ISO datetime).
      *
      * @param mixed $value
      * @return bool
      */
     public static function is_iso_date($value)
     {
-        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        $date = self::calendar_date_from_value($value);
+        if ($date === null) {
             return false;
         }
-        $parts = explode('-', $value);
+        $parts = explode('-', $date);
         $year = (int) $parts[0];
         $month = (int) $parts[1];
         $day = (int) $parts[2];
@@ -772,7 +904,51 @@ class Project_validation
     }
 
     /**
-     * ISO 8601 date allowing YYYY, YYYY-MM, or YYYY-MM-DD.
+     * Four-digit year YYYY.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function is_iso_year($value)
+    {
+        return is_string($value) && preg_match('/^\d{4}$/', $value) && (int) $value >= 1;
+    }
+
+    /**
+     * Year and month YYYY-MM.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function is_iso_year_month($value)
+    {
+        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}$/', $value)) {
+            return false;
+        }
+        $year = (int) substr($value, 0, 4);
+        $month = (int) substr($value, 5, 2);
+        return $year >= 1 && $month >= 1 && $month <= 12;
+    }
+
+    /**
+     * ISO 8601 date and time.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function is_iso_datetime($value)
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/', $value)) {
+            return false;
+        }
+        return self::is_iso_date(substr($value, 0, 10));
+    }
+
+    /**
+     * ISO 8601 date allowing YYYY, YYYY-MM, or YYYY-MM-DD (also legacy datetime).
      *
      * @param mixed $value
      * @return bool
@@ -782,13 +958,8 @@ class Project_validation
         if (!is_string($value)) {
             return false;
         }
-        if (preg_match('/^\d{4}$/', $value)) {
-            return (int) $value >= 1;
-        }
-        if (preg_match('/^\d{4}-\d{2}$/', $value)) {
-            $year = (int) substr($value, 0, 4);
-            $month = (int) substr($value, 5, 2);
-            return $year >= 1 && $month >= 1 && $month <= 12;
+        if (self::is_iso_year($value) || self::is_iso_year_month($value)) {
+            return true;
         }
         return self::is_iso_date($value);
     }
@@ -843,7 +1014,7 @@ class Project_validation
      */
     private function apply_template_field_rules($item, $field_key, $field_path, $value, &$issues, &$validation_report)
     {
-        $rules = self::map_frontend_to_backend_rules(self::merge_required_into_rules($item));
+        $rules = self::map_frontend_to_backend_rules(self::merge_date_format_into_rules(self::merge_required_into_rules($item), $item));
         if ($rules === '') {
             return;
         }

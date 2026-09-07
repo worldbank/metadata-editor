@@ -118,6 +118,9 @@ $lang['unsaved_changed']="Cambios no guardados";
 $lang['field_content_format']="Formato de entrada";
 $lang['field_content_format_help']="Texto, Markdown, LaTex, HTML. El predeterminado es Texto";
 
+$lang['field_date_format']="Formato de fecha";
+$lang['field_date_format_help']="Solo ISO 8601. El valor predeterminado es fecha parcial (AAAA, AAAA-MM o AAAA-MM-DD).";
+
 
 $lang['enum_store_options_label']="Seleccionar columna para usar como valor";
 
