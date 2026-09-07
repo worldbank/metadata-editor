@@ -101,6 +101,24 @@ Vue.component('template-apply-defaults-component', {
                 this.options
             );
             this.is_processed = true;
+            this.markProjectDirtyAfterDefaults();
+        },
+        markProjectDirtyAfterDefaults: function () {
+            if (!this.validation_report || this.validation_report.length === 0) {
+                return;
+            }
+            // Re-observe newly added trees (Vue 2) and force the Save button on.
+            // Do not rely on the ProjectMetadata watcher: it treats oldVal === '{}'
+            // as "initial load" and would clear is_dirty on a new project.
+            this.$store.state.formData = Object.assign({}, this.ProjectMetadata);
+            var root = this.$root;
+            this.$nextTick(function () {
+                if (root && typeof root.is_dirty !== 'undefined') {
+                    root.is_dirty = true;
+                } else if (typeof vue_app !== 'undefined') {
+                    vue_app.is_dirty = true;
+                }
+            });
         },
         closeDialog: function () {
             this.dialog = false;

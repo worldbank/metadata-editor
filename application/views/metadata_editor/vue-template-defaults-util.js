@@ -107,6 +107,33 @@ var TemplateDefaultsUtil = (function () {
     }
 
     /**
+     * Set a dotted path so Vue 2 observes new nested keys.
+     * lodash _.set creates plain objects Vue cannot detect, which leaves
+     * is_dirty false and the Save button grey on a new/empty project.
+     */
+    function setValueAtKey(meta, key, value) {
+        if (!meta || key == null || key === '') {
+            return;
+        }
+        if (typeof Vue !== 'undefined' && typeof Vue.set === 'function') {
+            var parts = String(key).split('.');
+            var current = meta;
+            for (var i = 0; i < parts.length - 1; i++) {
+                var part = parts[i];
+                var nextIsIndex = /^\d+$/.test(parts[i + 1]);
+                var child = current[part];
+                if (child == null || typeof child !== 'object') {
+                    Vue.set(current, part, nextIsIndex ? [] : {});
+                }
+                current = current[part];
+            }
+            Vue.set(current, parts[parts.length - 1], value);
+            return;
+        }
+        _.set(meta, key, value);
+    }
+
+    /**
      * @param {object} formTemplate
      * @param {object} metadata
      * @param {string} mode "empty" | "all"
@@ -133,7 +160,7 @@ var TemplateDefaultsUtil = (function () {
         }
 
         function applyDefaultAtKey(meta, key, item) {
-            _.set(meta, key, normalizeDefaultForField(item, item.default));
+            setValueAtKey(meta, key, normalizeDefaultForField(item, item.default));
         }
 
         function walkTemplateProp(item, propMeta, item_path, metadataRoot) {
@@ -235,6 +262,7 @@ var TemplateDefaultsUtil = (function () {
     return {
         countPendingEmptyDefaults: countPendingEmptyDefaults,
         listTemplateDefaultsToApply: listTemplateDefaultsToApply,
-        applyTemplateDefaults: applyTemplateDefaults
+        applyTemplateDefaults: applyTemplateDefaults,
+        setValueAtKey: setValueAtKey
     };
 })();
