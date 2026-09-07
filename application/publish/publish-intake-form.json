@@ -1,0 +1,37 @@
+{
+  "form_type": "publish_intake",
+  "title": "Publish intake",
+  "description": "Study-level information for a publish request, stored on project_publications.intake for each selected catalog.",
+  "fields": [
+    {
+      "key": "contains_pii",
+      "title": "Contains personally identifiable information (PII)",
+      "type": "string",
+      "display_type": "dropdown",
+      "required": true,
+      "enum": [
+        { "code": "yes", "label": "Yes" },
+        { "code": "no", "label": "No" },
+        { "code": "unknown", "label": "Unknown / under review" }
+      ],
+      "rules": { "in_list": "yes,no,unknown" }
+    },
+    {
+      "key": "pii_description",
+      "title": "PII description",
+      "type": "string",
+      "display_type": "textarea",
+      "required": false,
+      "help_text": "Describe what PII is present and how it is protected.",
+      "show_when": { "contains_pii": "yes" }
+    },
+    {
+      "key": "curator_notes",
+      "title": "Notes for curators",
+      "type": "string",
+      "display_type": "textarea",
+      "required": false,
+      "help_text": "Context for the publishing team (timing, sensitivity, special handling)."
+    }
+  ]
+}

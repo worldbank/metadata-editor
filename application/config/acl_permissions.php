@@ -124,6 +124,17 @@ $config['acl_permissions'] = [
         ]
     ],
 
+    "catalog"=>[
+        "title" => "Catalog connections",
+        "description" => "Create and manage shared catalog connections",
+        "permissions"=>[
+            [
+                "permission" => "admin",
+                "description" => "Create, edit, and delete shared catalog connections"
+            ]
+        ]
+    ],
+
     "collection"=>[ 
         "title" => "Collections",
         "permissions"=>[

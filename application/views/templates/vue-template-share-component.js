@@ -122,7 +122,7 @@ Vue.component('vue-template-share', {
         },
         removeAccess: function(index) {
             
-            if (!confirm(vm.$t("confirm_remove_user_access"))) {
+            if (!confirm(this.$t("confirm_remove_user_access"))) {
                 return;
             }
 

@@ -94,10 +94,16 @@ class Dashboard_model extends CI_Model {
         $this->db->select('
             COUNT(*) as total_projects,
             SUM(CASE WHEN created >= ' . $thirty_days_ago . ' THEN 1 ELSE 0 END) as recent_30_days,
-            SUM(CASE WHEN created >= ' . $this_month_start . ' THEN 1 ELSE 0 END) as this_month,
-            SUM(CASE WHEN published = 1 THEN 1 ELSE 0 END) as published,
-            SUM(CASE WHEN published = 0 OR published IS NULL THEN 1 ELSE 0 END) as unpublished
+            SUM(CASE WHEN created >= ' . $this_month_start . ' THEN 1 ELSE 0 END) as this_month
         ');
+        if ($this->db->field_exists('status', 'editor_projects')) {
+            $this->db->select('
+                SUM(CASE WHEN status IS NULL THEN 1 ELSE 0 END) as unset,
+                SUM(CASE WHEN status = \'draft\' THEN 1 ELSE 0 END) as draft,
+                SUM(CASE WHEN status = \'complete\' THEN 1 ELSE 0 END) as complete,
+                SUM(CASE WHEN status = \'archived\' THEN 1 ELSE 0 END) as archived
+            ', false);
+        }
         $this->db->from('editor_projects');
         $project_totals = $this->db->get()->row_array();
 
@@ -119,8 +125,10 @@ class Dashboard_model extends CI_Model {
         return [
             'total' => (int)$project_totals['total_projects'],
             'by_type' => $project_types,
-            'published' => (int)$project_totals['published'],
-            'unpublished' => (int)$project_totals['unpublished'],
+            'unset' => isset($project_totals['unset']) ? (int)$project_totals['unset'] : 0,
+            'draft' => isset($project_totals['draft']) ? (int)$project_totals['draft'] : 0,
+            'complete' => isset($project_totals['complete']) ? (int)$project_totals['complete'] : 0,
+            'archived' => isset($project_totals['archived']) ? (int)$project_totals['archived'] : 0,
             'recent_30_days' => (int)$project_totals['recent_30_days'],
             'this_month' => (int)$project_totals['this_month']
         ];

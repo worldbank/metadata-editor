@@ -60,18 +60,39 @@ class Editor_acl
 
 
 	/**
+	 * Accept a user object, numeric id (session userdata is often a string), or null (current user).
+	 *
+	 * @param mixed $user
+	 * @return object|null
+	 */
+	private function resolve_user($user)
+	{
+		if (empty($user)) {
+			$user = $this->current_user();
+		}
+
+		if (is_object($user)) {
+			return $user;
+		}
+
+		if (is_numeric($user)) {
+			return (object) array('id' => (int) $user);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Global project access via the Project manager role (not site Admin).
 	 *
-	 * @param object|null $user
+	 * @param object|int|string|null $user
 	 * @param string|null $permission view|edit|delete|publish|admin
 	 */
 	function user_has_global_project_access($user=null, $permission='view')
 	{
-		if (!$user) {
-			$user = (object)$this->current_user();
-		}
+		$user = $this->resolve_user($user);
 
-		if (!$user) {
+		if (!$user || empty($user->id)) {
 			return false;
 		}
 
@@ -87,9 +108,7 @@ class Editor_acl
 	 */
 	function user_sees_all_projects($user=null)
 	{
-		if (!$user) {
-			$user = (object)$this->current_user();
-		}
+		$user = $this->resolve_user($user);
 
 		if (!$user) {
 			return false;
@@ -512,11 +531,9 @@ class Editor_acl
 
 	function user_is_admin($user=null)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
-		}
+		$user = $this->resolve_user($user);
 
-		if(!$user){
+		if(!$user || !isset($user->id)){
 			throw new Exception("editor_acl::User not set");
 		}
 
@@ -566,6 +583,30 @@ class Editor_acl
 		}
 
 		return false;
+	}
+
+	/**
+	 * Site admin or catalog admin role: create/edit/delete shared catalog connections.
+	 *
+	 * @param object|null $user
+	 * @return bool
+	 */
+	function user_can_manage_official_catalogs($user=null)
+	{
+		if(empty($user)){
+			$user=$this->current_user();
+		}
+
+		if(!$user){
+			return false;
+		}
+
+		try {
+			$this->has_access('catalog', 'admin', $user);
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 
 	

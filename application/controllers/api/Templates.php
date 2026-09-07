@@ -607,7 +607,42 @@ class Templates extends MY_REST_Controller
 				$this->editor_acl->user_has_template_access($option['template_uid'],$permission='admin',$this->user);	
 			}
 
+			$this->load->helper('notification');
+			$this->load->model('Template_acl_model');
+			$pending=array();
+			foreach($options as $option){
+				$template_id=$this->Editor_template_model->get_id_by_uid($option['template_uid']);
+				$previous=null;
+				if ($template_id){
+					$previous=notification_first_permission(
+						$this->Template_acl_model->get_user_permissions($template_id, $option['user_id'])
+					);
+				}
+				$pending[]=array(
+					'user_id'=>(int)$option['user_id'],
+					'previous'=>$previous,
+					'permissions'=>isset($option['permissions']) ? $option['permissions'] : 'view',
+					'template_uid'=>$option['template_uid'],
+					'template_id'=>$template_id ? (int)$template_id : 0,
+				);
+			}
+
 			$result=$this->Editor_template_model->share_template($options, $this->user_id);
+
+			$this->load->library('Notification_service');
+			foreach($pending as $item){
+				$this->notification_service->notify_permission_change(
+					'template',
+					$item['user_id'],
+					$item['previous'],
+					$item['permissions'],
+					array(
+						'template_uid'=>$item['template_uid'],
+						'template_id'=>$item['template_id'],
+					),
+					$this->user_id
+				);
+			}
 
 			$output=array(
 				'status'=>'success',
@@ -663,7 +698,30 @@ class Templates extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_template_access($options['template_uid'],$permission='admin',$this->user);
+			$this->load->helper('notification');
+			$this->load->model('Template_acl_model');
+			$template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
+			$previous=null;
+			if ($template_id){
+				$previous=notification_first_permission(
+					$this->Template_acl_model->get_user_permissions($template_id, $options['user_id'])
+				);
+			}
 			$result=$this->Editor_template_model->unshare_template($options['template_uid'], $options['user_id']);
+			if ($previous !== null){
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'template',
+					(int)$options['user_id'],
+					$previous,
+					null,
+					array(
+						'template_uid'=>$options['template_uid'],
+						'template_id'=>$template_id ? (int)$template_id : 0,
+					),
+					$this->user_id
+				);
+			}
 
 			$output=array(
 				'status'=>'success',

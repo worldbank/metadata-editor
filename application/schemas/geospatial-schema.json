@@ -383,10 +383,7 @@
 				"maintenanceNote": {
 					"title": "Maintenance Note",
 					"description": "Note about the maintenance",
-					"type": "array",
-					"items": {
-						"type": "string"
-					}
+					"type": "string"
 				},
 				"contact": {
 					"title": "Contact",

@@ -52,5 +52,8 @@ $config['data_structures_enabled'] = '1';
 $config['schemas_enabled'] = '1';
 $config['tags_enabled'] = '1';
 
+// In-app notification retention (days). Inbox and prune cron hide/delete older rows.
+$config['notifications_retention_days'] = '30';
+
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

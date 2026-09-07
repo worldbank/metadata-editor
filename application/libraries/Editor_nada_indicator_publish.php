@@ -434,11 +434,6 @@ class Editor_nada_indicator_publish {
 	 */
 	private function get_connection($user_id, $catalog_connection_id)
 	{
-		$conn = $this->ci->Catalog_connections_model->get_connection($user_id, $catalog_connection_id);
-		if (!$conn) {
-			throw new Exception('Target catalog was not found');
-		}
-
-		return $conn;
+		return $this->ci->Catalog_connections_model->require_connection($user_id, $catalog_connection_id);
 	}
 }

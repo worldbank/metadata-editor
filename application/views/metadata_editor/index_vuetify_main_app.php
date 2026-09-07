@@ -209,10 +209,12 @@
 
             echo $this->load->view("metadata_editor/vue-import-options-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-publish-options-component.js",null,true);
+            echo $this->load->view("editor_common/vue-history-event-detail-dialog.js", null, true);
+            echo $this->load->view("metadata_editor/vue-submit-for-publishing-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-publish-hub-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-sdmx-csv-export-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-project-package-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-import-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-sharing-component.js",null,true);
@@ -307,10 +309,10 @@
         //Define route components
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
         const Home = { template: '<div><summary-component/> </div>' }
-        const PublishProject = { template: '<div><publish-options/> </div>' }
+        const PublishProject = { template: '<div><publish-hub/></div>' }
+        const CatalogPublications = { template: '<div><publish-hub/></div>' }
         const ProjectPackage = { template: '<div><project-package/> </div>' }
         const ProjectPdf = { template: '<div><generate-pdf/> </div>' }
-        const ConfigureCatalog = { template: '<div><configure-catalog/> </div>' }
         const ImportOptions = { template: '<div><import-options/> </div>' }
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
         const Datafiles ={template: '<div><datafiles/></div>'}
@@ -363,10 +365,12 @@
         const routes = [
             { path: '/', component: Home },
             { path: '/page-preview', component: PagePreview },
-            { path: '/publish', component: PublishProject },
+            { path: '/publish', component: PublishProject, name: 'publish' },
+            { path: '/publications', redirect: function (to) { return { path: '/publish', query: Object.assign({}, to.query, { tab: 'queue' }) }; } },
+            { path: '/publish-ready', redirect: function (to) { return { path: '/publish', query: Object.assign({}, to.query, { tab: 'queue' }) }; } },
+            { path: '/publish-request', redirect: function (to) { return { path: '/publish', query: Object.assign({}, to.query, { tab: 'queue' }) }; } },
             { path: '/project-package', component: ProjectPackage },
             { path: '/generate-pdf', component: ProjectPdf },            
-            { path: '/configure-catalog', component: ConfigureCatalog },
             { path: '/import', component: ImportOptions },
             { path: '/study/:element_id', component: main, name: 'study',props: true },
             { path: '/datafile/:file_id', component: DatafileEdit, props:true, name: 'datafile-edit' },
@@ -426,7 +430,7 @@
                 return;
             }
 
-            if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview' && to.path !== '/import-report') {
+            if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview' && to.path !== '/import-report' && to.path !== '/publications' && to.path !== '/publish' && to.path !== '/publish-ready' && to.path !== '/publish-request') {
                 next({ path: '/', replace: true });
                 return;
             }

@@ -10,6 +10,91 @@
   <script src="<?php echo base_url();?>vue-app/assets/bootstrap.bundle.min.js"></script>
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+    .catalogs-table table thead th {
+      vertical-align: middle !important;
+      white-space: nowrap;
+      height: 48px;
+    }
+    .catalogs-table table tbody td {
+      vertical-align: middle !important;
+      padding-top: 14px !important;
+      padding-bottom: 14px !important;
+    }
+    .catalogs-table tbody tr {
+      cursor: pointer;
+    }
+    .catalogs-title-cell {
+      min-width: 0;
+    }
+    .catalogs-row-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #d7dbe3;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-right: 16px;
+    }
+    .catalogs-title {
+      line-height: 1.3;
+    }
+    .catalogs-title-meta {
+      margin-top: 4px;
+      gap: 8px;
+    }
+    .catalogs-uid {
+      font-size: 12px;
+      color: #9e9e9e;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .catalogs-url-sub {
+      font-size: 13px;
+      color: #6b7280;
+      word-break: break-all;
+    }
+    .catalogs-id {
+      font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #4b5563;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .catalogs-type-chip {
+      height: 20px !important;
+      font-size: 11px !important;
+    }
+    .catalog-availability-hint {
+      font-weight: 400;
+    }
+    .catalog-readonly-summary {
+      border: 1px solid #d7dbe3;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 16px;
+    }
+    .catalog-readonly-title {
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .v-dialog.catalog-connection-dialog {
+      height: auto !important;
+    }
+    .v-dialog.catalog-connection-dialog .v-card {
+      height: auto !important;
+      flex: none !important;
+    }
+    .v-dialog.catalog-connection-dialog .v-card__text {
+      flex: none !important;
+    }
+    .catalog-key-dialog-text {
+      padding-top: 0 !important;
+    }
+  </style>
 </head>
 <body class="layout-top-nav">
 
@@ -22,6 +107,7 @@
     'is_admin' => $this->ion_auth->is_admin(),
     'can_access_site_admin' => $this->ion_auth->can_access_site_admin(),
     'can_access_admin_dashboard' => $this->ion_auth->can_access_admin_dashboard(),
+    'can_manage_official' => $this->editor_acl->user_can_manage_official_catalogs(),
   ), registry_acl_user_info_flags());
 ?>
 

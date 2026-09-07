@@ -132,6 +132,25 @@ class Collection_project_acl_model extends CI_Model {
         return $this->permissions;
     }
 
+    /**
+     * Direct project-ACL privilege for a user on a collection (no inheritance).
+     *
+     * @param int $collection_id
+     * @param int $user_id
+     * @return string|null view|edit|admin
+     */
+    function get_user_permission($collection_id, $user_id)
+    {
+        $this->db->select('permissions');
+        $this->db->where('collection_id', (int) $collection_id);
+        $this->db->where('user_id', (int) $user_id);
+        $row = $this->db->get('editor_collection_project_acl')->row_array();
+        if (!$row || empty($row['permissions'])) {
+            return null;
+        }
+        return (string) $row['permissions'];
+    }
+
 
     /**
      * Effective project-ACL privilege for a user on a collection.

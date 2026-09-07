@@ -175,6 +175,16 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 			<?php echo t('metadata_assessment_monthly_limit_note');?>
 		</div>
 	</div>
+
+	<div class="field">
+		<label><?php echo t('notifications_retention_days');?></label>
+		<input type="number" name="notifications_retention_days" min="1" max="365" step="1"
+			value="<?php echo isset($notifications_retention_days) ? (int) $notifications_retention_days : 30; ?>"
+			style="width:120px;">
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('notifications_retention_days_note');?>
+		</div>
+	</div>
 </fieldset>
 
 

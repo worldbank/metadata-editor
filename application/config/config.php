@@ -384,7 +384,7 @@ $config['encryption_key'] = "CzYs1979";
 */
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'nadaeditor';
-$config['sess_expiration'] = 60 * 30; //30 mins
+$config['sess_expiration'] = 60 * 120; //120 mins
 $config['sess_save_path'] = 'ci_sessions';//FCPATH.'files/sessions';
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 0;

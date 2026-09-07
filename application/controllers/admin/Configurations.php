@@ -97,6 +97,8 @@ class Configurations extends MY_Controller {
 		$settings['grant_editor_default'] = default_editor_role_enabled();
 		$settings['project_sharing_enabled'] = project_sharing_enabled();
 		$settings['metadata_assessment_enabled'] = metadata_assessment_enabled();
+		$this->load->helper('notification');
+		$settings['notifications_retention_days'] = notification_retention_days();
 		$settings['issues_enabled'] = site_feature_enabled('issues');
 		$settings['data_structures_enabled'] = site_feature_enabled('data_structures');
 		$settings['schemas_enabled'] = site_feature_enabled('schemas');
@@ -182,6 +184,16 @@ class Configurations extends MY_Controller {
 			? (string) max(0, (int) $raw_limit)
 			: '200';
 
+		$raw_retention = $this->input->post('notifications_retention_days');
+		$retention_days = is_numeric($raw_retention) ? (int) $raw_retention : 30;
+		if ($retention_days < 1) {
+			$retention_days = 1;
+		}
+		if ($retention_days > 365) {
+			$retention_days = 365;
+		}
+		$options['notifications_retention_days'] = (string) $retention_days;
+
 		// Site feature toggles
 		$options['issues_enabled'] = $this->input->post('issues_enabled') === '1' ? '1' : '0';
 		$options['data_structures_enabled'] = $this->input->post('data_structures_enabled') === '1' ? '1' : '0';
@@ -215,6 +227,7 @@ class Configurations extends MY_Controller {
 			$post['project_sharing'],
 			$post['metadata_assessment_enabled'],
 			$post['metadata_assessment_monthly_limit'],
+			$post['notifications_retention_days'],
 			$post['issues_enabled'],
 			$post['data_structures_enabled'],
 			$post['schemas_enabled'],

@@ -8,7 +8,7 @@
             <template v-else>
                 <v-icon style="font-size:x-large;">mdi-file-tree</v-icon>
             </template>
-            <strong v-cloak>{{Title}}</strong>            
+            <strong v-cloak>{{Title}}</strong>
         </div>
         <!--<div>{{ProjectMetadata.idno}} </div>-->        
     </div>
@@ -56,6 +56,7 @@
             {{$t('Save')}}
         </v-btn>
         </template>
+
         </template>
         <template v-else>
             <v-btn
@@ -173,12 +174,12 @@
 
 
                             <v-list-item @click="onRouterLinkClick('/publish')">
-                            <v-list-item-icon>
-                                <v-icon>mdi-arrow-top-right-thick</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-title>
-                                <?php echo t("publish_to_nada"); ?>
-                            </v-list-item-title>
+                                <v-list-item-icon>
+                                    <v-icon>mdi-arrow-top-right-thick</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>
+                                    {{$t('publish_to_catalog')}}
+                                </v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="onRouterLinkClick('/generate-pdf')">
                             <v-list-item-icon>

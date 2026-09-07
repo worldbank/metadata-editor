@@ -965,7 +965,11 @@ class Data_structure_model extends CI_Model {
 		$this->db->where('ep.data_structure_id', $structure_id);
 		$total = (int) $this->db->count_all_results();
 
-		$this->db->select('p.id, p.idno, p.title, p.type, p.published, p.created, p.changed, ep.data_structure_id');
+		$select = 'p.id, p.idno, p.title, p.type, p.created, p.changed, ep.data_structure_id';
+		if ($this->db->field_exists('status', 'editor_projects')) {
+			$select = 'p.id, p.idno, p.title, p.type, p.status, p.created, p.changed, ep.data_structure_id';
+		}
+		$this->db->select($select);
 		$this->db->from('editor_project_dsd ep');
 		$this->db->join('editor_projects p', 'p.id = ep.sid');
 		$this->db->where('ep.data_structure_id', $structure_id);

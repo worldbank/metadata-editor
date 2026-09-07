@@ -1487,3 +1487,30 @@ tr .action-buttons-hover {
   .font-weight-normal .v-label{
     font-weight: normal !important;
   }
+
+.vue-global-site-header .header-notification-badge .v-badge__badge {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+}
+
+.header-notification-item-icon {
+  margin-right: 16px !important;
+}
+
+.v-list--two-line .header-notification-view-all.v-list-item {
+  min-height: 40px !important;
+  justify-content: center !important;
+}
+
+.header-notification-empty {
+  margin: 8px 16px 12px;
+  padding: 16px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}

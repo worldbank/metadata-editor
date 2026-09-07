@@ -1493,8 +1493,10 @@ const DashboardHome = {
                 projects: {
                     total: 0,
                     by_type: [],
-                    published: 0,
-                    unpublished: 0,
+                    unset: 0,
+                    draft: 0,
+                    complete: 0,
+                    archived: 0,
                     recent_30_days: 0,
                     this_month: 0
                 },

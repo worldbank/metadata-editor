@@ -19,6 +19,10 @@ use Swaggest\JsonDiff\JsonMergePatch;
  */
 class Editor_model extends CI_Model {
 
+	const PROJECT_STATUS_DRAFT = 'draft';
+	const PROJECT_STATUS_COMPLETE = 'complete';
+	const PROJECT_STATUS_ARCHIVED = 'archived';
+
 	private $storage_path='datafiles/editor';
 	private $tmp_storage_path='datafiles/editor';
 	/** @var string|null Cached absolute storage root */
@@ -36,7 +40,7 @@ class Editor_model extends CI_Model {
 		'nation',
 		'year_start',
 		'year_end',
-		'published',
+		'status',
 		'created',
 		'changed',
 		'varcount',
@@ -46,6 +50,49 @@ class Editor_model extends CI_Model {
 		"thumbnail",
 		"attributes",
 		);
+
+	/**
+	 * @return bool
+	 */
+	public function editor_projects_has_status_column()
+	{
+		static $cached = null;
+		if ($cached === null) {
+			$cached = $this->db->field_exists('status', 'editor_projects');
+		}
+		return $cached;
+	}
+
+	/**
+	 * @param array|null $fields
+	 * @return array
+	 */
+	public function resolve_listing_fields($fields = null)
+	{
+		if ($fields === null) {
+			$fields = $this->listing_fields;
+		}
+		if ($this->editor_projects_has_status_column()) {
+			return $fields;
+		}
+		return array_values(array_filter($fields, function ($field) {
+			return $field !== 'status';
+		}));
+	}
+
+	/**
+	 * @param object|false $query
+	 * @return array|false
+	 */
+	private function row_array_or_false($query)
+	{
+		if ($query === false) {
+			$error = $this->db->error();
+			log_message('error', 'editor_projects query failed: ' . (isset($error['message']) ? $error['message'] : 'unknown'));
+			return false;
+		}
+		return $query->row_array();
+	}
 	
 
 	private $encoded_fields=array(
@@ -256,7 +303,7 @@ class Editor_model extends CI_Model {
 	 * 
 	 * 
 	 */
-	function get_list_all($dataset_type=null,$published=1)
+	function get_list_all($dataset_type=null,$status=null)
 	{
 		$this->db->select('id,idno,type');
 		
@@ -264,11 +311,31 @@ class Editor_model extends CI_Model {
 			$this->db->where('type',$dataset_type);
 		}
 
-		if(!empty($published)){
-			$this->db->where('published',$published);
+		if(!empty($status) && $this->editor_projects_has_status_column()){
+			$this->db->where('status',$status);
 		}
 		
 		return $this->db->get("editor_projects")->result_array();
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function project_statuses()
+	{
+		$CI =& get_instance();
+		$CI->load->helper('project_status');
+		return editor_project_statuses();
+	}
+
+	/**
+	 * @param mixed $value
+	 * @return string
+	 */
+	public function normalize_project_status($value)
+	{
+		$this->load->helper('project_status');
+		return normalize_editor_project_status($value);
 	}
 
 	
@@ -311,7 +378,7 @@ class Editor_model extends CI_Model {
 			'title', 'abbreviation', 'authoring_entity', 'nation', 
 			'year_start', 'year_end', 'study_idno',
 			'metafile', 'dirpath', 'thumbnail',
-			'varcount', 'published', 'is_shared', 'is_locked',
+			'varcount', 'status', 'is_shared', 'is_locked',
 			'created', 'changed', 'created_by', 'changed_by',
 			'created_utc', 'changed_utc',
 			'schema', 'schema_version',
@@ -444,11 +511,15 @@ class Editor_model extends CI_Model {
 	//get project basic info
     function get_basic_info($sid)
     {
-		$this->db->select("id,pid,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed, template_uid, is_locked, version_number, version_created, version_created_by, version_created");
+		$select = "id,pid,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end";
+		if ($this->editor_projects_has_status_column()) {
+			$select .= ",status";
+		}
+		$select .= ",created,changed, template_uid, is_locked, version_number, version_created, version_created_by, version_created";
+		$this->db->select($select);
 		$this->db->where("id",$sid);
 		
-		$survey=$this->db->get("editor_projects")->row_array();
-        return $survey;
+		return $this->row_array_or_false($this->db->get("editor_projects"));
 	}
 
 	/**
@@ -516,6 +587,16 @@ class Editor_model extends CI_Model {
 			// Filter out table-level fields from metadata before encoding
 			$metadata_only = $this->filter_metadata_fields($options['metadata']);
 			$options['metadata']=$this->encode_metadata($metadata_only);
+		}
+
+		if (array_key_exists('status', $options) && $options['status'] !== null && $options['status'] !== '') {
+			if ($this->editor_projects_has_status_column()) {
+				$options['status'] = $this->normalize_project_status($options['status']);
+			} else {
+				unset($options['status']);
+			}
+		} else {
+			unset($options['status']);
 		}
 
 		$this->db->insert('editor_projects',$options);
@@ -1940,7 +2021,8 @@ class Editor_model extends CI_Model {
         $pdf_path=$this->get_pdf_path($sid);
 
 		$this->pdf_report->initialize($sid, $options);
-		$this->pdf_report->generate($pdf_path);		
+		$this->pdf_report->generate($pdf_path);
+
 		return $pdf_path;
 	}
 

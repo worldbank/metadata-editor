@@ -20,7 +20,7 @@ class Project_search
 		'nation',
 		'year_start',
 		'year_end',
-		'published',
+		'status',
 		'created',
 		'changed',
 		'varcount',
@@ -59,7 +59,7 @@ class Project_search
 	function search($limit=10,$offset=0, $fields=array(), $search_options=array(), $user=null)
 	{
 		if (empty($fields)){
-			$fields=$this->listing_fields;
+			$fields=$this->ci->Editor_model->resolve_listing_fields($this->listing_fields);
 		}
 
 		foreach($fields as $idx=>$field){

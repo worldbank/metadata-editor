@@ -1,0 +1,59 @@
+{
+  "catalog_type": "nada",
+  "title": "NADA publish options",
+  "description": "Options stored on a project_publications row for catalog.type = nada.",
+  "fields": [
+    {
+      "key": "published",
+      "title": "Publish status",
+      "type": "integer",
+      "display_type": "dropdown",
+      "required": true,
+      "contexts": ["submit", "storage"],
+      "enum": [
+        { "code": "0", "label": "Draft" },
+        { "code": "1", "label": "Published" }
+      ],
+      "rules": { "in_list": "0,1" }
+    },
+    {
+      "key": "access_policy",
+      "title": "Data access",
+      "type": "string",
+      "display_type": "dropdown-custom",
+      "enum_store_column": "code",
+      "required": true,
+      "contexts": ["ready", "submit", "storage"],
+      "help_text": "Suggested NADA data access types; custom values are allowed.",
+      "enum": [
+        { "code": "open", "label": "Open access" },
+        { "code": "direct", "label": "Direct access" },
+        { "code": "public", "label": "Public use files" },
+        { "code": "licensed", "label": "Licensed data files" },
+        { "code": "remote", "label": "Data accessible only in data enclave" },
+        { "code": "enclave", "label": "Data available from external repository" },
+        { "code": "", "label": "Data not available" },
+        { "code": "data_na", "label": "Data not available" }
+      ]
+    },
+    {
+      "key": "repositoryid",
+      "title": "NADA collection",
+      "type": "string",
+      "display_type": "text",
+      "required": false,
+      "contexts": ["ready", "submit", "storage"],
+      "help_text": "NADA repository id (collection identifier). Optional when marking ready; curators may override."
+    },
+    {
+      "key": "data_remote_url",
+      "title": "Remote data URL",
+      "type": "string",
+      "display_type": "text",
+      "required": false,
+      "contexts": ["ready", "submit", "storage"],
+      "help_text": "Required when data access is remote.",
+      "show_when": { "access_policy": "remote" }
+    }
+  ]
+}

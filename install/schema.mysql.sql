@@ -398,13 +398,88 @@ CREATE TABLE `user_roles` (
 
 
 
+-- Publish targets (NADA or other). Not ME collections.
+-- Secrets live in editor_catalog_credentials (per user). type is varchar, not ENUM.
 CREATE TABLE `editor_catalogs` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) DEFAULT NULL,
+  `uid` varchar(100) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `type` varchar(50) NOT NULL DEFAULT 'nada',
+  `is_official` tinyint(1) NOT NULL DEFAULT 0,
   `url` varchar(500) DEFAULT NULL,
-  `api_key` varchar(200) DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `url_normalized` varchar(500) DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_editor_catalogs_uid` (`uid`),
+  KEY `idx_editor_catalogs_is_official` (`is_official`),
+  KEY `idx_editor_catalogs_url_normalized` (`url_normalized`)
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `editor_catalog_credentials` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `catalog_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `api_key` varchar(200) NOT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_editor_catalog_credentials_catalog_user` (`catalog_id`,`user_id`),
+  KEY `idx_editor_catalog_credentials_user` (`user_id`),
+  CONSTRAINT `fk_editor_catalog_credentials_catalog` FOREIGN KEY (`catalog_id`) REFERENCES `editor_catalogs` (`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `catalog_curators` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `catalog_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_catalog_curators_catalog_user` (`catalog_id`,`user_id`),
+  KEY `idx_catalog_curators_user` (`user_id`),
+  CONSTRAINT `fk_catalog_curators_catalog` FOREIGN KEY (`catalog_id`) REFERENCES `editor_catalogs` (`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `project_publications` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `catalog_id` int NOT NULL,
+  `status` varchar(30) DEFAULT NULL,
+  `request` varchar(30) DEFAULT NULL,
+  `remote_id` varchar(255) DEFAULT NULL,
+  `remote_url` varchar(500) DEFAULT NULL,
+  `source` varchar(30) DEFAULT NULL,
+  `options` json DEFAULT NULL,
+  `intake` json DEFAULT NULL,
+  `ready_at` int DEFAULT NULL,
+  `ready_by` int DEFAULT NULL,
+  `request_note` text,
+  `return_reason` text,
+  `requested_by` int DEFAULT NULL,
+  `requested_at` int DEFAULT NULL,
+  `updated_by` int DEFAULT NULL,
+  `updated_at` int DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_project_publications_sid_catalog` (`sid`,`catalog_id`),
+  KEY `idx_project_publications_catalog` (`catalog_id`),
+  KEY `idx_project_publications_request` (`request`),
+  KEY `idx_project_publications_ready_at` (`ready_at`),
+  CONSTRAINT `fk_project_publications_catalog` FOREIGN KEY (`catalog_id`) REFERENCES `editor_catalogs` (`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `project_publication_events` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `publication_id` int NOT NULL,
+  `event` varchar(50) NOT NULL,
+  `actor_user_id` int DEFAULT NULL,
+  `payload` json DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_project_publication_events_publication` (`publication_id`),
+  CONSTRAINT `fk_project_publication_events_publication` FOREIGN KEY (`publication_id`) REFERENCES `project_publications` (`id`) ON DELETE CASCADE
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
@@ -456,7 +531,7 @@ CREATE TABLE `editor_projects` (
   `metafile` varchar(255) DEFAULT NULL,
   `dirpath` varchar(255) DEFAULT NULL,
   `varcount` int DEFAULT NULL,
-  `published` tinyint DEFAULT NULL,
+  `status` varchar(20) DEFAULT NULL,
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,
@@ -475,6 +550,7 @@ CREATE TABLE `editor_projects` (
   `attributes` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unq_idno` (`idno`,`version_number`),
+  KEY `idx_editor_projects_status` (`status`),
   FULLTEXT KEY `ft_projects` (`title`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
@@ -1161,6 +1237,23 @@ CREATE TABLE `project_issues` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- Global in-app inbox (one row per recipient per event; read_at NULL = unread)
+CREATE TABLE `user_notifications` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT 'recipient',
+  `type` varchar(64) NOT NULL COMMENT 'e.g. publish.project_ready, project.access_granted',
+  `payload` json DEFAULT NULL COMMENT 'snapshots + deep-link data (sid, titles, href fields)',
+  `actor_user_id` int DEFAULT NULL COMMENT 'who triggered the event',
+  `read_at` int DEFAULT NULL COMMENT 'unix time; NULL = unread',
+  `email_sent_at` int DEFAULT NULL COMMENT 'unix time when digest included this row; Phase B',
+  `created` int NOT NULL COMMENT 'unix time',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_created` (`user_id`, `created`),
+  KEY `idx_user_unread` (`user_id`, `read_at`),
+  KEY `idx_user_type` (`user_id`, `type`),
+  KEY `idx_actor` (`actor_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- CodeIgniter migration ledger (fresh installs: schema already includes all migration SQL;
 -- bump version when adding application/migrations/*.php)
 CREATE TABLE `migrations` (
@@ -1168,4 +1261,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260703000002);
+INSERT INTO `migrations` (`version`) VALUES (20260905000001);

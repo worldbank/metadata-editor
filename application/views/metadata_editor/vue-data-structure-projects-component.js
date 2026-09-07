@@ -15,7 +15,7 @@ Vue.component('data-structure-projects', {
                 { text: 'ID', value: 'id', sortable: false, width: '72px' },
                 { text: 'Title', value: 'title', sortable: false },
                 { text: 'Type', value: 'type', sortable: false, width: '100px' },
-                { text: 'Published', value: 'published', sortable: false, width: '100px' }
+                { text: 'Status', value: 'status', sortable: false, width: '110px' }
             ],
             tableOptions: { page: 1, itemsPerPage: 25 }
         };
@@ -96,6 +96,26 @@ Vue.component('data-structure-projects', {
         projectUrl: function (item) {
             var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '';
             return base + '/editor/edit/' + item.id;
+        },
+        projectStatusLabel: function (status) {
+            if (status === null || status === undefined || status === '') {
+                return '—';
+            }
+            var s = String(status).toLowerCase();
+            if (s === 'complete') return 'Complete';
+            if (s === 'archived') return 'Archived';
+            if (s === 'draft') return 'Draft';
+            return String(status);
+        },
+        projectStatusColor: function (status) {
+            if (status === null || status === undefined || status === '') {
+                return 'grey lighten-3';
+            }
+            var s = String(status).toLowerCase();
+            if (s === 'complete') return 'green';
+            if (s === 'archived') return 'blue-grey';
+            if (s === 'draft') return 'grey';
+            return 'grey';
         }
     },
     template: `
@@ -121,10 +141,11 @@ Vue.component('data-structure-projects', {
                             {{ item.title || item.id }}
                         </a>
                     </template>
-                    <template v-slot:item.published="{ item }">
-                        <v-chip x-small :color="Number(item.published) === 1 ? 'green' : 'grey'" dark>
-                            {{ Number(item.published) === 1 ? 'Yes' : 'No' }}
+                    <template v-slot:item.status="{ item }">
+                        <v-chip v-if="item.status" x-small :color="projectStatusColor(item.status)" dark>
+                            {{ projectStatusLabel(item.status) }}
                         </v-chip>
+                        <span v-else class="grey--text">—</span>
                     </template>
                 </v-data-table>
             </v-card>

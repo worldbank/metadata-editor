@@ -200,7 +200,6 @@ class Project_versions
 			'nation' => $project_info['nation'],
 			'year_start' => $project_info['year_start'],
 			'year_end' => $project_info['year_end'],
-			'published' => $project_info['published'],
 			'created' => $project_info['created'],
 			'changed' => $project_info['changed'],
 			'varcount' => $project_info['varcount'],
@@ -216,6 +215,10 @@ class Project_versions
 			'version_notes' => $version_notes,
 			'metadata' => $project_info['metadata']
 		];
+
+		if (isset($project_info['status']) && $project_info['status'] !== null && $project_info['status'] !== '') {
+			$options['status'] = $project_info['status'];
+		}
 
 		//create target project
 		$new_sid = $this->ci->Editor_model->create_project($project_info['type'], $options);

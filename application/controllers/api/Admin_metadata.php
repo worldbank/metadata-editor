@@ -517,8 +517,43 @@ class Admin_metadata extends MY_REST_Controller
                 if (!$template_id){
                     throw new Exception("Template not found: " . $option['template_uid']);
                 }
+			}
 
+			$this->load->helper('notification');
+			$pending=array();
+			foreach($options as $option){
+				$template_id=$this->Editor_template_model->get_id_by_uid($option['template_uid']);
+				$previous=notification_first_permission(
+					$this->Admin_metadata_acl_model->get_user_permissions($template_id, $option['user_id'])
+				);
+				$pending[]=array(
+					'user_id'=>(int)$option['user_id'],
+					'previous'=>$previous,
+					'permissions'=>$option['permissions'],
+					'template_uid'=>$option['template_uid'],
+					'template_id'=>(int)$template_id,
+				);
+			}
+
+			foreach($options as $option){
+				$template_id=$this->Editor_template_model->get_id_by_uid($option['template_uid']);
                 $this->Admin_metadata_acl_model->add_user($template_id,$option['user_id'],$option['permissions']);
+			}
+
+			$actor_id=$this->get_api_user_id();
+			$this->load->library('Notification_service');
+			foreach($pending as $item){
+				$this->notification_service->notify_permission_change(
+					'admin_metadata',
+					$item['user_id'],
+					$item['previous'],
+					$item['permissions'],
+					array(
+						'template_uid'=>$item['template_uid'],
+						'template_id'=>$item['template_id'],
+					),
+					$actor_id
+				);
 			}
 
 			$output=array(
@@ -601,10 +636,28 @@ class Admin_metadata extends MY_REST_Controller
             $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
 
             if (!$template_id){
-                throw new Exception("Template not found: " . $template_uid);
+                throw new Exception("Template not found: " . $options['template_uid']);
             }
 
+			$this->load->helper('notification');
+			$previous=notification_first_permission(
+				$this->Admin_metadata_acl_model->get_user_permissions($template_id, $options['user_id'])
+			);
             $result=$this->Admin_metadata_acl_model->remove_user($template_id,$options['user_id']);
+			if ($previous !== null){
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'admin_metadata',
+					(int)$options['user_id'],
+					$previous,
+					null,
+					array(
+						'template_uid'=>$options['template_uid'],
+						'template_id'=>(int)$template_id,
+					),
+					$this->get_api_user_id()
+				);
+			}
 
 			$output=array(
 				'status'=>'success',

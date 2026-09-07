@@ -162,6 +162,8 @@ if (!function_exists('user_has_global_project_access')) {
 
 		if ($user === null) {
 			$user = $ci->acl_manager->current_user();
+		} elseif (!is_object($user) && is_numeric($user)) {
+			$user = (object) array('id' => (int) $user);
 		}
 
 		if (!$user) {
@@ -252,6 +254,37 @@ if (!function_exists('project_schema_enabled')) {
 	}
 }
 
+if (!function_exists('user_can_view_publish_queue')) {
+
+	/**
+	 * Curators / admins who may open the ready-to-publish queue.
+	 *
+	 * @param object|null $user
+	 * @return bool
+	 */
+	function user_can_view_publish_queue($user = null)
+	{
+		$ci =& get_instance();
+		$ci->load->library('Editor_acl');
+
+		if ($user === null) {
+			$user_id = $ci->session->userdata('user_id');
+		} else {
+			$user_id = is_object($user) && isset($user->id) ? (int) $user->id : (int) $user;
+		}
+
+		if (!$user_id) {
+			return false;
+		}
+
+		if ($ci->ion_auth->is_admin($user_id)) {
+			return true;
+		}
+
+		return $ci->editor_acl->user_has_global_project_access($user_id, 'view');
+	}
+}
+
 if (!function_exists('site_features_user_info')) {
 
 	/**
@@ -269,6 +302,7 @@ if (!function_exists('site_features_user_info')) {
 			'schemas_enabled' => site_feature_enabled('schemas'),
 			'tags_enabled' => site_feature_enabled('tags'),
 			'enabled_project_schemas' => $enabled,
+			'can_view_publish_queue' => user_can_view_publish_queue(),
 		);
 	}
 }

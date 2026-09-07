@@ -61,7 +61,7 @@ class Metadata_change_log
             'dirpath',
             'thumbnail',
             'varcount',
-            'published',
+            'status',
             'is_shared',
             'is_locked',
             'template_uid',

@@ -61,6 +61,14 @@ tags:
     description: Administrative Metadata templates
   - name: Publish projects
     description: Publish projects to NADA catalogs
+  - name: Publish requests
+    description: >-
+      Publish requests support a review-and-publish workflow: project owners submit
+      projects to official catalogs for administrators or catalog curators to review
+      and publish (or return), instead of pushing metadata to NADA themselves.
+      Owners mark projects ready; curators work the queue and record outcomes.
+  - name: Notifications
+    description: Current-user in-app notification inbox
   - name: Catalog connections
     description: Manage catalog connections
   - name: Issues
@@ -125,6 +133,7 @@ x-tagGroups:
   - name: Publish projects
     tags:
       - Publish projects
+      - Publish requests
   - name: Catalog connections
     tags:
       - Catalog connections
@@ -144,6 +153,9 @@ x-tagGroups:
   - name: Indicator DSD
     tags:
       - Indicator DSD
+  - name: Notifications
+    tags:
+      - Notifications
 paths:
   /issues:
     get:
@@ -4370,6 +4382,507 @@ paths:
           description: Bad request - project not found or publishing failed
       security:
         - ApiKeyAuth: []
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: List notifications for current user
+      description: >
+        Paginated in-app inbox for the authenticated user. Each row is server-rendered
+        with `title`, `body`, `href`, and `family`. Rows older than the site retention
+        window (`notifications_retention_days`, default 30) are excluded.
+      operationId: listNotifications
+      parameters:
+        - name: limit
+          in: query
+          description: Page size (default 25, max 100)
+          schema:
+            type: integer
+            default: 25
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: unread
+          in: query
+          description: When `1` or `true`, return only unread rows
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Exact notification type filter (e.g. `publish.project_ready`)
+          schema:
+            type: string
+        - name: family
+          in: query
+          description: >-
+            Family filter — `publish`, `sharing`, `ownership`, `collection`, `template`
+          schema:
+            type: string
+            enum: [publish, sharing, ownership, collection, template]
+      responses:
+        "200":
+          description: Inbox page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationsListResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  /notifications/unread_count:
+    get:
+      tags:
+        - Notifications
+      summary: Unread notification count
+      description: Badge count for the header bell. Scoped to current user and retention window.
+      operationId: getNotificationsUnreadCount
+      responses:
+        "200":
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationsUnreadCountResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  /notifications/read_all:
+    post:
+      tags:
+        - Notifications
+      summary: Mark all notifications read
+      operationId: markAllNotificationsRead
+      responses:
+        "200":
+          description: All rows marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationsMarkAllReadResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/notifications/{id}":
+    get:
+      tags:
+        - Notifications
+      summary: Get one notification
+      description: Returns a single rendered notification for the current user.
+      operationId: getNotification
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification row
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationSingleResponse"
+        "404":
+          description: Notification not found
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/notifications/{id}/read":
+    post:
+      tags:
+        - Notifications
+      summary: Mark one notification read
+      operationId: markNotificationRead
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated row and refreshed unread count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationMarkReadResponse"
+        "404":
+          description: Notification not found
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  /publish-requests/queue:
+    get:
+      tags:
+        - Publish requests
+      summary: Publish requests queue
+      description: >
+        Shows pending publish requests for administrators and catalog curators to review.
+        Filter by catalog; results are paginated.
+      operationId: listPublishQueue
+      parameters:
+        - name: catalog_id
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Pending queue page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishQueueResponse"
+        "400":
+          description: Access denied or bad request
+      security:
+        - ApiKeyAuth: []
+  /publish-requests/queue/history:
+    get:
+      tags:
+        - Publish requests
+      summary: Publish requests queue history
+      description: Resolved queue items and publish outcomes across catalogs (curator view).
+      operationId: listPublishQueueHistory
+      parameters:
+        - name: catalog_id
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: History page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishQueueHistoryResponse"
+        "400":
+          description: Access denied or bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/{publication_id}/resolve":
+    post:
+      tags:
+        - Publish requests
+      summary: Resolve publish request
+      description: >
+        Administrators and catalog curators can accept or reject a publishing request.
+        Provide `action` and `note` in the request body.
+      operationId: resolvePublishQueueItem
+      parameters:
+        - in: path
+          name: publication_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishResolveRequest"
+      responses:
+        "200":
+          description: Resolved placement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishResolveResponse"
+        "400":
+          description: Validation or access error
+      security:
+        - ApiKeyAuth: []
+  /publish-requests/resolve_batch:
+    post:
+      tags:
+        - Publish requests
+      summary: Resolve multiple requests
+      description: >
+        Batch resolve multiple requests. Maximum 100 items.
+      operationId: resolvePublishQueueBatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishResolveBatchRequest"
+      responses:
+        "200":
+          description: Batch result summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishResolveBatchResponse"
+        "400":
+          description: Validation or access error
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/project/{sid}":
+    get:
+      tags:
+        - Publish requests
+      summary: View publish requests by project
+      description: >
+        Returns publish request status for a project — which catalogs are queued,
+        published, or returned.
+      operationId: getProjectPublications
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Placements and summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishProjectPublicationsResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - Publish requests
+      summary: Create publish request
+      description: >
+        Submit a request to publish a project to one or more official catalogs.
+        Administrators and catalog curators are notified to review the request.
+      operationId: markProjectPublishReady
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishMarkReadyRequest"
+      responses:
+        "200":
+          description: Updated placements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishMarkReadyResponse"
+        "400":
+          description: Validation error
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+        - Publish requests
+      summary: Cancel publish request
+      description: >
+        A project owner can cancel a submitted publish request before a curator
+        reviews it. Optionally limit to specific catalogs with `catalog_ids` in
+        the body; omit the body to cancel all pending requests on the project.
+        If DELETE is not supported, use `POST /publish-requests/project/{sid}/clear`.
+      operationId: clearProjectPublishReady
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishCatalogIdsRequest"
+      responses:
+        "200":
+          description: Cleared placements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishClearReadyResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/project/{sid}/clear":
+    post:
+      tags:
+        - Publish requests
+      summary: Cancel publish request
+      description: >
+        A project owner can cancel a submitted publish request before a curator
+        reviews it. Optionally limit to specific catalogs with `catalog_ids` in
+        the body; omit the body to cancel all pending requests on the project.
+      operationId: clearProjectPublishReadyPost
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishCatalogIdsRequest"
+      responses:
+        "200":
+          description: Cleared placements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishClearReadyResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/project/{sid}/history":
+    get:
+      tags:
+        - Publish requests
+      summary: Publish request history by project 
+      description: >
+        Returns a history of publish requests for a project.
+      operationId: getProjectPublishHistory
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: History page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishProjectHistoryResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/project/{sid}/history/{event_id}":
+    delete:
+      tags:
+        - Publish requests
+      summary: Delete a publish request history event
+      description: >
+        Removes an event from the publish request history by project.
+        If DELETE is not supported, use
+        `POST /publish-requests/project/{sid}/history/{event_id}/delete`.
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStatusResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/project/{sid}/history/{event_id}/delete":
+    post:
+      tags:
+        - Publish requests
+      summary: Delete a published history event
+      operationId: deleteProjectPublishHistoryEventPost
+      parameters:
+        - in: path
+          name: sid
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStatusResponse"
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/publish-requests/{publication_id}":
+    get:
+      tags:
+        - Publish requests
+      summary: Get publish request by ID
+      description: >
+        Returns a publish request details by ID.
+      operationId: getPublishRequestById
+      parameters:
+        - in: path
+          name: publication_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Placement with project and catalog context
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishPlacementDetailResponse"
+        "400":
+          description: Access denied or not found
+      security:
+        - ApiKeyAuth: []
   "/versions/{id}":
     get:
       tags:
@@ -8395,6 +8908,450 @@ components:
           type: array
           items:
             type: string
+    ApiStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, failed]
+        message:
+          type: string
+    NotificationRow:
+      type: object
+      description: Server-rendered inbox row
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          description: Registry type (e.g. `publish.project_ready`, `project.access_granted`)
+        family:
+          type: string
+          enum: [publish, sharing, ownership, collection, template, other]
+        family_label:
+          type: string
+        subject:
+          type: string
+          description: Primary subject line (project, collection, or template title)
+        title:
+          type: string
+        body:
+          type: string
+        href:
+          type: string
+          description: In-app deep link (relative path)
+        action_label:
+          type: string
+          description: Short action label — Ready, Return, Publish, Close, Cancel, etc.
+        actor_label:
+          type: string
+        actor_user_id:
+          type: integer
+          nullable: true
+        read_at:
+          type: integer
+          nullable: true
+          description: Unix timestamp when marked read; null when unread
+        is_unread:
+          type: boolean
+        created:
+          type: integer
+        payload:
+          type: object
+          additionalProperties: true
+    NotificationsListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        unread_count:
+          type: integer
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotificationRow"
+    NotificationSingleResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        notification:
+          $ref: "#/components/schemas/NotificationRow"
+    NotificationsUnreadCountResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        unread_count:
+          type: integer
+    NotificationMarkReadResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        notification:
+          $ref: "#/components/schemas/NotificationRow"
+        unread_count:
+          type: integer
+    NotificationsMarkAllReadResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        updated:
+          type: integer
+          description: Number of rows marked read
+        unread_count:
+          type: integer
+          enum: [0]
+    PublicationPlacement:
+      type: object
+      description: One project × catalog row from `project_publications`
+      properties:
+        id:
+          type: integer
+          description: Publication placement id
+        sid:
+          type: integer
+        catalog_id:
+          type: integer
+        catalog_type:
+          type: string
+        catalog_title:
+          type: string
+        catalog_url:
+          type: string
+        is_official:
+          type: integer
+          enum: [0, 1]
+        status:
+          type: string
+          nullable: true
+        remote_id:
+          type: string
+          nullable: true
+        remote_url:
+          type: string
+          nullable: true
+        ready_at:
+          type: integer
+          nullable: true
+        ready_by:
+          type: integer
+          nullable: true
+        ready_by_username:
+          type: string
+          nullable: true
+        return_reason:
+          type: string
+          nullable: true
+        options:
+          type: object
+          additionalProperties: true
+        intake:
+          type: object
+          additionalProperties: true
+        is_update:
+          type: integer
+          description: Present on queue rows — 1 when placement already published on catalog
+    PublicationSummary:
+      type: object
+      properties:
+        chip:
+          type: string
+          enum: [none, ready, published]
+        label:
+          type: string
+        ready_catalogs:
+          type: array
+          items:
+            type: string
+        placed_catalogs:
+          type: array
+          items:
+            type: string
+        ready_count:
+          type: integer
+    PublishMarkReadyRequest:
+      type: object
+      required: [requests]
+      properties:
+        requests:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [catalog_id]
+            properties:
+              catalog_id:
+                type: integer
+              options:
+                $ref: "#/components/schemas/PublishOptions"
+    PublishMarkReadyWarning:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [no_curators, only_submitter]
+        catalog_id:
+          type: integer
+        catalog_title:
+          type: string
+        message:
+          type: string
+    PublishMarkReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationPlacement"
+        returned_catalogs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        summary:
+          $ref: "#/components/schemas/PublicationSummary"
+        study_validation:
+          type: object
+          additionalProperties: true
+        warnings:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublishMarkReadyWarning"
+    PublishProjectPublicationsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationPlacement"
+        summary:
+          $ref: "#/components/schemas/PublicationSummary"
+    PublicationEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        publication_id:
+          type: integer
+        event:
+          type: string
+        created:
+          type: integer
+          nullable: true
+        catalog_id:
+          type: integer
+          nullable: true
+        catalog_title:
+          type: string
+        catalog_url:
+          type: string
+        is_official:
+          type: integer
+        actor_user_id:
+          type: integer
+          nullable: true
+        actor_username:
+          type: string
+          nullable: true
+        payload:
+          type: object
+          additionalProperties: true
+    PublishProjectHistoryResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationEvent"
+    PublishQueueResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationPlacement"
+    PublishQueueHistoryResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationEvent"
+    PublishCatalogIdsRequest:
+      type: object
+      properties:
+        catalog_ids:
+          type: array
+          items:
+            type: integer
+          description: When omitted or empty, applies to all eligible placements on the project
+    PublishClearReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        cleared_catalog_ids:
+          type: array
+          items:
+            type: integer
+          description: Catalog ids whose pending request was canceled
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationPlacement"
+        returned_catalogs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        summary:
+          $ref: "#/components/schemas/PublicationSummary"
+    PublishResolveRequest:
+      type: object
+      required: [action, note]
+      properties:
+        action:
+          type: string
+          enum: [published, return, closed, cancel]
+        status:
+          type: string
+          enum: [published, draft]
+          description: Alias for legacy clients; used with `published` action
+        note:
+          type: string
+          maxLength: 5000
+        remote_id:
+          type: string
+          description: Catalog record id when manually marking published
+        remote_url:
+          type: string
+          description: Public catalog URL for the published record
+    PublishResolveResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        action:
+          type: string
+        publication_id:
+          type: integer
+        sid:
+          type: integer
+        catalog_id:
+          type: integer
+        recipient_user_id:
+          type: integer
+        project_title:
+          type: string
+        project_idno:
+          type: string
+        catalog_title:
+          type: string
+        note:
+          type: string
+    PublishResolveBatchRequest:
+      type: object
+      required: [publication_ids, action, note]
+      properties:
+        publication_ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: integer
+        action:
+          type: string
+          enum: [published, return, closed, cancel]
+        note:
+          type: string
+          maxLength: 5000
+    PublishResolveBatchResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        action:
+          type: string
+        succeeded_count:
+          type: integer
+        failed_count:
+          type: integer
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              publication_id:
+                type: integer
+              status:
+                type: string
+                enum: [success, failed]
+              message:
+                type: string
+    PublishPlacementDetailResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        publication:
+          $ref: "#/components/schemas/PublicationPlacement"
+        project:
+          type: object
+          additionalProperties: true
+        catalog:
+          type: object
+          additionalProperties: true
     ApiResponse:
       type: object
       properties:

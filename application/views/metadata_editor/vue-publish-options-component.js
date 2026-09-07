@@ -1,6 +1,16 @@
 /// publish project options
 Vue.component('publish-options', {
-    props:['value'],
+    props: {
+        value: {},
+        embedded: {
+            type: Boolean,
+            default: false,
+        },
+        publicationId: {
+            type: [Number, String],
+            default: 0,
+        },
+    },
     data: function () {    
         return {
             field_data: this.value,
@@ -89,16 +99,27 @@ Vue.component('publish-options', {
             data_access_list:[],
             study_info: null,
             publish_responses:{},//all publish responses
-            microdata_status: null
+            microdata_status: null,
+            publicationPrefill: null,
+            publicationPrefillCatalogApplied: false,
+            publicationPrefillRunId: 0,
         }
     },
-    mounted: async function(){
-        this.loadCatalogConnections();
-        this.getProjectBasicInfo();
-        this.loadMicrodataStatus();
-        this.refreshIndicatorPublishLocal();
+    mounted: function(){
         var vm = this;
-        this.$nextTick(function () {
+        vm.loadCatalogConnections();
+        vm.getProjectBasicInfo();
+        vm.loadMicrodataStatus();
+        vm.refreshIndicatorPublishLocal();
+        var runPrefill = function () {
+            vm.schedulePublicationPrefill();
+        };
+        if (vm.$router && typeof vm.$router.onReady === 'function') {
+            vm.$router.onReady(runPrefill);
+        } else {
+            vm.$nextTick(runPrefill);
+        }
+        vm.$nextTick(function () {
             vm.panels = vm.getDefaultExpandedPanels();
             vm.applyPublishOptionDefaults();
         });
@@ -1089,20 +1110,143 @@ Vue.component('publish-options', {
             return ok;
         },
         loadCatalogConnections: function() {
-            vm=this;
-            let url=CI.site_url + '/api/publish/catalog_connections';
-            axios.get(url)
+            var vm = this;
+            var url = CI.site_url + '/api/publish/catalog_connections';
+            return axios.get(url)
             .then(function (response) {
-                if(response.data){
-                    vm.catalog_connections=response.data.connections;
+                if (response.data) {
+                    vm.catalog_connections = response.data.connections;
                 }
             })
             .catch(function (error) {
                 console.log(error);
-            })
-            .then(function () {
-                console.log("request completed");
             });
+        },
+        getRoutePublicationId: function () {
+            var propId = parseInt(String(this.publicationId || ''), 10);
+            if (!isNaN(propId) && propId > 0) {
+                return propId;
+            }
+            var query = this.$route && this.$route.query ? this.$route.query : {};
+            if (query.publication_id || query.publication_id === 0) {
+                var routeId = parseInt(String(query.publication_id), 10);
+                if (!isNaN(routeId) && routeId > 0) {
+                    return routeId;
+                }
+            }
+            var hash = window.location.hash || '';
+            var qIndex = hash.indexOf('?');
+            if (qIndex === -1) {
+                return 0;
+            }
+            try {
+                var params = new URLSearchParams(hash.substring(qIndex + 1));
+                var hashId = parseInt(String(params.get('publication_id') || ''), 10);
+                return isNaN(hashId) || hashId < 1 ? 0 : hashId;
+            } catch (e) {
+                return 0;
+            }
+        },
+        schedulePublicationPrefill: function () {
+            var vm = this;
+            var runId = ++vm.publicationPrefillRunId;
+            vm.publicationPrefillCatalogApplied = false;
+            return Promise.all([
+                vm.loadCatalogConnections(),
+                vm.loadPublicationPrefill(),
+            ]).then(function () {
+                if (runId !== vm.publicationPrefillRunId) {
+                    return;
+                }
+                vm.applyPublicationPrefillCatalog();
+            });
+        },
+        ensurePrefillCatalogConnection: function (placement) {
+            if (!placement || !placement.catalog_id) {
+                return;
+            }
+            var catalogId = parseInt(String(placement.catalog_id), 10);
+            if (isNaN(catalogId) || catalogId < 1) {
+                return;
+            }
+            if (this.getConnectionInfo(catalogId)) {
+                return;
+            }
+            this.catalog_connections.push({
+                id: catalogId,
+                title: placement.catalog_title || ('Catalog #' + catalogId),
+                url: placement.catalog_url || '',
+                type: placement.catalog_type || 'nada',
+                has_credential: false,
+            });
+        },
+        loadPublicationPrefill: function () {
+            var vm = this;
+            var publicationId = vm.getRoutePublicationId();
+            if (!publicationId) {
+                vm.publicationPrefill = null;
+                return Promise.resolve(null);
+            }
+            return axios.get(CI.site_url + '/api/publish_requests/' + publicationId)
+                .then(function (response) {
+                    var data = response.data || {};
+                    if (data.status && data.status !== 'success') {
+                        vm.publicationPrefill = null;
+                        return null;
+                    }
+                    if (String(data.sid) !== String(vm.ProjectID)) {
+                        vm.publicationPrefill = null;
+                        return null;
+                    }
+                    vm.publicationPrefill = data;
+                    return data;
+                })
+                .catch(function (error) {
+                    console.log('publication prefill failed', error);
+                    vm.publicationPrefill = null;
+                    return null;
+                });
+        },
+        applyPublicationPrefillCatalog: function () {
+            if (!this.publicationPrefill || !this.publicationPrefill.catalog_id) {
+                return;
+            }
+            if (this.publicationPrefillCatalogApplied) {
+                this.applyPendingPublicationPrefillOptions();
+                return;
+            }
+            var catalogId = parseInt(String(this.publicationPrefill.catalog_id), 10);
+            if (isNaN(catalogId) || catalogId < 1) {
+                return;
+            }
+            this.ensurePrefillCatalogConnection(this.publicationPrefill);
+            var connection = this.getConnectionInfo(catalogId);
+            this.catalog = connection ? connection.id : catalogId;
+            this.publicationPrefillCatalogApplied = true;
+            this.onCatalogSelection();
+        },
+        applyPlacementOptionsToForm: function (options) {
+            if (!options || typeof options !== 'object') {
+                return;
+            }
+            if (options.access_policy !== undefined && options.access_policy !== null && options.access_policy !== '') {
+                this.publish_options.access_policy.value = options.access_policy;
+            }
+            if (options.repositoryid !== undefined && options.repositoryid !== null) {
+                this.publish_options.repositoryid.value = options.repositoryid;
+            }
+            if (options.data_remote_url !== undefined && options.data_remote_url !== null) {
+                this.publish_options.data_remote_url.value = options.data_remote_url;
+            }
+            if (options.published !== undefined && options.published !== null && options.published !== '') {
+                this.publish_options.published.value = String(options.published);
+            }
+        },
+        applyPendingPublicationPrefillOptions: function () {
+            if (!this.publicationPrefill || !this.publicationPrefill.options) {
+                return;
+            }
+            this.applyPlacementOptionsToForm(this.publicationPrefill.options);
         },
         getConnectionInfo: function(id)
         {
@@ -1224,6 +1368,7 @@ Vue.component('publish-options', {
                     }
                     vm.$nextTick(function () {
                         vm.applyStudyInfoToPublishOptions(response.data.study_info || null);
+                        vm.applyPendingPublicationPrefillOptions();
                     });
                 })
                 .catch(function (error) {
@@ -1237,6 +1382,12 @@ Vue.component('publish-options', {
         }
     },
     watch: {
+        publicationId: function () {
+            this.schedulePublicationPrefill();
+        },
+        '$route.query.publication_id': function () {
+            this.schedulePublicationPrefill();
+        },
         publish_metadata: function (val) {
             if (!val && !this.studyExistsOnNada && this.publish_indicator_data) {
                 this.publish_indicator_data = false;
@@ -1315,7 +1466,14 @@ Vue.component('publish-options', {
             let connections=[];
             for (let i=0;i<this.catalog_connections.length;i++){
                 let connection=this.catalog_connections[i];
-                connection.connection_title=connection.title + ' - ' + connection.url;
+                if (connection.type && connection.type !== 'nada') {
+                    continue;
+                }
+                let title = connection.title + (connection.url ? (' - ' + connection.url) : '');
+                if (!connection.has_credential) {
+                    title += ' (' + this.$t('no_api_key') + ')';
+                }
+                connection.connection_title=title;
                 connections.push(connection);
             }
 
@@ -1331,6 +1489,32 @@ Vue.component('publish-options', {
         },
         catalogSelected(){
             return this.catalog !== false && this.catalog !== null;
+        },
+        queuePrefillActive: function () {
+            return this.getRoutePublicationId() > 0 && !!this.publicationPrefill;
+        },
+        queuePrefillMissingApiKey: function () {
+            if (!this.queuePrefillActive || !this.publicationPrefillCatalogApplied) {
+                return false;
+            }
+            if (this.catalog === false || this.catalog === null) {
+                return false;
+            }
+            var connection = this.getConnectionInfo(this.catalog);
+            if (!connection) {
+                return true;
+            }
+            return !connection.has_credential;
+        },
+        queuePrefillCatalogTitle: function () {
+            if (this.publicationPrefill && this.publicationPrefill.catalog_title) {
+                return this.publicationPrefill.catalog_title;
+            }
+            var connection = this.getConnectionInfo(this.catalog);
+            return connection && connection.title ? connection.title : '';
+        },
+        CatalogSettingsUrl(){
+            return CI.site_url + '/settings/catalogs';
         },
         /** True when a thumbnail file exists on the project (from basic_info). */
         hasProjectThumbnail(){
@@ -1443,17 +1627,32 @@ Vue.component('publish-options', {
         }
     },  
     template: `
-            <div class="import-options-component mt-5 p-3">
+            <div :class="embedded ? 'publish-options-embedded' : 'import-options-component mt-5 p-3'">
 
-                <v-card>
-                    <v-card-title>{{$t("publish_to_nada")}}</v-card-title>
-                    <v-card-subtitle>{{$t("publish_to_nada_note")}}</v-card-subtitle>
+                <v-card :flat="embedded" :elevation="embedded ? 0 : undefined">
+                    <v-card-title v-if="!embedded">{{$t("publish_to_nada")}}</v-card-title>
+                    <v-card-subtitle :class="embedded ? 'px-0' : ''">{{$t("publish_to_nada_note")}}</v-card-subtitle>
                 
-                    <v-card-text>
+                    <v-card-text :class="embedded ? 'px-0 pt-2' : ''">
+
+                    <v-alert
+                        v-if="queuePrefillMissingApiKey"
+                        type="warning"
+                        dense
+                        outlined
+                        class="mb-3"
+                    >
+                        <div>
+                            {{ $t('publish_queue_missing_api_key', { catalog: queuePrefillCatalogTitle }) }}
+                        </div>
+                        <div class="mt-2">
+                            <a :href="CatalogSettingsUrl">{{ $t('configure_catalog') }}</a>
+                        </div>
+                    </v-alert>
                     
                     <v-card elevation="2" class="p-3 mb-3">
                             <div class="form-group-x" elevation="10">
-                                <label for="catalog_id">{{$t("catalog")}} <router-link class="btn btn-sm btn-link" to="/configure-catalog">{{$t("configure_catalog")}}</router-link></label>
+                                <label for="catalog_id">{{$t("catalog")}} <a class="btn btn-sm btn-link" :href="CatalogSettingsUrl">{{$t("configure_catalog")}}</a></label>
 
                                 <v-select
                                     v-model="catalog"

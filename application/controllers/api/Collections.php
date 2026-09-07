@@ -494,6 +494,12 @@ class Collections extends MY_REST_Controller
 				}
 			}
 
+			$this->load->helper('notification');
+			$previous=$this->Collection_project_acl_model->get_user_permission(
+				$options['collection_id'],
+				$options['user_id']
+			);
+			$new_permission=null;
 			foreach($permissions as $permission){
 				$data=array(
 					'collection_id'=>$options['collection_id'],
@@ -501,6 +507,18 @@ class Collections extends MY_REST_Controller
 					'permissions'=>$permission
 				);
 				$result=$this->Collection_project_acl_model->upsert($data);
+				$new_permission=$permission;
+			}
+			if ($new_permission !== null){
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'collection.project',
+					(int)$options['user_id'],
+					$previous,
+					$new_permission,
+					array('collection_id'=>(int)$options['collection_id']),
+					$this->user_id
+				);
 			}
 
 			//audit log
@@ -547,7 +565,23 @@ class Collections extends MY_REST_Controller
 			// Check user has access to this specific collection
 			$this->editor_acl->user_has_collection_acl_access($options['collection_id'], 'edit', $this->api_user);
 
+			$this->load->helper('notification');
+			$previous=$this->Collection_project_acl_model->get_user_permission(
+				$options['collection_id'],
+				$options['user_id']
+			);
 			$result=$this->Collection_project_acl_model->delete_user($options['collection_id'],$options['user_id']);
+			if ($previous !== null){
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'collection.project',
+					(int)$options['user_id'],
+					$previous,
+					null,
+					array('collection_id'=>(int)$options['collection_id']),
+					$this->user_id
+				);
+			}
 
 			//audit log
 			$this->audit_log->log_event(
@@ -630,7 +664,20 @@ class Collections extends MY_REST_Controller
 			throw new Exception("You don't have permission to manage ACL for this collection");
 		}
 
+		$this->load->helper('notification');
+		$previous=notification_first_permission(
+			$this->Collection_acl_model->get_user_permissions($options['collection_id'], $options['user_id'])
+		);
 		$result=$this->Collection_acl_model->add_user($options['collection_id'], $options['user_id'], $options['permissions']);
+		$this->load->library('Notification_service');
+		$this->notification_service->notify_permission_change(
+			'collection',
+			(int)$options['user_id'],
+			$previous,
+			$options['permissions'],
+			array('collection_id'=>(int)$options['collection_id']),
+			$this->user_id
+		);
 
 			//audit log
 			$this->audit_log->log_event(
@@ -688,7 +735,22 @@ class Collections extends MY_REST_Controller
 			throw new Exception("You don't have permission to manage ACL for this collection");
 		}
 
+		$this->load->helper('notification');
+		$previous=notification_first_permission(
+			$this->Collection_acl_model->get_user_permissions($options['collection_id'], $options['user_id'])
+		);
 		$result=$this->Collection_acl_model->update_user($options['collection_id'], $options['user_id'], $options['permissions']);
+		if ($previous !== null) {
+			$this->load->library('Notification_service');
+			$this->notification_service->notify_permission_change(
+				'collection',
+				(int)$options['user_id'],
+				$previous,
+				$options['permissions'],
+				array('collection_id'=>(int)$options['collection_id']),
+				$this->user_id
+			);
+		}
 
 			//audit log
 			$this->audit_log->log_event(
@@ -747,7 +809,22 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Cannot remove your own admin access");
 			}
 
+			$this->load->helper('notification');
+			$previous=notification_first_permission(
+				$this->Collection_acl_model->get_user_permissions($options['collection_id'], $options['user_id'])
+			);
 			$result=$this->Collection_acl_model->remove_user($options['collection_id'], $options['user_id']);
+			if ($previous !== null) {
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'collection',
+					(int)$options['user_id'],
+					$previous,
+					null,
+					array('collection_id'=>(int)$options['collection_id']),
+					$this->user_id
+				);
+			}
 
 			//audit log
 			$this->audit_log->log_event(

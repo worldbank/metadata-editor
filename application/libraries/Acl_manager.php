@@ -249,13 +249,34 @@ class Acl_manager
 		return $this->ci->ion_auth->current_user();
 	}
 
-	function user_is_admin($user=null)
+	/**
+	 * Accept a user object, numeric id (session userdata is often a string), or null (current user).
+	 *
+	 * @param mixed $user
+	 * @return object|null
+	 */
+	private function resolve_user($user)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
+		if (empty($user)) {
+			$user = $this->current_user();
 		}
 
-		if(!$user){
+		if (is_object($user)) {
+			return $user;
+		}
+
+		if (is_numeric($user)) {
+			return (object) array('id' => (int) $user);
+		}
+
+		return null;
+	}
+
+	function user_is_admin($user=null)
+	{
+		$user = $this->resolve_user($user);
+
+		if(!$user || !isset($user->id)){
 			throw new Exception("acl_manager::User not set");
 		}
 
@@ -382,9 +403,7 @@ class Acl_manager
 	 */
 	function has_site_admin_access($user=null)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
-		}
+		$user = $this->resolve_user($user);
 
 		if(!$user){
 			return false;
@@ -471,11 +490,9 @@ class Acl_manager
 
 	function has_access($resource,$privilege, $user=null)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
-		}
+		$user = $this->resolve_user($user);
 
-		if(!$user){
+		if(!$user || !isset($user->id)){
 			throw new Exception("acl_manager::User not set");
 		}
 

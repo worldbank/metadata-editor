@@ -1643,12 +1643,19 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Parameter `projects` is required");
 			}
 
-			$new_user_id=$options['owner_id'];
+			$new_user_id=(int)$options['owner_id'];
 			
 			foreach($options['projects'] as $project_id){
 
 				$sid=$this->get_sid($project_id);
 				$this->editor_acl->user_has_project_access($sid,$permission='admin',$this->api_user);
+
+				$previous_owner_id=0;
+				$this->load->model('editor_owners_model');
+				$previous_owner=$this->editor_owners_model->get_project_owner($sid);
+				if (is_array($previous_owner) && !empty($previous_owner['id'])){
+					$previous_owner_id=(int)$previous_owner['id'];
+				}
 
 				$result=$this->Editor_model->transfer_ownership($project_id,$new_user_id);
 				$this->audit_log->log_event(
@@ -1658,6 +1665,33 @@ class Editor extends MY_REST_Controller
 					$metadata=array('new_owner_id'=>$new_user_id),
 					$user_id
 				);
+
+				if ($new_user_id > 0 && $new_user_id !== $previous_owner_id){
+					$context=array(
+						'sid'=>(int)$sid,
+						'new_owner_id'=>$new_user_id,
+						'previous_owner_id'=>$previous_owner_id,
+					);
+					$this->load->library('Notification_service');
+					$new_context=$context;
+					$new_context['audience']='new';
+					$this->notification_service->notify_safe(
+						'project.ownership_transferred',
+						array($new_user_id),
+						$new_context,
+						$user_id
+					);
+					if ($previous_owner_id > 0){
+						$previous_context=$context;
+						$previous_context['audience']='previous';
+						$this->notification_service->notify_safe(
+							'project.ownership_transferred',
+							array($previous_owner_id),
+							$previous_context,
+							$user_id
+						);
+					}
+				}
 			}
 
 			$response=array(

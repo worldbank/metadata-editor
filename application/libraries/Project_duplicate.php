@@ -43,7 +43,6 @@ class Project_duplicate
 			'nation' => $project_info['nation'],
 			'year_start' => $project_info['year_start'],
 			'year_end' => $project_info['year_end'],
-			'published' => 0,
 			'created' => $now,
 			'changed' => $now,
 			'varcount' => $project_info['varcount'],

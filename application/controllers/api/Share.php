@@ -190,7 +190,35 @@ class Share extends MY_REST_Controller
 				throw new Exception("Parameter `users` must be an array");
 			}
 
+			$this->load->helper('notification');
+			$pending=array();
+			foreach($options['users'] as $user_id){
+				$member=$this->editor_owners_model->is_project_member($sid,$user_id);
+				$pending[]=array(
+					'user_id'=>(int)$user_id,
+					'previous'=>notification_first_permission($member),
+				);
+			}
+
 			$result=$this->editor_owners_model->add($sid,$options['users'],$options['permissions']);
+
+			$actor_id=$this->get_api_user_id();
+			$owner=$this->editor_owners_model->get_project_owner($sid);
+			$owner_id=($owner && !empty($owner['id'])) ? (int)$owner['id'] : 0;
+			$this->load->library('Notification_service');
+			foreach($pending as $item){
+				if ($owner_id > 0 && $item['user_id'] === $owner_id){
+					continue;
+				}
+				$this->notification_service->notify_permission_change(
+					'project',
+					$item['user_id'],
+					$item['previous'],
+					$options['permissions'],
+					array('sid'=>(int)$sid),
+					$actor_id
+				);
+			}
 			
 			$response=array(
 				'status'=>'success',
@@ -227,7 +255,20 @@ class Share extends MY_REST_Controller
 				throw new Exception("Missing parameter `userId`");
 			}
 
+			$this->load->helper('notification');
+			$member=$this->editor_owners_model->is_project_member($sid,$userId);
 			$result=$this->editor_owners_model->delete($sid,$userId);
+			if ($member){
+				$this->load->library('Notification_service');
+				$this->notification_service->notify_permission_change(
+					'project',
+					(int)$userId,
+					notification_first_permission($member),
+					null,
+					array('sid'=>(int)$sid),
+					$this->get_api_user_id()
+				);
+			}
 			
 			$response=array(
 				'status'=>'success',

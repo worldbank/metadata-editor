@@ -1,6 +1,6 @@
 <?php
 /**
- * User settings page (catalog connections and other per-user preferences).
+ * User settings. Catalog registry lives at /settings/catalogs.
  */
 class Settings extends MY_Controller {
 
@@ -13,6 +13,11 @@ class Settings extends MY_Controller {
 	}
 
 	public function index()
+	{
+		redirect('settings/catalogs');
+	}
+
+	public function catalogs()
 	{
 		$this->editor_acl->has_access_or_die($resource_ = 'editor', $privilege = 'view');
 		$options = array(

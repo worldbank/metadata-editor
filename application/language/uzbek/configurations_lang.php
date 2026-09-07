@@ -96,6 +96,8 @@ $lang['up_to_date']="Siz eng so'nggi versiyani ishlatmoqdasiz";
 $lang['update_check_failed']="Yangilanishlarni tekshirib bo'lmadi (tarmoq xatosi yoki API cheklovi)";
 $lang['support']="Qo'llab-quvvatlash";
 $lang['github_releases']="GitHub versiyalari va o'zgarishlar jurnali";
+$lang['notifications_retention_days']="Bildirishnoma saqlash muddati (kun)";
+$lang['notifications_retention_days_note']="Bu muddatdan eski bildirishnomalar yashiriladi va tozalash buyrug'i bilan o'chirilishi mumkin. Standart: 30. Oralik: 1–365.";
 
 
 /* End of file configurations_lang.php */

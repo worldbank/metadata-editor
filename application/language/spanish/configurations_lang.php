@@ -96,5 +96,7 @@ $lang['up_to_date']="Está ejecutando la última versión";
 $lang['update_check_failed']="No se pudo verificar actualizaciones (error de red o límite de API)";
 $lang['support']="Soporte";
 $lang['github_releases']="Versiones y registro de cambios en GitHub";
+$lang['notifications_retention_days']="Retención de notificaciones (días)";
+$lang['notifications_retention_days_note']="Las notificaciones anteriores a este plazo se ocultan y se pueden eliminar con el comando de limpieza. Valor predeterminado: 30. Rango: 1–365.";
 /* End of file configurations_lang.php */
 /* Location: ./application/language/english/configurations_lang.php */
