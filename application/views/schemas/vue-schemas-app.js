@@ -177,7 +177,10 @@
         }
         const title = item.title || item.uid;
         this.$confirm(this.$t('delete_schema_confirm', { title: title }))
-          .then(() => {
+          .then((confirmed) => {
+            if (!confirmed) {
+              return;
+            }
             axios.delete(this.baseApiUrl + '/' + encodeURIComponent(item.uid))
               .then(() => {
                 this.$alert(this.$t('schema_deleted'), { color: 'success' });
@@ -202,7 +205,10 @@
         }
 
         this.$confirm(this.$t('regenerate_template_confirm'))
-          .then(() => {
+          .then((confirmed) => {
+            if (!confirmed) {
+              return;
+            }
             axios.post(this.baseApiUrl + '/regenerate_template/' + encodeURIComponent(item.uid))
               .then(() => {
                 this.$alert(this.$t('schema_template_regenerated'), { color: 'success' });
@@ -870,7 +876,10 @@
           return;
         }
         this.$confirm(this.$t('delete_schema_file_confirm', { filename: file.filename }))
-          .then(() => {
+          .then((confirmed) => {
+            if (!confirmed) {
+              return;
+            }
             this.$set(this.deletingFiles, file.filename, true);
             axios.delete(this.baseApiUrl + '/files/' + encodeURIComponent(this.schemaUid), {
                 params: { filename: file.filename }
