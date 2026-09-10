@@ -94,6 +94,11 @@ ALTER TABLE `project_issues` ADD KEY `idx_field_path` (`field_path`);
 
 ALTER TABLE `project_issues` ADD KEY `idx_created` (`created`);
 
+-- Drop first: CREATE TABLE IF NOT EXISTS and v1.2 installs may already have this FK.
+-- MariaDB reports a second ADD as 1005/errno 121 (not skippable like MySQL 8's 1826).
+-- DROP of a missing FK is 1091 and is ignored by the migration runner.
+ALTER TABLE `project_issues` DROP FOREIGN KEY `fk_project_issues_project`;
+
 ALTER TABLE `project_issues` ADD CONSTRAINT `fk_project_issues_project` FOREIGN KEY (`project_id`) REFERENCES `editor_projects` (`id`) ON DELETE CASCADE;
 
 
