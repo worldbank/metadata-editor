@@ -307,18 +307,22 @@ ALTER TABLE `job_queue`
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Tag manager', 'Global role for managing tags', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Tag manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Codelist manager', 'Global role for managing codelists', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Codelist manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Data structure manager', 'Global role for managing data structures', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Data structure manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Project manager', 'Global access to all projects', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Project manager');
 
 UPDATE `roles`
