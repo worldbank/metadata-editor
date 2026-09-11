@@ -1011,6 +1011,11 @@ class Project_validation
 
     /**
      * Run mapped template rules against a single field value.
+     *
+     * CodeIgniter form_validation treats unexpected array/object POST values as
+     * empty (it is built for scalar form fields). Structured metadata — arrays
+     * of rows like identifiers — is therefore checked here for required, and
+     * never passed to CI.
      */
     private function apply_template_field_rules($item, $field_key, $field_path, $value, &$issues, &$validation_report)
     {
@@ -1027,32 +1032,54 @@ class Project_validation
             }
         }
 
-        $this->ci->load->library('form_validation');
-        $this->ci->form_validation->reset_validation();
-        $this->ci->form_validation->set_error_delimiters('', '');
+        // Empty optional fields (e.g. keyword URL) skip format rules and
+        // are omitted from the report. Invalid non-empty values still appear.
+        if (!$this->rules_include_required($rules_applied) && $this->is_empty_field_value($value)) {
+            return;
+        }
 
-        $ci_field = 'template_field';
-        $this->ci->form_validation->set_data(array($ci_field => $value));
         $label = $item['label'] ?? $item['title'] ?? $field_key;
-        $this->ci->form_validation->set_rules($ci_field, $label, $rules);
-
         $errors = array();
         $is_valid = true;
-        if (!$this->ci->form_validation->run()) {
-            $error_message = $this->ci->form_validation->error($ci_field);
-            $error_message = is_string($error_message) ? trim($error_message) : '';
-            if ($error_message === '') {
-                $error_message = 'Validation failed';
+
+        if ($this->is_structured_value($value)) {
+            if ($this->rules_include_required($rules_applied) && $this->is_empty_structured_value($value)) {
+                $error_message = $this->required_field_error($label);
+                $errors[] = $error_message;
+                $is_valid = false;
+                $issues[] = array(
+                    'type' => 'template_validation_error',
+                    'property' => $field_key,
+                    'path' => $field_path,
+                    'message' => $error_message,
+                    'label' => $label
+                );
             }
-            $errors[] = $error_message;
-            $is_valid = false;
-            $issues[] = array(
-                'type' => 'template_validation_error',
-                'property' => $field_key,
-                'path' => $field_path,
-                'message' => $error_message,
-                'label' => $label
-            );
+        } else {
+            $this->ci->load->library('form_validation');
+            $this->ci->form_validation->reset_validation();
+            $this->ci->form_validation->set_error_delimiters('', '');
+
+            $ci_field = 'template_field';
+            $this->ci->form_validation->set_data(array($ci_field => $value));
+            $this->ci->form_validation->set_rules($ci_field, $label, $rules);
+
+            if (!$this->ci->form_validation->run()) {
+                $error_message = $this->ci->form_validation->error($ci_field);
+                $error_message = is_string($error_message) ? trim($error_message) : '';
+                if ($error_message === '') {
+                    $error_message = 'Validation failed';
+                }
+                $errors[] = $error_message;
+                $is_valid = false;
+                $issues[] = array(
+                    'type' => 'template_validation_error',
+                    'property' => $field_key,
+                    'path' => $field_path,
+                    'message' => $error_message,
+                    'label' => $label
+                );
+            }
         }
 
         $validation_report[] = array(
@@ -1080,6 +1107,106 @@ class Project_validation
             return false;
         }
         return array_keys($value) === range(0, count($value) - 1);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function is_structured_value($value)
+    {
+        return is_array($value) || is_object($value);
+    }
+
+    /**
+     * True when a list/object has no meaningful content (empty array, empty
+     * object, or only empty rows/properties). Used for required on repeatable
+     * template fields.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function is_empty_structured_value($value)
+    {
+        if ($value === null) {
+            return true;
+        }
+        if (is_object($value)) {
+            $value = (array) $value;
+        }
+        if (!is_array($value)) {
+            return $this->is_empty_scalar_value($value);
+        }
+        if ($value === array()) {
+            return true;
+        }
+        foreach ($value as $item) {
+            if (is_array($item) || is_object($item)) {
+                if (!$this->is_empty_structured_value($item)) {
+                    return false;
+                }
+            } elseif (!$this->is_empty_scalar_value($item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function is_empty_field_value($value)
+    {
+        if ($this->is_structured_value($value)) {
+            return $this->is_empty_structured_value($value);
+        }
+        return $this->is_empty_scalar_value($value);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function is_empty_scalar_value($value)
+    {
+        if ($value === null || $value === false) {
+            return true;
+        }
+        if (is_numeric($value)) {
+            return false;
+        }
+        return trim((string) $value) === '';
+    }
+
+    /**
+     * @param array $rules
+     * @return bool
+     */
+    private function rules_include_required($rules)
+    {
+        foreach ($rules as $rule) {
+            if ($rule === 'required' || (is_string($rule) && strpos($rule, 'required:') === 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Match CodeIgniter's localized required message.
+     *
+     * @param string $label
+     * @return string
+     */
+    private function required_field_error($label)
+    {
+        $this->ci->lang->load('form_validation');
+        $line = $this->ci->lang->line('form_validation_required');
+        if (!is_string($line) || $line === '') {
+            $line = 'The {field} field is required.';
+        }
+        return str_replace(array('{field}', '{param}'), array($label, ''), $line);
     }
 
     /**
