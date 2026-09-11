@@ -16,6 +16,7 @@ class Validation extends MY_REST_Controller
         parent::__construct();
         $this->load->model('Editor_model');
         $this->load->model('Metadata_schemas_model');
+        $this->load->model('Project_translations_model');
         $this->load->library('editor_acl');
         $this->is_authenticated_or_die();
         $this->api_user = $this->api_user();
@@ -957,6 +958,39 @@ class Validation extends MY_REST_Controller
                 'status' => 'success',
                 'removed_fields' => $removed_fields,
                 'errors' => $errors
+            );
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
+        }
+        catch(Exception $e){
+            $error_output = array(
+                'status' => 'failed',
+                'message' => $e->getMessage()
+            );
+            $this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Check translation overlays against current source metadata.
+     *
+     * @param int $sid Project ID
+     */
+    function translations_get($sid=null)
+    {
+        try{
+            $sid = $this->get_sid($sid);
+            $project = $this->Editor_model->get_row($sid);
+
+            if (!$project){
+                throw new Exception("project not found");
+            }
+
+            $this->editor_acl->user_has_project_access($sid, $permission='view');
+
+            $response = array(
+                'status' => 'success',
+                'validation' => $this->Project_translations_model->validate_overlays($sid),
             );
 
             $this->set_response($response, REST_Controller::HTTP_OK);

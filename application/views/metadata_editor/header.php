@@ -58,7 +58,7 @@
         </template>
 
         </template>
-        <template v-else>
+        <template v-else-if="!UserHasEditAccess">
             <v-btn
                 color="red"
                 dark
@@ -195,6 +195,14 @@
                                 </v-list-item-icon>
                                 <v-list-item-title>
                                     {{$t('Change log')}}
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item v-if="translationsFeatureEnabled" @click="onRouterLinkClick('/translations')">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-translate</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>
+                                    {{$t('Translations')}}
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="issuesFeatureEnabled" @click="onRouterLinkClick('/issues')">

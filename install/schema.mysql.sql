@@ -548,6 +548,7 @@ CREATE TABLE `editor_projects` (
   `version_created_by` int DEFAULT NULL,
   `version_notes` varchar(500) DEFAULT NULL,
   `attributes` json DEFAULT NULL,
+  `language` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unq_idno` (`idno`,`version_number`),
   KEY `idx_editor_projects_status` (`status`),
@@ -1237,6 +1238,21 @@ CREATE TABLE `project_issues` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+CREATE TABLE `project_translations` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `language` varchar(10) NOT NULL,
+  `metadata` json DEFAULT NULL,
+  `created` int NOT NULL,
+  `created_by` int DEFAULT NULL,
+  `changed` int NOT NULL,
+  `changed_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_project_translation_lang` (`sid`,`language`),
+  CONSTRAINT `fk_project_translations_project` FOREIGN KEY (`sid`) REFERENCES `editor_projects` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- Global in-app inbox (one row per recipient per event; read_at NULL = unread)
 CREATE TABLE `user_notifications` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -1261,4 +1277,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260905000001);
+INSERT INTO `migrations` (`version`) VALUES (20260909224300);

@@ -65,6 +65,7 @@ class Metadata_change_log
             'is_shared',
             'is_locked',
             'template_uid',
+            'language',
             'partial_update',
             'collection_ids',
             'version_number',

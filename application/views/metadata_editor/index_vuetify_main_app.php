@@ -245,6 +245,9 @@
             echo $this->load->view("metadata_editor/vue-issue-create-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-issue-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-project-issues-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-project-translation-languages-util.js",null,true);
+            echo $this->load->view("metadata_editor/vue-project-translations-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-project-translation-edit-component.js",null,true);
 
             echo $this->load->view("project/vue-project-share-component.js", null, true);
             echo $this->load->view("project/vue-collection-share-component.js", null, true);
@@ -362,6 +365,14 @@
         //const MetadataTypeEditComp=VueMetadataTypeEdit;
         const MetadataTypesComp =VueMetadataTypes;
 
+        function translationsRouteGuard(to, from, next) {
+            if (typeof projectTranslationsUiEnabled === 'function' && projectTranslationsUiEnabled(project_type)) {
+                next();
+                return;
+            }
+            next('/');
+        }
+
         //routes
         const routes = [
             { path: '/', component: Home },
@@ -401,6 +412,8 @@
             { path: '/indicator-dsd-import', redirect: { path: '/data-explorer/INDICATOR_DATA', query: { tab: 'import' } } },
             { path: '/indicator-dsd-chart', component: IndicatorDsdChart, name: 'indicator-dsd-chart', props: true },
             { path: '/indicator-dsd-overview', component: IndicatorDsdOverview, name: 'indicator-dsd-overview', props: true },
+            { path: '/translations', component: { template: '<project-translations/>' }, name: 'project-translations', beforeEnter: translationsRouteGuard },
+            { path: '/translations/:language', component: { props: ['language'], template: '<project-translation-edit :language="language"/>' }, props: true, name: 'project-translation-edit', beforeEnter: translationsRouteGuard },
             { path: '/issues', component: { template: '<project-issues :project-id="$root.dataset_id" :can-edit="$root.UserHasEditAccess"/>' }, name: 'issues' },
             { path: '/issues/create', component: VueIssueCreate, name: 'issue-create' },
             { path: '/issues/:issueId', component: VueIssueEdit, props: true, name: 'issue-edit' },

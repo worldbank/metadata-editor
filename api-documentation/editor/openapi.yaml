@@ -71,6 +71,12 @@ tags:
     description: Current-user in-app notification inbox
   - name: Catalog connections
     description: Manage catalog connections
+  - name: Project translations
+    description: >-
+      Study-level metadata translations for a project. The project language is
+      the primary language of the canonical metadata. Target languages are
+      stored as overlays and do not include data files, variables, or variable
+      groups.
   - name: Issues
     description: Manage project metadata issues
   - name: Validation
@@ -4963,6 +4969,379 @@ paths:
           description: successful operation
       security:
         - ApiKeyAuth: []
+  /editor/{id}/translations:
+    get:
+      tags:
+        - Project translations
+      summary: List project translations
+      description: List target-language overlays and the project primary language
+      operationId: listProjectTranslations
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - Project translations
+      summary: Add a target language
+      description: >-
+        Add a translation language. The project language must already be set
+        and cannot be added as a target.
+      operationId: addProjectTranslation
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - language
+              properties:
+                language:
+                  type: string
+                  example: es
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Missing project language, invalid language, or already exists
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/language:
+    post:
+      tags:
+        - Project translations
+      summary: Set project primary language
+      description: >-
+        Set the primary language of the project metadata. Can be changed after
+        translations exist, but cannot be set to a language that already has
+        a translation overlay.
+      operationId: setProjectLanguage
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - language
+              properties:
+                language:
+                  type: string
+                  example: en
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Invalid language or language is already a target
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/{language}:
+    get:
+      tags:
+        - Project translations
+      summary: Get translation
+      description: Get the sparse study-metadata overlay for a language
+      operationId: getProjectTranslation
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: language
+          description: ISO 639 language code
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Translation not found
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - Project translations
+      summary: Save translation
+      description: >-
+        Replace the sparse study-metadata overlay for a language. The payload
+        uses the same keys as project metadata. Only translated scalar strings
+        are stored. Data files, variables, and variable groups are not accepted.
+      operationId: saveProjectTranslation
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: language
+          description: ISO 639 language code
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  type: object
+                  description: Sparse overlay matching project metadata keys
+                  example:
+                    study_desc:
+                      title_statement:
+                        title: Encuesta de Condiciones de Vida 2012
+                fields:
+                  type: array
+                  description: Alternate path/value payload; converted to metadata
+                  items:
+                    type: object
+                    required:
+                      - field_path
+                    properties:
+                      field_path:
+                        type: string
+                        example: /study_desc/title_statement/title
+                      value:
+                        type: string
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Invalid path, empty source, or not study metadata
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/{language}/export:
+    get:
+      tags:
+        - Project translations
+      summary: Export translated fields as JSON
+      description: >-
+        JSON containing only translated study fields. Untranslated content is
+        omitted. Array indexes stay arrays (not the stored overlay object keys).
+        Filename is {idno}-{language}.json. Default is inline in the browser;
+        pass download=1 to save as a file.
+      operationId: exportProjectTranslation
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: language
+          description: ISO 639 language code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: download
+          description: Set to 1 to download as an attachment
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Translated fields JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Translation not found
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/overlay/source:
+    get:
+      tags:
+        - Project translations
+      summary: Export source overlay
+      description: >-
+        Download or view the original study metadata as an overlay interchange
+        file. language is null; set it to a target language before import.
+        Filename is {idno}-source-overlay.json. Default is inline; pass
+        download=1 to save as a file.
+      operationId: exportProjectTranslationSourceOverlay
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: download
+          description: Set to 1 to download as an attachment
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Source overlay JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Project not found
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/overlay:
+    post:
+      tags:
+        - Project translations
+      summary: Import overlay
+      description: >-
+        Import a translation overlay interchange file. The payload must include
+        format=overlay and language. Creates the target language if needed and
+        replaces that overlay. Accepts a JSON body or a multipart file field
+        named file.
+      operationId: importProjectTranslationOverlay
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - format
+                - language
+              properties:
+                format:
+                  type: string
+                  example: overlay
+                type:
+                  type: string
+                  example: indicator
+                idno:
+                  type: string
+                language:
+                  type: string
+                  example: es
+                source_language:
+                  type: string
+                  example: en
+                metadata:
+                  type: object
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Overlay imported
+        "400":
+          description: Invalid overlay, type/idno mismatch, or validation failed
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/{language}/overlay:
+    get:
+      tags:
+        - Project translations
+      summary: Export overlay
+      description: >-
+        Download or view the stored translation overlay. This is the interchange
+        format for import. Filename is {idno}-{language}-overlay.json. Default
+        is inline; pass download=1 to save as a file.
+      operationId: exportProjectTranslationOverlay
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: language
+          description: ISO 639 language code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: download
+          description: Set to 1 to download as an attachment
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Overlay JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Translation not found
+      security:
+        - ApiKeyAuth: []
+  /editor/{id}/translations/{language}/delete:
+    post:
+      tags:
+        - Project translations
+      summary: Delete a target language
+      description: Delete a translation overlay
+      operationId: deleteProjectTranslation
+      parameters:
+        - in: path
+          name: id
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: language
+          description: ISO 639 language code
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Translation not found
+      security:
+        - ApiKeyAuth: []
   /catalog-connections:
     get:
       tags:
@@ -6809,6 +7188,54 @@ paths:
                 $ref: '#/components/schemas/VariablesValidationEnvelope'
         "400":
           description: Not a microdata project, or project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - ApiKeyAuth: []
+  "/validation/{sid}/translations":
+    get:
+      tags:
+        - Validation
+      summary: Translation overlay validation
+      description: >
+        Check stored translation overlays against the current source metadata.
+        Reports translated paths that are missing from the source, empty in the
+        source, not a text value, or not study metadata. Does not score
+        completeness. Requires project view access.
+      operationId: validationTranslations
+      parameters:
+        - $ref: '#/components/parameters/ValidationProjectSid'
+      responses:
+        "200":
+          description: Translation validation report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  validation:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      language:
+                        type: string
+                        nullable: true
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                      translations:
+                        type: array
+                        items:
+                          type: object
+        "400":
+          description: Project not found or request failed
           content:
             application/json:
               schema:

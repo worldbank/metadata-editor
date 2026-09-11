@@ -60,6 +60,10 @@ class Project_duplicate
 			'metadata' => $project_info['metadata'],
 		);
 
+		if ($this->ci->db->field_exists('language', 'editor_projects') && array_key_exists('language', $project_info)) {
+			$row['language'] = $project_info['language'];
+		}
+
 		$new_sid = $this->ci->Editor_model->create_project($project_info['type'], $row);
 		if (!$new_sid) {
 			$db_error = $this->ci->db->error();

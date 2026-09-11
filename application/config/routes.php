@@ -93,6 +93,16 @@ $route['api/editor/(.*)/versions'] = "api/versions/$1";
 $route['api/editor/(.*)/versions/(.*)'] = "api/versions/index/$1/$2";
 $route['api/editor/versions/(.*)'] = "api/versions/$1";
 
+//project translations (study metadata)
+$route['api/editor/(.*)/translations/language'] = "api/translations/language/$1";
+$route['api/editor/(.*)/translations/overlay/source'] = "api/translations/overlay_source/$1";
+$route['api/editor/(.*)/translations/overlay'] = "api/translations/overlay/$1";
+$route['api/editor/(.*)/translations/(.*)/overlay'] = "api/translations/overlay/$1/$2";
+$route['api/editor/(.*)/translations/(.*)/export'] = "api/translations/export/$1/$2";
+$route['api/editor/(.*)/translations/(.*)/delete'] = "api/translations/delete/$1/$2";
+$route['api/editor/(.*)/translations/(.*)'] = "api/translations/fields/$1/$2";
+$route['api/editor/(.*)/translations'] = "api/translations/project/$1";
+
 //project comparison
 $route['api/editor/compare'] = "api/compare";
 $route['api/editor/compare/(.*)'] = "api/compare/$1";
@@ -161,6 +171,7 @@ $route['api/validation/(:num)'] = "api/validation/schema/$1";
 $route['api/validation/(:num)/schema'] = "api/validation/schema/$1";
 $route['api/validation/(:num)/template'] = "api/validation/template/$1";
 $route['api/validation/(:num)/variables'] = "api/validation/variables/$1";
+$route['api/validation/(:num)/translations'] = "api/validation/translations/$1";
 $route['api/validation/(:num)/extra_fields'] = "api/validation/extra_fields/$1";
 $route['api/validation/(:num)/template_extra_fields'] = "api/validation/template_extra_fields/$1";
 $route['api/validation/(:num)/move_to_additional'] = "api/validation/move_to_additional/$1";

@@ -220,6 +220,10 @@ class Project_versions
 			$options['status'] = $project_info['status'];
 		}
 
+		if ($this->ci->db->field_exists('language', 'editor_projects') && array_key_exists('language', $project_info)) {
+			$options['language'] = $project_info['language'];
+		}
+
 		//create target project
 		$new_sid = $this->ci->Editor_model->create_project($project_info['type'], $options);
 
@@ -267,6 +271,43 @@ class Project_versions
 		$output['variable_groups'] = $this->copy_project_variable_groups($source_sid, $target_sid);
 		$output['external_resources'] = $this->copy_external_resources($source_sid, $target_sid);
 		$output['files'] = $this->copy_project_files($source_sid, $target_sid);
+		$output['translations'] = $this->copy_project_translations($source_sid, $target_sid);
+
+		return $output;
+	}
+
+	/**
+	 * Copy study-metadata translation overlays to the target project.
+	 *
+	 * @param int $source_sid
+	 * @param int $target_sid
+	 * @return array
+	 */
+	function copy_project_translations($source_sid, $target_sid)
+	{
+		$output = array(
+			'languages' => 0
+		);
+
+		if (!$this->ci->db->table_exists('project_translations')) {
+			return $output;
+		}
+
+		$source_sid = (int) $source_sid;
+		$target_sid = (int) $target_sid;
+
+		$headers = $this->ci->db->get_where('project_translations', array('sid' => $source_sid))->result_array();
+		foreach ($headers as $header) {
+			unset($header['id']);
+			$header['sid'] = $target_sid;
+
+			if (!$this->ci->db->insert('project_translations', $header)) {
+				$db_error = $this->ci->db->error();
+				throw new Exception('FAILED_TO_COPY_PROJECT_TRANSLATIONS: ' . $db_error['message']);
+			}
+
+			$output['languages']++;
+		}
 
 		return $output;
 	}

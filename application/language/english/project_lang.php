@@ -952,6 +952,33 @@ $lang['overwrite_existing_columns']='Overwrite existing columns';
 $lang['skip_existing_columns']='Skip existing columns';
 $lang['upload_another']='Upload Another File';
 
+$lang['Translations']='Translations';
+$lang['translations_help']='Translate study metadata into other languages. The project language is the language of the original metadata.';
+$lang['project_language']='Project language';
+$lang['project_language_required']='Set the project language before adding translations.';
+$lang['project_language_locked']='Project language cannot be changed after translations are added.';
+$lang['target_languages']='Target languages';
+$lang['add_language']='Add language';
+$lang['select_language']='Select language';
+$lang['search_languages']='Search languages';
+$lang['change_language']='Change';
+$lang['set_language']='Set language';
+$lang['use_language_code']='Use code {code}';
+$lang['no_translations']='No translations yet.';
+$lang['no_source_text_to_translate']='No study metadata text to translate.';
+$lang['delete_translation_confirm']='Remove this language and its translations?';
+$lang['fields']='Fields';
+$lang['translated']='Translated';
+$lang['draft']='Draft';
+$lang['complete']='Complete';
+$lang['view_json']='View JSON';
+$lang['Overlay']='Overlay';
+$lang['export_overlay']='Export overlay';
+$lang['export_source_overlay']='Export source overlay';
+$lang['import_overlay']='Import overlay';
+$lang['overlay_import_help']='Upload a translation overlay JSON file (format: overlay).';
+$lang['overlay_help']='An overlay is a file of translated fields only: export the source overlay to translate offline, then import it as a language.';
+$lang['overlay_imported']='Overlay imported.';
 
 /* End of file project_lang.php */
 /* Location: ./application/language/english/project_lang.php */

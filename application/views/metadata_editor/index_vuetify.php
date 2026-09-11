@@ -29,6 +29,39 @@
   .global-registry-scalar-field-input .v-input__append-inner > span.d-inline-flex {
     order: 2;
   }
+  .translation-edit { font-size: 0.875rem; background: #fff; color: #222; }
+  .translation-edit h5 { font-size: 1.05rem; }
+  .translation-toolbar { position: sticky; top: 56px; z-index: 6; background: #fff; padding: 16px 0 10px; border-bottom: 1px solid #e0e0e0; }
+  .translation-language-list { max-height: 360px; overflow-y: auto; border: 1px solid #eee; }
+  .translation-lang-chip { min-width: 36px; justify-content: center; font-weight: 600; letter-spacing: 0.03em; }
+  .translation-language-list .v-list-item--active { background: #e3f2fd; }
+  .translation-language-search.v-text-field--outlined.v-input--dense .v-input__slot { min-height: 36px !important; }
+  .translation-toolbar .d-flex { gap: 8px; }
+  .translation-complete { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .translation-complete-track { flex: 1; height: 8px; background: #eceff1; border-radius: 999px; overflow: hidden; }
+  .translation-complete-fill { height: 100%; background: #1976d2; border-radius: 999px; }
+  .translation-complete-meta { font-size: 0.75rem; color: #555; white-space: nowrap; }
+  .translation-complete-meta span { color: #1976d2; font-weight: 600; margin-left: 6px; }
+  .translation-board { background: linear-gradient(to right, #f3f5f7 50%, #fff 50%); }
+  .translation-pair { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0; width: 100%; }
+  .translation-col { min-width: 0; overflow-x: auto; padding: 8px 16px; background: transparent; }
+  .translation-source { white-space: pre-wrap; overflow-x: auto; background: #e8eef3; border: 0; padding: 6px 8px; min-height: 32px; font-size: 0.875rem; color: #222; line-height: 1.5; }
+  .translation-source--area { min-height: 84px; }
+  .translation-grid-head { position: sticky; top: 0; z-index: 4; font-size: 0.8125rem; font-weight: 600; color: #222; background: linear-gradient(to right, #f3f5f7 50%, #fff 50%); padding-top: 8px; border-bottom: 1px solid #c8c8c8; }
+  .translation-section-title { margin: 1.25rem 0 0.35rem; padding: 0 16px 0.35rem; font-size: 0.95rem; font-weight: 600; color: #111; }
+  .translation-field { padding: 8px 0 10px; background: transparent; border-bottom: 1px solid #d0d0d0; }
+  .translation-field-title { padding: 8px 16px 4px; font-size: 0.8125rem; font-weight: 600; color: #222; }
+  .translation-sublabel { font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 2px; }
+  .translation-idx { display: inline-block; min-width: 1.4rem; color: #666; font-weight: 600; }
+  .translation-col .table { width: max-content; min-width: 100%; margin-bottom: 0; background: transparent; }
+  .translation-col .table th,
+  .translation-col .table td { font-size: 0.8125rem; padding: 0.4rem 0.5rem; vertical-align: middle; background: transparent; border: 0; border-bottom: 1px solid #d0d0d0; }
+  .translation-col .table thead th { font-weight: 600; color: #222; white-space: nowrap; background: transparent; border-bottom: 1px solid #bdbdbd; }
+  .translation-col .table .translation-source { min-height: 0; padding: 4px 6px; display: block; }
+  .translation-col .table tbody tr:last-child td { border-bottom: 0; }
+  .translation-col .table th:first-child,
+  .translation-col .table td:first-child { width: 2.25rem; color: #666; }
+  .translation-edit .form-control { font-size: 0.875rem; background: #e8eef3; border-color: #cfcfcf; }
   </style>
 </head>
 
@@ -268,6 +301,10 @@
         },
         issuesFeatureEnabled(){
           return !(CI && CI.user_info && CI.user_info.issues_enabled === false);
+        },
+        translationsFeatureEnabled(){
+          return typeof projectTranslationsUiEnabled === 'function'
+            && projectTranslationsUiEnabled(this.dataset_type || this.$store.state.project_type);
         },
         ProjectIsLocked(){
           return this.$store.state.project_is_locked;
