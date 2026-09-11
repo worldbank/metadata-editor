@@ -94,6 +94,11 @@ ALTER TABLE `project_issues` ADD KEY `idx_field_path` (`field_path`);
 
 ALTER TABLE `project_issues` ADD KEY `idx_created` (`created`);
 
+-- Drop first: CREATE TABLE IF NOT EXISTS and v1.2 installs may already have this FK.
+-- MariaDB reports a second ADD as 1005/errno 121 (not skippable like MySQL 8's 1826).
+-- DROP of a missing FK is 1091 and is ignored by the migration runner.
+ALTER TABLE `project_issues` DROP FOREIGN KEY `fk_project_issues_project`;
+
 ALTER TABLE `project_issues` ADD CONSTRAINT `fk_project_issues_project` FOREIGN KEY (`project_id`) REFERENCES `editor_projects` (`id`) ON DELETE CASCADE;
 
 
@@ -302,18 +307,22 @@ ALTER TABLE `job_queue`
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Tag manager', 'Global role for managing tags', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Tag manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Codelist manager', 'Global role for managing codelists', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Codelist manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Data structure manager', 'Global role for managing data structures', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Data structure manager');
 
 INSERT INTO `roles` (`name`, `description`, `weight`, `is_admin`, `is_locked`)
 SELECT 'Project manager', 'Global access to all projects', 0, 0, 0
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `roles` WHERE `name` = 'Project manager');
 
 UPDATE `roles`
