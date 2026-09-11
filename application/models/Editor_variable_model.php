@@ -576,6 +576,115 @@ class Editor_variable_model extends ci_model {
 	}
 
 
+	/**
+	 * Remint codebook IDs that are reused across data files.
+	 *
+	 * NADA and DDI require vid unique per study. Rows that share a vid are
+	 * rewritten to {fid}_{vid} (same convention as NADA DDI import). The
+	 * original ID is kept in metadata.vid_original. No-op when all vids are
+	 * already unique. Updates the vid column directly so export/publish can
+	 * heal existing projects without an editable-project check.
+	 *
+	 * @param int $sid
+	 * @return array{updated:int,skipped:int}
+	 */
+	function ensure_unique_vids($sid)
+	{
+		$sid = (int) $sid;
+		if ($sid < 1) {
+			return array('updated' => 0, 'skipped' => 0);
+		}
+
+		$this->db->select('uid, fid, vid, metadata');
+		$this->db->where('sid', $sid);
+		$this->db->order_by('fid, sort_order, uid');
+		$rows = $this->db->get('editor_variables')->result_array();
+
+		if (!$rows) {
+			return array('updated' => 0, 'skipped' => 0);
+		}
+
+		$counts = array();
+		foreach ($rows as $row) {
+			$vid = trim((string) $row['vid']);
+			if ($vid === '') {
+				continue;
+			}
+			$counts[$vid] = isset($counts[$vid]) ? $counts[$vid] + 1 : 1;
+		}
+
+		$has_dupes = false;
+		foreach ($counts as $count) {
+			if ($count > 1) {
+				$has_dupes = true;
+				break;
+			}
+		}
+
+		if (!$has_dupes) {
+			return array('updated' => 0, 'skipped' => count($rows));
+		}
+
+		$this->load->library('DDI_Utils');
+
+		$used = array();
+		foreach ($rows as $row) {
+			$vid = trim((string) $row['vid']);
+			if ($vid !== '' && isset($counts[$vid]) && $counts[$vid] === 1) {
+				$used[$vid] = true;
+			}
+		}
+
+		$updated = 0;
+		$skipped = 0;
+
+		foreach ($rows as $row) {
+			$vid = trim((string) $row['vid']);
+			if ($vid === '' || !isset($counts[$vid]) || $counts[$vid] <= 1) {
+				$skipped++;
+				continue;
+			}
+
+			$new_vid = DDI_Utils::prefix_vid($row['fid'], $vid);
+			if ($new_vid === '' || $new_vid === $vid || isset($used[$new_vid])) {
+				$base = ($new_vid !== '' && $new_vid !== $vid) ? $new_vid : (trim((string) $row['fid']) . '_' . $vid);
+				$base = trim($base, '_');
+				if ($base === '') {
+					$base = $vid;
+				}
+				$candidate = $base;
+				$n = 2;
+				while (isset($used[$candidate]) || $candidate === $vid) {
+					$candidate = $base . '_' . $n;
+					$n++;
+				}
+				$new_vid = $candidate;
+			}
+
+			$used[$new_vid] = true;
+
+			$options = array('vid' => $new_vid);
+			$metadata = $this->Editor_model->decode_metadata(isset($row['metadata']) ? $row['metadata'] : '');
+			if (is_array($metadata)) {
+				if (!isset($metadata['vid_original']) || (string) $metadata['vid_original'] === '') {
+					$metadata['vid_original'] = $vid;
+				}
+				$metadata['vid'] = $new_vid;
+				$metadata['file_id'] = $row['fid'];
+				$metadata['fid'] = $row['fid'];
+				$options['metadata'] = $this->Editor_model->encode_metadata($metadata);
+			}
+
+			$this->db->where('sid', $sid);
+			$this->db->where('uid', $row['uid']);
+			$this->db->update('editor_variables', $options);
+			$updated++;
+		}
+
+		return array('updated' => $updated, 'skipped' => $skipped);
+	}
+
+
 
     /**
      * 

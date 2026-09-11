@@ -370,6 +370,8 @@ class ImportJsonMetadata
         $this->stream_process_variables($sid, $json_file_path, $file_id_mappings, $validate);
 
         $this->stream_process_variable_groups($sid, $json_file_path);
+
+        $this->ci->Editor_variable_model->ensure_unique_vids($sid);
         
         return true;
     }
@@ -739,6 +741,10 @@ class ImportJsonMetadata
             $this->ci->Editor_variable_groups_model->import_from_interchange($sid, $pending_variable_groups);
         }
 
+        if ($is_microdata_project) {
+            $this->ci->Editor_variable_model->ensure_unique_vids($sid);
+        }
+
         // For non-survey/microdata projects, process project metadata
         // Use canonical type for comparison
         if (!$is_microdata_project) {
@@ -875,6 +881,8 @@ class ImportJsonMetadata
             $this->ci->Editor_variable_groups_model->import_from_interchange($sid,$variable_groups);
             $this->import_stats['variable_groups'] = true;
         }
+
+        $this->ci->Editor_variable_model->ensure_unique_vids($sid);
     }
     
     /**
@@ -924,6 +932,8 @@ class ImportJsonMetadata
         if (!empty($variable_batch)) {
             $this->import_variable_metadata($sid, $variable_batch, $file_id_mappings, $validate);
         }
+
+        $this->ci->Editor_variable_model->ensure_unique_vids($sid);
     }
 
     /**
@@ -1424,6 +1434,7 @@ class ImportJsonMetadata
         $source_file_id = isset($datafile['file_id']) ? $datafile['file_id'] : $file_id;
         $file_id_mapping = array($source_file_id => $file_id);
         $this->import_variable_metadata($sid, $variables, $file_id_mapping, $validate);
+        $this->ci->Editor_variable_model->ensure_unique_vids($sid);
 
         $updated = $this->ci->Editor_datafile_model->data_file_by_id($sid, $file_id);
         return array(

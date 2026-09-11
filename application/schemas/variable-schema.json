@@ -12,7 +12,7 @@
 		"vid": {
 			"type": "string",
 			"title": "Variable unique ID",
-			"description": "Unique variable ID e.g. V1, V2"
+			"description": "Codebook ID unique within the study (e.g. V1, F2_V1). Must not be reused across data files."
 		},
 		"name": {
 			"type": "string",

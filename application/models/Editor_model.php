@@ -385,6 +385,7 @@ class Editor_model extends CI_Model {
 			'user_id',
 			'template_uid', 'version_number', 'version_created', 
 			'version_created_by', 'version_notes',
+			'language',
 			'attributes', 'metadata', 			
 			'partial_update', 'template_uid',
 			// API request-only keys (not study metadata)
@@ -516,6 +517,9 @@ class Editor_model extends CI_Model {
 			$select .= ",status";
 		}
 		$select .= ",created,changed, template_uid, is_locked, version_number, version_created, version_created_by, version_created";
+		if ($this->db->field_exists('language', 'editor_projects')) {
+			$select .= ",language";
+		}
 		$this->db->select($select);
 		$this->db->where("id",$sid);
 		
@@ -1891,6 +1895,10 @@ class Editor_model extends CI_Model {
 		$this->load->model('Editor_variable_groups_model');
 		$groups=$parser->get_variable_groups();
 		$this->Editor_variable_groups_model->import_from_interchange($sid, is_array($groups) ? $groups : array());
+
+		// After groups resolve DDI vids to UIDs, remint reused codebook IDs
+		// so export/publish stay unique per study (NADA UNIQUE(vid, sid)).
+		$this->Editor_variable_model->ensure_unique_vids($sid);
 	
 		return $output;
 		

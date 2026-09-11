@@ -172,6 +172,8 @@ class Editor_DDI_Writer
 
         $this->ensure_ddi_memory_limit();
 
+        $this->ci->Editor_variable_model->ensure_unique_vids($id);
+
         $dataset=$this->ci->Editor_model->get_row($id);
         $this->sid=$id;
 

@@ -39,6 +39,28 @@ class DDI_Utils
 		return is_array($tokens) ? $tokens : array();
 	}
 
+
+	/**
+	 * Build a file-scoped variable ID by prefixing the codebook vid with its file ID.
+	 *
+	 * NADA enforces UNIQUE(vid, sid). When the same DDI <var> @ID is stored in
+	 * more than one data file, prefix so each row is unique:
+	 * {fid="F2", original_vid="V1"} => "F2_V1".
+	 *
+	 * @param string $fid
+	 * @param string $original_vid
+	 * @return string Prefixed vid, or the original when either part is empty
+	 */
+	public static function prefix_vid($fid, $original_vid)
+	{
+		$fid = trim((string)$fid);
+		$original_vid = trim((string)$original_vid);
+		if ($fid === '' || $original_vid === '') {
+			return $original_vid;
+		}
+		return $fid.'_'.$original_vid;
+	}
+
 	
 
 

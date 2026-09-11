@@ -358,6 +358,8 @@ class Editor_partial_import
 			$this->ci->Editor_variable_groups_model->import_from_interchange($sid, is_array($groups) ? $groups : array());
 		}
 
+		$this->ci->Editor_variable_model->ensure_unique_vids($sid);
+
 		$result=array();
 		if (!empty($variable_warnings)){
 			$result['variable_warnings']=$variable_warnings;

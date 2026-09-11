@@ -60,6 +60,8 @@ class Project_json_writer
 			throw new Exception("Data file not found: " . $file_id);
 		}
 
+		$this->ci->Editor_variable_model->ensure_unique_vids($sid);
+
 		$exclude_fields = array(
 			'id',
 			'sid',
@@ -276,7 +278,9 @@ class Project_json_writer
 
 		$exclude_variables=isset($options['exclude_variables']) ? (int)$options['exclude_variables'] : 0;
 
-		if(in_array($project['type'], ['survey', 'microdata'])){			
+		if(in_array($project['type'], ['survey', 'microdata'])){
+			$this->ci->Editor_variable_model->ensure_unique_vids($sid);
+
 			$output['data_files'] = function () use ($sid) {
 				$files=$this->ci->Editor_datafile_model->select_all($sid, $include_file_info=false);
 				if ($files){
