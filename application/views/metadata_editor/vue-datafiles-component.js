@@ -13,6 +13,8 @@ Vue.component('datafiles', {
             edit_item:null,
             selected_files:[],
             select_all_files:false,
+            sort_column:'file_id',
+            sort_direction:'asc',
             dialog:{
                 show:false,
                 title:'',
@@ -537,11 +539,73 @@ Vue.component('datafiles', {
                 this.reloadDataFiles();
             }
         },
+        // Client-side only column sorting (not persisted). Clicking a sortable
+        // column header cycles asc -> desc -> unsorted (manual/drag order).
+        toggleSort: function(column){
+            if (this.sort_column !== column){
+                this.sort_column = column;
+                this.sort_direction = 'asc';
+            } else if (this.sort_direction === 'asc'){
+                this.sort_direction = 'desc';
+            } else {
+                this.sort_column = null;
+                this.sort_direction = 'asc';
+            }
+        },
+        sortIconClass: function(column){
+            if (this.sort_column !== column) return 'mdi-unfold-more-horizontal';
+            return this.sort_direction === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down';
+        },
+        parseFileSizeToBytes: function(size_display){
+            if (!size_display || size_display === '—') return -1;
+            let parts = size_display.trim().split(' ');
+            let value = parseFloat(parts[0]);
+            if (isNaN(value)) return -1;
+            let units = {B:1, KB:1024, MB:1024*1024, GB:1024*1024*1024, TB:1024*1024*1024*1024};
+            let unit = (parts[1] || '').toUpperCase();
+            return value * (units[unit] || 1);
+        },
+        getSortValue: function(data_file, column){
+            switch(column){
+                case 'file_id':
+                    return (data_file.file_id || '').toString().toLowerCase();
+                case 'file_name':
+                    return (data_file.file_name || '').toString().toLowerCase();
+                case 'data':
+                    return this.parseFileSizeToBytes(this.dataFileSizeDisplay(data_file));
+                case 'var_count':
+                    return Number(data_file.var_count) || 0;
+                case 'case_count':
+                    return Number(data_file.case_count) || 0;
+                case 'changed':
+                    return Number(data_file.changed) || 0;
+                default:
+                    return '';
+            }
+        },
     },
     computed: {
         data_files(){
             return this.$store.state.data_files;
-        },        
+        },
+        // Wraps data_files with their original (store) index so row actions
+        // that expect an index into data_files keep working when a sort is
+        // applied. When no sort column is set, order matches data_files
+        // exactly, so drag-to-reorder keeps working unaffected.
+        sortedDataFiles(){
+            let wrapped = this.data_files.map((file, originalIndex) => ({file, originalIndex}));
+            if (!this.sort_column) return wrapped;
+            let column = this.sort_column;
+            let dir = this.sort_direction === 'desc' ? -1 : 1;
+            wrapped.sort((a, b) => {
+                let va = this.getSortValue(a.file, column);
+                let vb = this.getSortValue(b.file, column);
+                if (va < vb) return -1 * dir;
+                if (va > vb) return 1 * dir;
+                return 0;
+            });
+            return wrapped;
+        },
         batchExportSelectedFiles(){
             if (!this.data_files.length || !this.selected_files.length) return [];
             return this.data_files
@@ -583,67 +647,67 @@ Vue.component('datafiles', {
                     <tr>
                         <th><input type="checkbox" v-model="select_all_files" @change="toggleFilesSelection" /></th>
                         <th><span class="mdi mdi-swap-vertical"></span></th>
-                        <th style="width:80px;">{{$t("file")}}#</th>
-                        <th>{{$t("file_name")}}</th>
-                        <th>{{$t("data")}}</th>
-                        <th>{{$t("variables")}}</th>
-                        <th>{{$t("cases")}}</th>
-                        <th>{{$t("Modified")}}</th>
+                        <th style="width:80px;cursor:pointer;user-select:none;" @click="toggleSort('file_id')">{{$t("file")}}# <v-icon small :color="sort_column=='file_id' ? 'primary' : 'grey lighten-1'">{{sortIconClass('file_id')}}</v-icon></th>
+                        <th style="cursor:pointer;user-select:none;" @click="toggleSort('file_name')">{{$t("file_name")}} <v-icon small :color="sort_column=='file_name' ? 'primary' : 'grey lighten-1'">{{sortIconClass('file_name')}}</v-icon></th>
+                        <th style="cursor:pointer;user-select:none;" @click="toggleSort('data')">{{$t("data")}} <v-icon small :color="sort_column=='data' ? 'primary' : 'grey lighten-1'">{{sortIconClass('data')}}</v-icon></th>
+                        <th style="cursor:pointer;user-select:none;" @click="toggleSort('var_count')">{{$t("variables")}} <v-icon small :color="sort_column=='var_count' ? 'primary' : 'grey lighten-1'">{{sortIconClass('var_count')}}</v-icon></th>
+                        <th style="cursor:pointer;user-select:none;" @click="toggleSort('case_count')">{{$t("cases")}} <v-icon small :color="sort_column=='case_count' ? 'primary' : 'grey lighten-1'">{{sortIconClass('case_count')}}</v-icon></th>
+                        <th style="cursor:pointer;user-select:none;" @click="toggleSort('changed')">{{$t("Modified")}} <v-icon small :color="sort_column=='changed' ? 'primary' : 'grey lighten-1'">{{sortIconClass('changed')}}</v-icon></th>
                         <th style="width: 50px;">{{$t("Actions")}}</th>
                     </tr>
                     </thead>
-                    <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
-                    <tr v-for="(data_file, index) in data_files" :key="data_file.file_id">
-                        <td><input type="checkbox" v-model="selected_files" :value="data_file.file_id" /></td>
-                        <td><v-icon class="handle">mdi-drag</v-icon></td>
-                        <td><v-icon color="primary" >mdi-file-document</v-icon> {{data_file.file_id}}</td>
+                    <tbody is="draggable" :list="data_files" :disabled="sort_column !== null" tag="tbody" handle=".handle" >
+                    <tr v-for="(row, row_index) in sortedDataFiles" :key="row.file.file_id">
+                        <td><input type="checkbox" v-model="selected_files" :value="row.file.file_id" /></td>
+                        <td><v-icon class="handle" :disabled="sort_column !== null" :color="sort_column ? 'grey lighten-2' : ''">mdi-drag</v-icon></td>
+                        <td><v-icon color="primary" >mdi-file-document</v-icon> {{row.file.file_id}}</td>
                         <td>
-                            <div style="cursor:pointer;color:#0D47A1;font-weight:500" @click="editFile(index)">
-                                {{data_file.file_name}}
+                            <div style="cursor:pointer;color:#0D47A1;font-weight:500" @click="editFile(row.originalIndex)">
+                                {{row.file.file_name}}
                             </div>
                         </td>
-                        <td class="text-secondary">{{dataFileSizeDisplay(data_file)}}</td>
-                        <td>{{data_file.var_count}}</td>
-                        <td>{{data_file.case_count}}</td>                       
-                        <td>{{momentDate(data_file.changed)}}</td>
+                        <td class="text-secondary">{{dataFileSizeDisplay(row.file)}}</td>
+                        <td>{{row.file.var_count}}</td>
+                        <td>{{row.file.case_count}}</td>
+                        <td>{{momentDate(row.file.changed)}}</td>
                         <td>
                             <div class="zxaction-buttons-hover">
                                 <v-menu offset-y>
-                                    <template v-slot:activator="{ on, attrs }">                                        
-                                            <v-btn small icon v-on="on" v-bind="attrs" 
-                                                   :title="$t('More options')" 
+                                    <template v-slot:activator="{ on, attrs }">
+                                            <v-btn small icon v-on="on" v-bind="attrs"
+                                                   :title="$t('More options')"
                                                    color="primary">
                                                 <v-icon>mdi-dots-vertical</v-icon>
                                             </v-btn>
                                     </template>
-                                                                    
+
                                     <v-list dense>
                                         <!-- View/Edit Options -->
-                                        <v-list-item @click="editFile(index)">
+                                        <v-list-item @click="editFile(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-edit</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("edit")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item 
-                                            :to="'/variables/' + data_file.file_id"
+
+                                        <v-list-item
+                                            :to="'/variables/' + row.file.file_id"
                                             :title="$t('Variables')">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-table</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Variables")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
-                                            :to="'/data-explorer/' + data_file.file_id"
+
+                                        <v-list-item v-if="hasCsvFile(row.file.file_id) || row.file.store_data==1"
+                                            :to="'/data-explorer/' + row.file.file_id"
                                             :title="$t('data')">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-table-eye</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("data")}}</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-list-item v-else disabled
                                             :title="$t('data')">
                                             <v-list-item-icon>
@@ -651,89 +715,89 @@ Vue.component('datafiles', {
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("data")}} ({{$t("No data")}})</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-divider></v-divider>
-                                        
+
                                         <!-- Data Management -->
-                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
-                                            @click="removeData(data_file)">
+                                        <v-list-item v-if="hasCsvFile(row.file.file_id) || row.file.store_data==1"
+                                            @click="removeData(row.file)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-database-remove</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("clear_data")}}</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-list-item v-else disabled>
                                             <v-list-item-icon>
                                                 <v-icon>mdi-database-remove</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("clear_data")}} ({{$t("No data")}})</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item @click="importSummaryStatistics(data_file.file_id)">
+
+                                        <v-list-item @click="importSummaryStatistics(row.file.file_id)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-update</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Refresh summary statistics")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item @click="replaceFile(index)">
+
+                                        <v-list-item @click="replaceFile(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-upload-outline</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Replace file")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item @click="duplicateFile(index)">
+
+                                        <v-list-item @click="duplicateFile(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-content-copy</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("duplicate_data_file")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item @click="exportMetadataFile(index)">
+
+                                        <v-list-item @click="exportMetadataFile(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-code-json</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("export_metadata")}}</v-list-item-title>
                                         </v-list-item>
 
-                                        <v-list-item @click="exportDictionaryCsv(index)">
+                                        <v-list-item @click="exportDictionaryCsv(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-book-open-variant</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("export_data_dictionary")}}</v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item @click="openImportMetadataDialog(index)">
+
+                                        <v-list-item @click="openImportMetadataDialog(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-import</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("import_metadata")}}</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-divider></v-divider>
-                                        
+
                                         <!-- Export Options -->
-                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
-                                            @click="openExportDialog(index)">
+                                        <v-list-item v-if="hasCsvFile(row.file.file_id) || row.file.store_data==1"
+                                            @click="openExportDialog(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-export</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("export")}}</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-list-item v-else disabled>
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-export</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("export")}} ({{$t("No data")}})</v-list-item-title>
                                         </v-list-item>
-                                        
+
                                         <v-divider></v-divider>
-                                        
+
                                         <!-- Delete Option -->
-                                        <v-list-item @click="deleteFile(index)" class="red--text">
+                                        <v-list-item @click="deleteFile(row.originalIndex)" class="red--text">
                                             <v-list-item-icon>
                                                 <v-icon color="red">mdi-delete-outline</v-icon>
                                             </v-list-item-icon>
