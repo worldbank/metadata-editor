@@ -127,7 +127,7 @@ Vue.component('template-validation-component', {
             } else if (typeof rules === 'object' && !Array.isArray(rules)) {
                 rules = Object.assign({}, rules);
             }
-            if (item.is_required || item.required) {
+            if (item.is_required) {
                 if (typeof rules === 'string') {
                     if (rules.indexOf('required') === -1) {
                         rules = rules ? ('required|' + rules) : 'required';

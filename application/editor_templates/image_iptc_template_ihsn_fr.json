@@ -39,7 +39,6 @@
                                             "key": "name",
                                             "title": "Nom",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "prop_key": "metadata_information.producers.name",
                                             "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
@@ -110,7 +109,6 @@
                                     "title": "ID principal",
                                     "type": "string",
                                     "class": "required",
-                                    "required": true,
                                     "help_text": "Un identifiant unique de l'image. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier l'image. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement le tableau. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde. Un identificateur d'objet numérique (DOI) ou l'ID inclus dans les métadonnées EXIF pour les images numériques peut être utilisé. pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même image (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
                                     "rules": [],
                                     "is_required": true,
@@ -120,7 +118,6 @@
                                     "key": "image_description.identifiers",
                                     "title": "Autres identifiants",
                                     "type": "array",
-                                    "required": true,
                                     "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (ID) autres que l'\"ID principal\" (IDNO). Il peut s'agir par exemple d'un Digital Object Identifier (DOI), ou de l'identifiant EXIF. L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\", donc si un DOI, EXIF ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de le répéter ici avec l'identification du type).",
                                     "props": [
                                         {
@@ -482,14 +479,12 @@
                                             "title": "À propos de l'image",
                                             "help_text": "Un ou plusieurs sujets, thèmes ou entités sur lesquels porte le contenu, chacun exprimé par un terme d'un vocabulaire contrôlé.",
                                             "class": "required",
-                                            "required": true,
                                             "type": "array",
                                             "props": [
                                                 {
                                                     "key": "cvId",
                                                     "title": "ID du vocabulaire",
                                                     "class": "required",
-                                                    "required": true,
                                                     "type": "string",
                                                     "help_text": "L'identifiant global unique du vocabulaire contrôlé d'où provient le terme.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId",
@@ -742,14 +737,12 @@
                                             "title": "Expression des droits",
                                             "help_text": "Une expression de droits incorporée utilisant un langage d'expression de droits qui est codée sous forme de chaîne. Structure d'expression de droits codée intégrée (EERE) Une structure fournissant des détails sur une expression de droits codée intégrée.",
                                             "class": "required",
-                                            "required": false,
                                             "type": "array",
                                             "props": [
                                                 {
                                                     "key": "encRightsExpr",
                                                     "title": "Expression codée des droits",
                                                     "class": "required",
-                                                    "required": true,
                                                     "type": "string",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.encRightsExpr",
                                                     "help_text": "ID du langage d'expression des droits. Un identifiant du langage d'expression des droits utilisé par l'expression des droits.",
@@ -784,7 +777,6 @@
                                                     "key": "linkedRightsExpr",
                                                     "title": "Lien vers l'expression codée des droits.",
                                                     "class": "required",
-                                                    "required": true,
                                                     "type": "string",
                                                     "help_text": "Lien vers une ressource Web représentant une expression de droits codée.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.linkedRightsExpr",
@@ -798,7 +790,6 @@
                                                     "title": "Type d'encodage",
                                                     "type": "string",
                                                     "class": "required",
-                                                    "required": true,
                                                     "help_text": "Le type d'encodage de l'expression des droits, identifié par un type de support IANA.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprEncType",
                                                     "display_type": "text"
@@ -808,7 +799,6 @@
                                                     "title": "ID de langue d'expression des droits",
                                                     "type": "string",
                                                     "class": "required",
-                                                    "required": true,
                                                     "help_text": "L'identifiant du langage d'expression des droits utilisé par l'expression des droits.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprLangId",
                                                     "display_type": "text"
@@ -1074,7 +1064,6 @@
                                                     "key": "gtin",
                                                     "title": "GTIN",
                                                     "type": "string",
-                                                    "required": true,
                                                     "help_text": "Le numéro d'article commercial mondial (GTIN) du produit (les codes GTIN-8 à GTIN-14 peuvent être utilisés).",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.gtin",
                                                     "display_type": "text"
@@ -1389,7 +1378,6 @@
                                                     "key": "assetIdentifier",
                                                     "title": "Identifiant de l'élément",
                                                     "class": "required",
-                                                    "required": true,
                                                     "type": "string",
                                                     "help_text": "Un identifiant unique créé par le registre et appliqué par le créateur de l'image numérique. Cette valeur ne doit pas être modifiée après avoir été appliquée. Cet identifiant est lié à un identifiant d'organisation de registre correspondant. Entrez l'identifiant unique créé par un registre et appliqué par le créateur de l'image numérique. Cette valeur ne doit pas être modifiée après avoir été appliquée. Cet identifiant peut être globalement unique en soi, mais il doit être unique pour le registre émetteur. Une entrée dans ce champ doit être rendue obligatoire.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.assetIdentifier",
@@ -1398,7 +1386,6 @@
                                                 {
                                                     "key": "registryIdentifier",
                                                     "title": "Identifiant du registre",
-                                                    "required": true,
                                                     "type": "string",
                                                     "help_text": "Un identifiant pour le registre\/l'organisation qui a émis l'identifiant d'image de registre correspondant.",
                                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.registryIdentifier",

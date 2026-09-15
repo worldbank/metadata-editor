@@ -303,19 +303,33 @@ class Schema_template_generator
         );
     }
 
+    /**
+     * Set is_required only when true. Do not emit leftover JSON Schema "required".
+     *
+     * @param array $field
+     * @param bool $is_required
+     * @return array
+     */
+    protected function with_is_required($field, $is_required)
+    {
+        if ($is_required) {
+            $field['is_required'] = true;
+        }
+        return $field;
+    }
+
     protected function build_field($schema, $path, $name, $is_required = false)
     {
         $field = array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => $this->normalize_type($schema),
-            'required' => (bool)$is_required,
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($schema)
         );
         $this->apply_schema_vocabulary($field, $schema);
 
-        return $field;
+        return $this->with_is_required($field, $is_required);
     }
 
     protected function build_array_field($schema, $path, $name, $depth, $is_required = false)
@@ -362,13 +376,12 @@ class Schema_template_generator
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => 'simple_array',
-            'required' => (bool)$is_required,
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'display_type' => $this->resolve_display_type($items_schema)
         );
         $this->apply_schema_vocabulary($field, $items_schema);
 
-        return $field;
+        return $this->with_is_required($field, $is_required);
     }
 
     /**
@@ -379,14 +392,13 @@ class Schema_template_generator
         $props = $this->build_array_props($items_schema, $path);
         $template_type = $this->resolve_object_array_template_type($props);
 
-        return array(
+        return $this->with_is_required(array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => $template_type,
-            'required' => (bool)$is_required,
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'props' => $props
-        );
+        ), $is_required);
     }
 
     /**
@@ -399,24 +411,22 @@ class Schema_template_generator
         $inner_kind = $this->classify_array_items_schema($inner_items);
 
         if ($inner_kind === 'primitive') {
-            return array(
+            return $this->with_is_required(array(
                 'key' => $path,
                 'title' => $this->resolve_title($schema, $name),
                 'type' => 'nested_array',
-                'required' => (bool)$is_required,
                 'help_text' => isset($schema['description']) ? $schema['description'] : '',
                 'props' => array(
                     $this->build_simple_array_prop('value', $path, $inner_items, $this->resolve_title($items_schema, 'value'))
                 )
-            );
+            ), $is_required);
         }
 
         if ($inner_kind === 'object') {
-            return array(
+            return $this->with_is_required(array(
                 'key' => $path,
                 'title' => $this->resolve_title($schema, $name),
                 'type' => 'nested_array',
-                'required' => (bool)$is_required,
                 'help_text' => isset($schema['description']) ? $schema['description'] : '',
                 'props' => array(
                     array(
@@ -427,20 +437,19 @@ class Schema_template_generator
                         'props' => $this->build_array_props($inner_items, $this->join_key($path, 'items'))
                     )
                 )
-            );
+            ), $is_required);
         }
 
         // Deeper nesting: nested_array column whose props describe the next level
-        return array(
+        return $this->with_is_required(array(
             'key' => $path,
             'title' => $this->resolve_title($schema, $name),
             'type' => 'nested_array',
-            'required' => (bool)$is_required,
             'help_text' => isset($schema['description']) ? $schema['description'] : '',
             'props' => array(
                 $this->build_array_prop_column($items_schema, 'items', $this->join_key($path, 'items'))
             )
-        );
+        ), $is_required);
     }
 
     protected function build_simple_array_prop($column_key, $base_path, $items_schema, $title = null)
@@ -452,7 +461,6 @@ class Schema_template_generator
             'title' => $title !== null ? $title : $this->resolve_title($items_schema, $column_key),
             'type' => 'simple_array',
             'prop_key' => $prop_path,
-            'required' => false,
             'help_text' => isset($items_schema['description']) ? $items_schema['description'] : '',
             'display_type' => $this->resolve_display_type($items_schema)
         );
@@ -490,7 +498,6 @@ class Schema_template_generator
                 'title' => $this->resolve_title($array_schema, $name),
                 'type' => 'simple_array',
                 'prop_key' => $prop_path,
-                'required' => false,
                 'help_text' => isset($array_schema['description']) ? $array_schema['description'] : '',
                 'display_type' => $this->resolve_display_type($items_schema)
             );
@@ -567,9 +574,7 @@ class Schema_template_generator
 
                 if ($this->is_array_schema($child)) {
                     $column = $this->build_array_prop_column($child, $name, $prop_path);
-                    if (isset($required[$name])) {
-                        $column['required'] = true;
-                    }
+                    $column = $this->with_is_required($column, isset($required[$name]));
                     $props[] = $column;
                     continue;
                 }
@@ -585,12 +590,11 @@ class Schema_template_generator
                     'title' => $this->resolve_title($child, $name),
                     'type' => $this->normalize_type($child),
                     'prop_key' => $prop_path,
-                    'required' => isset($required[$name]),
                     'help_text' => isset($child['description']) ? $child['description'] : '',
                     'display_type' => $this->resolve_display_type($child)
                 );
                 $this->apply_schema_vocabulary($prop, $child);
-                $props[] = $prop;
+                $props[] = $this->with_is_required($prop, isset($required[$name]));
             }
 
             return $props;

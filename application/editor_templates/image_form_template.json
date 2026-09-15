@@ -37,7 +37,6 @@
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
-                                    "required": true,
                                     "type": "text",
                                     "prop_key": "metadata_information.producers.name"
                                 },
@@ -93,10 +92,8 @@
                     "title": "Main identifier",
                     "type": "text",
                     "class": "required",
-                    "required": true,
                     "help_text": "The (main) unique identifier of the image, to be used for cataloguing purpose.",
                     "rules": {
-                        "required": true,
                         "alpha_dash": true,
                         "min": 5,
                         "max": 800
@@ -107,7 +104,6 @@
                     "key": "image_description.identifiers",
                     "title": "Other identifiers",
                     "type": "array",
-                    "required": true,
                     "help_text": "The repeatable element identifiers is used to list image identifiers other than the one used in idno. Some images may have unique identifiers assigned by different organizations or cataloguing systems; this element is used to document them.\n\nThis element is used to enter image identifiers (IDs) other than the catalog ID entered in the \"Main identifier\" element. It can for example be a Digital Object Identifier (DOI), or the EXIF identifier. Note that the ID entered in the \"Main identifier\" element can be repeated here (\"Main identifier\" does not provide a type parameter, that curators may want to document).\n\n- Type: The type of identifier. This could be for example “DOI”.\n- Identifier: The identifier itself.",
                     "props": [
                         {
@@ -170,7 +166,6 @@
                                     "key": "assetIdentifier",
                                     "title": "Asset Identifier",
                                     "class": "required",
-                                    "required": true,
                                     "type": "text",
                                     "help_text": "Unique identifier of the video as issued by a registry",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.assetIdentifier"
@@ -178,7 +173,6 @@
                                 {
                                     "key": "registryIdentifier",
                                     "title": "Registry Identifier",
-                                    "required": true,
                                     "type": "text",
                                     "help_text": "An identifier for the registry which issued the identifier of the video.",
                                     "rules": "is_uri",
@@ -596,14 +590,12 @@
                             "title": "Rights expression",
                             "help_text": "An embedded rights expression using a rights expression language which is encoded as a string. Embedded Encoded Rights Expression (EERE) structure A structure providing details of an embedded encoded rights expression\n\n- encRightsExpr: Rights Expression Language ID. An identifier of the rights expression language used by the rights expression.\n- rightsExprEncType: The encoding type of the rights expression, identified by an IANA Media Type.\n- rightsExprLangId: An embedded rights expression using any rights expression language.",
                             "class": "required",
-                            "required": false,
                             "type": "array",
                             "props": [
                                 {
                                     "key": "encRightsExpr",
                                     "title": "Encoded Rights Expression",
                                     "class": "required",
-                                    "required": true,
                                     "type": "text",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.encRightsExpr"
                                 },
@@ -632,7 +624,6 @@
                                     "key": "linkedRightsExpr",
                                     "title": "Link to Encoded Rights Expression",
                                     "class": "required",
-                                    "required": true,
                                     "type": "text",
                                     "help_text": "Link to a rights expression using a rights expression language.",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.linkedRightsExpr"
@@ -642,7 +633,6 @@
                                     "title": "Encoding type",
                                     "type": "text",
                                     "class": "required",
-                                    "required": true,
                                     "help_text": "Encoding type of the rights expression, identified by an IANA Media Type.",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprEncType"
                                 },
@@ -651,7 +641,6 @@
                                     "title": "Rights Expression Language ID",
                                     "type": "text",
                                     "class": "required",
-                                    "required": true,
                                     "help_text": "Identifier of the rights expression language used by the rights expression.",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprLangId"
                                 }
@@ -1024,7 +1013,6 @@
                                     "key": "gtin",
                                     "title": "GTIN (Global Trade Item Number)",
                                     "type": "text",
-                                    "required": true,
                                     "help_text": "A 14 digit GTIN (Global Trade Item Number) of the product (GTIN-8 to GTIN-14 codes are used).",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.gtin"
                                 },
@@ -1101,14 +1089,12 @@
                             "title": "aboutCvTerms ???????????????????",
                             "help_text": "Topics, themes or entities the content is about",
                             "class": "required",
-                            "required": true,
                             "type": "array",
                             "props": [
                                 {
                                     "key": "cvId",
                                     "title": "ID",
                                     "class": "required",
-                                    "required": true,
                                     "type": "text",
                                     "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from",
                                     "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId"

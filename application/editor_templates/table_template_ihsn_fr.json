@@ -108,7 +108,6 @@
                             "help_text": "Un identifiant unique de la table. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier la table. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement le tableau. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde. Un identificateur d'objet numérique (DOI) peut être utilisé. pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même table (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
                             "type": "string",
                             "rules": [],
-                            "required": true,
                             "name": "idno",
                             "is_required": true,
                             "display_type": "text"
@@ -148,7 +147,6 @@
                             "key": "table_description.title_statement.title",
                             "title": "Titre",
                             "type": "string",
-                            "required": true,
                             "name": "title",
                             "is_required": true,
                             "help_text": "Le titre du tableau. Le titre fournit une brève description du contenu du tableau. Il doit être concis et inclure les éléments clés indiqués dans le tableau. Il existe différents styles pour écrire un titre de tableau. Un style cohérent doit être appliqué à tous les tableaux publiés dans un catalogue. Faites attention à l'utilisation cohérente des majuscules dans le titre.",

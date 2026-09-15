@@ -83,7 +83,7 @@ Vue.component("form-input", {
       return this.$store.state.project_id || null;
     },
     isRequired() {
-      return !!(this.field && (this.field.is_required || this.field.required));
+      return !!(this.field && this.field.is_required);
     },
     fieldUsesGlobalScalarEnum: function () {
       return (

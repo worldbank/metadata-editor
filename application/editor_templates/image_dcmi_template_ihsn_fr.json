@@ -39,7 +39,6 @@
                                             "key": "name",
                                             "title": "Nom",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "prop_key": "metadata_information.producers.name",
                                             "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
@@ -110,7 +109,6 @@
                                     "title": "ID principal",
                                     "type": "string",
                                     "class": "required",
-                                    "required": true,
                                     "help_text": "Un identifiant unique de l'image. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier l'image. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement le tableau. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde. Un identificateur d'objet numérique (DOI) ou l'ID inclus dans les métadonnées EXIF pour les images numériques peut être utilisé. pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même image (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
                                     "rules": [],
                                     "is_required": true,
@@ -120,7 +118,6 @@
                                     "key": "image_description.identifiers",
                                     "title": "Autres identifiants",
                                     "type": "array",
-                                    "required": true,
                                     "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (ID) autres que l'\"ID principal\" (IDNO). Il peut s'agir par exemple d'un Digital Object Identifier (DOI), ou de l'identifiant EXIF. L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\", donc si un DOI, EXIF ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de le répéter ici avec l'identification du type).",
                                     "props": [
                                         {

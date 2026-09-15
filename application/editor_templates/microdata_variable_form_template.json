@@ -14,7 +14,6 @@
                     "title": "Variable unqiue ID",
                     "type": "text",
                     "class": "required",
-                    "required": true,
                     "help_text": "Variable unique identifier",
                     "rules":"required|idno|alpha_dash|min:2|max:80"
                 },
@@ -23,7 +22,6 @@
                     "title": "Name",
                     "type": "text",
                     "class": "required",
-                    "required": true,
                     "help_text": "Name",
                     "rules":"required|max:100"
                 },
@@ -32,7 +30,6 @@
                     "title": "Labl",
                     "type": "text",
                     "class": "required",
-                    "required": true,
                     "help_text": "Variable label",
                     "rules":"required|max:300"
                 },

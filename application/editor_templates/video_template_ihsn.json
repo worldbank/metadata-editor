@@ -40,7 +40,6 @@
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
-                                    "required": true,
                                     "type": "string",
                                     "prop_key": "metadata_information.producers.name",
                                     "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",

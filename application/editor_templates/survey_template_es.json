@@ -15,14 +15,12 @@
                     "key": "doc_desc.title_statement",
                     "title": "Información sobre los metadatos",
                     "type": "section",
-                    "required": false,
                     "help_text": "",
                     "items": [
                         {
                             "key": "doc_desc.title",
                             "title": "Título del documento",
                             "type": "string",
-                            "required": false,
                             "help_text": "El título del documento de metadatos (que puede ser el título del estudio\/operación estadística en sí). El documento de metadatos es el archivo de metadatos DDI (archivo XML o JSON) que se está generando. El \"Título del documento\" debe mencionar el alcance geográfico de la recopilación de datos, así como el período de referencia de los datos. \n\nPor ejemplo: \"DDI 2.5: Estudio de Estándares de Vida de Albania 2012\".\n\n------\nPara América Latina y el Caribe, es deseable señalar el Estándar utilizado para la generación de metadatos de la operación estadística (IHSN 1.6, DDI 1.0, DDI 2.0, DDI 2.5, etc.) antes del título de la operación estadística.\n\nPor ejemplo: \"DDI 2.5: Permisos de Construcción de la República de Panamá, 2016 - 2023\".",
                             "display_type": "text",
                             "is_recommended": true
@@ -31,7 +29,6 @@
                             "key": "doc_desc.idno",
                             "title": "ID del documento",
                             "type": "string",
-                            "required": false,
                             "help_text": "Es un identificador único para el documento de metadatos. Este identificador debe ser único en el catálogo donde se pretende publicar los metadatos. Idealmente, el identificador también debería ser único a nivel global. Este campo es diferente del \"ID primario\" en la sección Descripción de la operación estadística \/ Declaración del título, aunque es una buena práctica generar identificadores que establezcan una conexión clara entre estos dos identificadores. El ID del documento también podría incluir el identificador de versión del documento de metadatos. \n\nPor ejemplo, si el \"Identificador primario\" del estudio es \"ALB_LSMS_2012\", el \"ID del documento\" en la información de metadatos podría ser \"IHSN_DDI_v01_ALB_LSMS_2012\" si los metadatos DDI son producidos por el IHSN. \n\nCada organización debería establecer reglas sistemáticas para generar tales ID. Se puede establecer una regla de validación (usando una expresión regular) en las plantillas de usuario para hacer cumplir un formato de ID específico. El identificador no puede contener espacios en blanco.\n\n------\nPara América Latina y el Caribe, se sugiere usar el siguiente esquema:  \nestándar-país-productor(es)-operación estadística-año(s)-versión, donde: \n\n-Estándar utilizado para la generación de metadatos de la operación estadística (DDI)\n-Países la abreviación de 3 letras tipo ISO\n-Productor es la abreviación de la entidad dueña de los datos. Si existe más de una institución, incluir todas las que correspondan, separadas con un guion.\n-Operación estadística es la abreviación de la operación.\n-Año es el periodo de referencia al que corresponden los datos.\n-Versión es el número correlativo de versión del documento de metadatos.\n\nEjemplos aplicados:\n\"DDI-HND-INE-EPHPM-2010-V05\"\n\"DDI-PAN-INEC-PERCONST-2016-2023-V03\"\n\"DDI-BOL-INE-MSD-EDSA-2023-2024-V04\"",
                             "display_type": "text"
                         },
@@ -39,7 +36,6 @@
                             "key": "doc_desc.producers",
                             "title": "Responsable(s) de la documentación",
                             "type": "array",
-                            "required": false,
                             "help_text": "El responsable(s) de la documentación es el productor de metadatos, ya sea la persona u organización con la responsabilidad financiera y\/o administrativa de los procesos mediante los cuales se creó el documento de metadatos. Este es un elemento \"Recomendado\". Para propósitos de administración del catálogo, es útil contar con información sobre el responsable(s) de la documentación y la fecha de producción de los metadatos.\n\n------\nPara América Latina y el Caribe, se recomienda completar el Nombre, afiliación y rol del individuo(s) y organización(es) involucrados en la creación de la documentación de la operación estadística: i) Instancia a cargo de la documentación; ii) Instancia a cargo de la revisión; iii) Instancia a cargo de la aprobación y publicación.",
                             "props": [
                                 {
@@ -81,7 +77,6 @@
                             "key": "doc_desc.prod_date",
                             "title": "Fecha de documentación",
                             "type": "string",
-                            "required": false,
                             "help_text": "La fecha en que se produjo el documento de metadatos DDI (no la fecha en que se distribuyó o archivó), preferiblemente ingresada en formato ISO 8601 (YYYY-MM-DD o YYYY-MM). Se puede establecer una regla de validación en las plantillas de usuario para hacer cumplir un formato de fecha. Este es un elemento \"Recomendado\", ya que la información sobre el responsable(s) de la documentación y la fecha de producción de los metadatos es útil para fines de administración del catálogo.\n\n",
                             "is_recommended": true,
                             "display_type": "text"
@@ -97,7 +92,6 @@
                             "key": "doc_desc.version_statement.version_date",
                             "title": "Fecha de versión",
                             "type": "string",
-                            "required": false,
                             "help_text": "La fecha en que se produjo esta versión del documento de metadatos (archivo DDI), preferiblemente identificando una fecha exacta. Esto generalmente corresponderá al elemento \"Fecha de documentación\". Se recomienda ingresar la fecha en el formato de fecha ISO 8601 (YYYY-MM-DD o YYYY-MM o YYYY). Se puede establecer una regla de validación en las plantillas personalizadas para garantizar que las fechas se ingresen en el formato apropiado.",
                             "display_type": "text"
                         },
@@ -105,7 +99,6 @@
                             "key": "doc_desc.version_statement.version_resp",
                             "title": "Responsabilidad de la versión",
                             "type": "string",
-                            "required": false,
                             "help_text": "La organización o persona responsable de esta versión del documento de metadatos.",
                             "display_type": "text"
                         },
@@ -113,7 +106,6 @@
                             "key": "doc_desc.version_statement.version_notes",
                             "title": "Notas de la versión",
                             "type": "string",
-                            "required": false,
                             "help_text": "Este elemento se puede usar para aclarar información\/anotaciones sobre esta versión del documento de metadatos, por ejemplo, para indicar qué hay de nuevo o específico en esta versión en comparación con una versión anterior.\n\n-----\nPara América Latina y el Caribe, se sugiere detallar los cambios relevantes incorporados, usando el siguiente esquema:\n\nEjemplo: Versión 2 (18 de Octubre 2007). Esta versión reemplaza la versión 1 (01 de Octubre 2007) ya que incluye una descripción más detallada de la muestra.",
                             "display_type": "textarea"
                         }
@@ -139,7 +131,6 @@
                             "key": "study_desc.title_statement.idno",
                             "title": "ID principal",
                             "type": "string",
-                            "required": true,
                             "help_text": "El \"ID principal\" (también conocido como IDNO) es un número de identificación único utilizado para identificar la operación estadística (encuesta, censo u otro). Se requiere un identificador único para fines de catalogación, por lo que este elemento se declara como \"Obligatorio\". El identificador permitirá a los usuarios citar la operación estadística correctamente. El identificador debe ser único dentro del catálogo. Idealmente, también debería ser globalmente único; la opción recomendada es obtener un Identificador de Objeto Digital (DOI) para la operación estadística. \n\nAlternativamente, el \"ID principal\" puede ser construido por una organización utilizando un esquema consistente. El esquema podría ser, por ejemplo, \"catálogo-país-estudio-año-versión\", donde el país es el código de país ISO de 3 letras, el productor es la abreviatura de la agencia productora, el estudio es el acrónimo del estudio, el año es el año de referencia (o el año en que comenzó el estudio), la versión es un número de versión. \n\nUsando ese esquema, la Encuesta Demográfica y de Salud de Uganda 2005, por ejemplo, tendría el siguiente ID (donde \"MDA\" significa \"My Data Archive\"): MDA_UGA_DHS_2005_v01. \n\nTenga en cuenta que el esquema le permite proporcionar más de un identificador para el mismo estudio (en el elemento \"Otros identificadores\"); un identificador específico del catálogo no es incompatible con un identificador globalmente único como un DOI. \n\nSe puede establecer una regla de validación (usando una expresión regular) en las plantillas de usuario para hacer cumplir un formato de ID específico. El identificador no puede contener espacios en blanco.\n\n-------\nPara América Latina y el Caribe, se sugiere usar el siguiente esquema:  \npaís-productor(es)-operación estadística-año(s), donde: \n\n-Países la abreviación de 3 letras tipo ISO\n-Productor es la abreviación de la entidad dueña de los datos. Si existe más de una institución, incluir todas las que correspondan, separadas con un guion.\n-Operación estadística es la abreviación de la operación. Si no se cuenta con una abreviación, se puede generar una abreviatura considerando la primera letra de cada palabra del título oficial de la operación estadística.\n-Año es el periodo de referencia al que corresponden los datos, ya sea un relevamiento de datos puntual o un periodo, mismo que se señala con un guion.\n\nEjemplos aplicados:\n\"HND-INE-EPHPM-2010\"\n\"PAN-INEC-PERCONST-2016-2023\"\n\"BOL-INE-MSD-EDSA-2023-2024\"",
                             "rules": [],
                             "is_required": true,
@@ -149,7 +140,6 @@
                             "key": "study_desc.title_statement.identifiers",
                             "title": "Otros identificadores",
                             "type": "array",
-                            "required": true,
                             "help_text": "Este elemento repetible se utiliza para ingresar identificadores (ID) distintos del \"ID principal\" (IDNO). Puede ser, por ejemplo, un Identificador de Objeto Digital (DOI). El \"ID principal\" se puede repetir aquí (el \"ID principal\" no proporciona un parámetro \"Tipo\", por lo que, si se usa un DOI u otro tipo de ID estándar como identificador principal, se recomienda repetirlo aquí con la identificación del tipo). \n\n-----\n\nDOI: El Identificador de Objeto Digital, conocido en inglés como \"digital object identifier\", es un enlace permanente en forma de código alfanumérico que identifica de forma única un contenido electrónico \/ archivo digital, como ser una publicación, una imagen, libro, canción u otro, siempre que se trate de un objeto en el ambiente digital. A diferencia del sistema URL, usado en las páginas web, el sistema DOI no cambia con el paso del tiempo, aunque el archivo sea reubicado en una dirección distinta, puesto que lleva la información incorporada en forma de metadatos.",
                             "props": [
                                 {
@@ -175,7 +165,6 @@
                             "key": "study_desc.title_statement.title",
                             "title": "Título",
                             "type": "string",
-                            "required": true,
                             "help_text": "Este elemento es \"Requerido\". Proporcione aquí el título completo y autorizado del estudio. Asegúrese de usar un nombre único para cada estudio distinto. El título debe indicar el período de tiempo cubierto. Por ejemplo, en un país que realiza encuestas mensuales de fuerza laboral, el título de un estudio sería como \"Encuesta de fuerza laboral, diciembre de 2020\". Cuando una encuesta abarca dos años (por ejemplo, una encuesta de ingresos y gastos de los hogares realizada durante un período de 12 meses desde junio de 2020 hasta junio de 2021), el rango de años se puede proporcionar en el título, por ejemplo \"Encuesta de ingresos y gastos de los hogares 2020-2021\". El título de una encuesta debe ser su nombre oficial como se indica en el cuestionario de la encuesta u otros documentos del estudio (informe, etc.). Incluir el nombre del país en el título es opcional (otro elemento de metadatos se utiliza para identificar los países de referencia). Preste atención al uso consistente de la capitalización en el título. ",
                             "rules": [],
                             "is_required": true,
@@ -392,7 +381,6 @@
                                 "date_parts": true,
                                 "is_utc": false
                             },
-                            "required": false,
                             "help_text": "Esta es la fecha (preferiblemente ingresada en formato ISO 8601: AAAA-MM-DD o AAAA-MM o AAAA) de la producción real y final de la versión del conjunto de datos que se está documentando. Al menos se debe proporcionar el mes y el año. Se puede ingresar una expresión regular en las plantillas de usuario para validar la información capturada en este campo.",
                             "display_type": "text"
                         },
@@ -400,7 +388,6 @@
                             "key": "study_desc.production_statement.prod_place",
                             "title": "Lugar de producción",
                             "type": "string",
-                            "required": false,
                             "help_text": "La dirección de la organización que produjo el conjunto de datos que se está documentando.",
                             "display_type": "textarea"
                         },
@@ -1987,7 +1974,6 @@
                             "key": "study_desc.distribution_statement.distributors",
                             "title": "Distribuidores",
                             "type": "array",
-                            "required": false,
                             "help_text": "La(s) organización(es) designada(s) por el autor o productor para generar copias del resultado del estudio, incluidas las ediciones o revisiones necesarias.",
                             "props": [
                                 {

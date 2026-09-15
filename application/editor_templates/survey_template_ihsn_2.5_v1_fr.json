@@ -20,7 +20,6 @@
                             "key": "doc_desc.producers",
                             "title": "Producteurs des métadonnées",
                             "type": "array",
-                            "required": false,
                             "help_text": "Le producteur de métadonnées est la personne ou l'organisation ayant la resonsabilité financière et\/ou technique du processus de documentation ayant résulté à la création du fichier de métadonnées au format DDI. Cet élément est \"recommandé\" mais non obligatoire. L'information qu'il contient, en particulier l'identification du producteur des métadonnées et la date de documentation, est utile aux administrateurs de catalogues de (méta)données.  ",
                             "props": [
                                 {
@@ -62,7 +61,6 @@
                             "key": "doc_desc.prod_date",
                             "title": "Date de production",
                             "type": "string",
-                            "required": false,
                             "help_text": "La date à laquelle le document de métadonnées DDI a été produit (et non la date à laquelle il a été distribué ou archivé), de préférence au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM). Une règle de validation peut être définie dans un modèle (\"template\") pour imposer un format de date. Il s'agit d'un élément \"Recommandé\", car les informations sur le producteur et sur la date de production des métadonnées sont utiles à des fins d'administration du catalogue.",
                             "is_recommended": true,
                             "display_type": "date"
@@ -71,7 +69,6 @@
                             "key": "doc_desc.idno",
                             "title": "Identifiant du document DDI",
                             "type": "string",
-                            "required": false,
                             "help_text": "Un identifiant unique pour le document de métadonnées. Cet identifiant doit être unique dans le catalogue où les métadonnées seront publiées. Idéalement, l'identifiant devrait également être unique à l'échelle mondiale. Ceci est différent de l'\"ID principal\" dans la section \"Description de l'étude \/ Identification\", bien qu'il soit recommandé de générer des identifiants qui établissent un lien clair entre ces deux identifiants. L'ID du document peut également inclure l'identifiant de version du document de métadonnées. Par exemple, si l'identifiant principal de l'étude est \"ALB_LSMS_2012\", l'ID du document dans les informations sur les métadonnées pourrait être \"IHSN_DDI_v01_ALB_LSMS_2012\" si les métadonnées DDI sont produites par le IHSN. Chaque organisation devrait établir des règles systématiques pour générer de tels identifiants. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles d'utilisation pour imposer un format d'identifiant spécifique. L'identifiant ne peut pas contenir d'espaces vides.",
                             "display_type": "text"
                         }
@@ -82,7 +79,6 @@
                     "key": "doc_desc.title_statement",
                     "title": "Version du document DDI",
                     "type": "section",
-                    "required": false,
                     "help_text": "",
                     "items": [
                         {
@@ -96,7 +92,6 @@
                             "key": "doc_desc.version_statement.version_date",
                             "title": "Date de la version",
                             "type": "string",
-                            "required": false,
                             "help_text": "La date à laquelle cette version du document de métadonnées (fichier DDI) a été produite, en identifiant de préférence une date exacte. Cela correspond généralement à l'élément \"Date de production\". Il est recommandé d'indiquer la date au format de date ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA). Une règle de validation peut être ajoutée dans les modèles personnalisés pour s'assurer que les dates sont saisies dans le format approprié.\n",
                             "display_type": "date"
                         },
@@ -104,7 +99,6 @@
                             "key": "doc_desc.version_statement.version_resp",
                             "title": "Responsabilité de la version",
                             "type": "string",
-                            "required": false,
                             "help_text": "L'organisation ou la personne responsable de cette version du document de métadonnées.\n",
                             "display_type": "text"
                         },
@@ -112,7 +106,6 @@
                             "key": "doc_desc.version_statement.version_notes",
                             "title": "Notes sur la version",
                             "type": "string",
-                            "required": false,
                             "help_text": "Cet élément peut être utilisé pour préciser des informations ou des annotations concernant cette version du document de métadonnées, par exemple pour indiquer ce qui est nouveau ou spécifique dans cette version par rapport à une version précédente.",
                             "display_type": "textarea"
                         }
@@ -138,7 +131,6 @@
                             "key": "study_desc.title_statement.title",
                             "title": "Titre",
                             "type": "string",
-                            "required": true,
                             "help_text": "Cet élément est \"Obligatoire\". Indiquez ici le titre officiel complet de l'étude. Assurez-vous d'utiliser un nom unique pour chaque étude distincte. Le titre doit indiquer la période de temps couverte. Par exemple, dans un pays réalisant des enquêtes mensuelles sur la population active, le titre d'une étude pourrait être \"Enquête sur la population active, décembre 2020\". Lorsqu'une enquête s'étend sur deux années (par exemple, une enquête sur les revenus et les dépenses des ménages menée sur une période de 12 mois de juin 2020 à juin 2021), la plage d'années peut être indiquée dans le titre, par exemple \"Enquête sur les revenus et les dépenses des ménages 2020-2021\". Le titre d'une enquête doit être son nom officiel tel qu'indiqué sur le questionnaire ou dans d'autres documents (rapport, etc.). Inclure le nom du pays dans le titre est facultatif (un autre élément de métadonnées est utilisé pour identifier les pays de référence). Faites attention à l'utilisation cohérente des majuscules dans le titre.",
                             "rules": "required|max:300",
                             "is_required": true,
@@ -169,7 +161,6 @@
                             "key": "study_desc.title_statement.idno",
                             "title": "Identifiant (ID) principal",
                             "type": "string",
-                            "required": true,
                             "help_text": "L'« ID principal » (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier l'étude (enquête, recensement ou autre). Un identifiant unique est requis à des fins de catalogage, c'est pourquoi cet élément est déclaré comme « Obligatoire ». L'identifiant permettra aux utilisateurs de citer correctement l'ensemble de données. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique à l'échelle mondiale ; l'option recommandée est d'obtenir un identifiant d'objet numérique (DOI) pour l'étude. Alternativement, l'« ID principal » peut être construit par une organisation en utilisant un schéma cohérent. Le schéma pourrait par exemple être « catalogue-pays-étude-année-version », où le pays est le code ISO à trois lettres du pays, le producteur est l'abréviation de l'organisme producteur, l'étude est l'acronyme de l'étude, l'année est l'année de référence (ou l'année de début de l'étude), et la version est un numéro de version. En utilisant ce schéma, par exemple, l'Enquête Démographique et de Danté de l'Ouganda en 2005 aurait l'ID suivant (où « MDA » signifie « Mon Archive de Données ») : MDA_UGA_EDS_2005_v01. Notez que le schéma permet de fournir plus d'un identifiant pour une même étude (dans l'élément « Autres identifiants ») ; un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant unique à l'échelle mondiale comme un DOI. Une règle de validation peut être définie (en utilisant une expression régulière) dans les modèles utilisateur pour imposer un format d'ID spécifique. L'identifiant ne peut pas contenir d'espaces vides.",
                             "rules": [],
                             "is_required": true,
@@ -179,7 +170,6 @@
                             "key": "study_desc.title_statement.identifiers",
                             "title": "Autres identifiants",
                             "type": "array",
-                            "required": true,
                             "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (IDs) autres que l'« ID principal » (IDNO). Il peut s'agir par exemple d'un identifiant numérique d'objet (DOI). L'« ID principal » peut être répété ici (l'« ID principal » ne fournit pas de paramètre « Type », donc s'il est utilisé comme identifiant principal avec un DOI ou un autre type d'identifiant standard, il est recommandé de le répéter ici avec l'indication du type).",
                             "props": [
                                 {
@@ -3055,7 +3045,6 @@
                             "key": "study_desc.distribution_statement.distributors",
                             "title": "Distributeurs",
                             "type": "array",
-                            "required": false,
                             "help_text": "L'organisation ou les organisations désignées par l'auteur ou le producteur pour générer des copies des résultats de l'étude, y compris toutes les éditions ou révisions nécessaires.",
                             "props": [
                                 {

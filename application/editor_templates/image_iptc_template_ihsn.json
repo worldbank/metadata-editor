@@ -39,7 +39,6 @@
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
-                                    "required": true,
                                     "type": "string",
                                     "prop_key": "metadata_information.producers.name",
                                     "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",
@@ -110,7 +109,6 @@
                             "title": "Primary ID",
                             "type": "string",
                             "class": "required",
-                            "required": true,
                             "help_text": "A unique identifier of the image. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the image. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI), or the ID included in the EXIF metadata for digital pictures can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same image (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "rules": [],
                             "is_required": true,
@@ -120,7 +118,6 @@
                             "key": "image_description.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
-                            "required": true,
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI), or the EXIF identifier. The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI, EXIF, or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).",
                             "props": [
                                 {
@@ -484,14 +481,12 @@
                                     "title": "About the image",
                                     "help_text": "One or more topics, themes or entities the content is about, each one expressed by a term from a controlled vocabulary.",
                                     "class": "required",
-                                    "required": true,
                                     "type": "array",
                                     "props": [
                                         {
                                             "key": "cvId",
                                             "title": "Vocabulary ID",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "help_text": "The globally unique identifier of the controlled vocabulary the term is from.",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId",
@@ -745,14 +740,12 @@
                                     "title": "Rights expression",
                                     "help_text": "An embedded rights expression using a rights expression language which is encoded as a string. Embedded Encoded Rights Expression (EERE) structure A structure providing details of an embedded encoded rights expression.",
                                     "class": "required",
-                                    "required": false,
                                     "type": "array",
                                     "props": [
                                         {
                                             "key": "encRightsExpr",
                                             "title": "Encoded rights expression",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.encRightsExpr",
                                             "help_text": "Rights Expression Language ID. An identifier of the rights expression language used by the rights expression.",
@@ -787,7 +780,6 @@
                                             "key": "linkedRightsExpr",
                                             "title": "Link to encoded rights expression",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "help_text": "The link to a web resource representing an encoded rights expression.",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.linkedRightsExpr",
@@ -801,7 +793,6 @@
                                             "title": "Encoding type",
                                             "type": "string",
                                             "class": "required",
-                                            "required": true,
                                             "help_text": "The encoding type of the rights expression, identified by an IANA Media Type.",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprEncType",
                                             "display_type": "text"
@@ -811,7 +802,6 @@
                                             "title": "Rights expression language ID",
                                             "type": "string",
                                             "class": "required",
-                                            "required": true,
                                             "help_text": "The identifier of the rights expression language used by the rights expression.",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprLangId",
                                             "display_type": "text"
@@ -1077,7 +1067,6 @@
                                             "key": "gtin",
                                             "title": "GTIN",
                                             "type": "string",
-                                            "required": true,
                                             "help_text": "The Global Trade Item Number (GTIN) of the product (GTIN-8 to GTIN-14 codes can be used).",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.gtin",
                                             "display_type": "text"
@@ -1399,7 +1388,6 @@
                                             "key": "assetIdentifier",
                                             "title": "Asset identifier",
                                             "class": "required",
-                                            "required": true,
                                             "type": "string",
                                             "help_text": "A unique identifier created by the registry and applied by the creator of the digital image. This value shall not be changed after being applied. This identifier is linked to a corresponding Registry Organization Identifier. Enter the unique identifier created by a registry and applied by the creator of the digital image. This value shall not be changed after being applied. This identifier may be globally unique by itself, but it must be unique for the issuing registry. An input to this field should be made mandatory.",
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.assetIdentifier",
@@ -1408,7 +1396,6 @@
                                         {
                                             "key": "registryIdentifier",
                                             "title": "Registry identifier",
-                                            "required": true,
                                             "type": "string",
                                             "help_text": "An identifier for the registry\/organization which issued the corresponding Registry Image Id.",
                                             "rules": [],

@@ -708,7 +708,7 @@ class Project_validation
     }
 
     /**
-     * Merge field-level required / is_required into the field's rules object or pipe string.
+     * Merge field-level is_required into the field's rules object or pipe string.
      * Does not strip an existing rules.required entry.
      *
      * @param array $item Template field or prop
@@ -717,8 +717,7 @@ class Project_validation
     public static function merge_required_into_rules($item)
     {
         $rules = isset($item['rules']) ? $item['rules'] : array();
-        $is_required = !empty($item['is_required']) || !empty($item['required']);
-        if (!$is_required) {
+        if (empty($item['is_required'])) {
             return $rules;
         }
 

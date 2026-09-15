@@ -39,7 +39,6 @@
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
-                                    "required": true,
                                     "type": "string",
                                     "prop_key": "metadata_information.producers.name",
                                     "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",
@@ -110,7 +109,6 @@
                             "title": "Primary ID",
                             "type": "string",
                             "class": "required",
-                            "required": true,
                             "help_text": "A unique identifier of the image. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the image. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI), or the ID included in the EXIF metadata for digital pictures can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same image (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "rules": [],
                             "is_required": true,
@@ -120,7 +118,6 @@
                             "key": "image_description.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
-                            "required": true,
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI), or the EXIF identifier. The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI, EXIF, or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).",
                             "props": [
                                 {

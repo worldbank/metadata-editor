@@ -15,14 +15,12 @@
                     "key": "doc_desc.title_statement",
                     "title": "Metadata preparation",
                     "type": "section",
-                    "required": false,
                     "help_text": "",
                     "items": [
                         {
                             "key": "doc_desc.producers",
                             "title": "Metadata producers",
                             "type": "array",
-                            "required": false,
                             "help_text": "The metadata producer is the person or organization with the financial and\/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful. ",
                             "props": [
                                 {
@@ -64,7 +62,6 @@
                             "key": "doc_desc.prod_date",
                             "title": "Production date",
                             "type": "string",
-                            "required": false,
                             "help_text": "The date the DDI metadata document was produced (not the date it was distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
                             "is_recommended": true,
                             "display_type": "date"
@@ -73,7 +70,6 @@
                             "key": "doc_desc.idno",
                             "title": "Document ID",
                             "type": "string",
-                            "required": false,
                             "help_text": "A unique identifier for the metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section Study description \/ Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary identifier\" of the study is “ALB_LSMS_2012”, the \"Document ID\" in the Metadata information could be “IHSN_DDI_v01_ALB_LSMS_2012” if the DDI metadata are produced by the IHSN. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "display_type": "text"
                         }
@@ -95,7 +91,6 @@
                             "key": "doc_desc.version_statement.version_date",
                             "title": "Version date",
                             "type": "string",
-                            "required": false,
                             "help_text": "The date when this version of the metadata document (DDI file) was produced, preferably identifying an exact date. This will usually correspond to the \"Production date\" element. It is recommended to enter the date in the ISO 8601 date format (YYYY-MM-DD or YYYY-MM or YYYY). A validation rule can be entered in customized templates to ensure that dates are entered in the appropriate format. \n",
                             "display_type": "date"
                         },
@@ -103,7 +98,6 @@
                             "key": "doc_desc.version_statement.version_resp",
                             "title": "Version responsibility",
                             "type": "string",
-                            "required": false,
                             "help_text": "The organization or person responsible for this version of the metadata document.\n",
                             "display_type": "text"
                         },
@@ -111,7 +105,6 @@
                             "key": "doc_desc.version_statement.version_notes",
                             "title": "Version notes",
                             "type": "string",
-                            "required": false,
                             "help_text": "This element can be used to clarify information\/annotation regarding this version of the metadata document, for example to indicate what is new or specific in this version comparing with a previous version. ",
                             "display_type": "textarea"
                         }
@@ -138,7 +131,6 @@
                             "key": "study_desc.title_statement.title",
                             "title": "Title",
                             "type": "string",
-                            "required": true,
                             "help_text": "This element is \"Required\". Provide here the full authoritative title for the study. Make sure to use a unique name for each distinct study. The title should indicate the time period covered. For example, in a country conducting monthly labor force surveys, the title of a study would be like “Labor Force Survey, December 2020”. When a survey spans two years (for example, a household income and expenditure survey conducted over a period of 12 months from June 2020 to June 2021), the range of years can be provided in the title, for example “Household Income and Expenditure Survey 2020-2021”. The title of a survey should be its official name as stated on the survey questionnaire or in other study documents (report, etc.). Including the country name in the title is optional (another metadata element is used to identify the reference countries). Pay attention to the consistent use of capitalization in the title. ",
                             "rules": [],
                             "is_required": true,
@@ -169,7 +161,6 @@
                             "key": "study_desc.title_statement.idno",
                             "title": "Primary ID",
                             "type": "string",
-                            "required": true,
                             "help_text": "The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the study (survey, census or other). A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the dataset properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. The scheme could for example be “catalog-country-study-year-version”, where country is the 3-letter ISO country code, producer is the abbreviation of the producing agency, study is the study acronym, year is the reference year (or the year the study started), version is a version number. Using that scheme, the Uganda 2005 Demographic and Health Survey for example would have the following ID (where “MDA” stand for “My Data Archive”): MDA_UGA_DHS_2005_v01. Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "rules": [],
                             "is_required": true,
@@ -179,7 +170,6 @@
                             "key": "study_desc.title_statement.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
-                            "required": true,
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type). ",
                             "props": [
                                 {
@@ -3023,7 +3013,6 @@
                             "key": "study_desc.distribution_statement.distributors",
                             "title": "Distributors",
                             "type": "array",
-                            "required": false,
                             "help_text": "The organization(s) designated by the author or producer to generate copies of the study output including any necessary editions or revisions.",
                             "props": [
                                 {

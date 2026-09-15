@@ -114,7 +114,6 @@
                             "type": "string",
                             "class": "required",
                             "_rules": "required|idno|alpha_dash|min:5|max:80",
-                            "required": true,
                             "is_required": true,
                             "display_type": "text"
                         },
@@ -147,7 +146,6 @@
                             "title": "Title",
                             "type": "string",
                             "class": "required",
-                            "required": true,
                             "_rules": "required|max:300",
                             "name": "title",
                             "is_required": true,

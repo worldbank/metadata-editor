@@ -108,7 +108,6 @@
                             "help_text": "A unique identifier of the table. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the table. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI) can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same table (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "type": "string",
                             "rules": [],
-                            "required": true,
                             "name": "idno",
                             "is_required": true,
                             "display_type": "text"
@@ -149,7 +148,6 @@
                             "title": "Title",
                             "type": "string",
                             "rules": [],
-                            "required": true,
                             "name": "title",
                             "is_required": true,
                             "help_text": "The title of the table. The title provides a brief description of the content of the table. It should be concise and include the key elements shown in the table. There are varying styles for writing a table title. A consistent style should be applied to all tables published in a catalog. Pay attention to the consistent use of capitalization in the title. ",

@@ -15,14 +15,12 @@
                     "key": "doc_desc.title_statement",
                     "title": "Metadata haqida ma'lumot",
                     "type": "section",
-                    "required": false,
                     "help_text": "",
                     "items": [
                         {
                             "key": "doc_desc.title",
                             "title": "Hujjat sarlavhasi",
                             "type": "string",
-                            "required": false,
                             "help_text": "Metadata hujjatining sarlavhasi (bu tadqiqotning o'zi sarlavhasi bo'lishi mumkin). Metadata hujjati DDI metadata fayli (XML yoki JSON fayl) yaratilmoqda. The \"Document title\" geografik doirani qayd etishi kerak of the data collection as well as the qamrab olingan vaqt davri. Masalan: “DDI 2.5: Albania Living Standards Study 2012”.",
                             "display_type": "text"
                         },
@@ -30,7 +28,6 @@
                             "key": "doc_desc.idno",
                             "title": "Hujjat ID",
                             "type": "string",
-                            "required": false,
                             "help_text": "Noyob identifikator for the metadata document. This identifier katalogda noyob bo'lishi kerak where the metadata are nashr qilish uchun mo'ljallangan. Idealy, identifikator global miqyosda ham noyob bo'lishi kerak. Bu quyidagidan farq qiladi the \"Asosiy ID\" in section Tadqiqot tavsifi / Sarlavha bayoni, although yaxshi amaliyot to generate identifiers that aniq bog'lanish o'rnatish between these two identifiers. The Document ID shuningdek o'z ichiga olishi mumkin the metadata hujjati versiya identifikatori. Masalan, if the \"Asosiy IDentifier\" of the study is “ALB_LSMS_2012”, the \"Document ID\" in the Metadata information could be “IHSN_DDI_v01_ALB_LSMS_2012” agar DDI metadata ishlab chiqarilgan bo'lsa the IHSN. Har bir tashkilot o'rnatishi kerak tizimli qoidalar to bunday IDlarni yaratish. Tekshirish qoidasi belgilanishi mumkin (muntazam ifoda yordamida) foydalanuvchi shablonlarida ma'lum ID formatini majburlash uchun. The identifier bo'sh joylarni o'z ichiga olmasligi mumkin.",
                             "display_type": "text"
                         },
@@ -38,7 +35,6 @@
                             "key": "doc_desc.producers",
                             "title": "Metadata ishlab chiqaruvchilar",
                             "type": "array",
-                            "required": false,
                             "help_text": "Metadata ishlab chiqaruvchisi - bu metadata hujjati yaratilgan jarayonlar uchun moliyaviy va/yoki ma'muriy mas'uliyatga ega bo'lgan shaxs yoki tashkilot. Bu \"Tavsiya etiladi\" elementi. Katalog boshqaruvi maqsadlarida ishlab chiqaruvchi va metadata ishlab chiqarish sanasi haqidagi ma'lumot foydalidir.",
                             "props": [
                                 {
@@ -80,7 +76,6 @@
                             "key": "doc_desc.prod_date",
                             "title": "Ishlab chiqarish sanasi",
                             "type": "string",
-                            "required": false,
                             "help_text": "DDI metadata hujjati ishlab chiqarilgan sana (tarqatilgan yoki arxivlangan sana emas), afzal ISO 8601 formatida (YYYY-MM-DD yoki YYY-MM) kiritiladi. Sana formatini majburlash uchun foydalanuvchi shablonlarida tekshirish qoidasi belgilanishi mumkin. Bu \"Tavsiya etiladi\" elementi, chunki ishlab chiqaruvchi va metadata ishlab chiqarish sanasi haqidagi ma'lumot katalog boshqaruvi maqsadlarida foydalidir.",
                             "is_recommended": true,
                             "display_type": "text"
@@ -96,7 +91,6 @@
                             "key": "doc_desc.version_statement.version_date",
                             "title": "Versiya sanasi",
                             "type": "string",
-                            "required": false,
                             "help_text": "Metadata hujjatining (DDI fayl) ushbu versiyasi ishlab chiqarilgan sana, afzal ravishda aniq sanani ko'rsatadi. Bu odatda \"Ishlab chiqarish sanasi\" elementi bilan mos keladi. Sanani ISO 8601 sana formatida (YYYY-MM-DD yoki YYYY-MM yoki YYYY) kiritish tavsiya etiladi. Sanalarning mos formatda kiritilishini ta'minlash uchun moslashtirilgan shablonlarda tekshiruv qoidasini kiritish mumkin.\n",
                             "display_type": "text"
                         },
@@ -104,7 +98,6 @@
                             "key": "doc_desc.version_statement.version_resp",
                             "title": "Versiya mas'uliyati",
                             "type": "string",
-                            "required": false,
                             "help_text": "Metadata hujjatining ushbu versiyasi uchun mas'ul tashkilot yoki shaxs.\n",
                             "display_type": "text"
                         },
@@ -112,7 +105,6 @@
                             "key": "doc_desc.version_statement.version_notes",
                             "title": "Versiya eslatmalari",
                             "type": "string",
-                            "required": false,
                             "help_text": "Ushbu element metadata hujjatining ushbu versiyasi bo'yicha ma'lumot/izohni aniqlashtirish uchun ishlatilishi mumkin, masalan oldingi versiya bilan solishtirganda ushbu versiyada nima yangi yoki o'ziga xos ekanligini ko'rsatish uchun.",
                             "display_type": "textarea"
                         }
@@ -138,7 +130,6 @@
                             "key": "study_desc.title_statement.idno",
                             "title": "Asosiy ID",
                             "type": "string",
-                            "required": true,
                             "help_text": "The \"Asosiy ID\" (also referred to as IDNO) is a unique identification number used to identify the study (survey, census or other). Noyob identifikator is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the dataset properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Asosiy ID\" can be constructed by an organization using a consistent scheme. The scheme could Masalan be “catalog-country-study-year-version”, where country is the 3-letter ISO country code, producer is the abbreviation of the producing agency, study is the study acronym, year is the reference year (or the year the study started), version is a version number. Using that scheme, the Uganda 2005 Demographic and Health Survey Masalan would have the following ID (where “MDA” stand for “My Data Archive”): MDA_UGA_DHS_2005_v01. Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. Tekshirish qoidasi belgilanishi mumkin (muntazam ifoda yordamida) foydalanuvchi shablonlarida ma'lum ID formatini majburlash uchun. The identifier bo'sh joylarni o'z ichiga olmasligi mumkin.",
                             "rules": [],
                             "is_required": true,
@@ -148,7 +139,6 @@
                             "key": "study_desc.title_statement.identifiers",
                             "title": "Boshqa identifikatorlar",
                             "type": "array",
-                            "required": true,
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Asosiy ID\" (IDNO). It can Masalan be a Digital Object Identifier (DOI). The \"Asosiy ID\" can be repeated here (the \"Asosiy ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type). ",
                             "props": [
                                 {
@@ -173,7 +163,6 @@
                             "key": "study_desc.title_statement.title",
                             "title": "Sarlavha",
                             "type": "string",
-                            "required": true,
                             "help_text": "This element is \"Required\". Provide here the full authoritative title for the study. Make sure to use a unique name for each distinct study. The title should indicate the qamrab olingan vaqt davri. Masalan, in a country conducting monthly labor force surveys, the title of a study would be like “Labor Force Survey, December 2020”. When a survey spans two years (Masalan, a household income and expenditure survey conducted over a period of 12 months from June 2020 to June 2021), the range of years taqdim etilishi mumkin in the title, Masalan “Household Income and Expenditure Survey 2020-2021”. The title of a survey should be its official name as stated on the survey questionnaire or in other study documents (report, etc.). Including the country name in the title is optional (another metadata element is used to identify the reference countries). Pay attention to the consistent use of capitalization in the title. ",
                             "rules": [],
                             "is_required": true,
@@ -390,7 +379,6 @@
                                 "date_parts": true,
                                 "is_utc": false
                             },
-                            "required": false,
                             "help_text": "This is the date (afzal ISO 8601 formatida kiritiladi: YYYY-MM-DD or YYYY-MM or YYYY) of the actual and final production of the version of the dataset being documented. At least the month and year should be provided. A regular expression can be entered foydalanuvchi shablonlarida to validate the information captured in this field.",
                             "display_type": "text"
                         },
@@ -398,7 +386,6 @@
                             "key": "study_desc.production_statement.prod_place",
                             "title": "Ishlab chiqarish joyi",
                             "type": "string",
-                            "required": false,
                             "help_text": "Hujjatlashtirilayotgan ma'lumotlar to'plamini ishlab chiqargan tashkilotning manzili.",
                             "display_type": "textarea"
                         },
@@ -3192,7 +3179,6 @@
                             "key": "study_desc.distribution_statement.distributors",
                             "title": "Tarqatuvchilar",
                             "type": "array",
-                            "required": false,
                             "help_text": "The organization(s) designated by the author or producer to generate copies of the study output including any necessary editions or revisions.",
                             "props": [
                                 {

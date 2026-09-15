@@ -68,7 +68,7 @@ var FieldValidationRulesUtil = (function () {
 
         applySourceRules(rules, field.rules);
 
-        if (field.is_required || field.required) {
+        if (field.is_required) {
             rules.required = true;
         }
 

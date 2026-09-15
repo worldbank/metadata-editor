@@ -103,7 +103,7 @@ Vue.component('nested-section', {
                                 <div class="form-group form-field" :class="['field-' + column.key] ">
                                     <label :for="'field-' + normalizeClassID(path + '-' + column.key)">{{column.title}}                                        
                                         <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(path + ' ' + column.key)" ><i class="far fa-question-circle"></i></span>
-                                        <span v-if="column.required==true" class="required-label"> * </span>
+                                        <span v-if="column.is_required" class="required-label"> * </span>
                                     </label> 
                                     <input type="text"
                                         :value="getData(index+'.'+column.key)"

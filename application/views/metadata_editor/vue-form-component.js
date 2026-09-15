@@ -117,7 +117,7 @@ Vue.component('v-form', {
                         <label :for="'field-' + normalizeClassID(item.key)">
                             {{item.title}}
                             <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
-                            <span v-if="item.required==true" class="required-label"> * </span>
+                            <span v-if="item.is_required" class="required-label"> * </span>
                         </label>
                     
                         <v-textarea
@@ -146,7 +146,7 @@ Vue.component('v-form', {
                         <label :for="'field-' + normalizeClassID(item.key)">
                             {{item.title}}
                             <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
-                            <span v-if="item.required==true" class="required-label"> * </span>
+                            <span v-if="item.is_required" class="required-label"> * </span>
                         </label>
                         
                         <validation-provider 
@@ -171,7 +171,7 @@ Vue.component('v-form', {
                         <label :for="'field-' + normalizeClassID(item.key)">
                             {{item.title}} 
                             <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
-                            <span v-if="item.required==true" class="required-label"> * </span>
+                            <span v-if="item.is_required" class="required-label"> * </span>
                         </label>
 
                         <validation-provider 
