@@ -614,6 +614,9 @@ Vue.component('datafiles', {
             wrapped.sort((a, b) => {
                 let va = this.getSortValue(a.file, column);
                 let vb = this.getSortValue(b.file, column);
+                if (typeof va === 'string' && typeof vb === 'string'){
+                    return va.localeCompare(vb, undefined, {numeric: true, sensitivity: 'base'}) * dir;
+                }
                 if (va < vb) return -1 * dir;
                 if (va > vb) return 1 * dir;
                 return 0;
