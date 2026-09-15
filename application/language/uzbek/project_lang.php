@@ -619,6 +619,11 @@ $lang['batch_sum_stats_no_match'] = "Tanlangan turga mos o'zgaruvchi yo'q.";
 $lang['batch_sum_stats_will_apply'] = "{count} ta o'zgaruvchiga qo'llanadi.";
 $lang['batch_sum_stats_applied'] = "{count} ta o'zgaruvchi yangilandi.";
 
+// Data Files page: summary stats display options (single file or multi-file batch)
+$lang['summary_stats_options'] = "Qisqacha statistikalar parametrlari";
+$lang['summary_stats_options_help'] = "Tanlangan fayl(lar) uchun qisqacha statistikalarni ko'rsatish parametrlarini o'zgaruvchi interval turi (Diskret yoki Uzluksiz) bo'yicha sozlang.";
+$lang['no_variables'] = "O'zgaruvchilar yo'q";
+
 // Missing translations for project home page
 $lang['search'] = "Qidirish...";
 $lang['compare_projects'] = "Loyihalarni solishtirish";

@@ -642,6 +642,11 @@ $lang['batch_sum_stats_no_match'] = "Aucune variable ne correspond au type séle
 $lang['batch_sum_stats_will_apply'] = "S'appliquera à {count} variable(s).";
 $lang['batch_sum_stats_applied'] = "{count} variable(s) mise(s) à jour.";
 
+// Data Files page: summary stats display options (single file or multi-file batch)
+$lang['summary_stats_options'] = "Options des statistiques récapitulatives";
+$lang['summary_stats_options_help'] = "Définir les options d'affichage des statistiques récapitulatives pour le(s) fichier(s) sélectionné(s), appliquées par type d'intervalle de variable (Discret ou Continu).";
+$lang['no_variables'] = "Aucune variable";
+
 // Missing translations for project home page
 $lang['search'] = "Rechercher...";
 $lang['compare_projects'] = "Comparer les projets";

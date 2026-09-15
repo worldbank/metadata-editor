@@ -753,6 +753,11 @@ $lang['batch_sum_stats_no_match'] = "No variables match the selected type.";
 $lang['batch_sum_stats_will_apply'] = "Will apply to {count} variable(s).";
 $lang['batch_sum_stats_applied'] = "{count} variable(s) updated.";
 
+// Data Files page: summary stats display options (single file or multi-file batch)
+$lang['summary_stats_options'] = "Summary stats options";
+$lang['summary_stats_options_help'] = "Set summary statistics display options for the selected file(s), applied by variable interval type (Discrete or Continuous).";
+$lang['no_variables'] = "No variables";
+
 // Missing translations for project home page
 $lang['search'] = "Search...";
 $lang['compare_projects'] = "Compare Projects";

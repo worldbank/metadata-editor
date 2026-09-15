@@ -32,6 +32,10 @@ Vue.component('datafiles', {
                 file_physical_name:''
             },
             batch_export_dialog_show: false,
+            dialog_sum_stats_options: {
+                show: false,
+                files: []  // [{file_id, file_name}] - 1 or more
+            },
             dialog_import_metadata: {
                 show: false,
                 file_id: null,
@@ -530,6 +534,16 @@ Vue.component('datafiles', {
         openBatchExportDialog: function(){
             this.batch_export_dialog_show = true;
         },
+        openSumStatsOptionsDialog: function(file_idx){
+            let data_file = this.data_files[file_idx];
+            if (!data_file) return;
+            this.dialog_sum_stats_options.files = [{file_id: data_file.file_id, file_name: data_file.file_name}];
+            this.dialog_sum_stats_options.show = true;
+        },
+        openBatchSumStatsOptionsDialog: function(){
+            this.dialog_sum_stats_options.files = this.sumStatsBatchSelectedFiles;
+            this.dialog_sum_stats_options.show = true;
+        },
         confirmExport: function(){
             // This function is no longer needed as the export dialog handles everything
         },
@@ -612,6 +626,12 @@ Vue.component('datafiles', {
                 .filter(f => this.selected_files.indexOf(f.file_id) !== -1 && (this.hasCsvFile(f.file_id) || f.store_data === 1))
                 .map(f => ({ file_id: f.file_id, file_name: f.file_name, file_physical_name: f.file_physical_name || '' }));
         },        
+        sumStatsBatchSelectedFiles(){
+            if (!this.data_files.length || !this.selected_files.length) return [];
+            return this.data_files
+                .filter(f => this.selected_files.indexOf(f.file_id) !== -1 && f.var_count > 0)
+                .map(f => ({ file_id: f.file_id, file_name: f.file_name }));
+        },
         importMetadataFileSelected(){
             var s = this.dialog_import_metadata.selected_file;
             if (!s) return false;
@@ -633,8 +653,9 @@ Vue.component('datafiles', {
                 <v-row>
                     <v-col md="8">
                     <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-danger mr-2" @click="batchDelete">{{$t("Delete")}} {{selected_files.length}} {{$t("selected")}}</button>
-                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary" @click="openBatchExportDialog">{{$t("batch_export")}} ({{selected_files.length}})</button>
-                    
+                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary mr-2" @click="openBatchExportDialog">{{$t("batch_export")}} ({{selected_files.length}})</button>
+                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary" :disabled="sumStatsBatchSelectedFiles.length===0" @click="openBatchSumStatsOptionsDialog">{{$t("summary_stats_options")}} ({{sumStatsBatchSelectedFiles.length}})</button>
+
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
                         <v-btn color="primary" :to="'datafiles/import'" outlined small>{{$t("import_files")}}</v-btn>
@@ -739,6 +760,20 @@ Vue.component('datafiles', {
                                                 <v-icon>mdi-update</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Refresh summary statistics")}}</v-list-item-title>
+                                        </v-list-item>
+
+                                        <v-list-item v-if="row.file.var_count > 0" @click="openSumStatsOptionsDialog(row.originalIndex)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-tune-variant</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("summary_stats_options")}}</v-list-item-title>
+                                        </v-list-item>
+
+                                        <v-list-item v-else disabled>
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-tune-variant</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("summary_stats_options")}} ({{$t("no_variables")}})</v-list-item-title>
                                         </v-list-item>
 
                                         <v-list-item @click="replaceFile(row.originalIndex)">
@@ -888,10 +923,16 @@ Vue.component('datafiles', {
             </dialog-datafile-export>
 
             <!-- Batch Export Dialog -->
-            <dialog-batch-export 
-                v-model="batch_export_dialog_show" 
+            <dialog-batch-export
+                v-model="batch_export_dialog_show"
                 :selected-files="batchExportSelectedFiles">
             </dialog-batch-export>
+
+            <!-- Summary Stats Options Dialog (row action or multi-file batch) -->
+            <dialog-datafiles-sum-stats-options
+                v-model="dialog_sum_stats_options.show"
+                :selected-files="dialog_sum_stats_options.files">
+            </dialog-datafiles-sum-stats-options>
 
             <!-- Import metadata (replace) dialog -->
             <v-dialog v-model="dialog_import_metadata.show" max-width="500" persistent>

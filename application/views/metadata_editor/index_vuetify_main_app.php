@@ -174,6 +174,7 @@
             echo $this->load->view("metadata_editor/vue-data-explorer-host-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-export-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-batch-export-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-datafiles-sum-stats-options-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-microdata-resource-datafile-links-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-microdata-resource-details-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-generate-microdata-component.js",null,true);
