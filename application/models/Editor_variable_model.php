@@ -126,20 +126,14 @@ class Editor_variable_model extends ci_model {
     }
 
     /**
-     * Parse sum_stats_options based on variable data type and interval type.
+     * Parse sum_stats_options based on variable data type.
      *
-     * Key rule (takes precedence over everything else): if a variable has
-     * value/labels (var_catgry_labels, or var_catgry entries that carry a
-     * non-empty labl), frequencies are enabled regardless of the variable's
-     * data type (numeric, character, fixed, date) or interval type (discrete
-     * or continuous). This covers Stata, SPSS and similar imports where any
-     * variable with attached value labels should default to showing
-     * frequencies in the UI.
+     * Frequencies default to false unless var_catgry already carries frequency
+     * stats (stats entries with type 'freq'). Categories or value labels alone
+     * do not enable frequencies on first import.
      *
-     * As a secondary signal, frequencies are also enabled when the variable's
-     * interval type is 'discrete'. Otherwise frequencies default to false.
-     * The data type still controls defaults for the other options (wgt, mean,
-     * stdev, etc.) because those are not meaningful for non-numeric data.
+     * The data type controls defaults for the other options (wgt, mean, stdev,
+     * etc.) because those are not meaningful for non-numeric data.
      *
      * User choices in the UI are always preserved (not overwritten on
      * re-import) by bulk_upsert_dictionary().
@@ -147,10 +141,7 @@ class Editor_variable_model extends ci_model {
     private function parse_sum_stats_options($variable)
     {
         $data_type = isset($variable['var_format']['type']) ? $variable['var_format']['type'] : '';
-        $var_intrvl = isset($variable['var_intrvl']) ? $variable['var_intrvl'] : (isset($variable['metadata']['var_intrvl']) ? $variable['metadata']['var_intrvl'] : null);
-        $is_discrete = ($var_intrvl === 'discrete');
-        $has_value_labels = $this->variable_has_value_labels($variable);
-        $enable_freq = $has_value_labels || $is_discrete;
+        $enable_freq = $this->variable_has_category_frequencies($variable);
 
         switch ($data_type) {
             case 'numeric':
@@ -217,34 +208,32 @@ class Editor_variable_model extends ci_model {
     }
 
     /**
-     * Detect whether a variable carries value/labels.
-     *
-     * Returns true when var_catgry_labels contains at least one entry with a
-     * non-empty labl, or when var_catgry contains at least one entry with a
-     * non-empty labl. Checks both the top-level keys and the nested metadata
-     * payload so it works in every code path that calls parse_sum_stats_options.
+     * Detect whether a variable already has category frequency stats.
      *
      * @param array $variable
      * @return bool
      */
-    private function variable_has_value_labels($variable)
+    private function variable_has_category_frequencies($variable)
     {
-        $candidates = array();
-
-        foreach (array('var_catgry_labels', 'var_catgry') as $key) {
-            if (isset($variable[$key]) && is_array($variable[$key])) {
-                $candidates[] = $variable[$key];
-            }
-            if (isset($variable['metadata'][$key]) && is_array($variable['metadata'][$key])) {
-                $candidates[] = $variable['metadata'][$key];
-            }
+        $payloads = array($variable);
+        if (isset($variable['metadata']) && is_array($variable['metadata'])) {
+            $payloads[] = $variable['metadata'];
         }
 
-        foreach ($candidates as $entries) {
-            foreach ($entries as $entry) {
+        foreach ($payloads as $payload) {
+            if (!isset($payload['var_catgry']) || !is_array($payload['var_catgry'])) {
+                continue;
+            }
+            foreach ($payload['var_catgry'] as $entry) {
                 $entry = is_array($entry) ? $entry : (array)$entry;
-                if (isset($entry['labl']) && trim((string)$entry['labl']) !== '') {
-                    return true;
+                if (!isset($entry['stats']) || !is_array($entry['stats'])) {
+                    continue;
+                }
+                foreach ($entry['stats'] as $stat) {
+                    $stat = is_array($stat) ? $stat : (array)$stat;
+                    if (isset($stat['type']) && $stat['type'] === 'freq') {
+                        return true;
+                    }
                 }
             }
         }
