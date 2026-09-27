@@ -19,9 +19,10 @@ Vue.component('datafile-import', {
             file_types:{
                 "DTA": this.$t("Stata (DTA)"),
                 "SAV": this.$t("SPSS (SAV)"),
-                "CSV": this.$t("CSV")
+                "CSV": this.$t("CSV"),
+                "ZIP": this.$t("ZIP")
             },
-            allowed_file_types:["dta","sav","csv"],
+            allowed_file_types:["dta","sav","csv","zip"],
             /** Cleared after each pick so the list below is the source of truth */
             filePickerModel: null,
             dialog_process:false,
@@ -190,7 +191,9 @@ Vue.component('datafile-import', {
             for(i=0;i<this.files.length;){
                 this.current_import_file_index = i + 1;
                 let result = await this.processFile(i);
-                if (result && result.csvJob) {
+                if (result && Array.isArray(result.csvJobs) && result.csvJobs.length > 0) {
+                    csvJobs = csvJobs.concat(result.csvJobs);
+                } else if (result && result.csvJob) {
                     csvJobs.push(result.csvJob);
                 }
                 i++;
@@ -244,20 +247,42 @@ Vue.component('datafile-import', {
         {
             try{
                 let resp=await this.uploadFile(fileIdx);
-                let fileid=resp.result.file_id;
-                
-                if (!fileid){
+                let fileIds = [];
+                if (resp.result && Array.isArray(resp.result.file_ids) && resp.result.file_ids.length > 0) {
+                    fileIds = resp.result.file_ids.filter(function (id) { return !!id; });
+                } else if (resp.result && resp.result.file_id) {
+                    fileIds = [resp.result.file_id];
+                }
+
+                if (!fileIds.length){
                     throw new Error('File upload failed for file ' + this.files[fileIdx].name);
                 }
 
-                this.update_status=this.$t("Generating summary statistics and frequencies") + " " + this.files[fileIdx].name;
-                let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
+                let csvJobs = [];
+                let uploadedNames = (resp.result && resp.result.uploaded && resp.result.uploaded.uploaded_file_names)
+                    ? resp.result.uploaded.uploaded_file_names
+                    : [];
+                for (let f = 0; f < fileIds.length; f++) {
+                    let fileid = fileIds[f];
+                    let extractedName = uploadedNames[f] || '';
+                    let statusLabel = fileIds.length > 1
+                        ? this.files[fileIdx].name + ' (' + (f + 1) + '/' + fileIds.length + ')'
+                        : this.files[fileIdx].name;
 
-                let csvJob = null;
-                if (this.keep_data=='store'){
-                    if (!this.files[fileIdx].type.match('csv.*')) {
-                        this.update_status=this.$t("Exporting data to CSV") + " " + this.files[fileIdx].name;
-                        csvJob = await this.generateCSV(fileIdx,fileid);                    
+                    this.update_status=this.$t("Generating summary statistics and frequencies") + " " + statusLabel;
+                    await this.importDataFileSummaryStatistics(fileIdx, fileid);
+
+                    if (this.keep_data=='store'){
+                        let physicalExt = extractedName
+                            ? extractedName.split('.').pop().toLowerCase()
+                            : (this.files[fileIdx].type && this.files[fileIdx].type.match('csv.*') ? 'csv' : '');
+                        if (physicalExt !== 'csv') {
+                            this.update_status=this.$t("Exporting data to CSV") + " " + statusLabel;
+                            let csvJob = await this.generateCSV(fileIdx, fileid);
+                            if (csvJob) {
+                                csvJobs.push(csvJob);
+                            }
+                        }
                     }
                 }
 
@@ -270,8 +295,10 @@ Vue.component('datafile-import', {
 
                 return {
                     fileIdx: fileIdx,
-                    fileid: fileid,
-                    csvJob: csvJob
+                    fileid: fileIds[0],
+                    fileids: fileIds,
+                    csvJob: csvJobs.length === 1 ? csvJobs[0] : null,
+                    csvJobs: csvJobs
                 };
 
             } catch (error) {
@@ -312,6 +339,9 @@ Vue.component('datafile-import', {
             const chunkResult = await ResumableChunkUploader.uploadFileChunks(file, {
                 projectId: this.ProjectID,
                 fileType: 'data',
+                uploadMetadata: {
+                    allowed_types: 'dta,sav,csv,zip'
+                },
                 maxRetries: 3,
                 retryDelay: 1000,
                 exponentialBackoff: true,

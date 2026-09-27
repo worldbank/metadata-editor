@@ -91,7 +91,7 @@ class Editor_datafile_model extends CI_Model {
 
 	/**
 	 * 
-	 * Create new data file by uploading a data file (csv, dta, sav)
+	 * Create new data file by uploading a data file (csv, dta, sav, or zip)
 	 *
 	 * Provide either a standard multipart field `file` or a completed resumable `upload_id`, not both.
 	 *
@@ -114,35 +114,48 @@ class Editor_datafile_model extends CI_Model {
 			throw new Exception("File upload is required, or provide upload_id after completing a chunked upload.");
 		}
 
+		$upload_info = null;
+		$incoming_name = null;
+
 		if ($upload_id !== '') {
 			$this->load->library('Resumable_upload', null, 'uploader');
 			$upload_info = $this->uploader->get_completed_upload($upload_id);
 			if (!$upload_info) {
 				throw new Exception("Resumable upload not found or not complete. Upload all chunks before registering the data file.");
 			}
-			// Must use sanitized `filename` (not original_filename): that is what move_resumable_upload
-			// stores on disk and what we persist as file_name. Using original broke duplicate detection
-			// when sanitize_filename() changed the basename (e.g. spaces → underscores).
-			$datafile_info = $this->data_file_by_name($sid, $this->filename_part($upload_info['filename']));
-			// Also match legacy rows created before that fix (file_name from original basename).
-			if (!$datafile_info && isset($upload_info['original_filename'])) {
-				$by_original = $this->data_file_by_name($sid, $this->filename_part($upload_info['original_filename']));
-				if ($by_original) {
-					$datafile_info = $by_original;
-				}
-			}
+			$incoming_name = $upload_info['filename'];
 		} else {
-			$datafile_info = $this->check_uploaded_file_exists($sid);
-			$upload_info = null;
+			$incoming_name = isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null;
 		}
 
-		if ($overwrite==false && $datafile_info){
-			throw new Exception("Data file already exists. To overwrite, use the overwrite parameter.");
-		}
-		
-		// If overwrite is true and file exists, delete the physical file
-		if ($overwrite==true && $datafile_info){
-			$this->delete_physical_file($sid, $datafile_info['file_id']);
+		$incoming_ext = $incoming_name ? strtolower(pathinfo($incoming_name, PATHINFO_EXTENSION)) : '';
+		$is_zip_upload = ($incoming_ext === 'zip');
+
+		$datafile_info = null;
+		if (!$is_zip_upload) {
+			if ($upload_id !== '') {
+				// Must use sanitized `filename` (not original_filename): that is what move_resumable_upload
+				// stores on disk and what we persist as file_name. Using original broke duplicate detection
+				// when sanitize_filename() changed the basename (e.g. spaces → underscores).
+				$datafile_info = $this->data_file_by_name($sid, $this->filename_part($upload_info['filename']));
+				// Also match legacy rows created before that fix (file_name from original basename).
+				if (!$datafile_info && isset($upload_info['original_filename'])) {
+					$by_original = $this->data_file_by_name($sid, $this->filename_part($upload_info['original_filename']));
+					if ($by_original) {
+						$datafile_info = $by_original;
+					}
+				}
+			} else {
+				$datafile_info = $this->check_uploaded_file_exists($sid);
+			}
+
+			if ($overwrite==false && $datafile_info){
+				throw new Exception("Data file already exists. To overwrite, use the overwrite parameter.");
+			}
+
+			if ($overwrite==true && $datafile_info){
+				$this->delete_physical_file($sid, $datafile_info['file_id']);
+			}
 		}
 
 		if ($upload_id !== '') {
@@ -152,9 +165,6 @@ class Editor_datafile_model extends CI_Model {
 		}
 		$uploaded_file_name=$upload_result['file_name'];
 		$uploaded_path=$upload_result['full_path'];
-
-		// Validate uploaded file name
-		validate_filename($uploaded_file_name, 200);
 
 		if ($store_data=='store'){
 			$store_data=1;
@@ -169,6 +179,22 @@ class Editor_datafile_model extends CI_Model {
 			$original_client_name = $_FILES['file']['name'];
 		}
 
+		$uploaded_ext = strtolower(pathinfo($uploaded_file_name, PATHINFO_EXTENSION));
+		if ($uploaded_ext === 'zip') {
+			return $this->upload_create_from_zip(
+				$sid,
+				$uploaded_path,
+				$uploaded_file_name,
+				$overwrite,
+				$store_data,
+				$user_id,
+				$meta_patch,
+				$original_client_name
+			);
+		}
+
+		validate_filename($uploaded_file_name, 200);
+
 		$source_fields = $this->source_fields_from_upload(
 			$uploaded_file_name,
 			$original_client_name,
@@ -176,7 +202,6 @@ class Editor_datafile_model extends CI_Model {
 		);
 
 		if (!$datafile_info){
-			//create data file
 			$options=array(
 				'sid'=>$sid,
 				'file_id'=>$this->generate_fileid($sid),
@@ -192,9 +217,8 @@ class Editor_datafile_model extends CI_Model {
 				$options = array_merge($options, $meta_patch);
 			}
 
-			$result=$this->insert($sid,$options);
+			$this->insert($sid,$options);
 		}else{
-			//update data file
 			$options=array(
 				'file_physical_name'=>$uploaded_file_name,
 				'file_name'=>$this->filename_part($uploaded_file_name),
@@ -207,17 +231,138 @@ class Editor_datafile_model extends CI_Model {
 				$options = array_merge($options, $meta_patch);
 			}
 
-			$result=$this->update($datafile_info['id'],$options);
+			$this->update($datafile_info['id'],$options);
 		}
 
 		return [
 			'uploaded'=>[
 				'uploaded_file_name'=>$uploaded_file_name,
 				'base64'=>base64_encode($uploaded_file_name),
-				//'uploaded_path'=>$uploaded_path
 			],
-			'file_id'=>$this->file_id_by_name($sid,$uploaded_file_name)
+			'file_id'=>$this->file_id_by_name($sid,$uploaded_file_name),
+			'file_ids'=>array($this->file_id_by_name($sid,$uploaded_file_name)),
 		];
+	}
+
+	/**
+	 * Extract supported microdata files from a ZIP and register each as a data file.
+	 *
+	 * @param int $sid
+	 * @param string $zip_path Absolute path to ZIP in project data folder
+	 * @param string $zip_filename Stored ZIP basename
+	 * @param bool|int $overwrite
+	 * @param int $store_data
+	 * @param int|null $user_id
+	 * @param array $meta_patch
+	 * @param string|null $original_client_name
+	 * @return array
+	 */
+	private function upload_create_from_zip($sid, $zip_path, $zip_filename, $overwrite, $store_data, $user_id, array $meta_patch, $original_client_name = null)
+	{
+		$this->load->library('Microdata_zip_processor');
+		$data_folder = dirname($zip_path);
+
+		$scan = $this->microdata_zip_processor->scan($zip_path);
+		if (!$scan['valid']) {
+			@unlink($zip_path);
+			throw new Exception(implode(' ', $scan['errors']));
+		}
+
+		foreach ($scan['files'] as $file) {
+			$existing = $this->data_file_by_name($sid, $file['flat_name']);
+			if ($existing && !$overwrite) {
+				@unlink($zip_path);
+				throw new Exception(
+					"Data file already exists: " . $this->filename_part($file['flat_name']) . ". To overwrite, use the overwrite parameter."
+				);
+			}
+		}
+
+		if ($overwrite) {
+			foreach ($scan['files'] as $file) {
+				$existing = $this->data_file_by_name($sid, $file['flat_name']);
+				if ($existing) {
+					$this->delete_physical_file($sid, $existing['file_id']);
+				}
+			}
+		}
+
+		$extract = $this->microdata_zip_processor->extract($zip_path, $data_folder, $scan['files']);
+		if (!$extract['success']) {
+			$this->microdata_zip_processor->cleanup_files($data_folder, isset($extract['extracted_files']) ? $extract['extracted_files'] : array());
+			if (file_exists($zip_path)) {
+				@unlink($zip_path);
+			}
+			$message = !empty($extract['errors']) ? implode(' ', $extract['errors']) : 'Failed to extract ZIP file.';
+			throw new Exception($message);
+		}
+
+		$file_ids = array();
+		$uploaded_names = array();
+		$wght = $this->max_wght($sid);
+
+		foreach ($extract['extracted_files'] as $flat_name) {
+			$existing = $this->data_file_by_name($sid, $flat_name);
+			$source_fields = $this->source_fields_from_upload(
+				$flat_name,
+				$original_client_name ?: $zip_filename,
+				$user_id
+			);
+
+			if (!$existing) {
+				$wght++;
+				$options = array(
+					'sid' => $sid,
+					'file_id' => $this->generate_fileid($sid),
+					'file_physical_name' => $flat_name,
+					'file_name' => $this->filename_part($flat_name),
+					'wght' => $wght,
+					'store_data' => $store_data,
+					'created_by' => $user_id,
+					'changed_by' => $user_id,
+				);
+				$options = array_merge($options, $source_fields);
+				if (!empty($meta_patch)) {
+					$options = array_merge($options, $meta_patch);
+				}
+				$this->insert($sid, $options);
+			} else {
+				$options = array(
+					'file_physical_name' => $flat_name,
+					'file_name' => $this->filename_part($flat_name),
+					'store_data' => $store_data,
+					'changed_by' => $user_id,
+				);
+				$options = array_merge($options, $source_fields);
+				if (!empty($meta_patch)) {
+					$options = array_merge($options, $meta_patch);
+				}
+				$this->update($existing['id'], $options);
+			}
+
+			$file_id = $this->file_id_by_name($sid, $flat_name);
+			if ($file_id) {
+				$file_ids[] = $file_id;
+				$uploaded_names[] = $flat_name;
+			}
+		}
+
+		if (empty($file_ids)) {
+			throw new Exception('No data files were registered from ZIP archive.');
+		}
+
+		return array(
+			'uploaded' => array(
+				'uploaded_file_name' => $uploaded_names[0],
+				'uploaded_file_names' => $uploaded_names,
+				'base64' => base64_encode($uploaded_names[0]),
+				'extracted_from' => $zip_filename,
+				'skipped_count' => isset($scan['skipped_count']) ? (int) $scan['skipped_count'] : 0,
+			),
+			'file_id' => $file_ids[0],
+			'file_ids' => $file_ids,
+			'extracted_from' => $zip_filename,
+		);
 	}
 
 	function check_uploaded_file_exists($sid)

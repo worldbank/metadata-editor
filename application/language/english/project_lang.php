@@ -151,7 +151,8 @@ $lang['fixed']="Fixed";
 
 
 $lang['import_data_files']="Import data files";
-$lang['upload_one_or_more_data_files']="Upload one or more data files. Supported file types are: Stata(.dta), SPSS(.sav) and CSV";
+$lang['upload_one_or_more_data_files']="Upload one or more data files. Supported file types are: Stata (.dta), SPSS (.sav), CSV, and ZIP archives containing those formats";
+$lang['ZIP']="ZIP";
 $lang['drag_drop_data_files']="Drag and drop data files here";
 $lang['or']="Or";
 $lang['choose_files']="Choose files";

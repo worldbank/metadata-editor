@@ -29,3 +29,14 @@ $config['resumable_upload_max_size'] = 0; // 0 = unlimited
 $config['resumable_upload_chunk_size'] = 10485760; // 10MB
 $config['resumable_upload_expiry_hours'] = 1;
 
+/*
+|--------------------------------------------------------------------------
+| Microdata ZIP import
+|--------------------------------------------------------------------------
+|
+| microdata_zip_max_entries - Maximum total entries in a ZIP (files + folders)
+| microdata_upload_allowed_types - Allowed extensions for resumable data uploads
+|
+*/
+$config['microdata_zip_max_entries'] = 100;
+$config['microdata_upload_allowed_types'] = 'dta,sav,csv,zip';
