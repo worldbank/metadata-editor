@@ -226,7 +226,7 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
             if (status === 'unknown') {
                 return { label: this.$t('source_original_format_unknown'), warning: false };
             }
-            if ((fmt === 'dta' || fmt === 'sav') && (status === 'present' || onDisk)) {
+            if ((fmt === 'dta' || fmt === 'sav') && onDisk) {
                 return { label: this.$t('source_file_stored'), warning: false };
             }
             if (fmt === 'dta' || fmt === 'sav') {

@@ -1098,6 +1098,12 @@ class Editor_datafile_model extends CI_Model {
 						);
 					}
 				}
+
+				$fmt = isset($file['source_format']) ? strtolower((string) $file['source_format']) : '';
+				$ext = strtolower($this->get_file_extension($file['file_physical_name']));
+				if (in_array($fmt, array('dta', 'sav'), true) || in_array($ext, array('dta', 'sav'), true)) {
+					$this->update($file['id'], array('source_status' => 'missing'));
+				}
 			}
 			else{
 				// store_data=1: keep source file and working CSV
