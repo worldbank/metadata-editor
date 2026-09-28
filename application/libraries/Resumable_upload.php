@@ -77,6 +77,14 @@ class Resumable_upload {
 		if ($chunk_size <= 0) {
 			throw new Exception("INVALID_INPUT: chunk_size must be positive");
 		}
+
+		$total_size = (int)$total_size;
+		$total_chunks = (int)$total_chunks;
+		$chunk_size = (int)$chunk_size;
+		$calculated_total_chunks = (int)ceil($total_size / $chunk_size);
+		if ($total_chunks !== $calculated_total_chunks) {
+			throw new Exception("INVALID_INPUT: total_chunks ($total_chunks) doesn't match calculated value ($calculated_total_chunks) based on total_size ($total_size) and chunk_size ($chunk_size)");
+		}
 		
 		// Validate chunk size against PHP limits
 		if ($chunk_size > $this->max_chunk_size) {
@@ -127,6 +135,7 @@ class Resumable_upload {
 			'completed_at' => null,
 			'status' => 'in_progress',
 			'uploaded_chunks' => array(),
+			'uploaded_chunk_sizes' => array(),
 			'metadata' => $metadata
 		);
 		
@@ -234,60 +243,37 @@ class Resumable_upload {
 		
 		// Get actual size from binary data
 		$actual_size = strlen($chunk_data);
-		
-		// Validate chunk size (last chunk may be smaller)
-		$expected_size = $metadata['chunk_size'];
-		if ($chunk_number == $metadata['total_chunks'] - 1) {
-			// Last chunk: calculate expected size
-			$expected_size = $metadata['total_size'] - ($chunk_number * $metadata['chunk_size']);
+		$expected_size = $this->expected_chunk_byte_size($metadata, $chunk_number);
+
+		if ($expected_size <= 0) {
+			throw new Exception("CHUNK_SIZE_MISMATCH: Invalid expected size " . $expected_size . " for chunk " . $chunk_number);
 		}
 		
 		// Validate client-reported chunk size matches actual data size
 		if ($client_chunk_size !== null) {
-			if ($client_chunk_size != $actual_size) {
+			if ((int)$client_chunk_size != $actual_size) {
 				throw new Exception("CHUNK_SIZE_MISMATCH: Client reported " . $client_chunk_size . " bytes, but actual data is " . $actual_size . " bytes");
 			}
 		}
-		
-		// Validate actual size against expected size
-		if ($actual_size > $expected_size) {
-			throw new Exception("CHUNK_SIZE_MISMATCH: Expected max " . $expected_size . " bytes, got " . $actual_size);
+
+		// Non-final chunks must be exactly chunk_size; the last chunk must be the exact remainder.
+		if ($actual_size !== $expected_size) {
+			throw new Exception("CHUNK_SIZE_MISMATCH: Expected " . $expected_size . " bytes for chunk " . $chunk_number . ", got " . $actual_size);
 		}
 		
-		// For non-last chunks, validate minimum size (should be close to expected)
-		if ($chunk_number < $metadata['total_chunks'] - 1) {
-			$min_size = (int)($expected_size * 0.9);
-			if ($actual_size < $min_size) {
-				throw new Exception("CHUNK_SIZE_MISMATCH: Expected at least " . $min_size . " bytes for chunk " . $chunk_number . ", got " . $actual_size);
-			}
-		}
-		
-		// Save chunk file
-		$chunk_path = $this->get_chunk_path($upload_id, $chunk_number);
-		$chunks_dir = dirname($chunk_path);
-		
-		if (!file_exists($chunks_dir)) {
-			if (!@mkdir($chunks_dir, 0755, true)) {
-				throw new Exception("FAILED_TO_CREATE_CHUNKS_DIRECTORY");
-			}
-		}
-		
-		// Atomic write
-		$temp_chunk = $chunk_path . '.tmp';
-		if (@file_put_contents($temp_chunk, $chunk_data) === false) {
-			throw new Exception("FAILED_TO_WRITE_CHUNK");
-		}
-		
-		if (!@rename($temp_chunk, $chunk_path)) {
-			@unlink($temp_chunk);
-			throw new Exception("FAILED_TO_SAVE_CHUNK");
-		}
+		// Append chunk into the assembly file at the correct byte offset (no end-of-upload combine pass).
+		$this->append_chunk_to_assembly($upload_id, $metadata, $chunk_number, $chunk_data);
 		
 		// Update metadata
 		if (!in_array($chunk_number, $metadata['uploaded_chunks'])) {
 			$metadata['uploaded_chunks'][] = $chunk_number;
 			sort($metadata['uploaded_chunks']);
 		}
+
+		if (!isset($metadata['uploaded_chunk_sizes']) || !is_array($metadata['uploaded_chunk_sizes'])) {
+			$metadata['uploaded_chunk_sizes'] = array();
+		}
+		$metadata['uploaded_chunk_sizes'][(int)$chunk_number] = $actual_size;
 		
 		$metadata['updated_at'] = time();
 		
@@ -299,13 +285,11 @@ class Resumable_upload {
 		}
 		
 		// Check if upload is complete
-		$is_complete = $this->is_upload_complete($upload_id);
+		$is_complete = count($metadata['uploaded_chunks']) == $metadata['total_chunks'];
 		if ($is_complete) {
 			$metadata['status'] = 'completed';
 			$metadata['completed_at'] = time();
-			
-			// Combine chunks into final file
-			$this->combine_chunks($upload_id);
+			$this->finalize_assembled_upload($upload_id, $metadata);
 		}
 		
 		$this->save_upload_metadata($upload_id, $metadata);
@@ -326,6 +310,14 @@ class Resumable_upload {
 	 */
 	public function get_uploaded_chunks($upload_id)
 	{
+		$metadata = $this->get_upload_metadata($upload_id);
+		if ($metadata && !empty($metadata['uploaded_chunks']) && is_array($metadata['uploaded_chunks'])) {
+			$chunks = array_values(array_unique(array_map('intval', $metadata['uploaded_chunks'])));
+			sort($chunks);
+			return $chunks;
+		}
+		
+		// Legacy uploads may only have on-disk chunk parts.
 		$upload_path = $this->get_upload_path($upload_id);
 		$chunks_dir = unix_path($upload_path . '/chunks');
 		
@@ -363,9 +355,171 @@ class Resumable_upload {
 			return false;
 		}
 		
+		if ($metadata['status'] === 'completed') {
+			return true;
+		}
+		
 		$uploaded_chunks = $this->get_uploaded_chunks($upload_id);
 		
 		return count($uploaded_chunks) == $metadata['total_chunks'];
+	}
+	
+	/**
+	 * Expected payload size for one chunk. Non-final chunks are exactly chunk_size;
+	 * the last chunk is the remainder of total_size.
+	 *
+	 * @param array $metadata
+	 * @param int $chunk_number
+	 * @return int
+	 */
+	private function expected_chunk_byte_size($metadata, $chunk_number)
+	{
+		$chunk_size = (int)$metadata['chunk_size'];
+		$total_chunks = (int)$metadata['total_chunks'];
+		$total_size = (int)$metadata['total_size'];
+
+		if ((int)$chunk_number === $total_chunks - 1) {
+			return $total_size - ((int)$chunk_number * $chunk_size);
+		}
+
+		return $chunk_size;
+	}
+
+	/**
+	 * Require the sum of accepted chunk payloads to match total_size.
+	 * Skips uploads that predate uploaded_chunk_sizes.
+	 *
+	 * @param array $metadata
+	 * @return void
+	 */
+	private function assert_recorded_chunk_bytes($metadata)
+	{
+		if (!isset($metadata['uploaded_chunk_sizes']) || !is_array($metadata['uploaded_chunk_sizes'])) {
+			return;
+		}
+
+		$written = 0;
+		$total_chunks = (int)$metadata['total_chunks'];
+		$sizes = $metadata['uploaded_chunk_sizes'];
+
+		for ($i = 0; $i < $total_chunks; $i++) {
+			if (array_key_exists($i, $sizes)) {
+				$written += (int)$sizes[$i];
+			} elseif (array_key_exists((string)$i, $sizes)) {
+				$written += (int)$sizes[(string)$i];
+			} else {
+				throw new Exception("FILE_SIZE_MISMATCH: Missing recorded size for chunk " . $i);
+			}
+		}
+
+		if ($written !== (int)$metadata['total_size']) {
+			throw new Exception("FILE_SIZE_MISMATCH: Expected " . $metadata['total_size'] . " bytes of chunk data, got " . $written);
+		}
+	}
+
+	/**
+	 * Append one chunk into the in-progress assembly file at the correct offset.
+	 *
+	 * @param string $upload_id
+	 * @param array $metadata
+	 * @param int $chunk_number
+	 * @param string $chunk_data
+	 * @return void
+	 */
+	private function append_chunk_to_assembly($upload_id, $metadata, $chunk_number, $chunk_data)
+	{
+		$assembly_path = $this->get_assembly_temp_path($upload_id, $metadata['filename']);
+		$upload_path = $this->get_upload_path($upload_id);
+		
+		if (!file_exists($upload_path)) {
+			if (!@mkdir($upload_path, 0755, true)) {
+				throw new Exception("FAILED_TO_CREATE_UPLOAD_DIRECTORY");
+			}
+		}
+		
+		$offset = (int)$chunk_number * (int)$metadata['chunk_size'];
+		$chunk_length = strlen($chunk_data);
+		
+		$fp = @fopen($assembly_path, 'c+b');
+		if (!$fp) {
+			throw new Exception("FAILED_TO_OPEN_ASSEMBLY_FILE");
+		}
+		
+		if (!@flock($fp, LOCK_EX)) {
+			fclose($fp);
+			throw new Exception("FAILED_TO_LOCK_ASSEMBLY_FILE");
+		}
+		
+		if (@fseek($fp, $offset, SEEK_SET) !== 0) {
+			@flock($fp, LOCK_UN);
+			fclose($fp);
+			throw new Exception("FAILED_TO_SEEK_ASSEMBLY_FILE: chunk_" . $chunk_number);
+		}
+		
+		$written = @fwrite($fp, $chunk_data);
+		if ($written === false || $written !== $chunk_length) {
+			@flock($fp, LOCK_UN);
+			fclose($fp);
+			throw new Exception("FAILED_TO_WRITE_ASSEMBLY_CHUNK: chunk_" . $chunk_number);
+		}
+		
+		@fflush($fp);
+		@flock($fp, LOCK_UN);
+		fclose($fp);
+	}
+	
+	/**
+	 * Validate the assembled file and rename it into place.
+	 *
+	 * @param string $upload_id
+	 * @param array|null $metadata
+	 * @return string Path to final file
+	 */
+	private function finalize_assembled_upload($upload_id, $metadata = null)
+	{
+		@set_time_limit(0);
+		@ignore_user_abort(true);
+		
+		if ($metadata === null) {
+			$metadata = $this->get_upload_metadata($upload_id);
+		}
+		
+		if (!$metadata) {
+			throw new Exception("UPLOAD_NOT_FOUND");
+		}
+		
+		$upload_path = $this->get_upload_path($upload_id);
+		$assembly_path = $this->get_assembly_temp_path($upload_id, $metadata['filename']);
+		$final_file = unix_path($upload_path . '/' . $metadata['filename']);
+		
+		if (!file_exists($assembly_path)) {
+			// Legacy uploads that still have chunk parts but no assembly file.
+			return $this->combine_chunks($upload_id);
+		}
+		
+		$this->assert_recorded_chunk_bytes($metadata);
+
+		$actual_size = @filesize($assembly_path);
+		if ($actual_size === false) {
+			throw new Exception("FAILED_TO_READ_ASSEMBLY_FILE");
+		}
+		
+		if ((int)$actual_size !== (int)$metadata['total_size']) {
+			throw new Exception("FILE_SIZE_MISMATCH: Expected " . $metadata['total_size'] . ", got " . $actual_size);
+		}
+		
+		if (file_exists($final_file)) {
+			@unlink($final_file);
+		}
+		
+		if (!@rename($assembly_path, $final_file)) {
+			throw new Exception("FAILED_TO_FINALIZE_FILE");
+		}
+		
+		$this->delete_legacy_chunk_parts($upload_id);
+		$this->cleanup_expired_uploads_auto(50);
+		
+		return $final_file;
 	}
 	
 	/**
@@ -376,6 +530,9 @@ class Resumable_upload {
 	 */
 	public function combine_chunks($upload_id)
 	{
+		@set_time_limit(0);
+		@ignore_user_abort(true);
+		
 		$metadata = $this->get_upload_metadata($upload_id);
 		if (!$metadata) {
 			throw new Exception("UPLOAD_NOT_FOUND");
@@ -391,7 +548,7 @@ class Resumable_upload {
 			throw new Exception("FAILED_TO_CREATE_FINAL_FILE");
 		}
 		
-		// Combine chunks in order
+		// Combine chunks in order (legacy uploads that stored separate .part files).
 		$total_size = 0;
 		for ($i = 0; $i < $metadata['total_chunks']; $i++) {
 			$chunk_path = $this->get_chunk_path($upload_id, $i);
@@ -402,21 +559,23 @@ class Resumable_upload {
 				throw new Exception("CHUNK_NOT_FOUND: chunk_" . $i);
 			}
 			
-			$chunk_data = @file_get_contents($chunk_path);
-			if ($chunk_data === false) {
+			$in = @fopen($chunk_path, 'rb');
+			if (!$in) {
 				fclose($out);
 				@unlink($temp_file);
 				throw new Exception("FAILED_TO_READ_CHUNK: chunk_" . $i);
 			}
 			
-			$written = @fwrite($out, $chunk_data);
-			if ($written === false || $written != strlen($chunk_data)) {
+			$copied = @stream_copy_to_stream($in, $out);
+			fclose($in);
+			
+			if ($copied === false) {
 				fclose($out);
 				@unlink($temp_file);
 				throw new Exception("FAILED_TO_WRITE_CHUNK_DATA: chunk_" . $i);
 			}
 			
-			$total_size += strlen($chunk_data);
+			$total_size += (int)$copied;
 		}
 		
 		fclose($out);
@@ -428,18 +587,16 @@ class Resumable_upload {
 		}
 		
 		// Atomic rename
+		if (file_exists($final_file)) {
+			@unlink($final_file);
+		}
+		
 		if (!@rename($temp_file, $final_file)) {
 			@unlink($temp_file);
 			throw new Exception("FAILED_TO_FINALIZE_FILE");
 		}
 		
-		// Delete chunks after successful combination
-		$chunks_dir = unix_path($upload_path . '/chunks');
-		if (file_exists($chunks_dir)) {
-			$this->delete_directory($chunks_dir);
-		}
-		
-		// Automatic cleanup of expired uploads (incremental)
+		$this->delete_legacy_chunk_parts($upload_id);
 		$this->cleanup_expired_uploads_auto(50);
 		
 		return $final_file;
@@ -777,6 +934,33 @@ class Resumable_upload {
 		$upload_path = $this->get_upload_path($upload_id);
 		$chunks_dir = unix_path($upload_path . '/chunks');
 		return unix_path($chunks_dir . '/chunk_' . $chunk_number . '.part');
+	}
+	
+	/**
+	 * Path to the in-progress assembly file for incremental chunk writes.
+	 *
+	 * @param string $upload_id
+	 * @param string $filename
+	 * @return string
+	 */
+	private function get_assembly_temp_path($upload_id, $filename)
+	{
+		$upload_path = $this->get_upload_path($upload_id);
+		return unix_path($upload_path . '/' . $filename . '.tmp');
+	}
+	
+	/**
+	 * Remove legacy per-chunk part files if present.
+	 *
+	 * @param string $upload_id
+	 * @return void
+	 */
+	private function delete_legacy_chunk_parts($upload_id)
+	{
+		$chunks_dir = unix_path($this->get_upload_path($upload_id) . '/chunks');
+		if (file_exists($chunks_dir)) {
+			$this->delete_directory($chunks_dir);
+		}
 	}
 	
 	/**

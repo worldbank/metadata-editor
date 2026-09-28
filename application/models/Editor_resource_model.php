@@ -296,8 +296,12 @@ class Editor_resource_model extends ci_model {
 
 		$final_file_path = $survey_folder_type . '/' . $final_filename;
 		
-		// Move file from temp location to final location
-		if (!@copy($temp_file_path, $final_file_path)) {
+		if (file_exists($final_file_path)) {
+			@unlink($final_file_path);
+		}
+		
+		// Prefer rename (instant on same volume); fall back to streamed copy across devices.
+		if (!$this->move_uploaded_file($temp_file_path, $final_file_path)) {
 			throw new Exception('FAILED_TO_MOVE_FILE: Could not move file from ' . $temp_file_path . ' to ' . $final_file_path);
 		}
 		
@@ -313,6 +317,50 @@ class Editor_resource_model extends ci_model {
 			'file_ext' => pathinfo($final_filename, PATHINFO_EXTENSION),
 			'orig_name' => $original_filename
 		);
+	}
+
+	/**
+	 * Move an uploaded file into the project folder.
+	 *
+	 * Uses rename when possible; otherwise streams a copy for cross-device moves.
+	 *
+	 * @param string $source
+	 * @param string $dest
+	 * @return bool
+	 */
+	private function move_uploaded_file($source, $dest)
+	{
+		@set_time_limit(0);
+		@ignore_user_abort(true);
+
+		if (@rename($source, $dest)) {
+			return true;
+		}
+
+		$in = @fopen($source, 'rb');
+		if (!$in) {
+			return false;
+		}
+
+		$out = @fopen($dest, 'wb');
+		if (!$out) {
+			fclose($in);
+			return false;
+		}
+
+		$copied = @stream_copy_to_stream($in, $out);
+		fclose($in);
+		fclose($out);
+
+		if ($copied === false) {
+			@unlink($dest);
+			return false;
+		}
+
+		$source_size = @filesize($source);
+		$dest_size = @filesize($dest);
+
+		return $source_size !== false && $dest_size !== false && (int)$source_size === (int)$dest_size;
 	}
 
 

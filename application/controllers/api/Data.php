@@ -374,18 +374,21 @@ class Data extends MY_REST_Controller
 			//queue job
 			$api_response=$this->datautils->generate_summary_stats_queue($datafile_path,$dict_params);
 			$status_code=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
+			$upstream = isset($api_response['response']) && is_array($api_response['response']) ? $api_response['response'] : array();
 
-			$output=array(
-				'status'=>'success',
-				'params'=>$dict_params,
-				'file'=>realpath($datafile_path),
-				'request'=> isset($api_response['request']) ? $api_response['request'] :'',
-				'request_url'=>$api_response['request_url']
-				//'job_id'=>$api_response['job_id']
-			);
-			$output=array_merge($output,$api_response['response']);
-						
-			$this->set_response($output, $status_code);			
+			if ($status_code >= 200 && $status_code < 300) {
+				$output = array('status' => 'success');
+				if (isset($upstream['job_id'])) {
+					$output['job_id'] = $upstream['job_id'];
+				}
+				$this->set_response($output, $status_code);
+				return;
+			}
+
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $this->_fastapi_job_error_message($upstream),
+			), $status_code >= 400 ? $status_code : REST_Controller::HTTP_BAD_REQUEST);			
 		}
 		catch(Exception $e){
 			$response=array(
@@ -426,7 +429,6 @@ class Data extends MY_REST_Controller
 					'job_status' => 'failed',
 					'message' => $msg,
 					'variables_imported' => 0,
-					'api_response' => $api_response,
 				), $api_http_status >= 400 ? $api_http_status : REST_Controller::HTTP_BAD_GATEWAY);
 				return;
 			}
@@ -438,7 +440,6 @@ class Data extends MY_REST_Controller
 					'job_status' => $job_status,
 					'message' => $msg,
 					'variables_imported' => 0,
-					'api_response' => $api_response,
 				);
 				if (isset($upstream['detail'])) {
 					$out['detail'] = $upstream['detail'];
@@ -647,10 +648,23 @@ class Data extends MY_REST_Controller
 				throw new Exception("Data file not found");
 			}
 
-			//get file basic metadata [rows, columns, variable name and label]
 			$api_response=$this->datautils->generate_csv_queue($datafile_path);
-			$status_code=$api_response['status_code'];
-			$this->set_response($api_response['response'], $status_code);			
+			$status_code=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
+			$upstream = isset($api_response['response']) && is_array($api_response['response']) ? $api_response['response'] : array();
+
+			if ($status_code >= 200 && $status_code < 300) {
+				$output = array('status' => 'success');
+				if (isset($upstream['job_id'])) {
+					$output['job_id'] = $upstream['job_id'];
+				}
+				$this->set_response($output, $status_code);
+				return;
+			}
+
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $this->_fastapi_job_error_message($upstream),
+			), $status_code >= 400 ? $status_code : REST_Controller::HTTP_BAD_REQUEST);			
 		}
 		catch(Exception $e){
 			$response=array(
@@ -679,7 +693,6 @@ class Data extends MY_REST_Controller
 					'status' => 'failed',
 					'job_status' => 'failed',
 					'message' => $msg,
-					'api_response' => $api_response,
 				), $api_http_status >= 400 ? $api_http_status : REST_Controller::HTTP_BAD_GATEWAY);
 				return;
 			}
@@ -690,7 +703,6 @@ class Data extends MY_REST_Controller
 					'status' => 'failed',
 					'job_status' => $job_status,
 					'message' => $msg,
-					'api_response' => $api_response,
 				);
 				if (isset($upstream['detail'])) {
 					$out['detail'] = $upstream['detail'];
@@ -709,7 +721,6 @@ class Data extends MY_REST_Controller
 
 			$output=array(
 				'status'=>'success',
-				'api_response'=>$api_response,
 				'job_status'=>$job_status,
 				'csv_file'=>$csv_file_path ? basename($csv_file_path) : null
 			);
@@ -831,7 +842,6 @@ class Data extends MY_REST_Controller
 						'job_failed' => true,
 						'message' => isset($job_body['message']) ? $job_body['message'] : 'Job failed',
 						'job_id' => $job_id,
-						'api_response' => $last_status_response
 					), REST_Controller::HTTP_OK);
 					return;
 				}
@@ -841,16 +851,12 @@ class Data extends MY_REST_Controller
 
 			if (!$completed) {
 				$timed_out = true;
-				$out = array(
+				$this->set_response(array(
 					'status' => 'pending',
 					'timed_out' => true,
 					'job_id' => $job_id,
 					'message' => 'Job did not finish within ' . $max_wait_time . ' seconds'
-				);
-				if ($last_status_response !== null) {
-					$out['api_response'] = $last_status_response;
-				}
-				$this->set_response($out, REST_Controller::HTTP_OK);
+				), REST_Controller::HTTP_OK);
 				return;
 			}
 
@@ -906,7 +912,6 @@ class Data extends MY_REST_Controller
 					'status' => 'failed',
 					'job_status' => $job_status,
 					'message' => $msg,
-					'api_response' => $api_response,
 				];
 				if (isset($upstream['detail'])) {
 					$out['detail'] = $upstream['detail'];
@@ -916,7 +921,6 @@ class Data extends MY_REST_Controller
 			}
 			$this->set_response([
 				'status' => 'success',
-				'api_response' => $api_response,
 				'job_status' => $job_status
 			], REST_Controller::HTTP_OK);
 			return;
