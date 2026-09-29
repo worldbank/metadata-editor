@@ -122,6 +122,13 @@ Vue.component('datafile-data-explorer', {
             var url = CI.base_url + '/api/variables/export_csv/' + this.ProjectID + '/' + encodeURIComponent(this.fid) + '?download=1';
             window.location.href = url;
         },
+        exportVariableDocumentationCsv: function() {
+            if (!this.ProjectID || !this.fid) {
+                return;
+            }
+            var url = CI.base_url + '/api/variables/export_documentation_csv/' + this.ProjectID + '/' + encodeURIComponent(this.fid) + '?download=1&profile=full';
+            window.location.href = url;
+        },
         confirmDeleteData: function(){
             this.delete_confirm_dialog = true;
         },
@@ -170,6 +177,9 @@ Vue.component('datafile-data-explorer', {
                     <div class="float-right d-flex align-center" style="gap: 8px;">
                         <v-btn v-if="activeDataFile" color="primary" outlined small @click="exportDictionaryCsv">
                             <v-icon>mdi-book-open-variant</v-icon> {{$t("export_data_dictionary")}}
+                        </v-btn>
+                        <v-btn v-if="activeDataFile" color="primary" outlined small @click="exportVariableDocumentationCsv">
+                            <v-icon>mdi-file-document-outline</v-icon> {{$t("export_variable_documentation")}}
                         </v-btn>
                         <template v-if="variable_data.records">
                             <v-btn color="primary" outlined small @click="exportFile">

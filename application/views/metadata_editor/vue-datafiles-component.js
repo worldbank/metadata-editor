@@ -45,6 +45,15 @@ Vue.component('datafiles', {
                 message_success: '',
                 message_error: ''
             },
+            dialog_import_variable_documentation: {
+                show: false,
+                file_id: null,
+                file_name: '',
+                selected_file: null,
+                uploading: false,
+                message_success: '',
+                message_error: ''
+            },
             attrs: {}
             
         }
@@ -224,6 +233,60 @@ Vue.component('datafiles', {
             if (!data_file) return;
             let url = CI.base_url + '/api/variables/export_csv/' + this.dataset_id + '/' + encodeURIComponent(data_file.file_id) + '?download=1';
             window.location.href = url;
+        },
+        exportVariableDocumentationCsv: function(file_idx) {
+            let data_file = this.data_files[file_idx];
+            if (!data_file) return;
+            let url = CI.base_url + '/api/variables/export_documentation_csv/' + this.dataset_id + '/' + encodeURIComponent(data_file.file_id) + '?download=1&profile=full';
+            window.location.href = url;
+        },
+        openImportVariableDocumentationDialog: function(file_idx) {
+            let data_file = this.data_files[file_idx];
+            if (!data_file) return;
+            this.dialog_import_variable_documentation.show = true;
+            this.dialog_import_variable_documentation.file_id = data_file.file_id;
+            this.dialog_import_variable_documentation.file_name = data_file.file_name || data_file.file_id;
+            this.dialog_import_variable_documentation.selected_file = null;
+            this.dialog_import_variable_documentation.uploading = false;
+            this.dialog_import_variable_documentation.message_success = '';
+            this.dialog_import_variable_documentation.message_error = '';
+        },
+        submitImportVariableDocumentation: async function() {
+            var raw = this.dialog_import_variable_documentation.selected_file;
+            var file = Array.isArray(raw) ? (raw.length ? raw[0] : null) : raw;
+            if (!file || !(file instanceof File)) {
+                this.dialog_import_variable_documentation.message_error = this.$t("please_select_file");
+                return;
+            }
+            let vm = this;
+            let url = CI.base_url + '/api/variables/import_documentation_csv/' + vm.dataset_id + '/' + encodeURIComponent(this.dialog_import_variable_documentation.file_id) + '?profile=full';
+            let formData = new FormData();
+            formData.append('file', file);
+            this.dialog_import_variable_documentation.uploading = true;
+            this.dialog_import_variable_documentation.message_error = '';
+            this.dialog_import_variable_documentation.message_success = '';
+            try {
+                let response = await axios.post(url, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                if (response.data && response.data.status === 'success') {
+                    this.dialog_import_variable_documentation.message_success = this.$t("import_variable_documentation_success") + ' (' + (response.data.updated || 0) + ' ' + this.$t("variables") + ')';
+                    await vm.reloadDataFiles();
+                } else {
+                    this.dialog_import_variable_documentation.message_error = (response.data && response.data.message) ? response.data.message : vm.$t("failed");
+                }
+            } catch (error) {
+                let msg = (error.response && error.response.data && error.response.data.message) ? error.response.data.message : error.message;
+                if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length) {
+                    let first = error.response.data.errors[0];
+                    if (first && first.message) {
+                        msg = first.message;
+                    }
+                }
+                this.dialog_import_variable_documentation.message_error = vm.$t("failed") + ": " + msg;
+            } finally {
+                this.dialog_import_variable_documentation.uploading = false;
+            }
         },
         openImportMetadataDialog: function(file_idx){
             let data_file = this.data_files[file_idx];
@@ -807,6 +870,20 @@ Vue.component('datafiles', {
                                             <v-list-item-title>{{$t("export_data_dictionary")}}</v-list-item-title>
                                         </v-list-item>
 
+                                        <v-list-item @click="exportVariableDocumentationCsv(row.originalIndex)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-document-outline</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("export_variable_documentation")}}</v-list-item-title>
+                                        </v-list-item>
+
+                                        <v-list-item @click="openImportVariableDocumentationDialog(row.originalIndex)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-upload-outline</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("import_variable_documentation")}}</v-list-item-title>
+                                        </v-list-item>
+
                                         <v-list-item @click="openImportMetadataDialog(row.originalIndex)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-import</v-icon>
@@ -936,6 +1013,45 @@ Vue.component('datafiles', {
                 v-model="dialog_sum_stats_options.show"
                 :selected-files="dialog_sum_stats_options.files">
             </dialog-datafiles-sum-stats-options>
+
+            <!-- Import variable documentation CSV dialog -->
+            <v-dialog v-model="dialog_import_variable_documentation.show" max-width="500" persistent>
+                <v-card>
+                    <v-card-title class="text-h6 grey lighten-2">
+                        {{$t("import_variable_documentation")}}
+                    </v-card-title>
+                    <v-card-text>
+                        <p class="mb-3">{{$t("import_variable_documentation_help")}}</p>
+                        <v-file-input
+                            v-model="dialog_import_variable_documentation.selected_file"
+                            accept=".csv,text/csv"
+                            label=""
+                            outlined
+                            truncate-length="50"
+                            dense
+                            clearable
+                            prepend-icon=""
+                            prepend-inner-icon="mdi-paperclip"
+                            show-size
+                        ></v-file-input>
+                        <div class="alert alert-success mt-3" v-if="dialog_import_variable_documentation.message_success">
+                            {{dialog_import_variable_documentation.message_success}}
+                        </div>
+                        <div class="alert alert-danger mt-3" v-if="dialog_import_variable_documentation.message_error">
+                            {{dialog_import_variable_documentation.message_error}}
+                        </div>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn small text @click="dialog_import_variable_documentation.show = false" :disabled="dialog_import_variable_documentation.uploading">
+                            {{$t("close")}}
+                        </v-btn>
+                        <v-btn small color="primary" @click="submitImportVariableDocumentation" :loading="dialog_import_variable_documentation.uploading">
+                            {{$t("import")}}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
 
             <!-- Import metadata (replace) dialog -->
             <v-dialog v-model="dialog_import_metadata.show" max-width="500" persistent>

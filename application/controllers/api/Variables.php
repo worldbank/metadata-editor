@@ -760,5 +760,151 @@ class Variables extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * Export variable documentation as CSV (one row per variable).
+	 *
+	 * GET /api/variables/export_documentation_csv/{sid}/{fid}
+	 * Query: download=1, profile=documentation|full
+	 */
+	function export_documentation_csv_get($sid=null, $fid=null)
+	{
+		try {
+			$this->editor_acl->user_has_project_access($sid, $permission='view', $this->api_user);
+
+			if (!$sid || !$fid) {
+				throw new Exception('Project ID and file ID are required');
+			}
+
+			$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $fid);
+			if (!$datafile) {
+				throw new Exception('Data file not found');
+			}
+
+			$this->load->library('Variable_documentation_csv');
+			$profile = $this->input->get('profile');
+			$csv = $this->variable_documentation_csv->export_csv($sid, $fid, array(
+				'profile' => $profile,
+			));
+
+			$download = $this->input->get('download');
+			if ($download === null || $download === '') {
+				$download = true;
+			} else {
+				$download = filter_var($download, FILTER_VALIDATE_BOOLEAN);
+			}
+
+			if ($download) {
+				$filename = $this->variable_documentation_csv->documentation_filename_for_datafile($datafile);
+				header('Content-Type: text/csv; charset=UTF-8');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
+				header('Cache-Control: no-store, no-cache');
+				echo $csv;
+				exit();
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'csv' => $csv,
+				'format_version' => Variable_documentation_csv::FORMAT_VERSION,
+				'profile' => $this->variable_documentation_csv->normalize_profile($profile),
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * Import variable documentation from CSV. Empty cells are not applied.
+	 *
+	 * POST /api/variables/import_documentation_csv/{sid}/{fid}
+	 * Multipart field file, or raw CSV body. Query: dry_run=1, profile=documentation|full
+	 */
+	function import_documentation_csv_post($sid=null, $fid=null)
+	{
+		try {
+			$this->editor_acl->user_has_project_access($sid, $permission='edit', $this->api_user);
+
+			if (!$sid || !$fid) {
+				throw new Exception('Project ID and file ID are required');
+			}
+
+			$csv = $this->_import_documentation_csv_read_body();
+			if ($csv === null || trim($csv) === '') {
+				throw new Exception('Send CSV body or multipart "file" with variable rows');
+			}
+
+			$dry_run = filter_var($this->input->get('dry_run'), FILTER_VALIDATE_BOOLEAN);
+			$profile = $this->input->get('profile');
+
+			$this->load->library('Variable_documentation_csv');
+			$result = $this->variable_documentation_csv->import_csv($sid, $fid, $csv, array(
+				'dry_run' => $dry_run,
+				'profile' => $profile,
+			));
+
+			if (empty($result['ok'])) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => isset($result['message']) ? $result['message'] : 'Import failed',
+					'dry_run' => !empty($result['dry_run']),
+					'profile' => isset($result['profile']) ? $result['profile'] : null,
+					'rows_parsed' => isset($result['rows_parsed']) ? $result['rows_parsed'] : 0,
+					'updated' => isset($result['updated']) ? $result['updated'] : 0,
+					'skipped' => isset($result['skipped']) ? $result['skipped'] : 0,
+					'errors' => isset($result['errors']) ? $result['errors'] : array(),
+				), REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'dry_run' => !empty($result['dry_run']),
+				'profile' => isset($result['profile']) ? $result['profile'] : null,
+				'rows_parsed' => isset($result['rows_parsed']) ? $result['rows_parsed'] : 0,
+				'updated' => isset($result['updated']) ? $result['updated'] : 0,
+				'skipped' => isset($result['skipped']) ? $result['skipped'] : 0,
+				'errors' => isset($result['errors']) ? $result['errors'] : array(),
+			), REST_Controller::HTTP_OK);
+		}
+		catch (ValidationException $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+				'errors' => $e->GetValidationErrors(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	private function _import_documentation_csv_read_body()
+	{
+		if (!empty($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+			$data = file_get_contents($_FILES['file']['tmp_name']);
+			return ($data === false) ? null : $data;
+		}
+
+		$raw = $this->input->raw_input_stream;
+		if ($raw === null || trim($raw) === '') {
+			return null;
+		}
+
+		return $raw;
+	}
+
 	
 }
