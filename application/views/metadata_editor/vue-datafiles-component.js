@@ -271,6 +271,7 @@ Vue.component('datafiles', {
                 });
                 if (response.data && response.data.status === 'success') {
                     this.dialog_import_variable_documentation.message_success = this.$t("import_variable_documentation_success") + ' (' + (response.data.updated || 0) + ' ' + this.$t("variables") + ')';
+                    await vm.reloadDataFileVariables(vm.dialog_import_variable_documentation.file_id);
                     await vm.reloadDataFiles();
                 } else {
                     this.dialog_import_variable_documentation.message_error = (response.data && response.data.message) ? response.data.message : vm.$t("failed");
@@ -319,6 +320,7 @@ Vue.component('datafiles', {
                 });
                 if (response.data && response.data.status === 'success') {
                     this.dialog_import_metadata.message_success = this.$t("import_metadata_success") + ' (' + (response.data.variables_count || 0) + ' ' + this.$t("variables") + ')';
+                    await vm.reloadDataFileVariables(vm.dialog_import_metadata.file_id);
                     await vm.reloadDataFiles();
                 } else {
                     this.dialog_import_metadata.message_error = (response.data && response.data.message) ? response.data.message : vm.$t("failed");
