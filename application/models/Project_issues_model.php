@@ -189,6 +189,7 @@ class Project_issues_model extends CI_Model {
      * @param string $sort_by Sort column (default: created)
      * @param string $sort_order Sort order (ASC|DESC, default: DESC)
      * @return array Keys: total, issues, offset, limit
+     * @throws Exception When the issues query fails
      */
     public function get_all($filters = array(), $limit = 50, $offset = 0, $sort_by = 'created', $sort_order = 'DESC')
     {
@@ -208,7 +209,7 @@ class Project_issues_model extends CI_Model {
 
         // Filter by project IDs if provided (for permissions)
         if (!empty($filters['project_ids']) && is_array($filters['project_ids'])) {
-            $this->db->where_in('project_id', $filters['project_ids']);
+            $this->db->where_in('project_issues.project_id', $filters['project_ids']);
         }
 
         $total = $this->db->count_all_results();
@@ -226,7 +227,14 @@ class Project_issues_model extends CI_Model {
 
         $this->db->order_by('project_issues.' . $sort_by, $sort_order);
         $this->db->limit($limit, $offset);
-        $issues = $this->db->get()->result_array();
+        $query = $this->db->get();
+        if ($query === false) {
+            $error = $this->db->error();
+            $message = !empty($error['message']) ? $error['message'] : 'unknown database error';
+            log_message('error', 'Database query failed in get_all: ' . $message);
+            throw new Exception('Failed to load issues');
+        }
+        $issues = $query->result_array();
 
         // Decode JSON fields
         foreach ($issues as &$issue) {
@@ -554,20 +562,21 @@ class Project_issues_model extends CI_Model {
      */
     private function _apply_filters($filters)
     {
-        // Scope restricts the status set; an explicit status filter further narrows within the scope
+        // Scope restricts the status set; an explicit status filter further narrows within the scope.
+        // Qualify columns: get_all() joins editor_projects, which also has status.
         if (isset($filters['scope']) && !empty($filters['scope'])) {
             if ($filters['scope'] === 'open') {
-                $this->db->where_in('status', array('open', 'accepted'));
+                $this->db->where_in('project_issues.status', array('open', 'accepted'));
             } elseif ($filters['scope'] === 'closed') {
-                $this->db->where_in('status', array('fixed', 'rejected', 'dismissed', 'false_positive'));
+                $this->db->where_in('project_issues.status', array('fixed', 'rejected', 'dismissed', 'false_positive'));
             }
         } elseif (isset($filters['status']) && !empty($filters['status'])) {
             $vals = is_array($filters['status']) ? $filters['status'] : explode(',', $filters['status']);
             $vals = array_filter(array_map('trim', $vals));
             if (count($vals) > 1) {
-                $this->db->where_in('status', $vals);
+                $this->db->where_in('project_issues.status', $vals);
             } else {
-                $this->db->where('status', reset($vals));
+                $this->db->where('project_issues.status', reset($vals));
             }
         }
 
@@ -575,9 +584,9 @@ class Project_issues_model extends CI_Model {
             $vals = is_array($filters['category']) ? $filters['category'] : explode(',', $filters['category']);
             $vals = array_filter(array_map('trim', $vals));
             if (count($vals) > 1) {
-                $this->db->where_in('category', $vals);
+                $this->db->where_in('project_issues.category', $vals);
             } else {
-                $this->db->where('category', reset($vals));
+                $this->db->where('project_issues.category', reset($vals));
             }
         }
 
@@ -585,26 +594,26 @@ class Project_issues_model extends CI_Model {
             $vals = is_array($filters['severity']) ? $filters['severity'] : explode(',', $filters['severity']);
             $vals = array_filter(array_map('trim', $vals));
             if (count($vals) > 1) {
-                $this->db->where_in('severity', $vals);
+                $this->db->where_in('project_issues.severity', $vals);
             } else {
-                $this->db->where('severity', reset($vals));
+                $this->db->where('project_issues.severity', reset($vals));
             }
         }
 
         if (isset($filters['applied']) && $filters['applied'] !== null && $filters['applied'] !== '') {
-            $this->db->where('applied', (int) $filters['applied']);
+            $this->db->where('project_issues.applied', (int) $filters['applied']);
         }
 
         if (isset($filters['field_path']) && !empty($filters['field_path'])) {
-            $this->db->like('field_path', $filters['field_path']);
+            $this->db->like('project_issues.field_path', $filters['field_path']);
         }
 
         if (isset($filters['id']) && $filters['id'] !== null && $filters['id'] !== '') {
-            $this->db->where($this->table . '.id', (int) $filters['id']);
+            $this->db->where('project_issues.id', (int) $filters['id']);
         }
 
         if (isset($filters['project_id']) && $filters['project_id'] !== null && $filters['project_id'] !== '') {
-            $this->db->where($this->table . '.project_id', (int) $filters['project_id']);
+            $this->db->where('project_issues.project_id', (int) $filters['project_id']);
         }
     }
 
