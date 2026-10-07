@@ -598,6 +598,8 @@ $lang['notification_action'] = 'Amal';
 $lang['notification_permission'] = 'Ruxsat';
 $lang['notification_previous_permission'] = 'Oldingi ruxsat';
 $lang['notification_new_owner'] = 'Yangi egasi';
+$lang['assessment_monthly_usage'] = 'Bu oyda sayt foydalanishi: {used} / {limit}.';
+$lang['assessment_monthly_unlimited'] = 'Oylik baholash limiti sozlanmagan.';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/uzbek/general_lang.php */

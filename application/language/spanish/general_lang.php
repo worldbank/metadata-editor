@@ -675,6 +675,8 @@ $lang['notification_action'] = 'Acción';
 $lang['notification_permission'] = 'Permiso';
 $lang['notification_previous_permission'] = 'Permiso anterior';
 $lang['notification_new_owner'] = 'Nuevo propietario';
+$lang['assessment_monthly_usage'] = 'Uso del sitio este mes: {used} de {limit}.';
+$lang['assessment_monthly_unlimited'] = 'No hay un límite mensual de evaluaciones configurado.';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/spanish/general_lang.php */

@@ -152,6 +152,10 @@ Vue.component('field-issues', {
             const map = { low: 'grey', medium: 'warning', high: 'orange', critical: 'error' };
             return map[severity] || 'grey';
         },
+        severityLabel(severity) {
+            const key = 'severity_' + severity;
+            return this.$te(key) ? this.$t(key) : severity;
+        },
         truncate(str, len) {
             if (!str) return '';
             return str.length <= len ? str : str.substring(0, len) + '…';
@@ -173,7 +177,7 @@ Vue.component('field-issues', {
                             v-if="hasIssues"
                             icon
                             x-small
-                            title="Issues for this field"
+                            :title="$t('field_issues_for_field')"
                             class="field-issues-trigger mr-0"
                         >
                             <v-icon small color="warning">mdi-comment-alert</v-icon>
@@ -182,7 +186,7 @@ Vue.component('field-issues', {
                         <v-btn
                             icon
                             x-small
-                            title="Issues for this field -s"
+                            :title="$t('field_issues_for_field')"
                             class="field-issues-trigger"
                         >
                             <v-icon small>mdi-dots-vertical</v-icon>
@@ -192,12 +196,12 @@ Vue.component('field-issues', {
                 <v-card min-width="320" class="pa-4">
                     <div class="text-caption mb-0 px-2 pt-3" style="font-weight: bold;">
                         <v-icon small color="warning">mdi-comment-alert</v-icon>
-                        Issues
+                        {{ $t('issues') }}
                     </div>
                     <v-divider class="mb-2"></v-divider>
                     <v-progress-linear v-if="loading || loadingFullIssue" indeterminate color="primary" class="mb-2"></v-progress-linear>
                     <div v-else-if="displayIssues.length === 0" class="text-body-2 text--secondary pa-2 text-center">
-                        No issues for this field.
+                        {{ $t('no_issues_for_field') }}
                     </div>
                     <v-list v-else dense class="py-0" style="max-height: 240px; overflow-y: auto;">
                         <v-list-item
@@ -210,7 +214,7 @@ Vue.component('field-issues', {
                                 <v-list-item-title class="text-body-2">{{ truncate(issue.title || issue.description, 50) }}</v-list-item-title>
                                 <v-list-item-subtitle class="d-flex align-center mt-1">
                                     <issue-status-badge :status="issue.status" small class="mr-1"></issue-status-badge>
-                                    <v-chip v-if="issue.severity" x-small :color="getSeverityColor(issue.severity)" dark class="mr-1">{{ issue.severity }}</v-chip>
+                                    <v-chip v-if="issue.severity" x-small :color="getSeverityColor(issue.severity)" dark class="mr-1">{{ severityLabel(issue.severity) }}</v-chip>
                                 </v-list-item-subtitle>
                             </v-list-item-content>
                             <v-list-item-action>
@@ -222,7 +226,7 @@ Vue.component('field-issues', {
                     <div style="padding: 5px;padding-top:0px;padding-bottom: 10px; display: flex; justify-content: center; align-items: center;">
                         <v-btn block small color="primary" @click="openCreate">
                             <v-icon left small>mdi-plus</v-icon>
-                            New issue
+                            {{ $t('create_issue') }}
                         </v-btn>
                     </div>
                 </v-card>

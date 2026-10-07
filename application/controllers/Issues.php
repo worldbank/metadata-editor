@@ -10,6 +10,7 @@ class Issues extends MY_Controller {
         $this->load->library('Editor_acl');
         $this->lang->load('general');
         $this->lang->load('project');
+        $this->lang->load('issues');
     }
 
     public function index()

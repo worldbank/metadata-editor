@@ -34,15 +34,8 @@ Vue.component('issue-status-badge', {
             return colors[this.status] || 'grey';
         },
         badgeText() {
-            const labels = {
-                'open': 'Open',
-                'accepted': 'Accepted',
-                'rejected': 'Rejected',
-                'fixed': 'Fixed',
-                'dismissed': 'Dismissed',
-                'false_positive': 'False Positive'
-            };
-            return labels[this.status] || this.status;
+            const key = 'status_' + this.status;
+            return this.$te(key) ? this.$t(key) : this.status;
         },
         badgeIcon() {
             const icons = {

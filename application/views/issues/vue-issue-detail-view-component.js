@@ -30,18 +30,18 @@ Vue.component('issue-detail-view', {
             advancedPanel: undefined,
             diffRoot: null,
             severityOptions: [
-                { text: 'Low',      value: 'low' },
-                { text: 'Medium',   value: 'medium' },
-                { text: 'High',     value: 'high' },
-                { text: 'Critical', value: 'critical' }
+                { text: this.$t('severity_low'), value: 'low' },
+                { text: this.$t('severity_medium'), value: 'medium' },
+                { text: this.$t('severity_high'), value: 'high' },
+                { text: this.$t('severity_critical'), value: 'critical' }
             ],
             categoryOptions: [
-                { text: 'Typo / Wording', value: 'typo_wording' },
-                { text: 'Inconsistency',   value: 'inconsistency' },
-                { text: 'Missing Data',    value: 'missing_data' },
-                { text: 'Format Issue',    value: 'format_issue' },
-                { text: 'Completeness',    value: 'completeness' },
-                { text: 'Other',           value: 'other' }
+                { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+                { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+                { text: this.$t('category_missing_data'), value: 'missing_data' },
+                { text: this.$t('category_format_issue'), value: 'format_issue' },
+                { text: this.$t('category_completeness'), value: 'completeness' },
+                { text: this.$t('category_other'), value: 'other' }
             ]
         };
     },
@@ -117,13 +117,13 @@ Vue.component('issue-detail-view', {
                         this.localIssue = res.data.issue;
                         this.$nextTick(() => this.renderMetadataDiff());
                     } else {
-                        this.loadError = (res.data && res.data.message) || 'Failed to load issue';
+                        this.loadError = (res.data && res.data.message) || this.$t('error_load_issue');
                     }
                 })
                 .catch(err => {
                     this.loadError = (err.response && err.response.status === 404)
-                        ? 'Issue not found'
-                        : ((err.response && err.response.data && err.response.data.message) || err.message || 'Failed to load issue');
+                        ? this.$t('error_issue_not_found')
+                        : ((err.response && err.response.data && err.response.data.message) || err.message || this.$t('error_load_issue'));
                 })
                 .finally(() => { this.loading = false; });
         },
@@ -137,11 +137,11 @@ Vue.component('issue-detail-view', {
                     Vue.set(this.localIssue, field, value);
                     this.showAlert('Saved', 'success');
                 } else {
-                    throw new Error((res.data && res.data.message) || 'Failed to save');
+                    throw new Error((res.data && res.data.message) || this.$t('error_save_issue'));
                 }
             } catch (err) {
                 this.showAlert(
-                    (err.response && err.response.data && err.response.data.message) || err.message || 'Failed to save',
+                    (err.response && err.response.data && err.response.data.message) || err.message || this.$t('error_save_issue'),
                     'error'
                 );
             }
@@ -162,13 +162,13 @@ Vue.component('issue-detail-view', {
                         Vue.set(this.localIssue, 'status', newStatus);
                     }
                     this.resolutionNotes = '';
-                    this.showAlert('Issue updated', 'success');
+                    this.showAlert(this.$t('issue_updated'), 'success');
                 } else {
-                    throw new Error((res.data && res.data.message) || 'Failed to update status');
+                    throw new Error((res.data && res.data.message) || this.$t('error_update_status'));
                 }
             } catch (err) {
                 this.showAlert(
-                    (err.response && err.response.data && err.response.data.message) || err.message || 'Failed to update issue',
+                    (err.response && err.response.data && err.response.data.message) || err.message || this.$t('error_update_issue'),
                     'error'
                 );
             } finally {
@@ -263,7 +263,7 @@ Vue.component('issue-detail-view', {
                 <v-alert type="error" class="mb-4">{{ loadError }}</v-alert>
                 <v-btn :href="issuesListUrl" outlined>
                     <v-icon left>mdi-arrow-left</v-icon>
-                    Back to Issues
+                    {{ $t('back_to_issues') }}
                 </v-btn>
             </v-card-text>
 
@@ -273,7 +273,7 @@ Vue.component('issue-detail-view', {
                 <div class="d-flex align-center mb-4">
                     <v-btn text small :href="issuesListUrl" class="pl-0">
                         <v-icon left small>mdi-arrow-left</v-icon>
-                        Issues
+                        {{ $t('issues') }}
                     </v-btn>
                     <v-icon small class="mx-1 text--disabled">mdi-chevron-right</v-icon>
                     <span class="text-caption text--secondary">#{{ localIssue.id }}</span>
@@ -292,7 +292,7 @@ Vue.component('issue-detail-view', {
                         <v-card outlined class="mb-4">
                             <v-card-text class="pa-5">
 
-                                <div class="text-caption text--secondary mb-1">Description</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_description') }}</div>
                                 <div class="body-2 mb-2" style="white-space: pre-wrap;">{{ localIssue.description || '—' }}</div>
 
                                 <!-- Field Reference collapsible -->
@@ -303,7 +303,7 @@ Vue.component('issue-detail-view', {
                                             <v-expansion-panel-header>
                                                 <div style="width: 100%; text-align: left;">
                                                     <v-icon left small>mdi-code-tags</v-icon>
-                                                    <span class="text-subtitle-2">Field Reference</span>
+                                                    <span class="text-subtitle-2">{{ $t('issue_field_reference') }}</span>
                                                     <code v-if="localIssue.field_path" class="ml-2 text-caption">{{ localIssue.field_path }}</code>
                                                 </div>
                                             </v-expansion-panel-header>
@@ -313,15 +313,15 @@ Vue.component('issue-detail-view', {
                                                     <v-col cols="12" md="6">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small>mdi-file-document-outline</v-icon>
-                                                            Current Value
+                                                            {{ $t('issue_current_value') }}
                                                         </div>
                                                         <pre style="background-color:#f5f5f5;padding:10px;border-radius:4px;overflow:auto;font-size:12px;line-height:1.5;max-height:220px;white-space:pre-wrap;word-wrap:break-word;">{{ formatMetadata(localIssue.current_metadata) }}</pre>
                                                     </v-col>
                                                     <v-col cols="12" md="6">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small color="primary">mdi-file-document-edit-outline</v-icon>
-                                                            Suggested Value
-                                                            <v-chip v-if="localIssue.applied" x-small color="success" class="ml-1">Applied</v-chip>
+                                                            {{ $t('issue_suggested_value') }}
+                                                            <v-chip v-if="localIssue.applied" x-small color="success" class="ml-1">{{ $t('issue_applied') }}</v-chip>
                                                         </div>
                                                         <pre style="background-color:#f5f5f5;padding:10px;border-radius:4px;overflow:auto;font-size:12px;line-height:1.5;max-height:220px;white-space:pre-wrap;word-wrap:break-word;">{{ formatMetadata(localIssue.suggested_metadata) }}</pre>
                                                     </v-col>
@@ -331,7 +331,7 @@ Vue.component('issue-detail-view', {
                                                     <v-col cols="12">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small>mdi-compare</v-icon>
-                                                            Diff
+                                                            {{ $t('issue_diff') }}
                                                         </div>
                                                         <div ref="metadataDiffContainer" style="min-height:100px;max-height:350px;overflow:auto;background-color:#fafafa;border-radius:4px;padding:8px;"></div>
                                                     </v-col>
@@ -347,15 +347,15 @@ Vue.component('issue-detail-view', {
 
                         <!-- Resolution card -->
                         <v-card outlined>
-                            <v-card-title class="text-subtitle-1 pb-0">Resolution</v-card-title>
+                            <v-card-title class="text-subtitle-1 pb-0">{{ $t('issue_resolution') }}</v-card-title>
                             <v-card-text class="pt-3">
 
-                                <div class="body-2 mb-1">Notes</div>
+                                <div class="body-2 mb-1">{{ $t('issue_notes') }}</div>
                                 <v-textarea
                                     v-model="resolutionNotes"
                                     outlined
                                     rows="2"
-                                    placeholder="Notes or comments..."
+                                    :placeholder="$t('placeholder_notes')"
                                     hide-details
                                     class="mb-4"
                                 ></v-textarea>
@@ -363,43 +363,43 @@ Vue.component('issue-detail-view', {
                                 <!-- Open -->
                                 <template v-if="localIssue.status === 'open'">
                                     <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('accepted')" :loading="saving">
-                                        <v-icon left small>mdi-check</v-icon>Accept
+                                        <v-icon left small>mdi-check</v-icon>{{ $t('action_accept') }}
                                     </v-btn>
                                     <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
-                                        <v-icon left small>mdi-wrench</v-icon>Mark Fixed
+                                        <v-icon left small>mdi-wrench</v-icon>{{ $t('action_mark_fixed') }}
                                     </v-btn>
                                     <v-btn outlined small color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
-                                        <v-icon left small>mdi-close</v-icon>Reject
+                                        <v-icon left small>mdi-close</v-icon>{{ $t('action_reject') }}
                                     </v-btn>
                                     <v-btn outlined small class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
-                                        <v-icon left small>mdi-minus-circle</v-icon>Dismiss
+                                        <v-icon left small>mdi-minus-circle</v-icon>{{ $t('action_dismiss') }}
                                     </v-btn>
                                     <v-btn outlined small class="mr-2 mb-2" @click="resolve('false_positive')" :loading="saving">
-                                        <v-icon left small>mdi-alert-remove</v-icon>False Positive
+                                        <v-icon left small>mdi-alert-remove</v-icon>{{ $t('action_false_positive') }}
                                     </v-btn>
                                 </template>
 
                                 <!-- Accepted -->
                                 <template v-else-if="localIssue.status === 'accepted'">
                                     <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
-                                        <v-icon left small>mdi-wrench</v-icon>Mark Fixed
+                                        <v-icon left small>mdi-wrench</v-icon>{{ $t('action_mark_fixed') }}
                                     </v-btn>
                                     <v-btn outlined small color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
-                                        <v-icon left small>mdi-close</v-icon>Reject
+                                        <v-icon left small>mdi-close</v-icon>{{ $t('action_reject') }}
                                     </v-btn>
                                     <v-btn outlined small class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
-                                        <v-icon left small>mdi-minus-circle</v-icon>Dismiss
+                                        <v-icon left small>mdi-minus-circle</v-icon>{{ $t('action_dismiss') }}
                                     </v-btn>
                                     <v-btn outlined small class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
-                                        <v-icon left small>mdi-refresh</v-icon>Reopen
+                                        <v-icon left small>mdi-refresh</v-icon>{{ $t('action_reopen') }}
                                     </v-btn>
                                 </template>
 
                                 <!-- Closed -->
                                 <template v-else>
-                                    <div class="text-caption text--secondary mb-3">This issue is closed.</div>
+                                    <div class="text-caption text--secondary mb-3">{{ $t('issue_is_closed') }}</div>
                                     <v-btn outlined small class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
-                                        <v-icon left small>mdi-refresh</v-icon>Reopen
+                                        <v-icon left small>mdi-refresh</v-icon>{{ $t('action_reopen') }}
                                     </v-btn>
                                 </template>
 
@@ -414,7 +414,7 @@ Vue.component('issue-detail-view', {
                             <v-card-text class="pa-3">
 
                                 <!-- Status -->
-                                <div class="text-caption text--secondary mb-1">Status</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_status') }}</div>
                                 <div class="mb-3">
                                     <issue-status-badge :status="localIssue.status" small></issue-status-badge>
                                 </div>
@@ -422,13 +422,13 @@ Vue.component('issue-detail-view', {
                                 <v-divider class="mb-3"></v-divider>
 
                                 <!-- Severity -->
-                                <div class="text-caption text--secondary mb-1">Severity</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_severity') }}</div>
                                 <div class="mb-3">
                                     <v-select
                                         :value="localIssue.severity"
                                         :items="severityOptions"
                                         outlined dense hide-details clearable
-                                        placeholder="Not set"
+                                        :placeholder="$t('placeholder_not_set')"
                                         :disabled="!isEditable"
                                         style="font-size: 13px;"
                                         @change="saveField('severity', $event)"
@@ -438,7 +438,7 @@ Vue.component('issue-detail-view', {
                                 <v-divider class="mb-3"></v-divider>
 
                                 <!-- Category -->
-                                <div class="text-caption text--secondary mb-1">Category</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_category') }}</div>
                                 <div class="mb-3">
                                     <v-select
                                         :value="localIssue.category"
@@ -446,7 +446,7 @@ Vue.component('issue-detail-view', {
                                         item-text="text"
                                         item-value="value"
                                         outlined dense hide-details clearable
-                                        placeholder="Not set"
+                                        :placeholder="$t('placeholder_not_set')"
                                         :disabled="!isEditable"
                                         style="font-size: 13px;"
                                         @change="saveField('category', $event)"
@@ -456,7 +456,7 @@ Vue.component('issue-detail-view', {
                                 <v-divider class="mb-3"></v-divider>
 
                                 <!-- Project -->
-                                <div class="text-caption text--secondary mb-1">Project</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_project') }}</div>
                                 <div class="mb-3">
                                     <a :href="projectUrl" target="_blank" class="body-2 d-flex align-center text-decoration-none">
                                         <v-icon x-small class="mr-1">mdi-open-in-new</v-icon>

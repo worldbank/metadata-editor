@@ -46,43 +46,43 @@ Vue.component('issue-list', {
             selected: [],
             headers: [
                 { text: '', value: 'select', sortable: false, width: '50px' },
-                { text: 'Description', value: 'description' },
-                { text: 'Category', value: 'category', width: '150px' },
-                { text: 'Severity', value: 'severity', width: '120px' },
-                { text: 'Status', value: 'status', width: '150px' },
-                { text: 'Field', value:'field_path', width: '200px' },
-                { text: 'Created', value: 'created', width: '120px' },
-                { text: 'Actions', value: 'actions', sortable: false, width: '150px' }
+                { text: this.$t('issue_description'), value: 'description' },
+                { text: this.$t('issue_category'), value: 'category', width: '150px' },
+                { text: this.$t('issue_severity'), value: 'severity', width: '120px' },
+                { text: this.$t('issue_status'), value: 'status', width: '150px' },
+                { text: this.$t('field'), value:'field_path', width: '200px' },
+                { text: this.$t('activity_created'), value: 'created', width: '120px' },
+                { text: this.$t('actions'), value: 'actions', sortable: false, width: '150px' }
             ],
             statusOptions: [
-                { text: 'All', value: '' },
-                { text: 'Open', value: 'open' },
-                { text: 'Accepted', value: 'accepted' },
-                { text: 'Fixed', value: 'fixed' },
-                { text: 'Rejected', value: 'rejected' },
-                { text: 'Dismissed', value: 'dismissed' },
-                { text: 'False Positive', value: 'false_positive' }
+                { text: this.$t('status_all'), value: '' },
+                { text: this.$t('status_open'), value: 'open' },
+                { text: this.$t('status_accepted'), value: 'accepted' },
+                { text: this.$t('status_fixed'), value: 'fixed' },
+                { text: this.$t('status_rejected'), value: 'rejected' },
+                { text: this.$t('status_dismissed'), value: 'dismissed' },
+                { text: this.$t('status_false_positive'), value: 'false_positive' }
             ],
             categoryOptions: [
-                { text: 'All',             value: '' },
-                { text: 'Typo / Wording', value: 'typo_wording' },
-                { text: 'Inconsistency',   value: 'inconsistency' },
-                { text: 'Missing Data',    value: 'missing_data' },
-                { text: 'Format Issue',    value: 'format_issue' },
-                { text: 'Completeness',    value: 'completeness' },
-                { text: 'Other',           value: 'other' }
+                { text: this.$t('status_all'), value: '' },
+                { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+                { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+                { text: this.$t('category_missing_data'), value: 'missing_data' },
+                { text: this.$t('category_format_issue'), value: 'format_issue' },
+                { text: this.$t('category_completeness'), value: 'completeness' },
+                { text: this.$t('category_other'), value: 'other' }
             ],
             severityOptions: [
-                { text: 'All', value: '' },
-                { text: 'Low', value: 'low' },
-                { text: 'Medium', value: 'medium' },
-                { text: 'High', value: 'high' },
-                { text: 'Critical', value: 'critical' }
+                { text: this.$t('status_all'), value: '' },
+                { text: this.$t('severity_low'), value: 'low' },
+                { text: this.$t('severity_medium'), value: 'medium' },
+                { text: this.$t('severity_high'), value: 'high' },
+                { text: this.$t('severity_critical'), value: 'critical' }
             ],
             appliedOptions: [
-                { text: 'All', value: '' },
-                { text: 'Applied', value: '1' },
-                { text: 'Not Applied', value: '0' }
+                { text: this.$t('status_all'), value: '' },
+                { text: this.$t('issue_applied'), value: '1' },
+                { text: this.$t('issue_not_applied'), value: '0' }
             ]
         };
     },
@@ -93,18 +93,18 @@ Vue.component('issue-list', {
         scopedStatusOptions() {
             if (this.statusScope === 'open') {
                 return [
-                    { text: 'All open', value: '' },
-                    { text: 'Open', value: 'open' },
-                    { text: 'Accepted', value: 'accepted' }
+                    { text: this.$t('status_all_open'), value: '' },
+                    { text: this.$t('status_open'), value: 'open' },
+                    { text: this.$t('status_accepted'), value: 'accepted' }
                 ];
             }
             if (this.statusScope === 'closed') {
                 return [
-                    { text: 'All closed', value: '' },
-                    { text: 'Fixed', value: 'fixed' },
-                    { text: 'Rejected', value: 'rejected' },
-                    { text: 'Dismissed', value: 'dismissed' },
-                    { text: 'False Positive', value: 'false_positive' }
+                    { text: this.$t('status_all_closed'), value: '' },
+                    { text: this.$t('status_fixed'), value: 'fixed' },
+                    { text: this.$t('status_rejected'), value: 'rejected' },
+                    { text: this.$t('status_dismissed'), value: 'dismissed' },
+                    { text: this.$t('status_false_positive'), value: 'false_positive' }
                 ];
             }
             return this.statusOptions;
@@ -172,13 +172,13 @@ Vue.component('issue-list', {
                     this.total = response.data.total || 0;
                     this.selected = [];
                 } else {
-                    throw new Error(response.data.message || 'Failed to load issues');
+                    throw new Error(response.data.message || this.$t('error_load_issues'));
                 }
             } catch (error) {
                 console.error('Error loading issues:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to load issues'
+                    error.response?.data?.message || error.message || this.$t('error_load_issues')
                 );
             } finally {
                 this.loading = false;
@@ -205,7 +205,7 @@ Vue.component('issue-list', {
             this.$router.push('/issues/' + issue.id);
         },
         async deleteIssue(issue) {
-            if (!confirm('Are you sure you want to delete this issue?')) {
+            if (!confirm(this.$t('confirm_delete_issue'))) {
                 return;
             }
 
@@ -214,24 +214,24 @@ Vue.component('issue-list', {
                 const response = await axios.post(url);
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Issue deleted successfully');
+                    EventBus.$emit('onSuccess', this.$t('issue_deleted'));
                     this.$emit('issue-deleted', issue);
                     this.loadIssues();
                     this.refreshIssueSummary();
                 } else {
-                    throw new Error(response.data.message || 'Failed to delete issue');
+                    throw new Error(response.data.message || this.$t('error_delete_issue'));
                 }
             } catch (error) {
                 console.error('Error deleting issue:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to delete issue'
+                    error.response?.data?.message || error.message || this.$t('error_delete_issue')
                 );
             }
         },
         async bulkUpdateStatus(status) {
             if (this.selected.length === 0) {
-                EventBus.$emit('onFail', 'Please select issues first');
+                EventBus.$emit('onFail', this.$t('validation_select_issues'));
                 return;
             }
 
@@ -247,31 +247,31 @@ Vue.component('issue-list', {
                 if (response.data.status === 'success') {
                     EventBus.$emit(
                         'onSuccess',
-                        response.data.affected + ' issue(s) updated'
+                        this.$t('issues_updated').replace(':count', response.data.affected)
                     );
                     this.selected = [];
                     this.loadIssues();
                     this.refreshIssueSummary();
                 } else {
-                    throw new Error(response.data.message || 'Failed to update issues');
+                    throw new Error(response.data.message || this.$t('error_update_status'));
                 }
             } catch (error) {
                 console.error('Error updating issues:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to update issues'
+                    error.response?.data?.message || error.message || this.$t('error_update_status')
                 );
             }
         },
         async bulkDeleteIssues() {
             if (this.selected.length === 0) {
-                EventBus.$emit('onFail', 'Please select issues first');
+                EventBus.$emit('onFail', this.$t('validation_select_issues'));
                 return;
             }
 
             const issueIds = this.selected.map(issue => issue.id);
             const shouldDelete = confirm(
-                'Are you sure you want to delete ' + issueIds.length + ' selected issue(s)? This action cannot be undone.'
+                this.$t('confirm_delete_selected').replace(':count', issueIds.length)
             );
             if (!shouldDelete) {
                 return;
@@ -284,19 +284,19 @@ Vue.component('issue-list', {
                 if (response.data.status === 'success') {
                     EventBus.$emit(
                         'onSuccess',
-                        response.data.affected + ' issue(s) deleted'
+                        this.$t('issues_deleted').replace(':count', response.data.affected)
                     );
                     this.selected = [];
                     this.loadIssues();
                     this.refreshIssueSummary();
                 } else {
-                    throw new Error(response.data.message || 'Failed to delete issues');
+                    throw new Error(response.data.message || this.$t('error_delete_issue'));
                 }
             } catch (error) {
                 console.error('Error deleting issues:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to delete issues'
+                    error.response?.data?.message || error.message || this.$t('error_delete_issue')
                 );
             }
         },
@@ -311,6 +311,10 @@ Vue.component('issue-list', {
         getCategoryLabel(code) {
             const opt = this.categoryOptions.find(o => o.value === code);
             return opt ? opt.text : (code || '');
+        },
+        getSeverityLabel(code) {
+            const key = 'severity_' + code;
+            return this.$te(key) ? this.$t(key) : (code || '');
         }
     },
     template: `
@@ -323,7 +327,7 @@ Vue.component('issue-list', {
                             <v-select
                                 v-model="filters.status"
                                 :items="scopedStatusOptions"
-                                placeholder="Status"
+                                :placeholder="$t('filter_status')"
                                 outlined
                                 dense
                                 hide-details
@@ -334,7 +338,7 @@ Vue.component('issue-list', {
                             <v-select
                                 v-model="filters.category"
                                 :items="categoryOptions"
-                                placeholder="Category"
+                                :placeholder="$t('filter_category')"
                                 outlined
                                 dense
                                 hide-details
@@ -345,7 +349,7 @@ Vue.component('issue-list', {
                             <v-select
                                 v-model="filters.severity"
                                 :items="severityOptions"
-                                placeholder="Severity"
+                                :placeholder="$t('filter_severity')"
                                 outlined
                                 dense
                                 hide-details
@@ -356,7 +360,7 @@ Vue.component('issue-list', {
                             <v-select
                                 v-model="filters.applied"
                                 :items="appliedOptions"
-                                placeholder="Applied"
+                                :placeholder="$t('filter_applied')"
                                 outlined
                                 dense
                                 hide-details
@@ -370,7 +374,7 @@ Vue.component('issue-list', {
                                 small
                             >
                                 <v-icon left small>mdi-filter-off</v-icon>
-                                Clear
+                                {{ $t('filter_clear') }}
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -381,7 +385,7 @@ Vue.component('issue-list', {
             <v-card flat v-if="hasSelected" class="mb-3">
                 <v-card-text class="py-2">
                     <div class="d-flex align-center">
-                        <span class="mr-3"><strong>{{ selected.length }}</strong> selected</span>
+                        <span class="mr-3">{{ $t('activity_selected').replace(':count', selected.length) }}</span>
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
@@ -391,29 +395,29 @@ Vue.component('issue-list', {
                                     v-bind="attrs"
                                     v-on="on"
                                 >
-                                    Bulk Actions
+                                    {{ $t('action_bulk_actions') }}
                                     <v-icon right>mdi-menu-down</v-icon>
                                 </v-btn>
                             </template>
                             <v-list dense>
                                 <v-list-item @click="bulkUpdateStatus('false_positive')">
-                                    <v-list-item-title>Mark as False Positive</v-list-item-title>
+                                    <v-list-item-title>{{ $t('bulk_false_positive') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('dismissed')">
-                                    <v-list-item-title>Dismiss</v-list-item-title>
+                                    <v-list-item-title>{{ $t('action_dismiss') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('accepted')">
-                                    <v-list-item-title>Accept</v-list-item-title>
+                                    <v-list-item-title>{{ $t('action_accept') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('rejected')">
-                                    <v-list-item-title>Reject</v-list-item-title>
+                                    <v-list-item-title>{{ $t('action_reject') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-divider class="my-1"></v-divider>
                                 <v-list-item @click="bulkDeleteIssues()">
                                     <v-list-item-icon class="mr-2">
                                         <v-icon small color="error">mdi-delete</v-icon>
                                     </v-list-item-icon>
-                                    <v-list-item-title class="error--text">Delete selected</v-list-item-title>
+                                    <v-list-item-title class="error--text">{{ $t('action_delete_selected') }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -460,7 +464,7 @@ Vue.component('issue-list', {
                         outlined
                         class="text-capitalize"
                     >
-                        {{ item.severity }}
+                        {{ getSeverityLabel(item.severity) }}
                     </v-chip>
                     <span v-else class="text--disabled">-</span>
                 </template>
@@ -483,7 +487,7 @@ Vue.component('issue-list', {
                         icon
                         small
                         @click="viewIssue(item)"
-                        title="Edit"
+                        :title="$t('action_edit')"
                     >
                         <v-icon small>mdi-pencil</v-icon>
                     </v-btn>
@@ -491,7 +495,7 @@ Vue.component('issue-list', {
                         icon
                         small
                         @click="deleteIssue(item)"
-                        title="Delete"
+                        :title="$t('action_delete')"
                         color="error"
                     >
                         <v-icon small>mdi-delete</v-icon>
@@ -501,9 +505,9 @@ Vue.component('issue-list', {
                 <template v-slot:no-data>
                     <div class="text-center pa-5">
                         <v-icon size="64" color="grey lighten-2">mdi-alert-circle-outline</v-icon>
-                        <p class="text-h6 mt-3">No issues found</p>
+                        <p class="text-h6 mt-3">{{ $t('no_issues_found') }}</p>
                         <p v-if="Object.values(filters).some(v => v !== '')" class="text--secondary">
-                            Try adjusting your filters
+                            {{ $t('try_adjusting_filters') }}
                         </p>
                     </div>
                 </template>

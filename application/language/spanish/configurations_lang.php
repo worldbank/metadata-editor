@@ -96,6 +96,11 @@ $lang['up_to_date']="Está ejecutando la última versión";
 $lang['update_check_failed']="No se pudo verificar actualizaciones (error de red o límite de API)";
 $lang['support']="Soporte";
 $lang['github_releases']="Versiones y registro de cambios en GitHub";
+$lang['metadata_assessment']="Evaluación de metadatos";
+$lang['metadata_assessment_enable']="Activar la función Evaluar metadatos en la página de problemas";
+$lang['metadata_assessment_note']="Cuando está activada, los usuarios con acceso de edición en un proyecto pueden ejecutar una evaluación automática de la calidad de los metadatos. Requiere el backend FastAPI con las rutas de revisión configuradas y el trabajador en segundo plano en ejecución.";
+$lang['metadata_assessment_monthly_limit']="Límite mensual de evaluaciones";
+$lang['metadata_assessment_monthly_limit_note']="Número máximo de evaluaciones de metadatos por mes calendario, para todo el sitio. Introduzca 0 para ilimitado (sin límite).";
 $lang['notifications_retention_days']="Retención de notificaciones (días)";
 $lang['notifications_retention_days_note']="Las notificaciones anteriores a este plazo se ocultan y se pueden eliminar con el comando de limpieza. Valor predeterminado: 30. Rango: 1–365.";
 /* End of file configurations_lang.php */

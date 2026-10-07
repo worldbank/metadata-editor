@@ -72,6 +72,7 @@ class Projects extends MY_Controller {
 			}
 
 			$this->lang->load('indicator_dsd');
+			$this->lang->load('issues');
 
 			$options['translations']=$this->lang->language;
 

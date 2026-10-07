@@ -46,18 +46,18 @@ Vue.component('create-issue-dialog', {
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                { text: 'Typo / Wording', value: 'typo_wording' },
-                { text: 'Inconsistency',   value: 'inconsistency' },
-                { text: 'Missing Data',    value: 'missing_data' },
-                { text: 'Format Issue',    value: 'format_issue' },
-                { text: 'Completeness',    value: 'completeness' },
-                { text: 'Other',           value: 'other' }
+                { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+                { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+                { text: this.$t('category_missing_data'), value: 'missing_data' },
+                { text: this.$t('category_format_issue'), value: 'format_issue' },
+                { text: this.$t('category_completeness'), value: 'completeness' },
+                { text: this.$t('category_other'), value: 'other' }
             ],
             severityOptions: [
-                { text: 'Low', value: 'low' },
-                { text: 'Medium', value: 'medium' },
-                { text: 'High', value: 'high' },
-                { text: 'Critical', value: 'critical' }
+                { text: this.$t('severity_low'), value: 'low' },
+                { text: this.$t('severity_medium'), value: 'medium' },
+                { text: this.$t('severity_high'), value: 'high' },
+                { text: this.$t('severity_critical'), value: 'critical' }
             ]
         };
     },
@@ -150,7 +150,7 @@ Vue.component('create-issue-dialog', {
                     }
                     this.errors[type + '_metadata'] = null;
                 } else {
-                    this.errors[type + '_metadata'] = 'Invalid JSON format or field path not set';
+                    this.errors[type + '_metadata'] = this.$t('error_invalid_json');
                 }
             }
         },
@@ -177,7 +177,7 @@ Vue.component('create-issue-dialog', {
         },
         async createIssue() {
             if (!this.isValid) {
-                this.showToast('Please fill in the required fields', 'warning');
+                this.showToast(this.$t('validation_required_fields'), 'warning');
                 return;
             }
 
@@ -187,17 +187,17 @@ Vue.component('create-issue-dialog', {
                 const response = await axios.post(url, this.newIssue);
 
                 if (response.data.status === 'success') {
-                    this.showToast('Issue created successfully', 'success');
+                    this.showToast(this.$t('issue_created'), 'success');
                     this.$emit('issue-created', response.data.issue);
                     this.dialogVisible = false;
                     this.resetForm();
                 } else {
-                    throw new Error(response.data.message || 'Failed to create issue');
+                    throw new Error(response.data.message || this.$t('error_create_issue'));
                 }
             } catch (error) {
                 console.error('Error creating issue:', error);
                 this.showToast(
-                    error.response?.data?.message || error.message || 'Failed to create issue',
+                    error.response?.data?.message || error.message || this.$t('error_create_issue'),
                     'error'
                 );
             } finally {
@@ -231,9 +231,9 @@ Vue.component('create-issue-dialog', {
             <v-card class="d-flex flex-column" :class="{ 'fill-height': isMaximized }">
                 <v-card-title class="headline grey lighten-2 flex-shrink-0">
                     <v-icon left>mdi-plus-circle</v-icon>
-                    Create New Issue
+                    {{ $t('create_issue') }}
                     <v-spacer></v-spacer>
-                    <v-btn icon @click="isMaximized = !isMaximized" :title="isMaximized ? 'Restore' : 'Maximize'">
+                    <v-btn icon @click="isMaximized = !isMaximized" :title="isMaximized ? $t('action_restore') : $t('action_maximize')">
                         <v-icon>{{ isMaximized ? 'mdi-window-restore' : 'mdi-window-maximize' }}</v-icon>
                     </v-btn>
                     <v-btn icon @click="close">
@@ -246,12 +246,12 @@ Vue.component('create-issue-dialog', {
                     <!-- Title -->
                     <v-row dense>
                         <v-col cols="12">
-                            <div class="body-2 mb-1">Title <span class="error--text">*</span></div>
+                            <div class="body-2 mb-1">{{ $t('issue_title') }} <span class="error--text">*</span></div>
                             <v-text-field
                                 v-model="newIssue.title"
                                 outlined
                                 dense
-                                placeholder="Short title for the issue"
+                                :placeholder="$t('placeholder_issue_title')"
                                 hide-details="auto"
                                 counter="255"
                             ></v-text-field>
@@ -261,12 +261,12 @@ Vue.component('create-issue-dialog', {
                     <!-- Description -->
                     <v-row dense class="mt-4">
                         <v-col cols="12">
-                            <div class="body-2 mb-1">Description <span class="error--text">*</span></div>
+                            <div class="body-2 mb-1">{{ $t('issue_description') }} <span class="error--text">*</span></div>
                             <v-textarea
                                 v-model="newIssue.description"
                                 outlined
                                 rows="3"
-                                placeholder="Describe the issue in detail..."
+                                :placeholder="$t('placeholder_issue_description')"
                                 hide-details="auto"
                             ></v-textarea>
                         </v-col>
@@ -275,7 +275,7 @@ Vue.component('create-issue-dialog', {
                     <!-- Category and Severity -->
                     <v-row dense class="mt-4">
                         <v-col cols="12" md="6">
-                            <div class="body-2 mb-1">Category</div>
+                            <div class="body-2 mb-1">{{ $t('issue_category') }}</div>
                             <v-select
                                 v-model="newIssue.category"
                                 :items="categoryOptions"
@@ -283,13 +283,13 @@ Vue.component('create-issue-dialog', {
                                 item-value="value"
                                 outlined
                                 dense
-                                placeholder="Select a category"
+                                :placeholder="$t('placeholder_issue_category')"
                                 hide-details="auto"
                                 clearable
                             ></v-select>
                         </v-col>
                         <v-col cols="12" md="6">
-                            <div class="body-2 mb-1">Severity</div>
+                            <div class="body-2 mb-1">{{ $t('issue_severity') }}</div>
                             <v-select
                                 v-model="newIssue.severity"
                                 :items="severityOptions"
@@ -303,12 +303,12 @@ Vue.component('create-issue-dialog', {
                     <!-- Field Path -->
                     <v-row dense class="mt-4">
                         <v-col cols="12">
-                            <div class="body-2 mb-1">Field Path</div>
+                            <div class="body-2 mb-1">{{ $t('issue_field_path') }}</div>
                             <v-text-field
                                 v-model="newIssue.field_path"
                                 outlined
                                 dense
-                                placeholder="e.g., series_description.methodology"
+                                :placeholder="$t('placeholder_issue_field_path')"
                                 hint="Identifies the specific metadata field this issue refers to"
                                 persistent-hint
                             ></v-text-field>
@@ -319,23 +319,23 @@ Vue.component('create-issue-dialog', {
                     <template v-if="newIssue.field_path">
                         <v-row dense class="mt-4">
                             <v-col cols="12" md="6">
-                                <div class="body-2 mb-1">Current Value</div>
+                                <div class="body-2 mb-1">{{ $t('issue_current_value') }}</div>
                                 <v-textarea
                                     v-model="currentMetadataText"
                                     outlined
                                     rows="4"
-                                    placeholder="Current value of the field"
+                                    :placeholder="$t('placeholder_issue_current')"
                                     hide-details="auto"
                                     :error-messages="errors.current_metadata"
                                 ></v-textarea>
                             </v-col>
                             <v-col cols="12" md="6">
-                                <div class="body-2 mb-1">Suggested Value</div>
+                                <div class="body-2 mb-1">{{ $t('issue_suggested_value') }}</div>
                                 <v-textarea
                                     v-model="suggestedMetadataText"
                                     outlined
                                     rows="4"
-                                    placeholder="What it should be changed to"
+                                    :placeholder="$t('placeholder_issue_suggested')"
                                     hide-details="auto"
                                     :error-messages="errors.suggested_metadata"
                                 ></v-textarea>
@@ -354,7 +354,7 @@ Vue.component('create-issue-dialog', {
                         text
                         @click="close"
                     >
-                        Cancel
+                        {{ $t('action_cancel') }}
                     </v-btn>
                     <v-btn
                         small
@@ -364,7 +364,7 @@ Vue.component('create-issue-dialog', {
                         :disabled="!isValid"
                     >
                         <v-icon left>mdi-plus</v-icon>
-                        Create Issue
+                        {{ $t('action_create_issue') }}
                     </v-btn>
                 </v-card-actions>
             </v-card>

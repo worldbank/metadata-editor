@@ -27,26 +27,26 @@ const VueIssueEdit = Vue.component('issue-edit', {
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                { text: 'Typo / Wording', value: 'typo_wording' },
-                { text: 'Inconsistency',   value: 'inconsistency' },
-                { text: 'Missing Data',    value: 'missing_data' },
-                { text: 'Format Issue',    value: 'format_issue' },
-                { text: 'Completeness',    value: 'completeness' },
-                { text: 'Other',           value: 'other' }
+                { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+                { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+                { text: this.$t('category_missing_data'), value: 'missing_data' },
+                { text: this.$t('category_format_issue'), value: 'format_issue' },
+                { text: this.$t('category_completeness'), value: 'completeness' },
+                { text: this.$t('category_other'), value: 'other' }
             ],
             severityOptions: [
-                { text: 'Low', value: 'low' },
-                { text: 'Medium', value: 'medium' },
-                { text: 'High', value: 'high' },
-                { text: 'Critical', value: 'critical' }
+                { text: this.$t('severity_low'), value: 'low' },
+                { text: this.$t('severity_medium'), value: 'medium' },
+                { text: this.$t('severity_high'), value: 'high' },
+                { text: this.$t('severity_critical'), value: 'critical' }
             ],
             statusOptions: [
-                { text: 'Open', value: 'open' },
-                { text: 'Accepted', value: 'accepted' },
-                { text: 'Fixed', value: 'fixed' },
-                { text: 'Rejected', value: 'rejected' },
-                { text: 'Dismissed', value: 'dismissed' },
-                { text: 'False Positive', value: 'false_positive' }
+                { text: this.$t('status_open'), value: 'open' },
+                { text: this.$t('status_accepted'), value: 'accepted' },
+                { text: this.$t('status_fixed'), value: 'fixed' },
+                { text: this.$t('status_rejected'), value: 'rejected' },
+                { text: this.$t('status_dismissed'), value: 'dismissed' },
+                { text: this.$t('status_false_positive'), value: 'false_positive' }
             ],
             diffRoot: null,
             advancedPanel: [0]
@@ -132,6 +132,10 @@ const VueIssueEdit = Vue.component('issue-edit', {
         }
     },
     methods: {
+        getSeverityLabel(code) {
+            const key = 'severity_' + code;
+            return this.$te(key) ? this.$t(key) : (code || '');
+        },
         getCategoryLabel(code) {
             const opt = this.categoryOptions.find(o => o.value === code);
             return opt ? opt.text : (code || '');
@@ -151,13 +155,13 @@ const VueIssueEdit = Vue.component('issue-edit', {
                         }, 200);
                     });
                 } else {
-                    throw new Error(response.data.message || 'Failed to load issue');
+                    throw new Error(response.data.message || this.$t('error_load_issue'));
                 }
             } catch (error) {
                 console.error('Error loading issue:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to load issue'
+                    error.response?.data?.message || error.message || this.$t('error_load_issue')
                 );
                 this.$router.push('/issues');
             } finally {
@@ -207,7 +211,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                     }
                     this.errors[type + '_metadata'] = null;
                 } else {
-                    this.errors[type + '_metadata'] = 'Invalid JSON format or field path not set';
+                    this.errors[type + '_metadata'] = this.$t('error_invalid_json');
                 }
             }
         },
@@ -238,7 +242,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
         async saveChanges() {
             const title = (this.editedIssue.title !== undefined && this.editedIssue.title !== null ? String(this.editedIssue.title) : '').trim();
             if (!title) {
-                EventBus.$emit('onFail', 'Title is required');
+                EventBus.$emit('onFail', this.$t('validation_title_required'));
                 return;
             }
             this.saving = true;
@@ -247,25 +251,25 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 const response = await axios.put(url, this.editedIssue);
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Issue updated successfully');
+                    EventBus.$emit('onSuccess', this.$t('issue_updated'));
                     this.issue = response.data.issue;
                     this.editedIssue = { ...this.issue };
                     this.editMode = false;
                 } else {
-                    throw new Error(response.data.message || 'Failed to update issue');
+                    throw new Error(response.data.message || this.$t('error_update_issue'));
                 }
             } catch (error) {
                 console.error('Error updating issue:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to update issue'
+                    error.response?.data?.message || error.message || this.$t('error_update_issue')
                 );
             } finally {
                 this.saving = false;
             }
         },
         async applyChanges() {
-            if (!confirm('Apply the suggested metadata changes to the project?')) {
+            if (!confirm(this.$t('confirm_apply_to_field'))) {
                 return;
             }
 
@@ -275,16 +279,16 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 const response = await axios.post(url);
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Changes applied successfully');
+                    EventBus.$emit('onSuccess', this.$t('changes_applied'));
                     this.loadIssue();
                 } else {
-                    throw new Error(response.data.message || 'Failed to apply changes');
+                    throw new Error(response.data.message || this.$t('error_apply_changes'));
                 }
             } catch (error) {
                 console.error('Error applying changes:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to apply changes'
+                    error.response?.data?.message || error.message || this.$t('error_apply_changes')
                 );
             } finally {
                 this.applying = false;
@@ -296,17 +300,17 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 const response = await axios.post(url, { status: newStatus });
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Status updated');
+                    EventBus.$emit('onSuccess', this.$t('issue_updated'));
                     this.issue.status = newStatus;
                     this.editedIssue.status = newStatus;
                 } else {
-                    throw new Error(response.data.message || 'Failed to update status');
+                    throw new Error(response.data.message || this.$t('error_update_status'));
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to update status'
+                    error.response?.data?.message || error.message || this.$t('error_update_status')
                 );
             }
         },
@@ -318,7 +322,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 }
                 const response = await axios.post(CI.base_url + '/api/issues/status/' + this.issueId, { status: newStatus });
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Issue updated');
+                    EventBus.$emit('onSuccess', this.$t('issue_updated'));
                     this.issue.status = newStatus;
                     this.editedIssue.status = newStatus;
                     if (this.resolutionNotes.trim()) {
@@ -327,16 +331,16 @@ const VueIssueEdit = Vue.component('issue-edit', {
                     }
                     this.resolutionNotes = '';
                 } else {
-                    throw new Error(response.data.message || 'Failed to update status');
+                    throw new Error(response.data.message || this.$t('error_update_status'));
                 }
             } catch (error) {
-                EventBus.$emit('onFail', error.response?.data?.message || error.message || 'Failed to update issue');
+                EventBus.$emit('onFail', error.response?.data?.message || error.message || this.$t('error_update_issue'));
             } finally {
                 this.saving = false;
             }
         },
         async applyWithNotes() {
-            if (!confirm('Apply the suggested metadata changes to the project?')) {
+            if (!confirm(this.$t('confirm_apply_to_field'))) {
                 return;
             }
             this.applying = true;
@@ -346,20 +350,20 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 }
                 const response = await axios.post(CI.base_url + '/api/issues/apply/' + this.issueId);
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Changes applied successfully');
+                    EventBus.$emit('onSuccess', this.$t('changes_applied'));
                     this.resolutionNotes = '';
                     this.loadIssue();
                 } else {
-                    throw new Error(response.data.message || 'Failed to apply changes');
+                    throw new Error(response.data.message || this.$t('error_apply_changes'));
                 }
             } catch (error) {
-                EventBus.$emit('onFail', error.response?.data?.message || error.message || 'Failed to apply changes');
+                EventBus.$emit('onFail', error.response?.data?.message || error.message || this.$t('error_apply_changes'));
             } finally {
                 this.applying = false;
             }
         },
         async deleteIssue() {
-            if (!confirm('Are you sure you want to delete this issue?')) {
+            if (!confirm(this.$t('confirm_delete_issue'))) {
                 return;
             }
 
@@ -368,16 +372,16 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 const response = await axios.post(url);
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Issue deleted successfully');
+                    EventBus.$emit('onSuccess', this.$t('issue_deleted'));
                     this.$router.push('/issues');
                 } else {
-                    throw new Error(response.data.message || 'Failed to delete issue');
+                    throw new Error(response.data.message || this.$t('error_delete_issue'));
                 }
             } catch (error) {
                 console.error('Error deleting issue:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to delete issue'
+                    error.response?.data?.message || error.message || this.$t('error_delete_issue')
                 );
             }
         },
@@ -580,7 +584,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 <v-row>
                     <v-col cols="12" class="text-center py-12">
                         <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                        <div class="mt-4">Loading issue...</div>
+                        <div class="mt-4">{{ $t('loading_issue') }}</div>
                     </v-col>
                 </v-row>
             </v-container>
@@ -604,7 +608,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 class="mr-2"
                             >
                                 <v-icon left>mdi-pencil</v-icon>
-                                Edit
+                                {{ $t('action_edit') }}
                             </v-btn>
                             <v-btn
                                 v-if="editMode"
@@ -614,9 +618,9 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 class="mr-2"
                             >
                                 <v-icon left>mdi-content-save</v-icon>
-                                Save
+                                {{ $t('action_save') }}
                             </v-btn>
-                            <v-btn v-if="editMode" text @click="cancel" class="mr-2">Cancel</v-btn>
+                            <v-btn v-if="editMode" text @click="cancel" class="mr-2">{{ $t('action_cancel') }}</v-btn>
                             <v-btn v-if="UserHasEditAccess && !editMode" icon @click="deleteIssue">
                                 <v-icon color="error">mdi-delete</v-icon>
                             </v-btn>
@@ -635,7 +639,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                             <v-card-text class="pa-6">
 
                                 <!-- Title -->
-                                <div class="body-2 mb-1">Title <span v-if="editMode" class="error--text">*</span></div>
+                                <div class="body-2 mb-1">{{ $t('issue_title') }} <span v-if="editMode" class="error--text">*</span></div>
                                 <v-text-field
                                     v-if="editMode"
                                     v-model="editedIssue.title"
@@ -647,7 +651,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <div v-else class="body-1 mb-4">{{ issue.title }}</div>
 
                                 <!-- Description -->
-                                <div class="body-2 mb-1">Description</div>
+                                <div class="body-2 mb-1">{{ $t('issue_description') }}</div>
                                 <v-textarea
                                     v-if="editMode"
                                     v-model="editedIssue.description"
@@ -666,7 +670,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                             <v-expansion-panel-header>
                                                 <div>
                                                     <v-icon left small>mdi-code-tags</v-icon>
-                                                    <span class="text-subtitle-2">Field Reference</span>
+                                                    <span class="text-subtitle-2">{{ $t('issue_field_reference') }}</span>
                                                     <code v-if="issue.field_path && !editMode" class="ml-2 text-caption">{{ issue.field_path }}</code>
                                                 </div>
                                             </v-expansion-panel-header>
@@ -680,12 +684,12 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                                             :items="fieldPathOptions"
                                                             item-text="text"
                                                             item-value="value"
-                                                            label="Field Path"
+                                                            :label="$t('issue_field_path')"
                                                             outlined
                                                             dense
                                                             clearable
-                                                            placeholder="Select a field or type to search"
-                                                            hint="Select from project metadata or type custom path"
+                                                            :placeholder="$t('placeholder_select_field')"
+                                                            :hint="$t('hint_field_path')"
                                                             persistent-hint
                                                         >
                                                             <template v-slot:item="{ item }">
@@ -697,7 +701,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                                             </template>
                                                         </v-autocomplete>
                                                         <div v-else>
-                                                            <div class="text-caption text--secondary mb-1">Field Path</div>
+                                                            <div class="text-caption text--secondary mb-1">{{ $t('issue_field_path') }}</div>
                                                             <code>{{ issue.field_path }}</code>
                                                         </div>
                                                     </v-col>
@@ -708,7 +712,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                                     <v-col cols="12" md="6">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small>mdi-file-document-outline</v-icon>
-                                                            Current Value
+                                                            {{ $t('issue_current_value') }}
                                                         </div>
                                                         <v-textarea
                                                             v-if="editMode"
@@ -723,7 +727,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                                     <v-col cols="12" md="6">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small color="primary">mdi-file-document-edit-outline</v-icon>
-                                                            Suggested Value
+                                                            {{ $t('issue_suggested_value') }}
                                                         </div>
                                                         <v-textarea
                                                             v-if="editMode"
@@ -742,7 +746,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                                     <v-col cols="12">
                                                         <div class="text-subtitle-2 mb-2">
                                                             <v-icon left small>mdi-compare</v-icon>
-                                                            Diff
+                                                            {{ $t('issue_diff') }}
                                                         </div>
                                                         <div ref="metadataDiffContainer" style="min-height: 120px; max-height: 400px; overflow: auto; background-color: #fafafa; border-radius: 4px; padding: 8px;"></div>
                                                     </v-col>
@@ -757,14 +761,14 @@ const VueIssueEdit = Vue.component('issue-edit', {
 
                         <!-- Resolution -->
                         <v-card v-if="!editMode && UserHasEditAccess">
-                            <v-card-title class="text-subtitle-1">Resolution</v-card-title>
+                            <v-card-title class="text-subtitle-1">{{ $t('issue_resolution') }}</v-card-title>
                             <v-card-text>
-                                <div class="body-2 mb-1">Notes</div>
+                                <div class="body-2 mb-1">{{ $t('issue_notes') }}</div>
                                 <v-textarea
                                     v-model="resolutionNotes"
                                     outlined
                                     rows="2"
-                                    placeholder="Notes or comments..."
+                                    :placeholder="$t('placeholder_notes')"
                                     hide-details
                                     class="mb-4"
                                 ></v-textarea>
@@ -773,27 +777,27 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <template v-if="issue.status === 'open'">
                                     <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
                                         <v-icon left small>mdi-check-circle</v-icon>
-                                        Apply Changes
+                                        {{ $t('action_apply_to_field') }}
                                     </v-btn>
                                     <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('accepted')" :loading="saving">
                                         <v-icon left small>mdi-check</v-icon>
-                                        Accept
+                                        {{ $t('action_accept') }}
                                     </v-btn>
                                     <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
                                         <v-icon left small>mdi-wrench</v-icon>
-                                        Mark Fixed
+                                        {{ $t('action_mark_fixed') }}
                                     </v-btn>
                                     <v-btn outlined color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
                                         <v-icon left small>mdi-close</v-icon>
-                                        Reject
+                                        {{ $t('action_reject') }}
                                     </v-btn>
                                     <v-btn outlined class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
                                         <v-icon left small>mdi-minus-circle</v-icon>
-                                        Dismiss
+                                        {{ $t('action_dismiss') }}
                                     </v-btn>
                                     <v-btn outlined class="mr-2 mb-2" @click="resolve('false_positive')" :loading="saving">
                                         <v-icon left small>mdi-alert-remove</v-icon>
-                                        False Positive
+                                        {{ $t('action_false_positive') }}
                                     </v-btn>
                                 </template>
 
@@ -801,23 +805,23 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <template v-else-if="issue.status === 'accepted'">
                                     <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
                                         <v-icon left small>mdi-check-circle</v-icon>
-                                        Apply Changes
+                                        {{ $t('action_apply_to_field') }}
                                     </v-btn>
                                     <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
                                         <v-icon left small>mdi-wrench</v-icon>
-                                        Mark Fixed
+                                        {{ $t('action_mark_fixed') }}
                                     </v-btn>
                                     <v-btn outlined color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
                                         <v-icon left small>mdi-close</v-icon>
-                                        Reject
+                                        {{ $t('action_reject') }}
                                     </v-btn>
                                     <v-btn outlined class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
                                         <v-icon left small>mdi-minus-circle</v-icon>
-                                        Dismiss
+                                        {{ $t('action_dismiss') }}
                                     </v-btn>
                                     <v-btn outlined class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
                                         <v-icon left small>mdi-refresh</v-icon>
-                                        Reopen
+                                        {{ $t('action_reopen') }}
                                     </v-btn>
                                 </template>
 
@@ -825,7 +829,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <template v-else>
                                     <v-btn outlined class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
                                         <v-icon left small>mdi-refresh</v-icon>
-                                        Reopen
+                                        {{ $t('action_reopen') }}
                                     </v-btn>
                                 </template>
                             </v-card-text>
@@ -839,7 +843,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                             <v-card-text class="pa-4">
 
                                 <!-- Status -->
-                                <div class="text-caption text--secondary mb-1">Status</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_status') }}</div>
                                 <div class="mb-4">
                                     <v-select
                                         v-if="editMode"
@@ -855,7 +859,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <v-divider class="mb-4"></v-divider>
 
                                 <!-- Severity -->
-                                <div class="text-caption text--secondary mb-1">Severity</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_severity') }}</div>
                                 <div class="mb-4">
                                     <v-select
                                         v-if="editMode"
@@ -868,7 +872,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                     ></v-select>
                                     <div v-else>
                                         <v-chip v-if="issue.severity" small :color="issue.severity === 'critical' ? 'error' : issue.severity === 'high' ? 'warning' : 'default'">
-                                            {{ issue.severity }}
+                                            {{ getSeverityLabel(issue.severity) }}
                                         </v-chip>
                                         <span v-else class="text--secondary text-caption">—</span>
                                     </div>
@@ -877,7 +881,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <v-divider class="mb-4"></v-divider>
 
                                 <!-- Category -->
-                                <div class="text-caption text--secondary mb-1">Category</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_category') }}</div>
                                 <div class="mb-4">
                                     <v-select
                                         v-if="editMode"
@@ -896,7 +900,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <v-divider class="mb-4"></v-divider>
 
                                 <!-- Notes -->
-                                <div class="text-caption text--secondary mb-1">Notes</div>
+                                <div class="text-caption text--secondary mb-1">{{ $t('issue_notes') }}</div>
                                 <div class="mb-4">
                                     <v-textarea
                                         v-if="editMode"

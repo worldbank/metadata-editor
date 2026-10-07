@@ -53,7 +53,7 @@
                     <v-expansion-panels v-model="filterPanel" multiple>
 
                       <v-expansion-panel>
-                        <v-expansion-panel-header class="capitalize">Status</v-expansion-panel-header>
+                        <v-expansion-panel-header class="capitalize">{{ $t('filter_status') }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;" v-for="opt in scopedStatusOptions" :key="opt.value">
                             <v-checkbox
@@ -72,7 +72,7 @@
                       </v-expansion-panel>
 
                       <v-expansion-panel>
-                        <v-expansion-panel-header class="capitalize">Severity</v-expansion-panel-header>
+                        <v-expansion-panel-header class="capitalize">{{ $t('filter_severity') }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;" v-for="opt in severityOptions.filter(o => o.value)" :key="opt.value">
                             <v-checkbox
@@ -91,7 +91,7 @@
                       </v-expansion-panel>
 
                       <v-expansion-panel>
-                        <v-expansion-panel-header class="capitalize">Category</v-expansion-panel-header>
+                        <v-expansion-panel-header class="capitalize">{{ $t('filter_category') }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;" v-for="opt in categoryOptions.filter(o => o.value)" :key="opt.value">
                             <v-checkbox
@@ -110,7 +110,7 @@
                       </v-expansion-panel>
 
                       <v-expansion-panel>
-                        <v-expansion-panel-header class="capitalize">Applied</v-expansion-panel-header>
+                        <v-expansion-panel-header class="capitalize">{{ $t('filter_applied') }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
                           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;" v-for="opt in appliedOptions.filter(o => o.value !== '')" :key="opt.value">
                             <v-checkbox
@@ -133,7 +133,7 @@
                     <div class="mt-3">
                       <v-btn @click="clearFilters" outlined small block>
                         <v-icon left small>mdi-filter-off</v-icon>
-                        Clear Filters
+                        {{ $t('filter_clear') }}
                       </v-btn>
                     </div>
                   </div>
@@ -147,7 +147,7 @@
 
                     <div class="d-flex">
                       <div class="flex-grow-1 flex-shrink-0 mr-auto">
-                        <h3 class="mt-3">Issues</h3>
+                        <h3 class="mt-3">{{ $t('issues') }}</h3>
                       </div>
                     </div>
                   </div>
@@ -158,7 +158,7 @@
                         background-color="white"
                         v-model="searchQuery"
                         :prepend-inner-icon="loading ? 'mdi-loading mdi-spin' : 'mdi-magnify'"
-                        label="Search issues..."
+                        :label="$t('placeholder_search_issues')"
                         single-line
                         dense
                         outlined
@@ -202,7 +202,7 @@
                         {{ getFilterLabel(type, val) }}
                       </v-chip>
                     </template>
-                    <v-btn x-small text @click="clearFilters(); searchQuery = '';" class="ml-1">Clear all</v-btn>
+                    <v-btn x-small text @click="clearFilters(); searchQuery = '';" class="ml-1">{{ $t('filter_clear_all') }}</v-btn>
                   </div>
 
                   <div class="bg-white shadow rounded p-3 pt-1 mt-2">
@@ -214,24 +214,24 @@
                          :style="statusScope === 'open' ? 'font-weight:600;color:inherit;' : 'color:#6c757d;'"
                       >
                         <v-icon small :color="statusScope === 'open' ? 'success' : 'grey lighten-1'" class="mr-1">mdi-alert-circle-outline</v-icon>
-                        {{ openCount }} Open
+                        {{ openCount }} {{ $t('open') }}
                       </a>
                       <a href="javascript:void(0)" @click="setScope('closed')"
                          class="text-decoration-none d-flex align-center"
                          :style="statusScope === 'closed' ? 'font-weight:600;color:inherit;' : 'color:#6c757d;'"
                       >
                         <v-icon small :color="statusScope === 'closed' ? 'grey darken-1' : 'grey lighten-1'" class="mr-1">mdi-check-circle-outline</v-icon>
-                        {{ closedCount }} Closed
+                        {{ closedCount }} {{ $t('closed') }}
                       </a>
                     </div>
 
                     <div v-if="loading" class="mt-5 mb-3 p-3 text-center">
                       <v-progress-circular indeterminate color="primary" class="mr-2"></v-progress-circular>
-                      <span>Loading issues...</span>
+                      <span>{{ $t('loading_issues') }}</span>
                     </div>
 
                     <div v-if="!loading && issues.length === 0" class="mt-5 mb-3 p-3 border text-center text--secondary">
-                      No issues found
+                      {{ $t('no_issues_found') }}
                     </div>
 
                     <table class="table table-hover border-bottom" v-if="issues.length > 0">
@@ -250,33 +250,33 @@
                               <v-list dense>
                                 <v-list-item @click="bulkUpdateStatus('accepted')">
                                   <v-icon left small>mdi-check</v-icon>
-                                  <v-list-item-title>Accept</v-list-item-title>
+                                  <v-list-item-title>{{ $t('action_accept') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('dismissed')">
                                   <v-icon left small>mdi-minus-circle</v-icon>
-                                  <v-list-item-title>Dismiss</v-list-item-title>
+                                  <v-list-item-title>{{ $t('action_dismiss') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('false_positive')">
                                   <v-icon left small>mdi-alert-remove</v-icon>
-                                  <v-list-item-title>Mark as False Positive</v-list-item-title>
+                                  <v-list-item-title>{{ $t('bulk_false_positive') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="bulkUpdateStatus('rejected')">
                                   <v-icon left small>mdi-close</v-icon>
-                                  <v-list-item-title>Reject</v-list-item-title>
+                                  <v-list-item-title>{{ $t('action_reject') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-divider></v-divider>
                                 <v-list-item @click="bulkDelete">
                                   <v-icon left small color="error">mdi-delete</v-icon>
-                                  <v-list-item-title class="error--text">Delete</v-list-item-title>
+                                  <v-list-item-title class="error--text">{{ $t('action_delete') }}</v-list-item-title>
                                 </v-list-item>
                               </v-list>
                             </v-menu>
                           </th>
                           <th style="width:4px;"></th>
-                          <th>Title</th>
-                          <th style="width:180px;">Labels</th>
-                          <th style="width:120px;">Status</th>
-                          <th style="width:110px;">Created</th>
+                          <th>{{ $t('issue_title') }}</th>
+                          <th style="width:180px;">{{ $t('issue_labels') }}</th>
+                          <th style="width:120px;">{{ $t('issue_status') }}</th>
+                          <th style="width:110px;">{{ $t('activity_created') }}</th>
                           <th style="width:40px;"></th>
                         </tr>
                       </thead>
@@ -307,7 +307,7 @@
                             </div>
                           </td>
                           <td style="vertical-align: top; padding-top: 12px;">
-                            <v-chip v-if="item.severity" x-small :color="getSeverityColor(item.severity)" outlined class="text-capitalize mr-1 mb-1">{{ item.severity }}</v-chip>
+                            <v-chip v-if="item.severity" x-small :color="getSeverityColor(item.severity)" outlined class="mr-1 mb-1">{{ formatSeverity(item.severity) }}</v-chip>
                             <v-chip v-if="item.category" x-small outlined class="mb-1">{{ getFilterLabel('category', item.category) }}</v-chip>
                           </td>
                           <td style="vertical-align: top; padding-top: 12px;">
@@ -315,7 +315,7 @@
                           </td>
                           <td class="text-nowrap text-muted" style="vertical-align: top; padding-top: 14px;">{{ formatDate(item.created) }}</td>
                           <td style="vertical-align: top; padding-top: 10px;">
-                            <a :href="issueUrl(item)" title="View">
+                            <a :href="issueUrl(item)" :title="$t('action_view')">
                               <v-icon small>mdi-chevron-right</v-icon>
                             </a>
                           </td>
@@ -390,11 +390,11 @@
             searchQuery: '',
             sortBy: 'created_desc',
             sortByOptions: [
-              { value: 'created_desc', text: 'Newest first' },
-              { value: 'created_asc',  text: 'Oldest first' },
-              { value: 'title_asc',    text: 'Title A–Z' },
-              { value: 'title_desc',   text: 'Title Z–A' },
-              { value: 'severity_desc',text: 'Severity (high first)' }
+              { value: 'created_desc', text: this.$t('sort_newest') },
+              { value: 'created_asc',  text: this.$t('sort_oldest') },
+              { value: 'title_asc',    text: this.$t('sort_title_az') },
+              { value: 'title_desc',   text: this.$t('sort_title_za') },
+              { value: 'severity_desc',text: this.$t('sort_severity') }
             ],
             searchDebounce: null,
             loading: false,
@@ -406,34 +406,34 @@
             },
             filterPanel: [0, 1, 2, 3],
             statusOptions: [
-              { text: 'All', value: '' },
-              { text: 'Open', value: 'open' },
-              { text: 'Accepted', value: 'accepted' },
-              { text: 'Fixed', value: 'fixed' },
-              { text: 'Rejected', value: 'rejected' },
-              { text: 'Dismissed', value: 'dismissed' },
-              { text: 'False Positive', value: 'false_positive' }
+              { text: this.$t('status_all'), value: '' },
+              { text: this.$t('status_open'), value: 'open' },
+              { text: this.$t('status_accepted'), value: 'accepted' },
+              { text: this.$t('status_fixed'), value: 'fixed' },
+              { text: this.$t('status_rejected'), value: 'rejected' },
+              { text: this.$t('status_dismissed'), value: 'dismissed' },
+              { text: this.$t('status_false_positive'), value: 'false_positive' }
             ],
             categoryOptions: [
-              { text: 'All',             value: '' },
-              { text: 'Typo / Wording', value: 'typo_wording' },
-              { text: 'Inconsistency',   value: 'inconsistency' },
-              { text: 'Missing Data',    value: 'missing_data' },
-              { text: 'Format Issue',    value: 'format_issue' },
-              { text: 'Completeness',    value: 'completeness' },
-              { text: 'Other',           value: 'other' }
+              { text: this.$t('status_all'), value: '' },
+              { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+              { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+              { text: this.$t('category_missing_data'), value: 'missing_data' },
+              { text: this.$t('category_format_issue'), value: 'format_issue' },
+              { text: this.$t('category_completeness'), value: 'completeness' },
+              { text: this.$t('category_other'), value: 'other' }
             ],
             severityOptions: [
-              { text: 'All', value: '' },
-              { text: 'Low', value: 'low' },
-              { text: 'Medium', value: 'medium' },
-              { text: 'High', value: 'high' },
-              { text: 'Critical', value: 'critical' }
+              { text: this.$t('status_all'), value: '' },
+              { text: this.$t('severity_low'), value: 'low' },
+              { text: this.$t('severity_medium'), value: 'medium' },
+              { text: this.$t('severity_high'), value: 'high' },
+              { text: this.$t('severity_critical'), value: 'critical' }
             ],
             appliedOptions: [
-              { text: 'All', value: '' },
-              { text: 'Applied', value: '1' },
-              { text: 'Not Applied', value: '0' }
+              { text: this.$t('status_all'), value: '' },
+              { text: this.$t('issue_applied'), value: '1' },
+              { text: this.$t('issue_not_applied'), value: '0' }
             ],
             options: {
               page: 1,
@@ -591,7 +591,12 @@
             return colors[status] || 'grey';
           },
           formatStatus(status) {
-            return (status || '').replace(/_/g, ' ');
+            const key = 'status_' + status;
+            return this.$te(key) ? this.$t(key) : (status || '').replace(/_/g, ' ');
+          },
+          formatSeverity(severity) {
+            const key = 'severity_' + severity;
+            return this.$te(key) ? this.$t(key) : (severity || '');
           },
           setScope(scope) {
             this.statusScope = scope;

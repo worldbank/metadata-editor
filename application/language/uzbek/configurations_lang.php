@@ -96,6 +96,11 @@ $lang['up_to_date']="Siz eng so'nggi versiyani ishlatmoqdasiz";
 $lang['update_check_failed']="Yangilanishlarni tekshirib bo'lmadi (tarmoq xatosi yoki API cheklovi)";
 $lang['support']="Qo'llab-quvvatlash";
 $lang['github_releases']="GitHub versiyalari va o'zgarishlar jurnali";
+$lang['metadata_assessment']="Metama'lumotlarni baholash";
+$lang['metadata_assessment_enable']="Muammolar sahifasida metama'lumotlarni baholash funksiyasini yoqish";
+$lang['metadata_assessment_note']="Yoqilganda, loyihani tahrirlash huquqiga ega foydalanuvchilar metama'lumotlar sifatini avtomatik baholashi mumkin. Ko'rib chiqish marshrutlari sozlangan FastAPI backend va ishlayotgan fon ishchisi talab qilinadi.";
+$lang['metadata_assessment_monthly_limit']="Oylik baholash limiti";
+$lang['metadata_assessment_monthly_limit_note']="Kalendar oyida butun sayt bo'yicha metama'lumotlar baholashlarining maksimal soni. Cheklovsiz (limit yo'q) uchun 0 kiriting.";
 $lang['notifications_retention_days']="Bildirishnoma saqlash muddati (kun)";
 $lang['notifications_retention_days_note']="Bu muddatdan eski bildirishnomalar yashiriladi va tozalash buyrug'i bilan o'chirilishi mumkin. Standart: 30. Oralik: 1–365.";
 

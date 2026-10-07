@@ -326,11 +326,12 @@ Vue.component('vue-jobs-component', {
             }
             var usage = this.assessment_usage;
             if (usage.unlimited || !usage.limit || usage.limit <= 0) {
-                return this.$t('assessment_monthly_unlimited') || 'No monthly assessment limit configured.';
+                return this.$t('assessment_monthly_unlimited');
             }
-            return (this.$t('assessment_monthly_usage') || 'Site usage this month: {used} of {limit}.')
-                .replace('{used}', usage.used_this_month)
-                .replace('{limit}', usage.limit);
+            return this.$t('assessment_monthly_usage', {
+                used: usage.used_this_month,
+                limit: usage.limit
+            });
         },
 
         dashboardStatCards: function () {

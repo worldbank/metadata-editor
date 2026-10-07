@@ -25,8 +25,8 @@ Vue.component('field-issues-indicator', {
         chipText() {
             var n = this.openCount;
             if (n <= 0) return '';
-            if (n === 1) return '1 issue';
-            return n + ' issues';
+            if (n === 1) return this.$t('issue_count_one');
+            return this.$t('issue_count_many', { count: n });
         }
     },
     methods: {

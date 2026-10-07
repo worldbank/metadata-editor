@@ -29,18 +29,18 @@ const VueIssueCreate = Vue.component('issue-create', {
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                { text: 'Typo / Wording', value: 'typo_wording' },
-                { text: 'Inconsistency',   value: 'inconsistency' },
-                { text: 'Missing Data',    value: 'missing_data' },
-                { text: 'Format Issue',    value: 'format_issue' },
-                { text: 'Completeness',    value: 'completeness' },
-                { text: 'Other',           value: 'other' }
+                { text: this.$t('category_typo_wording'), value: 'typo_wording' },
+                { text: this.$t('category_inconsistency'), value: 'inconsistency' },
+                { text: this.$t('category_missing_data'), value: 'missing_data' },
+                { text: this.$t('category_format_issue'), value: 'format_issue' },
+                { text: this.$t('category_completeness'), value: 'completeness' },
+                { text: this.$t('category_other'), value: 'other' }
             ],
             severityOptions: [
-                { text: 'Low', value: 'low' },
-                { text: 'Medium', value: 'medium' },
-                { text: 'High', value: 'high' },
-                { text: 'Critical', value: 'critical' }
+                { text: this.$t('severity_low'), value: 'low' },
+                { text: this.$t('severity_medium'), value: 'medium' },
+                { text: this.$t('severity_high'), value: 'high' },
+                { text: this.$t('severity_critical'), value: 'critical' }
             ]
         };
     },
@@ -116,7 +116,7 @@ const VueIssueCreate = Vue.component('issue-create', {
         },
         async createIssue() {
             if (!this.isValid) {
-                EventBus.$emit('onFail', 'Please fill in the required fields');
+                EventBus.$emit('onFail', this.$t('validation_required_fields'));
                 return;
             }
 
@@ -126,17 +126,17 @@ const VueIssueCreate = Vue.component('issue-create', {
                 const response = await axios.post(url, this.newIssue);
 
                 if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', 'Issue created successfully');
+                    EventBus.$emit('onSuccess', this.$t('issue_created'));
                     // Navigate back to issues list
                     this.$router.push('/issues');
                 } else {
-                    throw new Error(response.data.message || 'Failed to create issue');
+                    throw new Error(response.data.message || this.$t('error_create_issue'));
                 }
             } catch (error) {
                 console.error('Error creating issue:', error);
                 EventBus.$emit(
                     'onFail',
-                    error.response?.data?.message || error.message || 'Failed to create issue'
+                    error.response?.data?.message || error.message || this.$t('error_create_issue')
                 );
             } finally {
                 this.saving = false;
@@ -257,7 +257,7 @@ const VueIssueCreate = Vue.component('issue-create', {
                             </v-btn>
                             <h2 class="text-h5">
                                 <v-icon left color="primary">mdi-plus-circle</v-icon>
-                                Create New Issue
+                                {{ $t('create_issue') }}
                             </h2>
                             <v-spacer></v-spacer>
                             <v-btn
@@ -267,7 +267,7 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 :disabled="!isValid"
                             >
                                 <v-icon left>mdi-content-save</v-icon>
-                                Create Issue
+                                {{ $t('action_create_issue') }}
                             </v-btn>
                         </div>
 
@@ -278,12 +278,12 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 <!-- Title -->
                                 <v-row dense>
                                     <v-col cols="12">
-                                        <div class="body-2 mb-1">Title <span class="error--text">*</span></div>
+                                        <div class="body-2 mb-1">{{ $t('issue_title') }} <span class="error--text">*</span></div>
                                         <v-text-field
                                             v-model="newIssue.title"
                                             outlined
                                             dense
-                                            placeholder="Short title for the issue"
+                                            :placeholder="$t('placeholder_issue_title')"
                                             hide-details="auto"
                                             counter="255"
                                         ></v-text-field>
@@ -293,12 +293,12 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 <!-- Description -->
                                 <v-row dense class="mt-4">
                                     <v-col cols="12">
-                                        <div class="body-2 mb-1">Description <span class="error--text">*</span></div>
+                                        <div class="body-2 mb-1">{{ $t('issue_description') }} <span class="error--text">*</span></div>
                                         <v-textarea
                                             v-model="newIssue.description"
                                             outlined
                                             rows="3"
-                                            placeholder="Describe the issue in detail..."
+                                            :placeholder="$t('placeholder_issue_description')"
                                             hide-details="auto"
                                         ></v-textarea>
                                     </v-col>
@@ -307,7 +307,7 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 <!-- Category and Severity -->
                                 <v-row dense class="mt-4">
                                     <v-col cols="12" md="6">
-                                        <div class="body-2 mb-1">Category</div>
+                                        <div class="body-2 mb-1">{{ $t('issue_category') }}</div>
                                         <v-select
                                             v-model="newIssue.category"
                                             :items="categoryOptions"
@@ -315,13 +315,13 @@ const VueIssueCreate = Vue.component('issue-create', {
                                             item-value="value"
                                             outlined
                                             dense
-                                            placeholder="Select a category"
+                                            :placeholder="$t('placeholder_issue_category')"
                                             hide-details="auto"
                                             clearable
                                         ></v-select>
                                     </v-col>
                                     <v-col cols="12" md="6">
-                                        <div class="body-2 mb-1">Severity</div>
+                                        <div class="body-2 mb-1">{{ $t('issue_severity') }}</div>
                                         <v-select
                                             v-model="newIssue.severity"
                                             :items="severityOptions"
@@ -335,7 +335,7 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 <!-- Field Path -->
                                 <v-row dense class="mt-4">
                                     <v-col cols="12">
-                                        <div class="body-2 mb-1">Field Path</div>
+                                        <div class="body-2 mb-1">{{ $t('issue_field_path') }}</div>
                                         <v-autocomplete
                                             v-model="newIssue.field_path"
                                             :items="fieldPathOptions"
@@ -344,8 +344,8 @@ const VueIssueCreate = Vue.component('issue-create', {
                                             outlined
                                             dense
                                             clearable
-                                            placeholder="Select a field or type to search"
-                                            hint="Identifies the specific metadata field this issue refers to"
+                                            :placeholder="$t('placeholder_select_field')"
+                                            :hint="$t('hint_field_path')"
                                             persistent-hint
                                         >
                                             <template v-slot:item="{ item }">
@@ -363,23 +363,23 @@ const VueIssueCreate = Vue.component('issue-create', {
                                 <template v-if="newIssue.field_path">
                                     <v-row dense class="mt-4">
                                         <v-col cols="12" md="6">
-                                            <div class="body-2 mb-1">Current Value</div>
+                                            <div class="body-2 mb-1">{{ $t('issue_current_value') }}</div>
                                             <v-textarea
                                                 v-model="currentMetadataText"
                                                 outlined
                                                 rows="4"
-                                                placeholder="Current value of the field"
+                                                :placeholder="$t('placeholder_issue_current')"
                                                 hide-details="auto"
                                                 :error-messages="errors.current_metadata"
                                             ></v-textarea>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <div class="body-2 mb-1">Suggested Value</div>
+                                            <div class="body-2 mb-1">{{ $t('issue_suggested_value') }}</div>
                                             <v-textarea
                                                 v-model="suggestedMetadataText"
                                                 outlined
                                                 rows="4"
-                                                placeholder="What it should be changed to"
+                                                :placeholder="$t('placeholder_issue_suggested')"
                                                 hide-details="auto"
                                                 :error-messages="errors.suggested_metadata"
                                             ></v-textarea>
@@ -392,7 +392,7 @@ const VueIssueCreate = Vue.component('issue-create', {
 
                             <v-card-actions class="pa-6 pt-2">
                                 <v-spacer></v-spacer>
-                                <v-btn text @click="cancel" class="mr-2">Cancel</v-btn>
+                                <v-btn text @click="cancel" class="mr-2">{{ $t('action_cancel') }}</v-btn>
                                 <v-btn
                                     color="primary"
                                     @click="createIssue"
@@ -400,7 +400,7 @@ const VueIssueCreate = Vue.component('issue-create', {
                                     :disabled="!isValid"
                                 >
                                     <v-icon left>mdi-content-save</v-icon>
-                                    Create Issue
+                                    {{ $t('action_create_issue') }}
                                 </v-btn>
                             </v-card-actions>
                         </v-card>
