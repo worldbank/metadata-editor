@@ -48,7 +48,7 @@ $data= array_remove_empty($data);
 <?php if (count($data)<1 ){return false;} ?>
 <div class="table-responsive field field-<?php echo str_replace(".","_",$template['key']);?>">
 <?php if ($hide_field_title!=true):?>
-    <h4 class="field-caption"><?php echo t($template['title']);?></h4>
+    <h5 class="field-subsection-title"><?php echo t($template['title']);?></h5>
 <?php endif;?>
 <table class="table table-sm table-bordered table-striped table-condensed xsl-table table-grid">
     <?php if ($hide_column_headings!=true):?>

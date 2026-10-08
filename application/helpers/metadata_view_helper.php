@@ -330,5 +330,222 @@ if ( ! function_exists('escape_html_attribute'))
 	}
 }
 
+if ( ! function_exists('preview_value_has_content'))
+{
+	function preview_value_has_content($value)
+	{
+		if ($value === null || $value === '') {
+			return false;
+		}
+
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				if (preview_value_has_content($item)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		return true;
+	}
+}
+
+if ( ! function_exists('preview_row_column_data'))
+{
+	/**
+	 * Resolve template column data from a nested_array row (e.g. geographicElement).
+	 */
+	function preview_row_column_data(array $row, array $column)
+	{
+		$key = isset($column['key']) ? $column['key'] : '';
+
+		if ($key !== '' && array_key_exists($key, $row) && preview_value_has_content($row[$key])) {
+			return $row[$key];
+		}
+
+		if ($key !== '' && substr($key, -8) === '-section') {
+			$base_key = substr($key, 0, -8);
+			if (array_key_exists($base_key, $row) && preview_value_has_content($row[$base_key])) {
+				return $row[$base_key];
+			}
+		}
+
+		if (!empty($column['props']) && is_array($column['props'])) {
+			$first_prop_key = isset($column['props'][0]['key']) ? $column['props'][0]['key'] : '';
+			if ($first_prop_key !== '' && strpos($first_prop_key, '.') !== false) {
+				$prefix = explode('.', $first_prop_key, 2)[0];
+				if (array_key_exists($prefix, $row) && preview_value_has_content($row[$prefix])) {
+					return $row[$prefix];
+				}
+			}
+		}
+
+		return null;
+	}
+}
+
+if ( ! function_exists('preview_section_prop_value'))
+{
+	function preview_section_prop_value($section_data, $section_key, $prop_key)
+	{
+		if (!is_array($section_data) || $prop_key === '') {
+			return null;
+		}
+
+		if (strpos($prop_key, '.') === false) {
+			return array_key_exists($prop_key, $section_data) ? $section_data[$prop_key] : null;
+		}
+
+		$root = explode('.', $prop_key, 2)[0];
+		$relative = explode('.', $prop_key, 2)[1];
+
+		$section_base = $section_key;
+		if (substr($section_key, -8) === '-section') {
+			$section_base = substr($section_key, 0, -8);
+		}
+
+		if ($section_base === $root || $section_key === $root) {
+			return array_data_get($section_data, $relative);
+		}
+
+		if (array_key_exists($root, $section_data) && is_array($section_data[$root])) {
+			return array_data_get($section_data, $prop_key);
+		}
+
+		return array_data_get($section_data, $prop_key);
+	}
+}
+
+if ( ! function_exists('preview_format_coordinate_pairs'))
+{
+	function preview_format_coordinate_pairs($coordinates)
+	{
+		if (!is_array($coordinates) || count($coordinates) === 0) {
+			return '';
+		}
+
+		$lines = array();
+		foreach ($coordinates as $pair) {
+			if (!is_array($pair) || count($pair) < 2) {
+				continue;
+			}
+			$values = array_values($pair);
+			$lines[] = $values[0] . ', ' . $values[1];
+		}
+
+		return implode("\n", $lines);
+	}
+}
+
+if ( ! function_exists('preview_bounding_box_corners'))
+{
+	/**
+	 * Parse west/east/south/north from a bounding box object for map rendering.
+	 *
+	 * @return array|null Keys west, east, south, north or null if incomplete/invalid
+	 */
+	function preview_bounding_box_corners(array $column, $bounding_box)
+	{
+		if (!is_array($bounding_box)) {
+			return null;
+		}
+
+		$opts = isset($column['bounding_box_options']) ? $column['bounding_box_options'] : array(
+			'west' => 'westBoundLongitude',
+			'east' => 'eastBoundLongitude',
+			'south' => 'southBoundLatitude',
+			'north' => 'northBoundLatitude',
+		);
+
+		$read = function ($path) use ($bounding_box) {
+			$short = strpos($path, '.') !== false ? substr($path, strrpos($path, '.') + 1) : $path;
+			$value = array_key_exists($short, $bounding_box) ? $bounding_box[$short] : array_data_get($bounding_box, $path);
+			if ($value === '' || $value === null) {
+				return null;
+			}
+			if (!is_numeric($value)) {
+				return null;
+			}
+			return $value + 0;
+		};
+
+		$west = $read($opts['west']);
+		$east = $read($opts['east']);
+		$south = $read($opts['south']);
+		$north = $read($opts['north']);
+
+		if ($west === null || $east === null || $south === null || $north === null) {
+			return null;
+		}
+		if ($south >= $north) {
+			return null;
+		}
+
+		return array(
+			'west' => $west,
+			'east' => $east,
+			'south' => $south,
+			'north' => $north,
+		);
+	}
+}
+
+if ( ! function_exists('preview_format_bounding_box'))
+{
+	function preview_format_bounding_box(array $column, $bounding_box)
+	{
+		if (!is_array($bounding_box)) {
+			return '';
+		}
+
+		$opts = isset($column['bounding_box_options']) ? $column['bounding_box_options'] : array(
+			'west' => 'westBoundLongitude',
+			'east' => 'eastBoundLongitude',
+			'south' => 'southBoundLatitude',
+			'north' => 'northBoundLatitude',
+		);
+
+		$parts = array();
+		foreach ($opts as $label => $path) {
+			$key = strpos($path, '.') !== false ? substr($path, strrpos($path, '.') + 1) : $path;
+			$value = array_key_exists($key, $bounding_box) ? $bounding_box[$key] : array_data_get($bounding_box, $path);
+			if ($value !== null && $value !== '') {
+				$parts[] = ucfirst($label) . ': ' . $value;
+			}
+		}
+
+		return implode('; ', $parts);
+	}
+}
+
+if ( ! function_exists('preview_format_scalar'))
+{
+	function preview_format_scalar($value, array $column = array())
+	{
+		if ($value === null || $value === '') {
+			return '';
+		}
+
+		if (isset($column['enum']) && is_array($column['enum'])) {
+			$store = isset($column['enum_store_column']) ? $column['enum_store_column'] : 'code';
+			foreach ($column['enum'] as $option) {
+				if (!is_array($option)) {
+					continue;
+				}
+				if (isset($option[$store]) && $option[$store] == $value) {
+					return isset($option['label']) ? $option['label'] : $value;
+				}
+			}
+		}
+
+		if (is_bool($value)) {
+			return $value ? 'true' : 'false';
+		}
+
+		return (string) $value;
+	}
+}
+
 /* End of file metadata_view_helper.php */
 /* Location: ./application/helpers/metadata_view_helper.php */

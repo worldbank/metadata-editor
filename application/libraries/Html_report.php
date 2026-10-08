@@ -34,11 +34,14 @@ class Html_Report{
 	 * Generate HTML content for reports
 	 * 
 	 * @param string $sid - Study ID
-	 * @param array $options - Options including 'pdf_mode' for PDF generation
+	 * @param array $options - Options including 'pdf_mode', 'exclude_maps' (e.g. HTML download)
 	 * @return string HTML content
 	 */
 	function generate($sid, $options=array())
     {
+		$this->pdf_mode = isset($options['pdf_mode']) && $options['pdf_mode'] === true;
+		$this->ci->pagepreview->exclude_maps = !empty($options['exclude_maps']);
+
 		$this->project=$this->ci->Editor_model->get_row($sid);
 
 		if (!$this->project){
@@ -75,13 +78,10 @@ class Html_Report{
 			}
 		}
 		
-		// Determine if this is PDF mode
-		$pdf_mode = isset($options['pdf_mode']) && $options['pdf_mode'] === true;
-		
 		return $this->ci->load->view('project_preview/html_report', array(
 			'html' => $html, 
 			'project' => $this->project, 
-			'pdf_mode' => $pdf_mode
+			'pdf_mode' => $this->pdf_mode
 		), true);
     }
 
@@ -118,7 +118,7 @@ class Html_Report{
 			$this->template_translations = $this->ci->Editor_template_model->get_template_translation_keys($template['uid'], 'compact');
 		}
 		
-		$this->ci->pagepreview->initialize($this->project,$template['template'], $this->pdf_mode);
+		$this->ci->pagepreview->initialize($this->project, $template['template'], $this->pdf_mode);
 
 		$html=$this->ci->load->view('project_preview/index',
 			array(					

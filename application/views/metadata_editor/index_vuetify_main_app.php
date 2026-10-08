@@ -154,6 +154,7 @@
             echo $this->load->view("metadata_editor/vue-form-main-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-preview-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-bounding-box-preview-map-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-section-preview-component.js",null,true);
             
             echo $this->load->view("metadata_editor/vue-files-component.js",null,true);

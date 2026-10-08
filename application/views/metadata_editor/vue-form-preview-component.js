@@ -181,7 +181,7 @@ Vue.component('v-form-preview', {
                 <!--text-field-->
                 <div v-if="(item.type=='text' || item.type=='string' || item.type=='textarea' || item.type=='dropdown') && !isFieldEmpty(item.key)">
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
-                        <label :for="'field-' + normalizeClassID(item.key)">
+                        <label class="field-label" :for="'field-' + normalizeClassID(item.key)">
                             {{item.title}}
                         </label>
                         <div :class="(item.content_format) ? 'content-format-' + item.content_format : 'content-format-text'">
@@ -223,8 +223,8 @@ Vue.component('v-form-preview', {
             </div>    
         </div>
 
-        <div v-if="item.type=='nested_array' && !isFieldEmpty(item.key)">
-            <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
+        <div v-if="item.type=='nested_array' && !isFieldEmpty(item.key)" class="form-field-nested-array mb-3">
+            <h4 class="field-title mt-3">{{item.title}}</h4>
             <nested-section-preview 
                 :value="formData[item.key]"                                         
                 :columns="item.props"

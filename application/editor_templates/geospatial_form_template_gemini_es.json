@@ -2011,10 +2011,10 @@
                                         {
                                             "key": "geohash",
                                             "title": "geohash",
-                                            "type": "array",
+                                            "type": "section",
                                             "props": [
                                                 {
-                                                    "key": "geohash",
+                                                    "key": "geohash.geohash",
                                                     "type": "string",
                                                     "title": "geohash",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geohash.geohash",
@@ -2022,7 +2022,7 @@
                                                     "display_type": "textarea"
                                                 },
                                                 {
-                                                    "key": "note",
+                                                    "key": "geohash.note",
                                                     "type": "string",
                                                     "title": "Nota",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geohash.note",

@@ -18,7 +18,7 @@ if (!isset($data) || empty($data) || !is_array($data)){
 ?>
 
 <?php if ($hide_field_title!=true):?>
-    <h4 class="field-caption"><?php echo t($template['title']);?></h4>
+    <h5 class="field-subsection-title"><?php echo t($template['title']);?></h5>
 <?php endif;?>
 <div class="table-responsive field field-<?php echo str_replace(".","_",$template['key']);?>">
 <table class="table table-bordered table-striped table-condensed xsl-table table-grid">
@@ -37,8 +37,13 @@ if (!isset($data) || empty($data) || !is_array($data)){
                     $column['hide_field_title']=true;
                 ?>
                 <?php  echo $this->load->view('project_preview/fields/field_array',array('data'=>isset($row[$column['key']]) ? $row[$column['key']] : [] ,'template'=>$column),true);?>
+            <?php elseif ($column['type'] === 'coordinate_pairs'):?>
+                <div class="text-block text-block--multiline"><?php echo html_escape(preview_format_coordinate_pairs(isset($row[$column['key']]) ? $row[$column['key']] : array())); ?></div>
             <?php else:?>
-                <?php echo isset($row[$column['key']]) ? html_escape($row[$column['key']]) : '';?>
+                <?php
+                    $cell = isset($row[$column['key']]) ? $row[$column['key']] : '';
+                    echo html_escape(preview_format_scalar($cell, $column));
+                ?>
             <?php endif;?>
         </td>
         <?php endforeach;?>

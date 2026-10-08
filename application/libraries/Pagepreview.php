@@ -14,18 +14,37 @@ class Pagepreview{
     private $metadata;
     private $template;
     public $pdf_mode = false;
+    public $exclude_maps = false;
 	
 	function __construct()
 	{
         $this->ci =& get_instance();
         $this->ci->load->helper("array");
+        $this->ci->load->helper('metadata_view_helper');
     }
 
-    function initialize($metadata,$template,$pdf_mode=false)
+    function initialize($metadata, $template, $pdf_mode = false)
     {
+        if (is_array($metadata)
+            && isset($metadata['type'])
+            && $metadata['type'] === 'geospatial'
+            && isset($metadata['metadata'])
+            && is_array($metadata['metadata'])) {
+            $this->ci->load->library('Metadata_helper');
+            $metadata['metadata'] = $this->ci->metadata_helper->normalize_geospatial_metadata_for_schema($metadata['metadata']);
+        }
+
         $this->metadata=$metadata;
         $this->template=$template;
         $this->pdf_mode = (bool)$pdf_mode;
+    }
+
+    /**
+     * Whether server-rendered preview should include Leaflet bbox maps (PDF/download omit them).
+     */
+    function show_preview_maps()
+    {
+        return !$this->pdf_mode && !$this->exclude_maps;
     }
 
     function render_html()
@@ -82,7 +101,7 @@ class Pagepreview{
     private function render_section_container($item){
         $output=array();
         $output[]='<div id="'.html_escape($item['key']).'">';
-        $output[]='<h1 class="field-section-container mt-3" >'.html_escape($item['title']).'</h1>';
+        $output[]='<h1 class="field-section-container section-container-title mt-3">'.html_escape($item['title']).'</h1>';
 
         if (isset($item['items'])){
             $el_html=$this->render_element($item['items']);

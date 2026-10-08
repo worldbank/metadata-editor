@@ -2000,10 +2000,10 @@
                                         {
                                             "key": "geohash",
                                             "title": "Geohash",
-                                            "type": "array",
+                                            "type": "section",
                                             "props": [
                                                 {
-                                                    "key": "geohash",
+                                                    "key": "geohash.geohash",
                                                     "type": "string",
                                                     "title": "Geohash",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geohash.geohash",
@@ -2011,7 +2011,7 @@
                                                     "display_type": "textarea"
                                                 },
                                                 {
-                                                    "key": "note",
+                                                    "key": "geohash.note",
                                                     "type": "string",
                                                     "title": "Note",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geohash.note",

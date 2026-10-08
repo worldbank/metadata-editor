@@ -172,13 +172,29 @@ var BoundingBoxUtil = (function () {
         };
     }
 
+    /**
+     * Basemap for read-only preview maps (same OSM layer as the bbox editor).
+     * Not used in downloaded HTML (maps omitted on export).
+     */
+    function previewMapTileLayer(maxZoom) {
+        var zoom = typeof maxZoom === 'number' ? maxZoom : 10;
+        return {
+            url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            options: {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: zoom
+            }
+        };
+    }
+
     return {
         wrapLongitude: wrapLongitude,
         isoLongitudesFromUnwrapped: isoLongitudesFromUnwrapped,
         unwrappedLongitudesFromIso: unwrappedLongitudesFromIso,
         leafletBoundsFromIso: leafletBoundsFromIso,
         longitudeIntervalsFromIso: longitudeIntervalsFromIso,
-        unionIsoBoxes: unionIsoBoxes
+        unionIsoBoxes: unionIsoBoxes,
+        previewMapTileLayer: previewMapTileLayer
     };
 })();
 

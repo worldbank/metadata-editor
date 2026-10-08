@@ -1151,9 +1151,13 @@ class Editor extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			$this->load->library("html_report");
-			$html=$this->html_report->generate($sid, $html_options=array(
-				'exclude_private_fields'=>$exclude_private_fields
-			));
+			$html_options = array(
+				'exclude_private_fields' => $exclude_private_fields,
+			);
+			if ($download) {
+				$html_options['exclude_maps'] = true;
+			}
+			$html=$this->html_report->generate($sid, $html_options);
 			
 			if ($download){
 				$this->load->helper('download');
