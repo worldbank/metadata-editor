@@ -158,6 +158,7 @@ Vue.component('editor-bounding-box-field', {
                 // Add OpenStreetMap tiles (limit max zoom to match map settings)
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
+                    referrerPolicy: 'strict-origin-when-cross-origin',
                     maxZoom: 10 // Match map maxZoom to prevent excessive zooming
                 }).addTo(this.map);
                 
