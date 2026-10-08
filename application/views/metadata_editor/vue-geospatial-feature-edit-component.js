@@ -241,7 +241,8 @@ Vue.component('geospatial-feature-edit', {
                 
                 // Add OpenStreetMap tiles
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
+                    attribution: '© OpenStreetMap contributors',
+                    referrerPolicy: 'strict-origin-when-cross-origin',
                 }).addTo(this.map);
                 
                 // Add bounding box rectangle
