@@ -70,10 +70,11 @@ class Packager extends MY_REST_Controller
 
 			$path = $this->Editor_model->get_project_folder($sid);
 			$project=$this->Editor_model->get_basic_info($sid);
-			$zip_path=$path.'/'.$project['idno'].'.zip';
+			$basename = $this->projectpackage->package_basename($project);
+			$zip_path = $path . '/' . $basename . '.zip';
 
-			if ($generate==1){				
-				$zip_path=$this->projectpackage->prepare_package($sid);
+			if ($generate==1){
+				$zip_path = $this->projectpackage->prepare_package($sid);
 			}
 
 			if (file_exists($zip_path)){

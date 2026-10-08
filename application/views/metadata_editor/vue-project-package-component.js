@@ -63,6 +63,7 @@ Vue.component('project-package', {
             errors:'',
             is_processing:false,
             project_export_status:'',
+            project_export_error:'',
             collections:[]
         }
     },
@@ -72,103 +73,54 @@ Vue.component('project-package', {
         downloadZip: function()
         {
             this.exportProjectMetadata();            
-        },        
+        },
         async exportProjectMetadata()
         {
-            await this.prepareProjectExport();
+            this.project_export_error = '';
+            this.project_export_status = this.$t('processing_please_wait');
 
-            //download
-            let url=CI.base_url + '/api/packager/download_zip/'+this.ProjectID;
-            window.open(url, '_blank');
-        },
-        async prepareProjectExport()
-        {
-            this.project_export_status=this.$t("exporting_to_json");
-            await this.exportProjectJSON();
+            const url = CI.base_url + '/api/packager/generate/' + this.ProjectID;
 
-            if (this.ProjectType=='survey' || this.ProjectType=='microdata'){
-                this.project_export_status=this.$t("exporting_ddi");
-                await this.exportProjectDDI();
-                //this.project_export_status="Exporting data files";
-                //await this.exportProjectDatafiles();
+            try {
+                const response = await axios.post(url);
+
+                if (!response.data || response.data.status !== 'success') {
+                    const message = response.data && response.data.message
+                        ? response.data.message
+                        : this.$t('package_export_failed');
+                    throw new Error(message);
+                }
+
+                const downloadUrl = CI.base_url + '/api/packager/download_zip/' + this.ProjectID;
+                window.open(downloadUrl, '_blank');
+            } catch (error) {
+                this.project_export_error = this.packageExportErrorMessage(error);
+            } finally {
+                this.project_export_status = '';
             }
-            
-            this.project_export_status=this.$t("processing_please_wait");
-            await this.exportExternalResourcesJSON();
-            await this.exportExternalResourcesRDF();
-            this.project_export_status= this.$t("writing_zip");
-            await this.writeProjectZip();
-            this.project_export_status="done";
         },
-        async exportProjectJSON() {
-            let url=CI.base_url + '/api/editor/generate_json/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
-        },
-        async exportProjectDDI() {
-            let url=CI.base_url + '/api/editor/generate_ddi/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing DDI done");
-            });            
-        },
-        async exportExternalResourcesJSON() {
-            let url=CI.base_url + '/api/resources/write_json/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
-        },
-        async exportExternalResourcesRDF() {
-            let url=CI.base_url + '/api/resources/write_rdf/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
-        },
-        async writeProjectZip() {
-            let url=CI.base_url + '/api/packager/generate_zip/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing ZIP done");
-            });
+        packageExportErrorMessage: function(error)
+        {
+            const status = error.response && error.response.status;
+            if (status === 504 || status === 502 || status === 503) {
+                return this.$t('package_export_server_timeout');
+            }
+
+            if (error.response && error.response.data) {
+                const data = error.response.data;
+                if (typeof data === 'string' && data.trim() !== '') {
+                    return data;
+                }
+                if (data.message) {
+                    return data.message;
+                }
+            }
+
+            if (error.message) {
+                return error.message;
+            }
+
+            return this.$t('package_export_failed');
         },
         
     },
@@ -200,7 +152,8 @@ Vue.component('project-package', {
                     <v-card-text>
                         <div class="mb-3">{{$t("project_package_note")}}</div>
                         <v-btn color="primary" :disabled="project_export_status!=''" @click="downloadZip()">{{$t("download_zip_package")}}</v-btn>
-                        <span v-if="project_export_status!='done' && project_export_status!=''"><i class="fas fa-circle-notch fa-spin"></i> {{project_export_status}}</span>
+                        <span v-if="project_export_status!=''"><i class="fas fa-circle-notch fa-spin"></i> {{project_export_status}}</span>
+                        <div v-if="project_export_error" class="error--text mt-2">{{project_export_error}}</div>
                     </v-card-text>
                 </v-card>
                 

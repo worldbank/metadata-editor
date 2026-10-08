@@ -176,6 +176,8 @@ $lang['exporting_ddi']="Exporting metadata to DDI";
 $lang['writing_zip']="Writing zip file";
 $lang['select_atleast_one_project']="Select at least one project";
 $lang['project_package_note']="Create zip package with all documentation";
+$lang['package_export_failed']="Package export failed";
+$lang['package_export_server_timeout']="The server stopped responding before the export finished. If the export is large, ask your administrator to increase web server timeouts or try again later.";
 $lang['confirm_remove_project__from_collection']="Are you sure you want to remove this project from the collection?";
 
 $lang['metadata']="Metadata";
@@ -431,6 +433,8 @@ $lang['project_validation']="Project validation";
 $lang['no_validation_errors']="No validation errors found";
 $lang['project_package']="Project package";
 $lang['project_package_note']="Create zip package with all documentation";
+$lang['package_export_failed']="Package export failed";
+$lang['package_export_server_timeout']="The server stopped responding before the export finished. If the export is large, ask your administrator to increase web server timeouts or try again later.";
 $lang['download_zip_package']="Download zip package";
 $lang['exporting_to_json']="Exporting metadata to JSON";
 $lang['exporting_ddi']="Exporting metadata to DDI";
