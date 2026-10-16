@@ -54,9 +54,22 @@ class Data_structure_csv_import {
 		}
 
 		$dry_run = !empty($options['dry_run']);
+		$overwrite = !empty($options['overwrite']);
 		$user_id = isset($options['user_id']) ? $options['user_id'] : null;
 
-		$errors = $this->_validate_components($structure_id, $components);
+		$existing_by_key = array();
+		$max_sort_order = -1;
+		foreach ($this->CI->Data_structure_component_model->get_components_by_structure_id($structure_id) as $row) {
+			$key = isset($row['name']) ? strtolower(trim((string) $row['name'])) : '';
+			if ($key !== '') {
+				$existing_by_key[$key] = $row;
+			}
+			if (isset($row['sort_order']) && (int) $row['sort_order'] > $max_sort_order) {
+				$max_sort_order = (int) $row['sort_order'];
+			}
+		}
+
+		$errors = $this->_validate_components($components, $existing_by_key, $overwrite);
 		if (!empty($errors)) {
 			throw new Exception('VALIDATION_FAILED: ' . json_encode($errors));
 		}
@@ -75,6 +88,7 @@ class Data_structure_csv_import {
 			'dry_run' => $dry_run,
 			'structure_id' => $structure_id,
 			'components_created' => array(),
+			'components_updated' => array(),
 			'components_preview' => array(),
 			'codelists_created' => array(),
 			'codelists_reused' => array(),
@@ -84,28 +98,26 @@ class Data_structure_csv_import {
 			'warnings' => array(),
 		);
 
-		$resolved_codelists = array();
-		foreach ($components as $idx => $comp) {
-			$resolved_codelists[$idx] = $this->_resolve_codelist_for_mapping(
-				$comp,
-				$csv_path,
-				$delimiter,
-				$parsed['headers'],
-				$agency,
-				$dry_run,
-				$summary,
-				$user_id
-			);
-		}
-
 		if ($dry_run) {
 			foreach ($components as $idx => $comp) {
+				$codelist_id = $this->_resolve_codelist_for_mapping(
+					$comp,
+					$csv_path,
+					$delimiter,
+					$parsed['headers'],
+					$agency,
+					true,
+					$summary,
+					$user_id
+				);
+				$key = strtolower(trim((string) $comp['name']));
 				$summary['components_preview'][] = array(
+					'action' => isset($existing_by_key[$key]) ? 'update' : 'create',
 					'name' => trim((string) $comp['name']),
 					'label' => isset($comp['label']) ? trim((string) $comp['label']) : null,
 					'column_type' => trim((string) $comp['column_type']),
 					'csv_column' => trim((string) $comp['csv_column']),
-					'codelist_id' => $resolved_codelists[$idx],
+					'codelist_id' => $codelist_id,
 				);
 			}
 			return $summary;
@@ -113,26 +125,60 @@ class Data_structure_csv_import {
 
 		$this->CI->db->trans_begin();
 		try {
+			$next_sort_order = $max_sort_order + 1;
 			foreach ($components as $idx => $comp) {
-				$codelist_id = $resolved_codelists[$idx];
+				$codelist_id = $this->_resolve_codelist_for_mapping(
+					$comp,
+					$csv_path,
+					$delimiter,
+					$parsed['headers'],
+					$agency,
+					false,
+					$summary,
+					$user_id
+				);
+				$name = trim((string) $comp['name']);
+				$label = isset($comp['label']) ? trim((string) $comp['label']) : '';
 				$row = array(
-					'name' => trim((string) $comp['name']),
-					'label' => isset($comp['label']) ? trim((string) $comp['label']) : null,
+					'label' => $label !== '' ? $label : null,
 					'column_type' => trim((string) $comp['column_type']),
 					'codelist_id' => $codelist_id !== null && $codelist_id > 0 ? (int) $codelist_id : null,
-					'sort_order' => $idx,
 				);
-				if ($row['label'] === '') {
-					$row['label'] = null;
+				if ($user_id) {
+					$row['updated_by'] = (int) $user_id;
 				}
+
+				$key = strtolower($name);
+				if (isset($existing_by_key[$key])) {
+					$existing = $existing_by_key[$key];
+					$this->CI->Data_structure_component_model->update_component((int) $existing['id'], $row);
+					$summary['components_updated'][] = array(
+						'id' => (int) $existing['id'],
+						'name' => $existing['name'],
+						'csv_column' => trim((string) $comp['csv_column']),
+						'before' => array(
+							'label' => isset($existing['label']) ? $existing['label'] : null,
+							'column_type' => $existing['column_type'],
+							'codelist_id' => !empty($existing['codelist_id']) ? (int) $existing['codelist_id'] : null,
+						),
+						'after' => array(
+							'label' => $row['label'],
+							'column_type' => $row['column_type'],
+							'codelist_id' => $row['codelist_id'],
+						),
+					);
+					continue;
+				}
+
+				$row['name'] = $name;
+				$row['sort_order'] = $next_sort_order++;
 				if ($user_id) {
 					$row['created_by'] = (int) $user_id;
-					$row['updated_by'] = (int) $user_id;
 				}
 				$new_id = $this->CI->Data_structure_component_model->create_component($structure_id, $row);
 				$summary['components_created'][] = array(
 					'id' => $new_id,
-					'name' => $row['name'],
+					'name' => $name,
 					'csv_column' => trim((string) $comp['csv_column']),
 				);
 			}
@@ -275,21 +321,15 @@ class Data_structure_csv_import {
 	}
 
 	/**
-	 * @param int $structure_id
 	 * @param array $components
+	 * @param array $existing_by_key Existing component rows keyed by lowercase name
+	 * @param bool  $overwrite When true, components matching an existing name update it
 	 * @return array[] error objects
 	 */
-	protected function _validate_components($structure_id, array $components)
+	protected function _validate_components(array $components, array $existing_by_key, $overwrite)
 	{
 		$errors = array();
 		$names = array();
-		$existing_by_name = array();
-		foreach ($this->CI->Data_structure_component_model->get_components_by_structure_id($structure_id) as $row) {
-			$n = isset($row['name']) ? strtolower(trim((string) $row['name'])) : '';
-			if ($n !== '') {
-				$existing_by_name[$n] = $row['name'];
-			}
-		}
 
 		foreach ($components as $idx => $comp) {
 			if (!is_array($comp)) {
@@ -308,7 +348,7 @@ class Data_structure_csv_import {
 						'path' => "components[{$idx}].name",
 						'message' => "Duplicate component name '{$name}' (case-insensitive match with '{$names[$key]}').",
 					);
-				} elseif (isset($existing_by_name[$key])) {
+				} elseif (!$overwrite && isset($existing_by_key[$key])) {
 					$errors[] = array(
 						'path' => "components[{$idx}].name",
 						'message' => "Component name '{$name}' already exists on this data structure.",
@@ -354,6 +394,15 @@ class Data_structure_csv_import {
 		}
 
 		$columns = array();
+		foreach ($existing_by_key as $key => $row) {
+			if (isset($names[$key])) {
+				continue;
+			}
+			$columns[] = array(
+				'name' => $row['name'],
+				'column_type' => $row['column_type'],
+			);
+		}
 		foreach ($components as $comp) {
 			$columns[] = array(
 				'name' => trim((string) $comp['name']),

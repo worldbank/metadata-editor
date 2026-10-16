@@ -40,6 +40,18 @@ Vue.component('indicator-dsd-chart', {
             },
             error: null,
             activeTab: 0, // 0 = chart, 1 = table
+            /** auto | line | bar | hbar */
+            chartType: 'auto',
+            /** Type actually drawn (line | bar | hbar) after resolving 'auto' */
+            renderedChartType: 'line',
+            /** Data table: horizontal = row per time period; vertical = row per series */
+            tableLayout: 'horizontal',
+            /** Dimensions with one value across all series: [{label, value}] */
+            chartContext: [],
+            /** Series without a numeric value in single-period bars */
+            chartHiddenCount: 0,
+            /** A measure-type dimension varies, so different units may share one axis */
+            chartMixedMeasures: false,
             suppressFilterAutoApply: false,
             _filterApplyTimer: null
         }
@@ -56,6 +68,11 @@ Vue.component('indicator-dsd-chart', {
             handler: function() {
                 this.scheduleAutoApplyFilters();
             }
+        },
+        chartType: function() {
+            this.$nextTick(() => {
+                this.updateChart();
+            });
         }
     },
     created: async function() {
@@ -143,11 +160,35 @@ Vue.component('indicator-dsd-chart', {
                 box-sizing: border-box;
                 overflow-y: auto;
             }
-            .indicator-dsd-chart-component .chart-series-summary {
+            .indicator-dsd-chart-component .chart-toolbar {
                 flex: 0 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .indicator-dsd-chart-component .chart-series-summary {
                 font-size: 0.8125rem;
                 color: rgba(0, 0, 0, 0.6);
+            }
+            .indicator-dsd-chart-component .chart-context {
+                margin-left: 12px;
+            }
+            .indicator-dsd-chart-component .chart-context strong {
+                color: rgba(0, 0, 0, 0.87);
+                font-weight: 500;
+            }
+            .indicator-dsd-chart-component .table-toolbar {
+                display: flex;
+                justify-content: flex-end;
                 margin-bottom: 8px;
+            }
+            .indicator-dsd-chart-component .chart-notice {
+                flex: 0 0 auto;
+                font-size: 0.75rem;
+                color: rgba(0, 0, 0, 0.6);
+                margin-bottom: 6px;
             }
             .indicator-dsd-chart-component .chart-plot-area {
                 position: relative;
@@ -183,6 +224,11 @@ Vue.component('indicator-dsd-chart', {
                 border-radius: 2px;
                 margin-top: 7px;
                 flex-shrink: 0;
+            }
+            .indicator-dsd-chart-component .chart-legend-swatch--box {
+                width: 12px;
+                height: 12px;
+                margin-top: 3px;
             }
             .indicator-dsd-chart-component .chart-legend-label {
                 font-size: 0.8125rem;
@@ -377,7 +423,165 @@ Vue.component('indicator-dsd-chart', {
             }
             return this.chartSeriesId(record);
         },
-        transformToChartData: function(records) {
+        /** Numeric observation value or null (accepts numeric strings such as "1,234"). */
+        toChartNumber: function(value) {
+            if (value === null || value === undefined) {
+                return null;
+            }
+            if (typeof value === 'number') {
+                return isFinite(value) ? value : null;
+            }
+            const s = String(value).replace(/[,\s]/g, '');
+            if (s === '' || !/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(s)) {
+                return null;
+            }
+            return parseFloat(s);
+        },
+        /**
+         * Split series into slice dimensions: which dimensions vary across the loaded series
+         * (used for short labels / grouping) and which are constant (shown once as context).
+         */
+        buildSeriesDimensions: function(records) {
+            const metaDims = (this.rawData && this.rawData.metadata && Array.isArray(this.rawData.metadata.slice_dimensions))
+                ? this.rawData.metadata.slice_dimensions
+                : [];
+            const partsBySid = {};
+            let partCount = null;
+            let consistent = true;
+
+            records.forEach(record => {
+                const sid = this.chartSeriesId(record);
+                if (!sid || partsBySid[sid]) {
+                    return;
+                }
+                let parts = Array.isArray(record.series_parts)
+                    ? record.series_parts.map(p => (p === null || p === undefined) ? '' : String(p))
+                    : this.chartSeriesDisplay(record).split(' | ');
+                if (partCount === null) {
+                    partCount = parts.length;
+                } else if (parts.length !== partCount) {
+                    consistent = false;
+                }
+                partsBySid[sid] = parts;
+            });
+
+            if (!consistent || !partCount) {
+                return { dims: [], partsBySid: {}, varying: [], constant: [] };
+            }
+
+            const dims = [];
+            for (let i = 0; i < partCount; i++) {
+                const m = metaDims.length === partCount ? metaDims[i] : null;
+                dims.push({
+                    key: m && m.name ? String(m.name) : ('dim_' + i),
+                    label: m && m.label ? String(m.label) : ((this.$t('dimension') || 'Dimension') + ' ' + (i + 1)),
+                    column_type: m && m.column_type ? String(m.column_type) : ''
+                });
+            }
+
+            const varying = [];
+            const constant = [];
+            dims.forEach((dim, i) => {
+                const values = new Set(Object.keys(partsBySid).map(sid => partsBySid[sid][i]));
+                if (values.size > 1) {
+                    varying.push(i);
+                } else {
+                    const v = values.values().next().value;
+                    if (v !== undefined && v !== '') {
+                        constant.push({ label: dim.label, value: v });
+                    }
+                }
+            });
+
+            return { dims: dims, partsBySid: partsBySid, varying: varying, constant: constant };
+        },
+        /** Series label using only the dimensions that vary; falls back to the full label. */
+        shortSeriesLabel: function(dimInfo, sid, fallback) {
+            const parts = dimInfo && dimInfo.partsBySid ? dimInfo.partsBySid[sid] : null;
+            if (!parts || !dimInfo.varying.length) {
+                return fallback;
+            }
+            return dimInfo.varying.map(i => parts[i]).join(' · ');
+        },
+        /**
+         * One time period: bars per series. With 2+ varying dimensions, the non-measure dimension with
+         * the fewest values becomes the bar color (datasets); the remaining varying dimensions form the categories.
+         */
+        buildSinglePeriodBars: function(chartData, dimInfo) {
+            const period = chartData.labels[0];
+            const rows = chartData.datasets.map(ds => ({
+                sid: ds.sid,
+                label: ds.label,
+                value: ds.data[0]
+            }));
+            const hidden = rows.filter(r => r.value === null).length;
+            const valid = rows.filter(r => r.value !== null);
+            const varying = dimInfo.varying;
+
+            if (varying.length < 2) {
+                valid.sort((a, b) => b.value - a.value);
+                return {
+                    labels: valid.map(r => r.label),
+                    datasets: [{
+                        label: String(period),
+                        data: valid.map(r => r.value),
+                        backgroundColor: INDICATOR_CHART_LINE_COLORS[0],
+                        borderColor: INDICATOR_CHART_LINE_COLORS[0],
+                        borderWidth: 0
+                    }],
+                    legendItems: [],
+                    hidden: hidden
+                };
+            }
+
+            const distinctCount = idx => new Set(valid.map(r => dimInfo.partsBySid[r.sid][idx])).size;
+            const nonMeasure = varying.filter(i => dimInfo.dims[i].column_type !== 'measure');
+            const colorCandidates = nonMeasure.length ? nonMeasure : varying;
+            const colorIdx = colorCandidates.slice().sort((a, b) => distinctCount(a) - distinctCount(b) || b - a)[0];
+            const categoryDims = varying.filter(i => i !== colorIdx);
+
+            const categories = [];
+            const groups = [];
+            const values = {};
+            valid.forEach(r => {
+                const parts = dimInfo.partsBySid[r.sid];
+                const cat = categoryDims.map(i => parts[i]).join(' · ');
+                const grp = parts[colorIdx];
+                if (categories.indexOf(cat) === -1) {
+                    categories.push(cat);
+                }
+                if (groups.indexOf(grp) === -1) {
+                    groups.push(grp);
+                }
+                values[cat + '\u0000' + grp] = r.value;
+            });
+
+            const datasets = groups.map((grp, gi) => {
+                const color = INDICATOR_CHART_LINE_COLORS[gi % INDICATOR_CHART_LINE_COLORS.length];
+                return {
+                    label: grp,
+                    data: categories.map(cat => {
+                        const v = values[cat + '\u0000' + grp];
+                        return v === undefined ? null : v;
+                    }),
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 0
+                };
+            });
+
+            return {
+                labels: categories,
+                datasets: datasets,
+                legendItems: datasets.map((ds, idx) => ({
+                    id: idx + '-' + ds.label,
+                    label: ds.label,
+                    color: ds.backgroundColor
+                })),
+                hidden: hidden
+            };
+        },
+        transformToChartData: function(records, dimInfo) {
             if (!records || !Array.isArray(records) || records.length === 0) {
                 return { labels: [], datasets: [], legendItems: [] };
             }
@@ -410,14 +614,12 @@ Vue.component('indicator-dsd-chart', {
             Object.keys(seriesData).sort((a, b) =>
                 String(seriesDisplay[a] || a).localeCompare(String(seriesDisplay[b] || b), undefined, { sensitivity: 'base' })
             ).forEach(sid => {
-                const data = labels.map(timePeriod => ({
-                    x: timePeriod,
-                    y: seriesData[sid][timePeriod] !== undefined ? seriesData[sid][timePeriod] : null
-                }));
+                const data = labels.map(timePeriod => this.toChartNumber(seriesData[sid][timePeriod]));
                 const color = INDICATOR_CHART_LINE_COLORS[colorIdx % INDICATOR_CHART_LINE_COLORS.length];
 
                 datasets.push({
-                    label: seriesDisplay[sid] || sid,
+                    sid: sid,
+                    label: this.shortSeriesLabel(dimInfo, sid, seriesDisplay[sid] || sid),
                     data: data,
                     borderColor: color,
                     backgroundColor: color,
@@ -490,6 +692,81 @@ Vue.component('indicator-dsd-chart', {
                 return row;
             });
         },
+        formatTableValue: function(value) {
+            if (value === null || value === undefined) {
+                return '-';
+            }
+            if (typeof value === 'number') {
+                return value.toLocaleString(undefined, {maximumFractionDigits: 2});
+            }
+            return String(value);
+        },
+        /** Vertical layout: one row per series, a column per slice dimension, then a column per time period. */
+        transformToVerticalTable: function(records) {
+            if (!records || !Array.isArray(records) || records.length === 0) {
+                return { headers: [], items: [] };
+            }
+
+            const dimInfo = this.buildSeriesDimensions(records);
+            const values = {};
+            const idToDisplay = {};
+            const timePeriods = new Set();
+
+            records.forEach(record => {
+                const sid = this.chartSeriesId(record);
+                if (!sid) {
+                    return;
+                }
+                if (!values[sid]) {
+                    values[sid] = {};
+                    idToDisplay[sid] = this.chartSeriesDisplay(record);
+                }
+                values[sid][record.time_period] = record.observation_value;
+                timePeriods.add(record.time_period);
+            });
+
+            const periods = Array.from(timePeriods).sort();
+            const sids = Object.keys(values).sort((a, b) =>
+                String(idToDisplay[a] || a).localeCompare(String(idToDisplay[b] || b), undefined, { sensitivity: 'base' })
+            );
+
+            const headers = dimInfo.dims.length
+                ? dimInfo.dims.map((dim, i) => ({ text: dim.label, value: 'dim_' + i, sortable: true }))
+                : [{ text: this.$t('series') || 'Series', value: 'series', sortable: true }];
+            periods.forEach((p, i) => {
+                headers.push({ text: String(p), value: 'p_' + i, sortable: true, align: 'right' });
+            });
+
+            const items = sids.map(sid => {
+                const row = {};
+                if (dimInfo.dims.length) {
+                    dimInfo.partsBySid[sid].forEach((part, i) => {
+                        row['dim_' + i] = part;
+                    });
+                } else {
+                    row.series = idToDisplay[sid] || sid;
+                }
+                periods.forEach((p, i) => {
+                    row['p_' + i] = this.formatTableValue(values[sid][p]);
+                });
+                return row;
+            });
+
+            return { headers: headers, items: items };
+        },
+        /** Concrete chart type for the selected mode; 'auto' picks by number of periods and series. */
+        resolveChartType: function(periodCount, seriesCount) {
+            if (this.chartType !== 'auto') {
+                return this.chartType;
+            }
+            if (periodCount <= 1) {
+                return 'hbar';
+            }
+            if (periodCount <= 5 && seriesCount <= 8) {
+                return 'bar';
+            }
+            return 'line';
+        },
         updateChart: function() {
             if (!this.rawData || !this.rawData.records || !Array.isArray(this.rawData.records) || this.rawData.records.length === 0) {
                 return;
@@ -513,8 +790,62 @@ Vue.component('indicator-dsd-chart', {
             }
 
             // Transform raw data to Chart.js format
-            const chartData = this.transformToChartData(this.rawData.records);
-            this.chartLegendItems = chartData.legendItems || [];
+            const dimInfo = this.buildSeriesDimensions(this.rawData.records);
+            const chartData = this.transformToChartData(this.rawData.records, dimInfo);
+            const periods = chartData.labels || [];
+            const type = this.resolveChartType(periods.length, chartData.datasets.length);
+            const isBar = type === 'bar' || type === 'hbar';
+            const isHorizontal = type === 'hbar';
+            const transposed = isBar && periods.length === 1;
+
+            let labels = periods;
+            let datasets = chartData.datasets;
+            let legendItems = chartData.legendItems || [];
+            let hiddenCount = 0;
+
+            if (type === 'line') {
+                datasets.forEach(ds => {
+                    ds.pointRadius = periods.length <= 3 ? 5 : 3;
+                    ds.pointHoverRadius = ds.pointRadius + 2;
+                });
+            }
+
+            if (transposed) {
+                const bars = this.buildSinglePeriodBars(chartData, dimInfo);
+                labels = bars.labels;
+                datasets = bars.datasets;
+                legendItems = bars.legendItems;
+                hiddenCount = bars.hidden;
+            }
+
+            this.renderedChartType = type;
+            this.chartLegendItems = legendItems;
+            this.chartContext = dimInfo.constant;
+            this.chartHiddenCount = hiddenCount;
+            this.chartMixedMeasures = dimInfo.varying.some(i => dimInfo.dims[i].column_type === 'measure');
+
+            const timeAxisTitle = vm.$t('field_time_period') || 'Time period';
+            const valueAxisTitleBase = vm.$t('dsd_role_measure') || 'Observation value';
+            const valueAxisTitle = transposed ? valueAxisTitleBase + ' (' + periods[0] + ')' : valueAxisTitleBase;
+            const categoryAxis = {
+                title: {
+                    display: !transposed,
+                    text: timeAxisTitle
+                },
+                grid: {
+                    display: false
+                }
+            };
+            const valueAxis = {
+                title: {
+                    display: true,
+                    text: valueAxisTitle
+                },
+                beginAtZero: isBar,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            };
 
             const ctx = canvas.getContext('2d');
             
@@ -523,16 +854,19 @@ Vue.component('indicator-dsd-chart', {
             if (canvasParent) {
                 canvasParent.style.position = 'relative';
                 canvasParent.style.width = '100%';
-                canvasParent.style.height = '100%';
+                const barCount = isHorizontal ? labels.length * datasets.length : 0;
+                canvasParent.style.height = barCount > 14 ? (barCount * 26 + 80) + 'px' : '100%';
             }
             
             this.chart = new Chart(ctx, {
-                type: 'line',
+                type: isBar ? 'bar' : 'line',
                 data: {
-                    labels: chartData.labels || [],
-                    datasets: chartData.datasets || []
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
+                    indexAxis: isHorizontal ? 'y' : 'x',
+                    spanGaps: true,
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
@@ -542,7 +876,8 @@ Vue.component('indicator-dsd-chart', {
                     },
                     interaction: {
                         intersect: false,
-                        mode: 'index'
+                        mode: 'index',
+                        axis: isHorizontal ? 'y' : 'x'
                     },
                     plugins: {
                         legend: {
@@ -557,25 +892,8 @@ Vue.component('indicator-dsd-chart', {
                         }
                     },
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: vm.$t('field_time_period') || 'Time period'
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: vm.$t('dsd_role_measure') || 'Observation value'
-                            },
-                            beginAtZero: false,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
+                        x: isHorizontal ? valueAxis : categoryAxis,
+                        y: isHorizontal ? categoryAxis : valueAxis
                     }
                 }
             });
@@ -622,6 +940,15 @@ Vue.component('indicator-dsd-chart', {
         ProjectID() {
             return this.$store.state.project_id;
         },
+        chartTabIcon: function() {
+            if (this.renderedChartType === 'bar') {
+                return 'mdi-chart-bar';
+            }
+            if (this.renderedChartType === 'hbar') {
+                return 'mdi-align-horizontal-left';
+            }
+            return 'mdi-chart-line';
+        },
         hasData: function() {
             return this.rawData && this.rawData.records && Array.isArray(this.rawData.records) && this.rawData.records.length > 0;
         },
@@ -659,15 +986,27 @@ Vue.component('indicator-dsd-chart', {
                 Array.isArray(this.dimensionFilters[k]) && this.dimensionFilters[k].length > 0
             );
         },
+        verticalTable: function() {
+            if (this.tableLayout !== 'vertical' || !this.rawData || !this.rawData.records) {
+                return { headers: [], items: [] };
+            }
+            return this.transformToVerticalTable(this.rawData.records);
+        },
         tableData: function() {
             if (!this.rawData || !this.rawData.records) {
                 return [];
+            }
+            if (this.tableLayout === 'vertical') {
+                return this.verticalTable.items;
             }
             return this.transformToTableData(this.rawData.records);
         },
         tableHeaders: function() {
             if (!this.rawData || !this.rawData.records || !Array.isArray(this.rawData.records) || this.rawData.records.length === 0) {
                 return [];
+            }
+            if (this.tableLayout === 'vertical') {
+                return this.verticalTable.headers;
             }
 
             const seriesIds = new Set();
@@ -938,7 +1277,7 @@ Vue.component('indicator-dsd-chart', {
                         style="border-bottom: 1px solid #e0e0e0; background: #f5f5f5;"
                     >
                         <v-tab>
-                            <v-icon left small>mdi-chart-line</v-icon>
+                            <v-icon left small>{{ chartTabIcon }}</v-icon>
                             {{$t("chart") || "Chart"}}
                         </v-tab>
                         <v-tab>
@@ -968,8 +1307,37 @@ Vue.component('indicator-dsd-chart', {
                                 </div>
                             </div>
                             <div v-else class="tab-pane tab-pane--chart">
-                                <div class="chart-series-summary">
-                                    {{ seriesCount }} {{ $t('series') || 'series' }}
+                                <div class="chart-toolbar">
+                                    <div class="chart-series-summary">
+                                        {{ seriesCount }} {{ $t('series') || 'series' }}
+                                        <span v-if="chartContext.length" class="chart-context">
+                                            <span v-for="(c, ci) in chartContext" :key="'ctx-' + ci">
+                                                <span v-if="ci > 0"> · </span>{{ c.label }}: <strong>{{ c.value }}</strong>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <v-btn-toggle v-model="chartType" mandatory dense>
+                                        <v-btn small value="auto" :title="$t('chart_type_auto')">
+                                            {{ $t('chart_type_auto') }}
+                                        </v-btn>
+                                        <v-btn small value="line" :title="$t('chart_type_line')">
+                                            <v-icon small>mdi-chart-line</v-icon>
+                                        </v-btn>
+                                        <v-btn small value="bar" :title="$t('chart_type_bar')">
+                                            <v-icon small>mdi-chart-bar</v-icon>
+                                        </v-btn>
+                                        <v-btn small value="hbar" :title="$t('chart_type_hbar')">
+                                            <v-icon small>mdi-align-horizontal-left</v-icon>
+                                        </v-btn>
+                                    </v-btn-toggle>
+                                </div>
+                                <div v-if="chartMixedMeasures" class="chart-notice">
+                                    <v-icon x-small color="orange darken-2">mdi-alert</v-icon>
+                                    {{ $t('chart_mixed_measures_notice') }}
+                                </div>
+                                <div v-if="chartHiddenCount > 0" class="chart-notice">
+                                    <v-icon x-small color="grey">mdi-information-outline</v-icon>
+                                    {{ chartHiddenCount }} {{ $t('chart_series_without_value') }}
                                 </div>
                                 <div class="chart-plot-area">
                                     <canvas ref="chartCanvas"></canvas>
@@ -982,6 +1350,7 @@ Vue.component('indicator-dsd-chart', {
                                     >
                                         <span
                                             class="chart-legend-swatch"
+                                            :class="{ 'chart-legend-swatch--box': renderedChartType !== 'line' }"
                                             :style="{ backgroundColor: item.color }"
                                         ></span>
                                         <span class="chart-legend-label">{{ item.label }}</span>
@@ -1004,6 +1373,18 @@ Vue.component('indicator-dsd-chart', {
                                     </div>
                                 </div>
                                 <div v-else>
+                                    <div class="table-toolbar">
+                                        <v-btn-toggle v-model="tableLayout" mandatory dense>
+                                            <v-btn small value="horizontal" :title="$t('table_layout_horizontal_help')">
+                                                <v-icon small left>mdi-table-arrow-right</v-icon>
+                                                {{ $t('table_layout_horizontal') }}
+                                            </v-btn>
+                                            <v-btn small value="vertical" :title="$t('table_layout_vertical_help')">
+                                                <v-icon small left>mdi-table-arrow-down</v-icon>
+                                                {{ $t('table_layout_vertical') }}
+                                            </v-btn>
+                                        </v-btn-toggle>
+                                    </div>
                                     <v-data-table
                                         :headers="tableHeaders"
                                         :items="tableData"

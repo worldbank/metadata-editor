@@ -9,6 +9,7 @@ Vue.component('data-structure-csv-bootstrap', {
             structureLoading: false,
             structureTitle: '',
             structureName: '',
+            existingComponents: [],
             file: null,
             fileName: '',
             parseError: '',
@@ -48,6 +49,26 @@ Vue.component('data-structure-csv-bootstrap', {
                 return 'Data structure #' + this.numericStructureId;
             }
             return '';
+        },
+        hasExistingComponents: function () {
+            return this.existingComponents.length > 0;
+        },
+        existingComponentsByKey: function () {
+            var map = {};
+            this.existingComponents.forEach(function (c) {
+                var key = String(c.name || '').trim().toLowerCase();
+                if (key) {
+                    map[key] = c;
+                }
+            });
+            return map;
+        },
+        newComponentCount: function () {
+            var vm = this;
+            return vm.mappedComponents.filter(function (m) { return !vm.existingComponentFor(m); }).length;
+        },
+        updatedComponentCount: function () {
+            return this.mappedComponents.length - this.newComponentCount;
         },
         roleItems: function () {
             var vm = this;
@@ -236,13 +257,14 @@ Vue.component('data-structure-csv-bootstrap', {
                 return;
             }
             vm.structureLoading = true;
-            axios.get(vm.apiBase() + '/single/' + vm.numericStructureId)
+            axios.get(vm.apiBase() + '/single/' + vm.numericStructureId, { params: { with_components: 1 } })
                 .then(function (res) {
                     vm.structureLoading = false;
                     if (res.data && res.data.status === 'success' && res.data.data_structure) {
                         var ds = res.data.data_structure;
                         vm.structureTitle = ds.title || '';
                         vm.structureName = ds.name || '';
+                        vm.existingComponents = Array.isArray(ds.components) ? ds.components : [];
                     }
                 })
                 .catch(function () {
@@ -258,6 +280,7 @@ Vue.component('data-structure-csv-bootstrap', {
         },
         resetWizard: function () {
             this.wizardStep = 1;
+            this.existingComponents = [];
             this.file = null;
             this.fileName = '';
             this.parseError = '';
@@ -518,6 +541,24 @@ Vue.component('data-structure-csv-bootstrap', {
         },
         buildInitialMappings: function (headers) {
             var vm = this;
+            if (vm.hasExistingComponents) {
+                return headers.map(function (h) {
+                    var mapping = {
+                        csv_column: h,
+                        included: false,
+                        is_label_only: false,
+                        role: '',
+                        component_name: vm.normalizeComponentName(h),
+                        component_label: h,
+                        codelist_mode: 'none',
+                        codelist_id: null,
+                        codelist_display: '',
+                        codelist_label_column: ''
+                    };
+                    vm.applyExistingComponentValues(mapping);
+                    return mapping;
+                });
+            }
             var mappings = headers.map(function (h) {
                 var isLabelOnly = vm.isLikelyLabelOnlyColumn(h, headers);
                 if (isLabelOnly) {
@@ -559,11 +600,53 @@ Vue.component('data-structure-csv-bootstrap', {
             vm.syncLabelOnlyFlags(mappings);
             return mappings;
         },
+        existingComponentNamed: function (name) {
+            var key = String(name || '').trim().toLowerCase();
+            return (key && this.existingComponentsByKey[key]) || null;
+        },
+        existingComponentFor: function (mapping) {
+            return mapping ? this.existingComponentNamed(mapping.component_name) : null;
+        },
+        previousRoleText: function (component) {
+            var existing = this.existingComponentNamed(component && component.name);
+            if (!existing || existing.column_type === component.column_type) {
+                return '';
+            }
+            return this.columnTypes[existing.column_type] || existing.column_type;
+        },
+        existingCodelistDisplay: function (component) {
+            var ref = component && component.codelist_reference;
+            if (ref && (ref.agency || ref.name)) {
+                var text = (ref.agency ? ref.agency + ':' : '') + (ref.name || '');
+                return ref.version ? text + ' (' + ref.version + ')' : text;
+            }
+            return component && component.codelist_id ? 'Codelist #' + component.codelist_id : '';
+        },
+        applyExistingComponentValues: function (mapping) {
+            var existing = this.existingComponentFor(mapping);
+            if (!existing) {
+                return;
+            }
+            mapping.component_name = existing.name;
+            mapping.role = existing.column_type || '';
+            mapping.component_label = existing.label || mapping.csv_column;
+            if (existing.codelist_id && this.supportsCodelistRole(mapping.role)) {
+                mapping.codelist_mode = 'global';
+                mapping.codelist_id = existing.codelist_id;
+                mapping.codelist_display = this.existingCodelistDisplay(existing);
+            } else {
+                mapping.codelist_mode = 'none';
+                mapping.codelist_id = null;
+                mapping.codelist_display = '';
+            }
+            mapping.codelist_label_column = '';
+        },
         syncLabelOnlyFlags: function (mappings) {
             var vm = this;
             var list = mappings || vm.columnMappings;
+            var autoDetect = !vm.hasExistingComponents;
             list.forEach(function (m) {
-                if (vm.isLikelyLabelOnlyColumn(m.csv_column, vm.headers)) {
+                if (autoDetect && vm.isLikelyLabelOnlyColumn(m.csv_column, vm.headers)) {
                     m.is_label_only = true;
                     m.included = false;
                     m.codelist_mode = 'none';
@@ -572,13 +655,16 @@ Vue.component('data-structure-csv-bootstrap', {
                 }
             });
             list.forEach(function (m) {
-                if (vm.isLikelyLabelOnlyColumn(m.csv_column, vm.headers)) {
+                if (autoDetect && vm.isLikelyLabelOnlyColumn(m.csv_column, vm.headers)) {
                     return;
                 }
                 var referenced = list.some(function (c) {
                     return c.codelist_mode === 'from_csv' && c.codelist_label_column === m.csv_column;
                 });
                 if (!referenced) {
+                    if (m.is_label_only && !autoDetect) {
+                        vm.applyExistingComponentValues(m);
+                    }
                     m.is_label_only = false;
                 }
             });
@@ -613,8 +699,12 @@ Vue.component('data-structure-csv-bootstrap', {
             if (mapping.included) {
                 return;
             }
-            mapping.codelist_id = null;
-            mapping.codelist_display = '';
+            if (this.existingComponentFor(mapping)) {
+                this.applyExistingComponentValues(mapping);
+            } else {
+                mapping.codelist_id = null;
+                mapping.codelist_display = '';
+            }
             this.clearLabelOnlyUsageOf(mapping.csv_column);
         },
         clearLabelOnlyUsageOf: function (csvColumn) {
@@ -838,21 +928,42 @@ Vue.component('data-structure-csv-bootstrap', {
             if (vm.mappedComponents.length === 0) {
                 errors.push('Select at least one column to import and assign it a component role.');
             }
-            vm.mappedComponents.forEach(function (m) {
-                var t = m.role;
-                if (!byType[t]) {
-                    byType[t] = [];
+            vm.columnMappings.forEach(function (m) {
+                if (m.included && !m.is_label_only && !m.role) {
+                    errors.push('Choose a role for column "' + m.csv_column + '".');
                 }
-                byType[t].push(m);
             });
+
+            var resulting = [];
+            var importedKeys = {};
+            vm.mappedComponents.forEach(function (m) {
+                var name = (m.component_name || '').trim();
+                importedKeys[name.toLowerCase()] = true;
+                resulting.push({ name: name || m.csv_column, role: m.role });
+            });
+            vm.existingComponents.forEach(function (c) {
+                var key = String(c.name || '').trim().toLowerCase();
+                if (!importedKeys[key]) {
+                    resulting.push({ name: c.name, role: c.column_type });
+                }
+            });
+            resulting.forEach(function (c) {
+                if (!byType[c.role]) {
+                    byType[c.role] = [];
+                }
+                byType[c.role].push(c);
+            });
+            var namesFor = function (type) {
+                return byType[type].map(function (c) { return c.name; }).join(', ');
+            };
 
             ['indicator_id', 'time_period', 'observation_value'].forEach(function (type) {
                 var count = byType[type] ? byType[type].length : 0;
                 var label = vm.columnTypes[type] || type;
                 if (count === 0) {
-                    errors.push('Required role missing: ' + label + ' (exactly one column).');
+                    errors.push('Required role missing: ' + label + ' (exactly one component).');
                 } else if (count > 1) {
-                    errors.push('Too many columns mapped as ' + label + ' (max 1).');
+                    errors.push('Only one component can have the role ' + label + '. Found: ' + namesFor(type) + '.');
                 }
             });
 
@@ -863,7 +974,7 @@ Vue.component('data-structure-csv-bootstrap', {
                     warnings.push('Recommended role not set: ' + label + '.');
                 }
                 if (count > 1) {
-                    errors.push('Too many columns mapped as ' + label + ' (max 1).');
+                    errors.push('Only one component can have the role ' + label + '. Found: ' + namesFor(type) + '.');
                 }
             });
 
@@ -923,7 +1034,7 @@ Vue.component('data-structure-csv-bootstrap', {
                     label: role.label,
                     tier: role.tier,
                     present: cols.length > 0,
-                    columns: cols.map(function (c) { return c.component_name || c.csv_column; })
+                    columns: cols.map(function (c) { return c.name; })
                 };
             });
 
@@ -953,6 +1064,7 @@ Vue.component('data-structure-csv-bootstrap', {
             return {
                 delimiter: this.delimiter,
                 dry_run: false,
+                overwrite: this.hasExistingComponents,
                 components: this.applySummary.components
             };
         },
@@ -990,9 +1102,13 @@ Vue.component('data-structure-csv-bootstrap', {
                     if (res.data && res.data.status === 'success') {
                         var summary = res.data.summary || {};
                         var created = (summary.components_created || []).length;
+                        var updated = (summary.components_updated || []).length;
                         var msg = created === 1
                             ? '1 component created.'
                             : created + ' components created.';
+                        if (updated > 0) {
+                            msg += updated === 1 ? ' 1 component updated.' : ' ' + updated + ' components updated.';
+                        }
                         var clSummary = vm.formatCodelistImportSummary(summary);
                         if (clSummary) {
                             msg += ' ' + clSummary + '.';
@@ -1106,6 +1222,7 @@ Vue.component('data-structure-csv-bootstrap', {
                                             dense outlined hide-details
                                             class="ds-csv-step-control ds-csv-file-row-control"
                                             :loading="parsing"
+                                            :disabled="structureLoading"
                                             @change="onFileSelected"
                                         ></v-file-input>
                                     </v-col>
@@ -1127,7 +1244,16 @@ Vue.component('data-structure-csv-bootstrap', {
                             </v-stepper-content>
 
                             <v-stepper-content step="2" class="pa-6">
-                                <p class="text-body-2 grey--text text--darken-1 mb-3">
+                                <p v-if="hasExistingComponents" class="text-body-2 grey--text text--darken-1 mb-3">
+                                    This data structure already has <strong>{{ existingComponents.length }}</strong> components.
+                                    Check the columns to import and choose a role for each.
+                                    A column whose component name matches an existing component <strong>updates</strong> it
+                                    (role, label and codelist; description and other details are kept). Other columns are <strong>added</strong>.
+                                    Existing components not selected here are left unchanged.
+                                    For codelists created from CSV, pick a <strong>Label field</strong> on the code column.
+                                    Component names follow SDMX ID rules (A–Z, a–z, 0–9, underscore; max 100; no leading _).
+                                </p>
+                                <p v-else class="text-body-2 grey--text text--darken-1 mb-3">
                                     Check the columns to import and assign each a component role.
                                     For codelists created from CSV, pick a <strong>Label field</strong> on the code column
                                     (e.g. <code>ref_area</code> → label field <code>ref_area_label</code>).
@@ -1179,6 +1305,7 @@ Vue.component('data-structure-csv-bootstrap', {
                                                             v-model="mapping.role"
                                                             :items="roleItems"
                                                             item-value="value" item-text="text"
+                                                            placeholder="Select role"
                                                             dense outlined hide-details
                                                             class="ds-csv-map-control"
                                                             :disabled="!mapping.included"
@@ -1199,6 +1326,13 @@ Vue.component('data-structure-csv-bootstrap', {
                                                         @input="onComponentNameInput(mapping)"
                                                     ></v-text-field>
                                                     <span v-else class="grey--text text-caption">—</span>
+                                                    <v-chip v-if="hasExistingComponents && mapping.included" x-small label class="mt-1"
+                                                        :color="existingComponentFor(mapping) ? 'orange darken-1' : 'green darken-1'" dark>
+                                                        {{ existingComponentFor(mapping) ? 'Update' : 'New' }}
+                                                    </v-chip>
+                                                    <div v-else-if="hasExistingComponents && existingComponentFor(mapping)" class="text-caption grey--text">
+                                                        In DSD: {{ existingComponentFor(mapping).name }}
+                                                    </div>
                                                 </td>
                                                 <td class="ds-csv-map-col-codelist">
                                                     <template v-if="showCodelistOptions(mapping)">
@@ -1240,6 +1374,10 @@ Vue.component('data-structure-csv-bootstrap', {
                                                                 class="ds-csv-map-control"
                                                                 @change="onCodelistLabelColumnChange(mapping)"
                                                             ></v-select>
+                                                            <div v-if="mapping.codelist_mode === 'from_csv' && !mapping.codelist_label_column"
+                                                                class="grey--text text-caption">
+                                                                No label column — codes will be used as labels; edit them later in the codelist.
+                                                            </div>
                                                         </div>
                                                     </template>
                                                     <span v-else class="grey--text text-caption">—</span>
@@ -1272,10 +1410,16 @@ Vue.component('data-structure-csv-bootstrap', {
                                     </v-chip>
                                 </div>
                                 <v-row dense>
-                                    <v-col cols="12" sm="3">
+                                    <v-col v-if="!hasExistingComponents" cols="12" sm="3">
                                         <v-card outlined class="pa-3 text-center">
                                             <div class="text-h5 primary--text">{{ applySummary.component_count }}</div>
                                             <div class="text-caption">Components</div>
+                                        </v-card>
+                                    </v-col>
+                                    <v-col v-else cols="12" sm="3">
+                                        <v-card outlined class="pa-3 text-center">
+                                            <div class="text-h5 primary--text">{{ newComponentCount }} / {{ updatedComponentCount }}</div>
+                                            <div class="text-caption">New / updated components</div>
                                         </v-card>
                                     </v-col>
                                     <v-col cols="12" sm="3">
@@ -1298,13 +1442,25 @@ Vue.component('data-structure-csv-bootstrap', {
                                     </v-col>
                                 </v-row>
                                 <div class="mt-4">
-                                    <div class="text-subtitle-2 mb-2">Components to create</div>
+                                    <div class="text-subtitle-2 mb-2">{{ hasExistingComponents ? 'Components to add or update' : 'Components to create' }}</div>
                                     <v-simple-table dense>
                                         <thead>
-                                            <tr><th>Name</th><th>Role</th><th>CSV column</th><th>Codelist</th></tr>
+                                            <tr>
+                                                <th v-if="hasExistingComponents">Action</th>
+                                                <th>Name</th><th>Role</th><th>CSV column</th><th>Codelist</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
                                             <tr v-for="c in applySummary.components" :key="c.name">
+                                                <td v-if="hasExistingComponents">
+                                                    <v-chip x-small label dark
+                                                        :color="existingComponentNamed(c.name) ? 'orange darken-1' : 'green darken-1'">
+                                                        {{ existingComponentNamed(c.name) ? 'Update' : 'New' }}
+                                                    </v-chip>
+                                                    <div v-if="previousRoleText(c)" class="text-caption grey--text">
+                                                        was {{ previousRoleText(c) }}
+                                                    </div>
+                                                </td>
                                                 <td><code class="text-caption">{{ c.name }}</code></td>
                                                 <td>
                                                     <v-chip x-small :color="columnTypeColor(c.column_type)" dark class="text-capitalize">
@@ -1332,7 +1488,13 @@ Vue.component('data-structure-csv-bootstrap', {
                                     </v-expansion-panel>
                                 </v-expansion-panels>
                                 <v-alert type="info" dense text class="mt-3">
-                                    Apply creates components on this data structure and global codelists (prefixed with <code>CL_</code>) from CSV columns where configured.
+                                    <template v-if="hasExistingComponents">
+                                        Apply adds new components and updates matching ones (role, label and codelist) on this data structure,
+                                        and creates global codelists (prefixed with <code>CL_</code>) from CSV columns where configured.
+                                    </template>
+                                    <template v-else>
+                                        Apply creates components on this data structure and global codelists (prefixed with <code>CL_</code>) from CSV columns where configured.
+                                    </template>
                                 </v-alert>
                             </v-stepper-content>
                         </v-stepper-items>

@@ -2332,6 +2332,7 @@ class Indicator_dsd_model extends CI_Model {
      * @param array $page timeseries_page
      * @param array $records
      * @param array $metadata chart-aggregate metadata (slice_columns)
+     * @return array<int,array{physical:string,name:string,label:string,column_type:string}> slice dimensions in series_parts order
      */
     private function enrich_chart_aggregate_records_from_dsd($sid, $page, array &$records, array $metadata)
     {
@@ -2340,7 +2341,7 @@ class Indicator_dsd_model extends CI_Model {
             : array();
 
         if (count($records) === 0) {
-            return;
+            return array();
         }
 
         $key_map = $this->timeseries_page_column_upper_to_physical($page);
@@ -2360,13 +2361,15 @@ class Indicator_dsd_model extends CI_Model {
                 }
             }
 
-            return;
+            return array();
         }
 
         $columns = $this->enrich_columns_resolved_code_lists($sid, $this->select_all($sid, false));
 
         /** @var array<string,array<string,string>> upper physical -> lower(code) -> label */
         $labels_by_col_upper = array();
+        /** @var array<string,array{name:string,label:string,column_type:string}> upper physical -> DSD column info */
+        $dim_info_by_col_upper = array();
         foreach ($columns as $col) {
             if (!is_array($col)) {
                 continue;
@@ -2374,6 +2377,16 @@ class Indicator_dsd_model extends CI_Model {
             $ct = isset($col['column_type']) ? $col['column_type'] : '';
             if (!in_array($ct, self::chart_slice_dsd_column_types(), true)) {
                 continue;
+            }
+            $info_uk = $this->dsd_physical_column_key($col['name']);
+            if ($info_uk !== '' && isset($key_map[$info_uk])) {
+                $col_name = isset($col['name']) ? (string) $col['name'] : '';
+                $col_label = isset($col['label']) && trim((string) $col['label']) !== '' ? trim((string) $col['label']) : $col_name;
+                $dim_info_by_col_upper[strtoupper($key_map[$info_uk])] = array(
+                    'name' => $col_name,
+                    'label' => $col_label,
+                    'column_type' => (string) $ct,
+                );
             }
             if (in_array($ct, array('periodicity', 'attribute', 'annotation'), true)) {
                 if (!$this->indicator_dsd_column_has_resolved_codelist($sid, $col)) {
@@ -2464,6 +2477,7 @@ class Indicator_dsd_model extends CI_Model {
             }
 
             $records[$i]['series_key_label'] = implode(' | ', $parts_label);
+            $records[$i]['series_parts'] = $parts_label;
             if ($geo_label !== null && $geo_label !== '') {
                 $records[$i]['geography'] = $geo_label;
             } elseif (!isset($records[$i]['geography']) && isset($records[$i]['series_key'])) {
@@ -2472,6 +2486,18 @@ class Indicator_dsd_model extends CI_Model {
 
             unset($records[$i]['slice_values']);
         }
+
+        $slice_dimensions = array();
+        foreach ($slice_cols as $phys) {
+            $phys = trim((string) $phys);
+            $pu = strtoupper($phys);
+            $info = isset($dim_info_by_col_upper[$pu])
+                ? $dim_info_by_col_upper[$pu]
+                : array('name' => $phys, 'label' => $phys, 'column_type' => '');
+            $slice_dimensions[] = array_merge(array('physical' => $phys), $info);
+        }
+
+        return $slice_dimensions;
     }
 
     /**
@@ -2487,7 +2513,7 @@ class Indicator_dsd_model extends CI_Model {
         $records = isset($raw['records']) && is_array($raw['records']) ? $raw['records'] : array();
         $metadata = isset($raw['metadata']) && is_array($raw['metadata']) ? $raw['metadata'] : array();
 
-        $this->enrich_chart_aggregate_records_from_dsd($sid, $page, $records, $metadata);
+        $slice_dimensions = $this->enrich_chart_aggregate_records_from_dsd($sid, $page, $records, $metadata);
 
         $out = array(
             'records' => $records,
@@ -2497,6 +2523,7 @@ class Indicator_dsd_model extends CI_Model {
             'metadata' => $metadata,
         );
         $out['metadata']['source'] = 'duckdb';
+        $out['metadata']['slice_dimensions'] = $slice_dimensions;
 
         return $out;
     }

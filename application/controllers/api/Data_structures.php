@@ -403,6 +403,7 @@ class Data_structures extends MY_REST_Controller {
      *
      * Multipart: file + payload (JSON string), or JSON body with upload_id + payload fields.
      * payload: { delimiter, dry_run?, overwrite?, components: [...] }
+     * overwrite: update components whose name already exists instead of rejecting them.
      */
     public function import_components_csv_post($id = null)
     {

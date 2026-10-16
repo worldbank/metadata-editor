@@ -6350,6 +6350,11 @@ paths:
         `{ delimiter, dry_run?, overwrite?, components: [{ name, label, column_type,
         csv_column, codelist?: { mode: global|from_csv, ... } }] }`. Codelists created from
         CSV use maintainable id `CL_{component_name}` under the structure agency.
+        Without `overwrite`, component names that already exist are rejected. With
+        `overwrite: true`, a component whose name matches an existing one (case-insensitive)
+        updates its label, column_type and codelist; other fields are kept. Structure role
+        rules are checked against the resulting set of components. The summary lists
+        `components_created` and `components_updated`.
       operationId: dataStructuresImportComponentsCsv
       parameters:
         - name: id
