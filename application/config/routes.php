@@ -165,6 +165,7 @@ $route['api/tags'] = 'api/tags';
 // issues: minimal open-issues list for project (counts/badges)
 $route['api/issues/project/(:num)/summary'] = 'api/issues/project_summary/$1';
 $route['api/issues/project/(:num)/assessment_status'] = 'api/issues/assessment_status/$1';
+$route['api/issues/project/(:num)/stats'] = 'api/issues/stats/$1';
 
 //validation API
 $route['api/validation/(:num)'] = "api/validation/schema/$1";

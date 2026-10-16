@@ -8,6 +8,9 @@
  */
 class Project_issues_model extends CI_Model {
 
+    const OPEN_STATUSES = array('open', 'accepted');
+    const CLOSED_STATUSES = array('fixed', 'rejected', 'dismissed', 'false_positive');
+
     private $issue_fields = array(
         'project_id',
         'title',
@@ -90,7 +93,7 @@ class Project_issues_model extends CI_Model {
         $sort_order = strtoupper($sort_order) === 'ASC' ? 'ASC' : 'DESC';
 
         // Validate sort column
-        $allowed_sort = array('id', 'created', 'resolved', 'status', 'severity', 'category');
+        $allowed_sort = array('id', 'title', 'created', 'resolved', 'status', 'severity', 'category');
         if (!in_array($sort_by, $allowed_sort)) {
             $sort_by = 'created';
         }
@@ -101,18 +104,20 @@ class Project_issues_model extends CI_Model {
         $this->_apply_filters($filters);
         $total = $this->db->count_all_results();
 
-        // Get issues
+        // Get issues: list columns only; full record (description, metadata) via get_by_id
+        $this->db->select('id, project_id, title, category, field_path, severity, status, source,
+            created, created_by, assigned_to, resolved, applied');
         $this->db->from('project_issues');
         $this->db->where('project_id', $project_id);
         $this->_apply_filters($filters);
-        $this->db->order_by($sort_by, $sort_order);
+        if ($sort_by === 'severity') {
+            $this->db->order_by("CASE severity WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'medium' THEN 2 WHEN 'low' THEN 1 ELSE 0 END", $sort_order, false);
+        } else {
+            $this->db->order_by($sort_by, $sort_order);
+        }
+        $this->db->order_by('id', 'DESC');
         $this->db->limit($limit, $offset);
         $issues = $this->db->get()->result_array();
-
-        // Decode JSON fields
-        foreach ($issues as &$issue) {
-            $issue = $this->_decode_json_fields($issue);
-        }
 
         return array(
             'total'  => $total,
@@ -414,7 +419,7 @@ class Project_issues_model extends CI_Model {
         );
 
         // If status is closed/resolved, set resolved timestamp
-        if (in_array($status, array('rejected', 'fixed', 'dismissed', 'false_positive'))) {
+        if (in_array($status, self::CLOSED_STATUSES)) {
             $update_data['resolved'] = time();
             if ($user_id) {
                 $update_data['resolved_by'] = (int) $user_id;
@@ -464,8 +469,20 @@ class Project_issues_model extends CI_Model {
         $this->db->where('applied', 1);
         $applied_count = $this->db->count_all_results('project_issues');
 
+        $open = 0;
+        $closed = 0;
+        foreach ($by_status as $row) {
+            if (in_array($row['status'], self::OPEN_STATUSES, true)) {
+                $open += (int) $row['count'];
+            } elseif (in_array($row['status'], self::CLOSED_STATUSES, true)) {
+                $closed += (int) $row['count'];
+            }
+        }
+
         return array(
             'total'       => $total,
+            'open'        => $open,
+            'closed'      => $closed,
             'by_status'   => $by_status,
             'by_category' => $by_category,
             'by_severity' => $by_severity,
@@ -517,7 +534,7 @@ class Project_issues_model extends CI_Model {
         );
 
         // If status is closed/resolved, set resolved timestamp
-        if (in_array($status, array('rejected', 'fixed', 'dismissed', 'false_positive'))) {
+        if (in_array($status, self::CLOSED_STATUSES)) {
             $update_data['resolved'] = time();
             if ($user_id) {
                 $update_data['resolved_by'] = (int) $user_id;
@@ -566,11 +583,13 @@ class Project_issues_model extends CI_Model {
         // Qualify columns: get_all() joins editor_projects, which also has status.
         if (isset($filters['scope']) && !empty($filters['scope'])) {
             if ($filters['scope'] === 'open') {
-                $this->db->where_in('project_issues.status', array('open', 'accepted'));
+                $this->db->where_in('project_issues.status', self::OPEN_STATUSES);
             } elseif ($filters['scope'] === 'closed') {
-                $this->db->where_in('project_issues.status', array('fixed', 'rejected', 'dismissed', 'false_positive'));
+                $this->db->where_in('project_issues.status', self::CLOSED_STATUSES);
             }
-        } elseif (isset($filters['status']) && !empty($filters['status'])) {
+        }
+
+        if (isset($filters['status']) && !empty($filters['status'])) {
             $vals = is_array($filters['status']) ? $filters['status'] : explode(',', $filters['status']);
             $vals = array_filter(array_map('trim', $vals));
             if (count($vals) > 1) {

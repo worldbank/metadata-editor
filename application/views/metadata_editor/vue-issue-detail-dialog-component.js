@@ -78,7 +78,7 @@ Vue.component('issue-detail-dialog', {
                    (this.localIssue.current_metadata != null || this.localIssue.suggested_metadata != null);
         },
         canApply() {
-            return this.hasSuggestedMetadata && !Number(this.localIssue && this.localIssue.applied);
+            return this.hasSuggestedMetadata && !!this.localIssue.field_path;
         },
         isEditable() {
             return this.localIssue &&
@@ -269,53 +269,21 @@ Vue.component('issue-detail-dialog', {
                 this.saving = false;
             }
         },
-        getValueToApplyPayload() {
-            const text = (this.applyValueToApply != null && String(this.applyValueToApply).trim())
-                ? String(this.applyValueToApply).trim()
-                : '';
-            if (!text) return null;
-            try { return JSON.parse(text); } catch (e) { return text; }
-        },
-        setValueByPath(obj, path, value) {
-            if (!path || !obj || typeof obj !== 'object') return;
-            const parts = path.split('.');
-            let current = obj;
-            for (let i = 0; i < parts.length - 1; i++) {
-                const key = parts[i];
-                if (!(key in current) || current[key] == null) {
-                    Vue.set(current, key, {});
-                }
-                current = current[key];
-            }
-            Vue.set(current, parts[parts.length - 1], value);
-        },
         applyChanges() {
-            const valueToApply = this.getValueToApplyPayload();
-            if (valueToApply === null && (!this.applyValueToApply || !String(this.applyValueToApply).trim())) {
-                this.showToast('Enter a value to apply', 'warning');
-                return;
-            }
             if (!confirm(this.$t('confirm_apply_to_field'))) return;
-            const fieldPath = this.localIssue && this.localIssue.field_path;
-            if (!fieldPath) {
-                this.showToast('No field path on this issue', 'error');
-                return;
-            }
-            const formData = this.$store.state.formData;
-            if (!formData || typeof formData !== 'object') {
-                this.showToast('Project metadata not loaded', 'error');
-                return;
-            }
-            this.loading = true;
+            const value = IssueApplyHelper.parseEditedValue(
+                this.applyValueToApply,
+                IssueApplyHelper.getSuggestedValue(this.localIssue)
+            );
             try {
-                const value = valueToApply !== null ? valueToApply : String(this.applyValueToApply || '').trim();
-                this.setValueByPath(formData, fieldPath, value);
+                if (!IssueApplyHelper.applyToForm(this, this.localIssue.field_path, value)) {
+                    this.showToast(this.$t('error_apply_changes'), 'error');
+                    return;
+                }
                 this.showToast(this.$t('changes_applied'), 'success');
                 this.$emit('issue-applied', this.localIssue);
             } catch (error) {
                 this.showToast(error.message || this.$t('error_apply_changes'), 'error');
-            } finally {
-                this.loading = false;
             }
         },
         close() {
@@ -409,7 +377,6 @@ Vue.component('issue-detail-dialog', {
                                                                     outlined
                                                                     class="mt-2"
                                                                     @click="applyChanges"
-                                                                    :loading="loading"
                                                                 >
                                                                     <v-icon small left>mdi-check</v-icon>
                                                                     {{ $t('action_apply_to_field') }}

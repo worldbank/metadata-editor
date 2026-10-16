@@ -378,7 +378,10 @@ paths:
       tags:
         - Issues
       summary: List issues for a project
-      description: Get all issues for a specific project
+      description: >-
+        List issues for a project. Each item contains list columns only (id, project_id, title,
+        category, field_path, severity, status, source, created, created_by, assigned_to, resolved,
+        applied). Use GET /issues/{id} for the full issue including description and metadata.
       operationId: listProjectIssues
       parameters:
         - name: sid
@@ -387,6 +390,12 @@ paths:
           description: Project SID
           schema:
             type: string
+        - name: scope
+          in: query
+          description: "Status group: open (open, accepted) or closed (fixed, rejected, dismissed, false_positive)"
+          schema:
+            type: string
+            enum: [open, closed]
         - name: status
           in: query
           description: Status filter (can be comma-separated)
@@ -426,9 +435,10 @@ paths:
             default: 0
         - name: sort_by
           in: query
-          description: Sort field
+          description: Sort field (severity sorts by rank)
           schema:
             type: string
+            enum: [id, title, created, resolved, status, severity, category]
             default: created
         - name: sort_order
           in: query
@@ -448,7 +458,10 @@ paths:
       tags:
         - Issues
       summary: Get issue statistics
-      description: Get issue statistics for a specific project
+      description: >-
+        Issue counts for a project. stats contains total, open (open, accepted),
+        closed (fixed, rejected, dismissed, false_positive), applied, and by_status,
+        by_category, by_severity arrays of { status|category|severity, count } rows.
       operationId: getProjectIssueStats
       parameters:
         - name: sid

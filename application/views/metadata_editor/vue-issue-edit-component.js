@@ -18,7 +18,6 @@ const VueIssueEdit = Vue.component('issue-edit', {
         return {
             loading: false,
             saving: false,
-            applying: false,
             issue: null,
             editedIssue: {},
             editMode: false,
@@ -66,7 +65,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
             return this.issue && (this.issue.current_metadata != null || this.issue.suggested_metadata != null);
         },
         canApply() {
-            return this.hasSuggestedMetadata && !this.issue.is_applied;
+            return this.hasSuggestedMetadata && !!this.issue.field_path;
         },
         isEditable() {
             return this.issue && (this.issue.status === 'open' || this.issue.status === 'accepted');
@@ -268,30 +267,19 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 this.saving = false;
             }
         },
-        async applyChanges() {
+        applyToForm() {
             if (!confirm(this.$t('confirm_apply_to_field'))) {
                 return;
             }
-
-            this.applying = true;
             try {
-                const url = CI.base_url + '/api/issues/apply/' + this.issueId;
-                const response = await axios.post(url);
-
-                if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', this.$t('changes_applied'));
-                    this.loadIssue();
-                } else {
-                    throw new Error(response.data.message || this.$t('error_apply_changes'));
+                const value = IssueApplyHelper.getSuggestedValue(this.issue);
+                if (!IssueApplyHelper.applyToForm(this, this.issue.field_path, value)) {
+                    throw new Error(this.$t('error_apply_changes'));
                 }
+                EventBus.$emit('onSuccess', this.$t('changes_applied'));
             } catch (error) {
                 console.error('Error applying changes:', error);
-                EventBus.$emit(
-                    'onFail',
-                    error.response?.data?.message || error.message || this.$t('error_apply_changes')
-                );
-            } finally {
-                this.applying = false;
+                EventBus.$emit('onFail', error.message || this.$t('error_apply_changes'));
             }
         },
         async updateStatus(newStatus) {
@@ -337,29 +325,6 @@ const VueIssueEdit = Vue.component('issue-edit', {
                 EventBus.$emit('onFail', error.response?.data?.message || error.message || this.$t('error_update_issue'));
             } finally {
                 this.saving = false;
-            }
-        },
-        async applyWithNotes() {
-            if (!confirm(this.$t('confirm_apply_to_field'))) {
-                return;
-            }
-            this.applying = true;
-            try {
-                if (this.resolutionNotes.trim()) {
-                    await axios.put(CI.base_url + '/api/issues/' + this.issueId, { notes: this.resolutionNotes });
-                }
-                const response = await axios.post(CI.base_url + '/api/issues/apply/' + this.issueId);
-                if (response.data.status === 'success') {
-                    EventBus.$emit('onSuccess', this.$t('changes_applied'));
-                    this.resolutionNotes = '';
-                    this.loadIssue();
-                } else {
-                    throw new Error(response.data.message || this.$t('error_apply_changes'));
-                }
-            } catch (error) {
-                EventBus.$emit('onFail', error.response?.data?.message || error.message || this.$t('error_apply_changes'));
-            } finally {
-                this.applying = false;
             }
         },
         async deleteIssue() {
@@ -775,7 +740,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
 
                                 <!-- Open -->
                                 <template v-if="issue.status === 'open'">
-                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
+                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyToForm">
                                         <v-icon left small>mdi-check-circle</v-icon>
                                         {{ $t('action_apply_to_field') }}
                                     </v-btn>
@@ -803,7 +768,7 @@ const VueIssueEdit = Vue.component('issue-edit', {
 
                                 <!-- Accepted -->
                                 <template v-else-if="issue.status === 'accepted'">
-                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
+                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyToForm">
                                         <v-icon left small>mdi-check-circle</v-icon>
                                         {{ $t('action_apply_to_field') }}
                                     </v-btn>

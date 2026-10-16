@@ -21,7 +21,9 @@ Vue.component('project-issues', {
     },
     data() {
         return {
-            issueListKey: 0, // For forcing list refresh
+            listRefreshTrigger: 0,
+            openCount: null,
+            closedCount: null,
             activeTab: 0,
             assessmentSubmitting: false,
             assessmentPhase: 'idle', // 'idle' | 'submitting' | 'running'
@@ -138,6 +140,7 @@ Vue.component('project-issues', {
             this.loadAssessmentReadiness();
         }
         this.checkAssessmentStatus();
+        this.loadIssueCounts();
     },
     beforeDestroy() {
         this.stopAssessmentStatusAutoRefresh();
@@ -232,9 +235,25 @@ Vue.component('project-issues', {
         createIssue() {
             this.$router.push('/issues/create');
         },
+        async loadIssueCounts() {
+            try {
+                const url = CI.base_url + '/api/issues/project/' + this.projectId + '/stats';
+                const response = await axios.get(url);
+                if (response.data.status === 'success' && response.data.stats) {
+                    this.openCount = response.data.stats.open;
+                    this.closedCount = response.data.stats.closed;
+                }
+            } catch (err) {
+                console.error('Load issue counts:', err);
+            }
+        },
+        onIssueListChanged() {
+            this.listRefreshTrigger++;
+            this.loadIssueCounts();
+        },
         refreshIssueList() {
-            // Force re-render of issue list by changing key
-            this.issueListKey++;
+            this.listRefreshTrigger++;
+            this.loadIssueCounts();
             // Refresh Vuex open-issues summary so field-level badges/indicators update without page reload
             if (this.$store && this.projectId) {
                 this.$store.dispatch('fetchOpenIssuesSummary', { projectId: this.projectId });
@@ -479,25 +498,33 @@ Vue.component('project-issues', {
 
                         <!-- Issue Tabs -->
                         <v-tabs v-model="activeTab" class="mb-2">
-                            <v-tab>{{ $t('open') }}</v-tab>
-                            <v-tab>{{ $t('closed') }}</v-tab>
+                            <v-tab>
+                                {{ $t('open') }}
+                                <span v-if="openCount !== null" class="ml-1 text--secondary">({{ openCount }})</span>
+                            </v-tab>
+                            <v-tab>
+                                {{ $t('closed') }}
+                                <span v-if="closedCount !== null" class="ml-1 text--secondary">({{ closedCount }})</span>
+                            </v-tab>
                         </v-tabs>
 
                         <v-tabs-items v-model="activeTab">
                             <v-tab-item>
                                 <issue-list
-                                    :key="'open-' + issueListKey"
                                     :project-id="projectId"
                                     :can-edit="canEdit"
+                                    :refresh-trigger="listRefreshTrigger"
                                     status-scope="open"
+                                    @changed="onIssueListChanged"
                                 ></issue-list>
                             </v-tab-item>
                             <v-tab-item>
                                 <issue-list
-                                    :key="'closed-' + issueListKey"
                                     :project-id="projectId"
                                     :can-edit="canEdit"
+                                    :refresh-trigger="listRefreshTrigger"
                                     status-scope="closed"
+                                    @changed="onIssueListChanged"
                                 ></issue-list>
                             </v-tab-item>
                         </v-tabs-items>

@@ -161,7 +161,7 @@ $lang['issue_deleted']                 = "Issue deleted successfully";
 $lang['issue_saved']                   = "Saved";
 $lang['issues_updated']                = ":count issue(s) updated";
 $lang['issues_deleted']                = ":count issue(s) deleted";
-$lang['changes_applied']               = "Changes applied to project metadata";
+$lang['changes_applied']               = "Value applied to the form. Save the project to keep the change.";
 
 // ─── Error messages ───────────────────────────────────────────────────────────
 $lang['error_load_issue']              = "Failed to load issue";

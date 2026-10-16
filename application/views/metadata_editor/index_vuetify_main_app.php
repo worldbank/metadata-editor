@@ -238,6 +238,7 @@
             echo $this->load->view("metadata_editor/vue-geospatial-gallery-component.js",null,true);
 
             //issues components
+            echo $this->load->view("metadata_editor/vue-issue-apply-helper.js",null,true);
             echo $this->load->view("metadata_editor/vue-issue-status-badge-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-create-issue-dialog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-issue-detail-dialog-component.js",null,true);
