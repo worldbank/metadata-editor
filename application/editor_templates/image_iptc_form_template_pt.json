@@ -1,0 +1,1860 @@
+{
+    "type": "template",
+    "title": "Projeto de imagem",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Informação sobre os metadados",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Informação sobre os metadados",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" na secção \"DCMI / Descrição da imagem\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único para o documento de metadados da imagem. Este identificador deve ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" na secção \"Identificadores da imagem\", embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" da imagem for “IMG_0001”, o ID do documento poderá ser “IHSN_IMG_001_v1.0” se os metadados forem produzidos pelo IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "class": "required",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A data em que os metadados desta imagem foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", uma vez que a informação sobre o produtor e a data de produção dos metadados é útil para fins de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A versão do documento de metadados (não a versão da própria imagem).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "identification",
+            "title": "Identificadores da imagem",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "identification1674239118073",
+                    "title": "Identificadores",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "image_description.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único da imagem. O \"ID principal\" (também designado IDNO) é um número de identificação único utilizado para identificar a imagem. É necessário um identificador único para fins de catalogação, pelo que este elemento é declarado como \"Obrigatório\". O identificador permitirá aos utilizadores citar o quadro corretamente. O identificador deve ser único no catálogo. Idealmente, deve também ser único a nível global. Pode ser utilizado um Digital Object Identifier (DOI) ou o ID incluído nos metadados EXIF das fotografias digitais. para o estudo. Em alternativa, o \"ID principal\" pode ser construído por uma organização utilizando um esquema coerente. Note-se que o esquema permite fornecer mais do que um identificador para a mesma imagem (no elemento \"Outros identificadores\"); um identificador específico do catálogo não é, portanto, incompatível com um identificador globalmente único como um DOI. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "rules": [],
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) que não o \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI) ou o identificador EXIF. O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\", pelo que, se for utilizado um DOI, EXIF ou outro tipo de ID normalizado como identificador principal, recomenda-se repeti-lo aqui com a identificação do tipo).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "description": "Tipo de identificador, por exemplo `doi`, `handle`, `other`",
+                                    "type": "string",
+                                    "prop_key": "image_description.identifiers.type",
+                                    "help_text": "O tipo de identificador. Pode ser, por exemplo, “DOI” ou \"EXIF\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "image_description.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "iptc",
+            "title": "IPTC",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "photoVideoMetadataIPTC",
+                    "title": "Metadados IPTC",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "photoVideoMetadataIPTC1674253949119",
+                            "title": "Declaração de título",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "O título é uma referência abreviada da imagem digital. Fornece um nome curto, verbal e legível por humanos, que pode ser um texto e/ou uma referência numérica. Não é o mesmo que o Cabeçalho (ver abaixo). Há quem utilize o campo de título para guardar o nome do ficheiro da imagem, embora o campo possa ser utilizado de muitas formas. Este elemento não deve ser utilizado para indicar o identificador único da imagem.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.headline",
+                                    "title": "Cabeçalho",
+                                    "type": "string",
+                                    "help_text": "Um breve resumo publicável do conteúdo da imagem. Note-se que um cabeçalho não é o mesmo que um título.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.digitalImageGuid",
+                                    "title": "Identificador globalmente único",
+                                    "type": "string",
+                                    "help_text": "Um identificador globalmente único (GUID) para a imagem. Este identificador é criado e aplicado pelo criador da imagem digital no momento da sua criação. Este valor não deve ser alterado após esse momento. O identificador pode ser gerado através de um algoritmo que garanta que o identificador criado é globalmente único. Os dispositivos que criam imagens digitais, como câmaras digitais ou de vídeo ou digitalizadores, criam normalmente esse identificador no momento da criação dos dados digitais e acrescentam-no aos metadados incorporados no ficheiro de imagem (por exemplo, os metadados EXIF). Os requisitos do IPTC para identificadores únicos são os seguintes:\n- Deve ser globalmente único. \n- Deve identificar o corpo da câmara.\n- Deve identificar cada fotografia individual tirada com esse corpo de câmara.\n- Deve identificar a data e a hora da criação da fotografia.\n- Deve estar protegido contra adulteração.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.dateCreated",
+                                    "title": "Data de criação",
+                                    "type": "string",
+                                    "help_text": "Indica a data e, opcionalmente, a hora em que o conteúdo da imagem foi criado. Para uma fotografia, será a data e a hora em que a fotografia foi tirada. Quando não existe informação sobre a hora, esta é definida como 00:00:00. O formato preferido para o elemento \"Data de criação\" é o formato DateTime truncado, por exemplo: 2021-02-22T21:24:06Z",
+                                    "field_options": {
+                                        "format": "datetime_iso"
+                                    },
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253753650",
+                            "title": "Autor e colaboradores",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.creatorNames",
+                                    "title": "Nome do criador",
+                                    "type": "simple_array",
+                                    "class": "required",
+                                    "help_text": "Introduza os dados do criador ou criadores desta imagem. O criador da imagem deve, frequentemente, ser mencionado em associação com qualquer utilização da imagem. O criador da imagem, o titular dos direitos de autor, o fornecedor da imagem e o licenciante podem ser a mesma entidade ou entidades diferentes.",
+                                    "enum": [],
+                                    "is_recommended": true,
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.jobtitle",
+                                    "title": "Cargo do criador",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "O cargo do fotógrafo (a pessoa indicada em \"Nome do criador\"). A utilização deste elemento pressupõe que a informação sobre o fotógrafo (\"Nome do criador\") não está vazia.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.jobid",
+                                    "title": "ID do trabalho",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Número ou identificador destinado a melhorar a gestão do fluxo de trabalho (controlo ou acompanhamento). Trata-se de um identificador criado pelo utilizador, relativo ao trabalho para o qual a imagem é fornecida.\nNota: Como este identificador faz referência a um trabalho do fluxo de trabalho do destinatário, tem de ser primeiro emitido pelo destinatário, depois transmitido ao criador ou fornecedor do objeto noticioso e, por fim, acrescentado pelo criador a este campo.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.source",
+                                    "title": "Fonte",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "O nome de uma pessoa ou entidade que desempenha uma função na cadeia de fornecimento do conteúdo. A fonte pode ser diferente do criador e das entidades indicadas no aviso de direitos de autor.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.supplier",
+                                    "title": "Fornecedor",
+                                    "class": "required",
+                                    "help_text": "Identifica o fornecedor mais recente da imagem, que não é necessariamente o seu proprietário ou criador.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "O nome do fornecedor da imagem (pessoa ou organização).",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.supplier.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "identifiers",
+                                            "title": "Identificador",
+                                            "class": "required",
+                                            "type": "simple_array",
+                                            "help_text": "O identificador do fornecedor mais recente desta imagem. Este não será necessariamente o criador ou o proprietário da imagem.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.supplier.identifiers",
+                                            "enum": [],
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.imageSupplierImageId",
+                                    "title": "ID do fornecedor",
+                                    "type": "string",
+                                    "help_text": "Um identificador único atribuído à imagem pelo fornecedor da imagem. Deve ser um dos ID introduzidos em \"ID principal\" ou em \"Outros identificadores\" na secção \"Identificadores\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.creditLine",
+                                    "title": "Crédito",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "O crédito à(s) pessoa(s) e/ou organização(ões) exigido pelo fornecedor da imagem, a utilizar aquando da publicação. Trata-se de um campo de texto livre.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.captionWriter",
+                                    "title": "Autor da legenda",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Um identificador, ou o nome, da pessoa envolvida na redação, edição ou correção da descrição da imagem.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo",
+                                    "title": "Informações de contacto ",
+                                    "class": "required",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "country",
+                                            "title": "País",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.country"
+                                        },
+                                        {
+                                            "key": "emailwork",
+                                            "title": "E-mail (profissional)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.emailwork"
+                                        },
+                                        {
+                                            "key": "region",
+                                            "title": "Região (estado/província)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.region"
+                                        },
+                                        {
+                                            "key": "phonework",
+                                            "title": "Telefone (profissional)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.phonework"
+                                        },
+                                        {
+                                            "key": "weburlwork",
+                                            "title": "URL",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.weburlwork"
+                                        },
+                                        {
+                                            "key": "address",
+                                            "title": "Morada",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.address"
+                                        },
+                                        {
+                                            "key": "city",
+                                            "title": "Cidade",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.city"
+                                        },
+                                        {
+                                            "key": "postalCode",
+                                            "title": "Código postal",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.postalCode"
+                                        }
+                                    ],
+                                    "help_text": "As informações de contacto do criador fornecem todos os dados necessários para entrar em contacto com o criador desta imagem e compreendem um conjunto de elementos para um endereçamento correto. Note-se que, se o criador for também o licenciante, as suas informações de contacto devem ser indicadas nos campos do licenciante.\n\n- País: O nome do país da morada da pessoa que criou esta imagem.\n- E-mail profissional: O(s) endereço(s) de e-mail profissional(ais) do criador da imagem. Podem ser indicados vários endereços de e-mail, devendo neste caso ser separados por vírgula.\n- Região: O estado ou a província da morada do criador da imagem.\n- Telefone profissional: O(s) número(s) de telefone profissional(ais) do criador da imagem. Utilize o formato internacional incluindo o indicativo do país, como +1 (123) 456789. Podem ser indicados vários números, devendo neste caso ser separados por vírgula.\n- URL profissional: O endereço web profissional do criador da imagem. Podem ser indicados vários endereços, devendo neste caso ser separados por vírgula.\n- Morada: A morada do criador da imagem. Pode incluir o nome de uma empresa.\n- Cidade: A cidade da morada da pessoa que criou a imagem.\n- Código postal: Introduza o código postal local da morada da pessoa que criou a imagem."
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253617761",
+                            "title": "Descrição do conteúdo",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Uma descrição textual da imagem, incluindo legendas. Descreve quem, o quê e porquê do que está a acontecer nesta imagem. Pode incluir nomes de pessoas e/ou a sua função na ação que decorre na imagem. Exemplo: “O presidente da Associação de Metadados profere o discurso principal”.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodes",
+                                    "title": "Códigos de cena",
+                                    "type": "string",
+                                    "help_text": "Os \"Códigos de cena\" descrevem a cena do conteúdo de uma fotografia. Deve ser utilizado o vocabulário controlado IPTC Scene-NewsCodes (publicado sob uma licença Creative Commons Attribution (CC BY) 4.0), em que uma cena é representada por uma cadeia de 6 dígitos.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled",
+                                    "title": "Códigos de cena com rótulo",
+                                    "class": "required",
+                                    "type": "array",
+                                    "help_text": "O elemento \"Códigos de cena\" descrito acima apenas permite registar códigos. Para melhorar a capacidade de descoberta (através da indexação de palavras-chave importantes), devem ser fornecidos não só os códigos de cena, mas também a descrição da cena. A norma IPTC não dispõe de um elemento que permita introduzir o rótulo e a descrição da cena. O elemento \"Códigos de cena com rótulo\" foi acrescentado ao esquema do IHSN. Idealmente, os curadores introduzirão os códigos de cena no elemento \"Códigos de cena\" para manter a total compatibilidade com o IPTC, e complementarão essa informação introduzindo também os códigos e a respetiva descrição no elemento \"Códigos de cena com rótulo\".",
+                                    "props": [
+                                        {
+                                            "key": "code",
+                                            "title": "Código",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.code",
+                                            "help_text": "O código da cena do conteúdo de uma fotografia. Deve ser utilizado o vocabulário controlado IPTC Scene-NewsCodes (publicado ao abrigo de uma licença Creative Commons Attribution (CC BY) 4.0), no qual uma cena é representada por uma cadeia de 6 algarismos. Ver o quadro acima.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "label",
+                                            "title": "Rótulo",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.label",
+                                            "help_text": "O rótulo da cena. Ver exemplos no quadro acima.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "title": "Descrição",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.description",
+                                            "help_text": "Uma descrição mais detalhada da cena. Ver exemplos no quadro acima.",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodes",
+                                    "title": "Códigos de assunto",
+                                    "type": "simple_array",
+                                    "class": "required",
+                                    "help_text": "Especifica um ou mais assuntos do vocabulário controlado IPTC Subject-NewsCodes para categorizar a imagem. Cada assunto é representado por uma cadeia de 8 dígitos. O vocabulário é composto por cerca de 1400 termos organizados em 3 níveis (os utilizadores podem decidir utilizar apenas o primeiro nível, ou os dois primeiros; quanto maior o detalhe, melhor a facilidade de pesquisa da imagem).",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled",
+                                    "title": "Códigos de assunto com rótulo",
+                                    "class": "required",
+                                    "type": "array",
+                                    "help_text": "O elemento \"Códigos de assunto\" descrito acima apenas permite registar códigos. Para melhorar a capacidade de descoberta (através da indexação de palavras-chave importantes), devem ser fornecidos não só os códigos de assunto, mas também a descrição do assunto. A norma IPTC não dispõe de um elemento que permita introduzir o rótulo e a descrição do assunto. O elemento \"Códigos de assunto com rótulo\"  foi acrescentado ao esquema do IHSN. Idealmente, os curadores introduzirão os códigos de assunto no elemento \"Códigos de assunto\" para manter a total compatibilidade com o IPTC, e complementarão essa informação introduzindo também os códigos e a respetiva descrição no elemento \"Códigos de assunto com rótulo\".",
+                                    "props": [
+                                        {
+                                            "key": "code",
+                                            "title": "Código",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.code",
+                                            "help_text": "Especifica um ou mais assuntos do vocabulário controlado IPTC Subject-NewsCodes para categorizar a imagem. Cada assunto é representado por uma cadeia de 8 algarismos. O vocabulário é composto por cerca de 1400 termos organizados em 3 níveis (os utilizadores podem decidir utilizar apenas o primeiro nível, ou os dois primeiros; quanto maior o detalhe fornecido, melhor a capacidade de descoberta da imagem). Ver exemplos no quadro acima.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "label",
+                                            "title": "Rótulo",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.label",
+                                            "help_text": "O rótulo do assunto. Ver exemplos no quadro acima.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "title": "Descrição",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.description",
+                                            "help_text": "Uma descrição mais detalhada do assunto. Ver exemplos no quadro acima.",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.keywords",
+                                    "title": "Palavras-chave",
+                                    "type": "simple_array",
+                                    "class": "required",
+                                    "help_text": "As palavras-chave são palavras ou expressões que descrevem aspetos salientes do que a imagem representa. A adição de palavras-chave pode melhorar significativamente a capacidade de descoberta dos dados, pelo que é recomendada. As palavras-chave podem resumir e melhorar a descrição do conteúdo ou do assunto de um recurso. As palavras-chave podem ser selecionadas a partir de um tesauro normalizado, de preferência um tesauro internacional e multilingue, ou podem ser sugeridas por modelos de aprendizagem automática. Pode ser definido um vocabulário controlado nos modelos de utilizador.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms",
+                                    "title": "Sobre a imagem",
+                                    "help_text": "Um ou mais temas, assuntos ou entidades de que trata o conteúdo, cada um expresso por um termo de um vocabulário controlado.",
+                                    "class": "required",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "cvId",
+                                            "title": "ID do vocabulário",
+                                            "class": "required",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do vocabulário controlado de onde provém o termo.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermName",
+                                            "title": "Rótulo do termo",
+                                            "type": "string",
+                                            "help_text": "O nome, em linguagem natural, do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermId",
+                                            "title": "ID do termo",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermRefinedAbout",
+                                            "title": "Pormenores",
+                                            "type": "string",
+                                            "help_text": "A relação \"sobre\" refinada entre o termo e o conteúdo.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermRefinedAbout",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.eventName",
+                                    "title": "Nome do evento",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "O nome ou uma breve descrição do evento em que a imagem foi captada. Se se tratar de um subevento de um evento maior, mencionar ambos na descrição. Por exemplo: “Discurso de abertura, 1.ª Conferência Internacional sobre Normas de Metadados, Nova Iorque, novembro de 2021”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown",
+                                    "title": "Localização representada",
+                                    "class": "required",
+                                    "help_text": "Este bloco de elementos é utilizado para documentar o local representado na imagem. Esta informação deve ser fornecida com o maior detalhe possível. Contém elementos que podem ser utilizados para fornecer uma descrição “encadeada” do local, desde um nível geográfico elevado (região do mundo) até um local muito específico (cidade e sublocal dentro de uma cidade).",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "O nome completo do local.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "identifiers",
+                                            "title": "Identificador",
+                                            "type": "string",
+                                            "help_text": "Um identificador globalmente único do local representado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.identifiers",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "worldRegion",
+                                            "title": "Região do mundo",
+                                            "type": "string",
+                                            "help_text": "O nome de uma região do mundo. Este elemento encontra-se no primeiro nível (de topo) da hierarquia geográfica descendente.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.worldRegion",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "countryName",
+                                            "title": "Nome do país",
+                                            "type": "string",
+                                            "help_text": "O nome do país de um local. Este elemento encontra-se no segundo nível de uma hierarquia geográfica descendente.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.countryName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "countryCode",
+                                            "title": "Código do país",
+                                            "type": "string",
+                                            "help_text": "O código ISO do país indicado em \"Nome do país\".",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.countryCode",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provinceState",
+                                            "title": "Sub-região",
+                                            "type": "string",
+                                            "help_text": "O nome de uma sub-região do país - por exemplo, o nome de uma província ou de um estado. Este elemento encontra-se no terceiro nível de uma hierarquia geográfica descendente.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.provinceState",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "city",
+                                            "title": "Cidade",
+                                            "type": "string",
+                                            "help_text": "O nome da cidade. Este elemento encontra-se no quarto nível de uma hierarquia geográfica descendente.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.city",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "sublocation",
+                                            "title": "Sublocal",
+                                            "type": "string",
+                                            "help_text": "O nome do sublocal pode ser o nome de um sublocal de uma cidade ou o nome de um local ou monumento (natural) conhecido fora de uma cidade. Este elemento encontra-se no quinto nível (o mais baixo) de uma hierarquia geográfica descendente.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.sublocation",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "gpsAltitude",
+                                            "title": "Altitude GPS",
+                                            "type": "string",
+                                            "help_text": "A altitude, em metros, de uma posição baseada no WGS84 deste local.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsAltitude",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "gpsLatitude",
+                                            "title": "Latitude GPS",
+                                            "type": "string",
+                                            "help_text": "Latitude de uma posição baseada no WGS84 deste local (em alguns casos, esta informação pode constar dos metadados EXIF).",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsLatitude",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "gpsLongitude",
+                                            "title": "Longitude GPS",
+                                            "type": "string",
+                                            "help_text": "Longitude de uma posição baseada no WGS84 deste local (em alguns casos, esta informação pode constar dos metadados EXIF).",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsLongitude",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.genres",
+                                    "title": "Géneros",
+                                    "help_text": "Género(s) artístico, de estilo, jornalístico, de produto ou outro da imagem (expresso por um termo de qualquer vocabulário controlado).\n",
+                                    "class": "required",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "cvId",
+                                            "title": "ID do vocabulário",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do vocabulário controlado de onde provém o termo.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermName",
+                                            "title": "Rótulo do termo",
+                                            "type": "string",
+                                            "help_text": "O nome, em linguagem natural, do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermId",
+                                            "title": "ID do termo",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermRefinedAbout",
+                                            "title": "Sobre",
+                                            "type": "string",
+                                            "help_text": "Opcionalmente, introduza um refinamento da relação \"sobre\" entre o termo e o conteúdo da imagem. Deve ser um identificador globalmente único de um vocabulário controlado. Pode ser utilizado para refinar a relação genérica \"sobre\".",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermRefinedAbout",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.intellectualGenre",
+                                    "title": "Género intelectual",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Um termo para descrever a natureza da imagem quanto às suas características intelectuais ou jornalísticas (por exemplo, “atualidade”, “entrevista”, “enquadramento”, “reportagem”, “resumo”, “síntese final” para géneros jornalísticos, ou “agenda”, “obituário”, “comunicado de imprensa”, “transcrição” para géneros relacionados com categorias noticiosas. Aconselha-se a utilização de termos de um vocabulário controlado, como o NewsCodes Scheme publicado pelo IPTC ao abrigo de uma licença Creative Commons Attribution (CC BY) 4.0.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253315130",
+                            "title": "Condições de utilização e direitos",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.copyrightNotice",
+                                    "title": "Aviso de direitos de autor",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Contém qualquer aviso de direitos de autor necessário para reivindicar a propriedade intelectual desta fotografia e deve identificar o atual titular dos direitos de autor da fotografia. Outras entidades, como o criador da fotografia, podem ser acrescentadas no campo correspondente. As notas sobre direitos de utilização devem ser fornecidas em “Condições de utilização dos direitos”. Exemplo: ©2008 Jane Doe. Se a titularidade dos direitos de autor tiver de ser expressa de forma mais controlada, utilizar os campos “Titular dos direitos de autor”, “ID do titular dos direitos de autor”, “Nome do titular dos direitos de autor” descritos abaixo em vez do elemento \"Aviso de direitos de autor\".",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners",
+                                    "title": "Titulares dos direitos de autor",
+                                    "class": "required",
+                                    "help_text": "Titular ou titulares dos direitos de autor da imagem licenciada, descritos num formato estruturado (como alternativa ao elemento \"Aviso de direitos de autor\"). Este bloco tem a mesma finalidade de identificar o(s) titular(es) dos direitos da imagem. O titular dos direitos de autor, o criador da imagem e o licenciante podem ser a mesma entidade ou entidades diferentes.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "class": "required",
+                                            "type": "string",
+                                            "help_text": "O nome do titular dos direitos de autor da imagem licenciada.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Função",
+                                            "type": "simple_array",
+                                            "help_text": "A função da entidade.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.role",
+                                            "enum": [],
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "identifiers",
+                                            "title": "Identificador",
+                                            "type": "simple_array",
+                                            "help_text": "O identificador globalmente único do titular dos direitos de autor da imagem licenciada.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.identifiers",
+                                            "enum": [],
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.usageTerms",
+                                    "title": "Condições de utilização",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Os parâmetros de licenciamento da imagem expressos em texto livre. Introduzir instruções sobre a forma como esta imagem pode ser legalmente utilizada. Os campos PLUS da IPTC Extension podem ser utilizados em paralelo para expressar a utilização licenciada em termos mais controlados.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr",
+                                    "title": "Expressão de direitos",
+                                    "help_text": "Uma expressão de direitos incorporada, utilizando uma linguagem de expressão de direitos codificada como cadeia de caracteres. Estrutura Embedded Encoded Rights Expression (EERE): uma estrutura que fornece os detalhes de uma expressão de direitos codificada incorporada.",
+                                    "class": "required",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "encRightsExpr",
+                                            "title": "Expressão de direitos codificada",
+                                            "class": "required",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.encRightsExpr",
+                                            "help_text": "ID da linguagem de expressão de direitos. Um identificador da linguagem de expressão de direitos utilizada pela expressão de direitos.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "rightsExprEncType",
+                                            "title": "Tipo de codificação",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.rightsExprEncType",
+                                            "help_text": "O tipo de codificação da expressão de direitos, identificado por um IANA Media Type.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "rightsExprLangId",
+                                            "title": "ID da linguagem de expressão de direitos",
+                                            "type": "string",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.rightsExprLangId",
+                                            "help_text": "Uma expressão de direitos incorporada, utilizando qualquer linguagem de expressão de direitos.",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr",
+                                    "title": "Expressão de direitos ligada",
+                                    "class": "required",
+                                    "help_text": "Ligação para a expressão de direitos codificada.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "linkedRightsExpr",
+                                            "title": "Ligação para a expressão de direitos codificada",
+                                            "class": "required",
+                                            "type": "string",
+                                            "help_text": "A ligação para um recurso web que representa uma expressão de direitos codificada.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.linkedRightsExpr",
+                                            "display_type": "text",
+                                            "rules": {
+                                                "is_uri": true
+                                            }
+                                        },
+                                        {
+                                            "key": "rightsExprEncType",
+                                            "title": "Tipo de codificação",
+                                            "type": "string",
+                                            "class": "required",
+                                            "help_text": "O tipo de codificação da expressão de direitos, identificado por um IANA Media Type.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprEncType",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "rightsExprLangId",
+                                            "title": "ID da linguagem de expressão de direitos",
+                                            "type": "string",
+                                            "class": "required",
+                                            "help_text": "O identificador da linguagem de expressão de direitos utilizada pela expressão de direitos.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprLangId",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.webstatementRights",
+                                    "title": "Declaração web de direitos",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "URL que remete para um recurso web com uma declaração sobre a titularidade dos direitos de autor e os direitos de utilização da imagem.",
+                                    "enum": [],
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.instructions",
+                                    "title": "Instruções para os utilizadores",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Instruções do fornecedor ou criador para o destinatário da imagem, que podem incluir qualquer um dos seguintes elementos: embargos e outras restrições não abrangidas pelo campo “Condições de utilização dos direitos”; informação sobre o meio original de captura (notas de digitalização, informação sobre o espaço de cor) ou outra informação textual específica de que o utilizador possa necessitar para uma reprodução exata; autorizações adicionais necessárias para a publicação; créditos de publicação, caso excedam o comprimento do campo de crédito do IIM.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus",
+                                    "title": "Estado da autorização de propriedade",
+                                    "class": "required",
+                                    "help_text": "Resume a disponibilidade e o âmbito das autorizações de propriedade que permitem a utilização das propriedades que aparecem na fotografia. Deve ser selecionado um valor de um vocabulário controlado. Recomenda-se aplicar o valor PR-UPR com muito cuidado e verificar minuciosamente a redação da autorização de propriedade antes de o aplicar.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "cvId",
+                                            "title": "ID do vocabulário",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do vocabulário controlado de onde provém o termo.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermName",
+                                            "title": "Rótulo do termo",
+                                            "type": "string",
+                                            "help_text": "O nome, em linguagem natural, do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermId",
+                                            "title": "ID do termo",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermRefinedAbout",
+                                            "title": "Sobre",
+                                            "type": "string",
+                                            "help_text": "Relação \"sobre\" refinada do termo do VC. A relação \"sobre\" refinada entre o termo e o conteúdo. Opcionalmente, introduza um refinamento da relação \"Sobre\" entre o termo e o conteúdo da imagem. Deve ser um identificador globalmente único de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermRefinedAbout",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseDocuments",
+                                    "title": "Documentos de autorização de propriedade",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Identificador opcional associado a cada autorização de propriedade.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253496408",
+                            "title": "Obras de arte, objetos e produtos na imagem",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects",
+                                    "title": "Obra de arte ou objeto",
+                                    "class": "required",
+                                    "help_text": "Este bloco fornece um conjunto de elementos de metadados a utilizar para descrever o objeto ou a obra de arte representados na imagem.",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "title",
+                                            "title": "Título",
+                                            "type": "string",
+                                            "help_text": "Um nome legível por humanos do objeto ou da obra de arte representados na imagem.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.title",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "contentDescription",
+                                            "title": "Descrição do conteúdo",
+                                            "type": "string",
+                                            "help_text": "Uma descrição textual do conteúdo representado no objeto ou na obra de arte.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.contentDescription",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "physicalDescription",
+                                            "title": "Descrição física",
+                                            "type": "string",
+                                            "help_text": "Uma descrição textual das características físicas da obra de arte ou do objeto, sem referência ao conteúdo representado. Seria utilizada para descrever o tipo de objeto, os materiais, as técnicas e as dimensões.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.physicalDescription",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "creatorNames",
+                                            "title": "Nome do criador",
+                                            "type": "simple_array",
+                                            "help_text": "O nome da(s) pessoa(s) (possivelmente uma organização) que criou(criaram) o objeto ou a obra de arte representados na imagem.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.creatorNames",
+                                            "enum": []
+                                        },
+                                        {
+                                            "key": "creatorIdentifiers",
+                                            "title": "Identificador do criador",
+                                            "type": "simple_array",
+                                            "help_text": "Um ou vários identificadores globalmente únicos do artista que criou a obra de arte ou o objeto representados na imagem. Pode ser um identificador emitido por um registo em linha de pessoas ou empresas. Certifique-se de que introduz estes identificadores exatamente pela mesma ordem que os nomes introduzidos no campo \"Nomes dos criadores\".",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.creatorIdentifiers",
+                                            "enum": []
+                                        },
+                                        {
+                                            "key": "contributionDescription",
+                                            "title": "Descrição da contribuição",
+                                            "type": "string",
+                                            "help_text": "Uma descrição de quaisquer contribuições feitas para a obra de arte ou o objeto. Deve incluir o tipo, a data e o local da contribuição, bem como detalhes sobre o colaborador.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.contributionDescription",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "stylePeriod",
+                                            "title": "Período estilístico",
+                                            "type": "simple_array",
+                                            "help_text": "O estilo, período histórico ou artístico, movimento, grupo ou escola cujas características estão representadas na obra de arte ou no objeto. Aconselha-se a utilização de termos de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.stylePeriod",
+                                            "enum": []
+                                        },
+                                        {
+                                            "key": "dateCreated",
+                                            "title": "Data de criação",
+                                            "type": "string",
+                                            "help_text": "Indica a data e, opcionalmente, a hora em que a obra de arte ou o objeto presente na imagem foi criado. Aplica-se a obras de arte ou objetos com direitos de propriedade intelectual associados. Formato esperado YYYY-MM-DDThh:mm:ssZ ou YYYY-MM-DDThh:mm:ss+hh:mm ",
+                                            "display_options": {
+                                                "format": "datetime_iso"
+                                            },
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.dateCreated",
+                                            "display_type": "date"
+                                        },
+                                        {
+                                            "key": "circaDateCreated",
+                                            "title": "Data aproximada de criação",
+                                            "class": "required",
+                                            "type": "string",
+                                            "help_text": "A data aproximada ou o intervalo de datas associado à criação e produção de uma obra de arte ou objeto, ou dos seus componentes.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.circaDateCreated",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "source",
+                                            "title": "Fonte",
+                                            "type": "string",
+                                            "help_text": "O nome da organização ou entidade que detém e regista a obra de arte ou o objeto presente nesta imagem para efeitos de inventário.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.source",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "sourceInventoryNr",
+                                            "title": "Número de inventário da fonte",
+                                            "type": "string",
+                                            "help_text": "O número de inventário atribuído pela organização ou entidade que detém e regista a obra de arte ou o objeto presente na imagem.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.sourceInventoryNr",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "sourceInventoryUrl",
+                                            "title": "URL do inventário da fonte",
+                                            "type": "string",
+                                            "help_text": "Um URL de referência para o registo de metadados do inventário mantido pela fonte.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.sourceInventoryUrl",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "currentCopyrightOwnerName",
+                                            "title": "Nome do atual titular dos direitos de autor",
+                                            "type": "string",
+                                            "help_text": "O nome do atual titular dos direitos de autor da obra de arte ou do objeto.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentCopyrightOwnerName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "currentCopyrightOwnerIdentifier",
+                                            "title": "ID do atual titular dos direitos de autor",
+                                            "type": "string",
+                                            "help_text": "Um identificador globalmente único do atual titular dos direitos de autor, por exemplo, atribuído por um registo em linha de pessoas ou empresas.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentCopyrightOwnerIdentifier",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "copyrightNotice",
+                                            "title": "Aviso de direitos de autor",
+                                            "type": "string",
+                                            "help_text": "Qualquer aviso de direitos de autor necessário para reivindicar a propriedade intelectual da obra de arte ou do objeto presente na imagem, que deve identificar o atual titular dos direitos de autor desta obra com direitos de propriedade intelectual associados.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.copyrightNotice",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "currentLicensorName",
+                                            "title": "Nome do atual licenciante",
+                                            "type": "string",
+                                            "help_text": "Nome do atual licenciante da obra de arte ou do objeto.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentLicensorName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "currentLicensorIdentifier",
+                                            "title": "ID do atual licenciante",
+                                            "type": "string",
+                                            "help_text": "Um identificador globalmente único do atual licenciante, por exemplo, atribuído por um registo em linha de pessoas ou empresas.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentLicensorIdentifier",
+                                            "rules": [],
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.productsShown",
+                                    "title": "Produtos apresentados",
+                                    "class": "required",
+                                    "help_text": "Detalhes sobre um produto apresentado na imagem.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "O nome do produto.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "title": "Descrição",
+                                            "type": "string",
+                                            "help_text": "Uma descrição textual do produto.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.description",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "gtin",
+                                            "title": "GTIN",
+                                            "type": "string",
+                                            "help_text": "O Número Global de Artigo Comercial (GTIN) do produto (podem ser utilizados códigos GTIN-8 a GTIN-14).",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.gtin",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253401892",
+                            "title": "Pessoas e modelos na imagem",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.personInImageNames",
+                                    "title": "Pessoas na imagem (lista)",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Uma lista das pessoas apresentadas na imagem, fornecida como um único elemento de texto.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.personsShown",
+                                    "title": "Pessoas apresentadas (discriminadas)",
+                                    "class": "required",
+                                    "help_text": "Este bloco repetível de elementos é utilizado para fornecer informação discriminada sobre a(s) pessoa(s) apresentada(s) na imagem. Não é necessário listar todos os detalhes, apenas os que puderem ser reconhecidos.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "O nome de uma pessoa apresentada na imagem.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "title": "Descrição",
+                                            "type": "string",
+                                            "help_text": "Uma descrição textual da pessoa. Por exemplo, podem incluir-se as ações realizadas, as expressões emocionais apresentadas e outros aspetos.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.description",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "identifiers",
+                                            "title": "Identificadores",
+                                            "type": "simple_array",
+                                            "help_text": "Identificador globalmente único da pessoa, como os do Wikidata.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.identifiers",
+                                            "enum": []
+                                        },
+                                        {
+                                            "key": "characteristics",
+                                            "title": "Características",
+                                            "help_text": "Uma propriedade ou característica da pessoa, fornecida como um termo selecionado de um vocabulário controlado.",
+                                            "type": "array",
+                                            "props": [
+                                                {
+                                                    "key": "cvTermName",
+                                                    "title": "Rótulo do termo",
+                                                    "type": "string",
+                                                    "help_text": "O nome, em linguagem natural, do termo de um vocabulário controlado.",
+                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermName",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "cvTermId",
+                                                    "title": "ID do termo",
+                                                    "type": "string",
+                                                    "help_text": "O identificador globalmente único do termo de um vocabulário controlado.",
+                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermId",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "cvId",
+                                                    "title": "ID do vocabulário",
+                                                    "type": "string",
+                                                    "help_text": "O identificador globalmente único do vocabulário controlado de onde provém o termo.",
+                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvId",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "cvTermRefinedAbout",
+                                                    "title": "Sobre",
+                                                    "type": "string",
+                                                    "help_text": "A relação \"about\" refinada do termo com o conteúdo. Opcionalmente, introduzir um refinamento da relação ‘about’ do termo com o conteúdo da imagem. Deve ser um identificador globalmente único de um vocabulário controlado.",
+                                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermRefinedAbout",
+                                                    "display_type": "textarea"
+                                                }
+                                            ],
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.modelAges",
+                                    "title": "Idades dos modelos",
+                                    "type": "string",
+                                    "help_text": "Idade do(s) modelo(s) humano(s) no momento em que a imagem foi captada. Ter em conta eventuais implicações legais da indicação de idades de modelos jovens. Não devem ser incluídas idades inferiores a 18 anos.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.additionalModelInfo",
+                                    "title": "Informações adicionais sobre os modelos",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Informações sobre outras facetas do(s) modelo(s).",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.minorModelAgeDisclosure",
+                                    "title": "Divulgação da idade de modelos menores",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "A idade do modelo mais jovem retratado na imagem, no momento em que a imagem foi criada. Esta informação não se destina a ser exibida publicamente; destina-se a ser utilizada como filtro para a inclusão/exclusão de imagens em catálogos e processos de difusão.",
+                                    "enum": [],
+                                    "rules": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseDocuments",
+                                    "title": "Documentos de autorização dos modelos",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Identificador associado a cada autorização de modelo.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus",
+                                    "title": "Estado da autorização dos modelos",
+                                    "class": "required",
+                                    "help_text": "Resume a disponibilidade e o âmbito das autorizações de modelo que permitem a utilização da imagem das pessoas que aparecem na fotografia.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "cvTermName",
+                                            "title": "Rótulo do termo",
+                                            "type": "string",
+                                            "help_text": "O nome, em linguagem natural, do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermName",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermId",
+                                            "title": "ID do termo",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do termo de um vocabulário controlado.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvId",
+                                            "title": "ID do vocabulário",
+                                            "type": "string",
+                                            "help_text": "O identificador globalmente único do vocabulário controlado de onde provém o termo.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvId",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "cvTermRefinedAbout",
+                                            "title": "Sobre",
+                                            "type": "string",
+                                            "help_text": "A relação \"about\" refinada do termo com o conteúdo. Opcionalmente, introduzir um refinamento da relação \"About\" do termo com o conteúdo da imagem. Deve ser um identificador globalmente único de um vocabulário controlado. Pode ser utilizado para refinar a relação \"about\" genérica.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermRefinedAbout",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253485215",
+                            "title": "Organizações na imagem",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.organisationInImageNames",
+                                    "title": "Nome da organização",
+                                    "type": "string",
+                                    "help_text": "O nome da organização ou empresa que figura na imagem.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.organisationInImageCodes",
+                                    "title": "Código da organização",
+                                    "type": "string",
+                                    "help_text": "O código, extraído de um vocabulário controlado, utilizado para identificar a organização ou empresa que figura na imagem. Por exemplo, pode ser utilizado um símbolo bolsista (ticker). Introduzir um identificador do vocabulário controlado, seguido de dois pontos e, por fim, o código do vocabulário atribuído à organização (por exemplo, nasdaq:companyA)",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "photoVideoMetadataIPTC1674253897496",
+                            "title": "Informação técnica",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.imageRating",
+                                    "title": "Classificação da imagem",
+                                    "type": "string",
+                                    "class": "required",
+                                    "help_text": "Classificação da imagem atribuída pelo seu utilizador ou fornecedor. O valor deve ser -1 ou estar no intervalo de 0 a 5. -1 indica “rejeitada” e 0 “não classificada”. Se não for indicado um valor explícito, será assumido o valor predefinido 0.",
+                                    "rules_": "numeric|min_value:1|max_value:5",
+                                    "rules": {
+                                        "numeric": true
+                                    },
+                                    "enum": [
+                                        {
+                                            "code": "-1",
+                                            "label": "Rejeitada"
+                                        },
+                                        {
+                                            "code": "0",
+                                            "label": "Sem classificação"
+                                        },
+                                        {
+                                            "code": "1",
+                                            "label": "Classificação 1 (mais baixa)"
+                                        },
+                                        {
+                                            "code": "2",
+                                            "label": "Classificação 2"
+                                        },
+                                        {
+                                            "code": "3",
+                                            "label": "Classificação 3"
+                                        },
+                                        {
+                                            "code": "4",
+                                            "label": "Classificação 4"
+                                        },
+                                        {
+                                            "code": "5",
+                                            "label": "Classificação 5 (mais alta)"
+                                        }
+                                    ],
+                                    "display_type": "dropdown",
+                                    "default": "0"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.digitalSourceType",
+                                    "title": "Tipo de fonte digital",
+                                    "type": "string",
+                                    "help_text": "O tipo de fonte desta imagem digital. Deve ser selecionado um valor do vocabulário controlado do IPTC (publicado sob uma licença Creative Commons Atribuição (CC BY) 4.0), que contém os seguintes valores:\n- digitalCapture | Captura digital original de uma cena real | A imagem digital é a instância original e única e foi captada por uma câmara digital\n- negativeFilm | Digitalizada a partir de um negativo em película | A imagem digital foi digitalizada a partir de um negativo em película ou em qualquer outro suporte transparente\n- positiveFilm | Digitalizada a partir de um positivo em película | A imagem digital foi digitalizada a partir de um positivo num diapositivo ou em qualquer outro suporte transparente\n- print | Digitalizada a partir de uma impressão em suporte não transparente | A imagem digital foi digitalizada a partir de uma imagem impressa num suporte não transparente\n- softwareImage | Criada por software | A imagem digital foi criada por software informático",
+                                    "rules": [],
+                                    "enum": [
+                                        {
+                                            "code": "digitalCapture",
+                                            "label": "Captura digital"
+                                        },
+                                        {
+                                            "code": "negativeFilm",
+                                            "label": "Película negativa"
+                                        },
+                                        {
+                                            "code": "positiveFilm ",
+                                            "label": "Película positiva "
+                                        },
+                                        {
+                                            "code": "print ",
+                                            "label": "Impressão "
+                                        },
+                                        {
+                                            "code": "softwareImage",
+                                            "label": "Imagem criada por software"
+                                        }
+                                    ],
+                                    "display_type": "dropdown"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.maxAvailHeight",
+                                    "title": "Altura máxima disponível",
+                                    "type": "integer",
+                                    "help_text": "A altura máxima disponível, em píxeis, da fotografia original a partir da qual esta fotografia foi obtida por redução de tamanho.",
+                                    "rules": {
+                                        "numeric": true
+                                    },
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.maxAvailWidth",
+                                    "title": "Largura máxima disponível",
+                                    "type": "integer",
+                                    "class": "required",
+                                    "help_text": "A largura máxima disponível, em píxeis, da fotografia original a partir da qual esta fotografia foi obtida por redução de tamanho.",
+                                    "rules": {
+                                        "numeric": true
+                                    },
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries",
+                                    "title": "Entradas de registo",
+                                    "help_text": "Um elemento estruturado utilizado para fornecer informação de catalogação (ou seja, uma entrada num registo). Inclui o identificador único da imagem atribuído pelo registo e o identificador da organização do registo.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "role",
+                                            "title": "Função",
+                                            "type": "string",
+                                            "help_text": "Um identificador do motivo e/ou finalidade desta entrada de registo.",
+                                            "rules": [],
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.role",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "assetIdentifier",
+                                            "title": "Identificador do recurso",
+                                            "class": "required",
+                                            "type": "string",
+                                            "help_text": "Um identificador único criado pelo registo e aplicado pelo criador da imagem digital. Este valor não deve ser alterado depois de aplicado. Este identificador está associado a um identificador da organização do registo correspondente. Introduzir o identificador único criado por um registo e aplicado pelo criador da imagem digital. Este valor não deve ser alterado depois de aplicado. Este identificador pode ser globalmente único por si só, mas tem de ser único para o registo que o emite. O preenchimento deste campo deve ser obrigatório.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.assetIdentifier",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "registryIdentifier",
+                                            "title": "Identificador do registo",
+                                            "type": "string",
+                                            "help_text": "Um identificador do registo/organização que emitiu o ID de imagem do registo correspondente.",
+                                            "rules": [],
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.registryIdentifier",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "is_recommended": true
+                                }
+                            ],
+                            "help_text": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "license",
+            "title": "Licença",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "image_description.license",
+                    "title": "Licença",
+                    "class": "required",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Nome",
+                            "type": "string",
+                            "prop_key": "image_description.license.name",
+                            "help_text": "O nome da licença.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "uri",
+                            "title": "URL",
+                            "type": "string",
+                            "prop_key": "image_description.license.uri",
+                            "help_text": "Um URL onde pode ser encontrada informação detalhada sobre a licença / condições de utilização.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "O nome e a ligação para a licença ao abrigo da qual a imagem é disponibilizada."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "album",
+            "title": "Álbum",
+            "items": [
+                {
+                    "key": "image_description.album",
+                    "title": "Álbum",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Nome",
+                            "type": "string",
+                            "prop_key": "image_description.album.name",
+                            "help_text": "O nome (rótulo) do álbum.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "prop_key": "image_description.album.description",
+                            "help_text": "Uma breve descrição do álbum.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "owner",
+                            "title": "Proprietário",
+                            "type": "string",
+                            "prop_key": "image_description.album.owner",
+                            "help_text": "O proprietário ou depositário do álbum.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "uri",
+                            "title": "URL",
+                            "type": "string",
+                            "prop_key": "image_description.album.uri",
+                            "help_text": "Uma ligação (URL) para o álbum.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Quando uma imagem é publicada num catálogo que contém outras imagens, pode ser desejável organizá-las por álbum. Os álbuns são coleções de imagens organizadas por tema, período, local ou outros critérios. Uma imagem pode pertencer a mais do que um álbum. Os álbuns são “coleções virtuais”."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Etiquetas",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "display_type": "text",
+                            "help_text": "O nome de um grupo de etiquetas. "
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

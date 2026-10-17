@@ -1,0 +1,219 @@
+{
+    "type": "template",
+    "title": "Metadados personalizados",
+    "description": "Modelo flexível para documentar recursos que não se enquadram nos esquemas existentes.",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Informação sobre os metadados",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information.section",
+                    "title": "Metadados do documento",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "Número de ID do documento",
+                            "type": "string",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "display_type": "date"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão do documento",
+                            "type": "string",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "description",
+            "title": "Descrição",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "description.identification.section",
+                    "title": "Identificação",
+                    "items": [
+                        {
+                            "key": "description.identification.metadata_type",
+                            "title": "Tipo de metadados",
+                            "type": "string",
+                            "help_text": "Tipo de conteúdo de metadados.",
+                            "is_required": true,
+                            "_rules": "required|alpha|min:4|max:30",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description.identification.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "help_text": "Identificador único utilizado para referenciar este recurso.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description.identification.title",
+                            "title": "Título",
+                            "type": "string",
+                            "help_text": "Título legível do recurso.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description.identification.subtitle",
+                            "title": "Subtítulo",
+                            "type": "string",
+                            "help_text": "Subtítulo",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description.identification.authors",
+                            "title": "Autores",
+                            "type": "array",
+                            "help_text": "Autores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "description.identification.authors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "description.identification.authors.affiliation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "description.identification.authors.abbr",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "description.identification.authors.role",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "description.identification.publishers",
+                            "title": "Editores",
+                            "type": "array",
+                            "help_text": "Editores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "description.identification.publishers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "description.identification.publishers.affiliation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "description.identification.publishers.abbr",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "description.identification.publishers.role",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "description.identification.description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "help_text": "Breve descrição que resume o recurso.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "description.identification.spatial",
+                            "title": "Espacial",
+                            "type": "string",
+                            "help_text": "Descrição ou código da cobertura/extensão espacial.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description.identification.temporal",
+                            "title": "Temporal",
+                            "type": "string",
+                            "help_text": "Cobertura temporal (por exemplo, data ou período).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

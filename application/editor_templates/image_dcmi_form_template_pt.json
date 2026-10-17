@@ -1,0 +1,977 @@
+{
+    "type": "template",
+    "title": "Projeto de imagem",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Informação sobre os metadados",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Informação sobre os metadados",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" na secção \"DCMI / Descrição da imagem\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único para o documento de metadados da imagem. Este identificador deve ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" na secção \"Identificadores da imagem\", embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" da imagem for “IMG_0001”, o ID do documento poderá ser “IHSN_IMG_001_v1.0” se os metadados forem produzidos pelo IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "class": "required",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A data em que os metadados desta imagem foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", uma vez que a informação sobre o produtor e a data de produção dos metadados é útil para fins de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A versão do documento de metadados (não a versão da própria imagem).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "identification",
+            "title": "Identificadores da imagem",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "identification1674239080345",
+                    "title": "Identificadores",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "image_description.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único da imagem. O \"ID principal\" (também designado IDNO) é um número de identificação único utilizado para identificar a imagem. É necessário um identificador único para fins de catalogação, pelo que este elemento é declarado como \"Obrigatório\". O identificador permitirá aos utilizadores citar o quadro corretamente. O identificador deve ser único no catálogo. Idealmente, deve também ser único a nível global. Pode ser utilizado um Digital Object Identifier (DOI) ou o ID incluído nos metadados EXIF das fotografias digitais. para o estudo. Em alternativa, o \"ID principal\" pode ser construído por uma organização utilizando um esquema coerente. Note-se que o esquema permite fornecer mais do que um identificador para a mesma imagem (no elemento \"Outros identificadores\"); um identificador específico do catálogo não é, portanto, incompatível com um identificador globalmente único como um DOI. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "rules": [],
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) que não o \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI) ou o identificador EXIF. O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\", pelo que, se for utilizado um DOI, EXIF ou outro tipo de ID normalizado como identificador principal, recomenda-se repeti-lo aqui com a identificação do tipo).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "description": "Tipo de identificador, por exemplo `doi`, `handle`, `other`",
+                                    "type": "string",
+                                    "prop_key": "image_description.identifiers.type",
+                                    "help_text": "O tipo de identificador. Pode ser, por exemplo, “DOI” ou \"EXIF\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "image_description.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "DCMI",
+            "title": "DCMI",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "image_description.dcmi",
+                    "title": "Descrição da imagem",
+                    "items": [
+                        {
+                            "key": "image_description.dcmi.type",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "default": "image",
+                            "help_text": "O esquema Dublin Core é flexível e versátil e pode ser utilizado para documentar diferentes tipos de recursos. Este elemento é utilizado para documentar o tipo de recurso que está a ser documentado. O DCMI fornece uma lista de categorias sugeridas, incluindo “image” (imagem), que é o tipo relevante a introduzir aqui. Alguns utilizadores poderão querer ser mais específicos na descrição do tipo de recurso, por exemplo, distinguindo imagens a cores de imagens a preto e branco. Essa distinção não deve ser feita neste elemento; pode ser utilizado outro elemento para esse fim (como etiquetas e grupos de etiquetas).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.date",
+                            "title": "Data",
+                            "type": "string",
+                            "help_text": "A data em que a fotografia foi tirada / a imagem foi criada. A data deve, de preferência, ser introduzida no formato ISO 8601 (AAAA-MM-DD). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data específico.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.title",
+                            "title": "Título",
+                            "type": "string",
+                            "help_text": "O título da fotografia.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.caption",
+                            "title": "Legenda",
+                            "type": "string",
+                            "help_text": "Uma legenda para a fotografia.",
+                            "is_recommended": true,
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "image_description.dcmi.description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "help_text": "Uma breve descrição do conteúdo representado na imagem. Este elemento fornecerá normalmente informação mais detalhada do que o título ou a legenda. Note-se que podem ser utilizados outros elementos para fornecer uma descrição mais específica e “discriminada” de uma imagem; o elemento \"Palavras-chave\", por exemplo, pode ser utilizado para enumerar rótulos associados a uma imagem (possivelmente gerados de forma automatizada com ferramentas de rotulagem de imagens baseadas em aprendizagem automática).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "image_description.dcmi.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.keywords.name",
+                                    "help_text": "A palavra-chave (ou expressão) propriamente dita. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.keywords.vocabulary",
+                                    "help_text": "O vocabulário controlado (incluindo o número de versão ou a data) do qual a palavra-chave é extraída, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.keywords.uri",
+                                    "help_text": "O URL do vocabulário controlado do qual a palavra-chave é extraída, se existir.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "As palavras-chave são palavras ou expressões que descrevem aspetos salientes do que a imagem representa. A adição de palavras-chave pode melhorar significativamente a capacidade de descoberta dos dados, pelo que é recomendada. As palavras-chave podem resumir e melhorar a descrição do conteúdo ou do assunto de um recurso. As palavras-chave podem ser selecionadas a partir de um tesauro normalizado, de preferência um tesauro internacional e multilingue, ou podem ser sugeridas por modelos de aprendizagem automática. Pode ser definido um vocabulário controlado nos modelos de utilizador."
+                        },
+                        {
+                            "key": "image_description.dcmi.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.id",
+                                    "help_text": "O identificador único do tema. Pode ser um número sequencial ou o ID do tema num vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Tema",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.name",
+                                    "help_text": "O rótulo do tema. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "Quando é utilizado um vocabulário controlado hierárquico (aninhado), o campo \"ID do nível superior\" pode ser utilizado para indicar um tema de nível superior ao qual este tema pertence.",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.vocabulary",
+                                    "help_text": "A especificação (nome, incluindo a versão e a data) do vocabulário controlado do qual o tema é retirado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.uri",
+                                    "help_text": "Uma ligação (URL) para o sítio web do vocabulário controlado.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os temas indicam o(s) tema(s) substantivo(s) geral(ais) que a imagem representa. Uma classificação temática facilita a referenciação e as pesquisas em catálogos eletrónicos de inquéritos; os temas devem, por isso, ser selecionados a partir de um vocabulário controlado normalizado, por exemplo a classificação de temas do CESSDA (uma tipologia de temas disponível em 11 línguas) ou o Journal of Economic Literature (JEL) Classification System. Note-se que é possível combinar temas de mais do que um vocabulário controlado. "
+                        },
+                        {
+                            "key": "image_description.dcmi.country",
+                            "type": "array",
+                            "title": "País",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.country.name",
+                                    "help_text": "O nome do país. Note-se que muitas organizações têm as suas próprias políticas de designação de países/regiões/economias/territórios, que os curadores de dados terão de cumprir.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.country.code",
+                                    "help_text": "O código do país. Recomenda-se a utilização de uma lista normalizada de códigos de países, como a ISO 3166. ",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O país representado na imagem, se aplicável. Esta informação é altamente relevante e será frequentemente utilizada como filtro (faceta) nos catálogos de dados. Trata-se, por isso, de um campo \"Recomendado\". Uma imagem representará apenas parte de um país, mas pretende-se ainda assim registar esta informação nos metadados. Note-se que muitas organizações têm as suas próprias políticas de designação e grafia de países/regiões/economias/territórios, que os curadores de dados terão de cumprir.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "image_description.dcmi.coverage",
+                            "title": "Cobertura geográfica",
+                            "type": "string",
+                            "help_text": "Este elemento complementa o elemento \"País\" e permite fornecer informação mais específica, por exemplo o nome de uma província ou cidade.",
+                            "enum": [],
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.latitude",
+                            "title": "Latitude GPS",
+                            "type": "string",
+                            "help_text": "A latitude da localização geográfica onde a fotografia foi tirada.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.longitude",
+                            "title": "Longitude GPS",
+                            "type": "string",
+                            "help_text": "A longitude da localização geográfica onde a fotografia foi tirada.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.altitude",
+                            "title": "Altitude GPS",
+                            "type": "string",
+                            "help_text": "A altitude da localização geográfica onde a fotografia foi tirada.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.format",
+                            "title": "Formato",
+                            "type": "string",
+                            "help_text": "Refere-se ao formato do ficheiro de imagem. É normalmente expresso através de um formato MIME.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.languages",
+                            "type": "array",
+                            "title": "Língua",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.languages.name",
+                                    "help_text": "O nome da língua.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.languages.code",
+                                    "help_text": "O código da língua.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A língua refere-se à língua em que os metadados da imagem são fornecidos. Trata-se de um campo repetível, para permitir a indicação de mais do que uma língua. Para os códigos e nomes das línguas, recomenda-se a utilização da norma ISO 639-2."
+                        },
+                        {
+                            "key": "image_description.dcmi.source",
+                            "title": "Fonte",
+                            "type": "string",
+                            "help_text": "Um recurso relacionado do qual a imagem descrita deriva.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.relations",
+                            "type": "array",
+                            "title": "Relações",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.relations.name",
+                                    "help_text": "O nome (título) do recurso relacionado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "enum": [
+                                        {
+                                            "code": "isPartOf",
+                                            "label": "É parte de"
+                                        },
+                                        {
+                                            "code": "hasPart",
+                                            "label": "Tem parte"
+                                        },
+                                        {
+                                            "code": "isVersionOf",
+                                            "label": "É versão de"
+                                        },
+                                        {
+                                            "code": "isFormatOf",
+                                            "label": "É formato de"
+                                        },
+                                        {
+                                            "code": "hasFormat",
+                                            "label": "Tem formato"
+                                        },
+                                        {
+                                            "code": "references",
+                                            "label": "Referencia"
+                                        },
+                                        {
+                                            "code": "isReferencedBy",
+                                            "label": "É referenciado por"
+                                        },
+                                        {
+                                            "code": "isBasedOn",
+                                            "label": "É baseado em"
+                                        },
+                                        {
+                                            "code": "isBasisFor",
+                                            "label": "É base para"
+                                        },
+                                        {
+                                            "code": "requires",
+                                            "label": "Requer"
+                                        },
+                                        {
+                                            "code": "isRequiredBy",
+                                            "label": "É requerido por"
+                                        }
+                                    ],
+                                    "prop_key": "image_description.dcmi.relations.type",
+                                    "help_text": "Uma breve descrição do tipo de relação. Pode ser utilizado um vocabulário controlado.",
+                                    "display_type": "dropdown-custom"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.relations.uri",
+                                    "help_text": "Uma ligação para o recurso relacionado que está a ser descrito.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de recursos relacionados (imagens ou de outro tipo)."
+                        },
+                        {
+                            "key": "image_description.dcmi.note",
+                            "title": "Nota",
+                            "type": "string",
+                            "help_text": "Qualquer informação adicional sobre a imagem, não abrangida por um dos outros elementos de metadados.",
+                            "enum": [],
+                            "display_type": "textarea"
+                        }
+                    ]
+                },
+                {
+                    "key": "DCMI1673378175843",
+                    "title": "Autores e direitos",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "image_description.dcmi.creator",
+                            "title": "Criador",
+                            "type": "string",
+                            "help_text": "O nome da pessoa (ou organização) que tirou a fotografia ou criou a imagem.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.contributor",
+                            "title": "Colaborador",
+                            "type": "string",
+                            "help_text": "O colaborador pode ser uma pessoa ou organização, possivelmente uma organização patrocinadora.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "A pessoa ou organização que publica a imagem.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.rights",
+                            "title": "Direitos",
+                            "type": "string",
+                            "help_text": "Os direitos de autor da fotografia. Está disponível outro elemento para descrever a licença ao abrigo da qual a imagem é distribuída. ",
+                            "enum": [],
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "license",
+            "title": "Licença",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "image_description.license",
+                    "title": "Licença",
+                    "class": "required",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Nome",
+                            "type": "string",
+                            "prop_key": "image_description.license.name",
+                            "help_text": "O nome da licença (por exemplo, CC-BY 4.0).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "uri",
+                            "title": "URL",
+                            "type": "string",
+                            "prop_key": "image_description.license.uri",
+                            "help_text": "Um URL onde pode ser encontrada informação detalhada sobre a licença / condições de utilização.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "A licença ao abrigo da qual a imagem é publicada."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "album",
+            "title": "Álbuns",
+            "items": [
+                {
+                    "key": "image_description.album",
+                    "title": "Álbum",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Nome",
+                            "type": "string",
+                            "prop_key": "image_description.album.name",
+                            "help_text": "O nome (rótulo) do álbum.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "prop_key": "image_description.album.description",
+                            "help_text": "Uma breve descrição do álbum.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "owner",
+                            "title": "Proprietário",
+                            "type": "string",
+                            "prop_key": "image_description.album.owner",
+                            "help_text": "O proprietário ou depositário do álbum.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "uri",
+                            "title": "URL",
+                            "type": "string",
+                            "prop_key": "image_description.album.uri",
+                            "help_text": "Uma ligação (URL) para o álbum.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Quando uma imagem é publicada num catálogo que contém outras imagens, pode ser desejável organizá-las por álbum. Os álbuns são coleções de imagens organizadas por tema, período, local ou outros critérios. Uma imagem pode pertencer a mais do que um álbum. Os álbuns são “coleções virtuais”."
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "key": "document_tags",
+            "title": "Etiquetas",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Um grupo definido pelo utilizador (opcional) ao qual a etiqueta pertence. O agrupamento de etiquetas permite implementar facetas controladas em catálogos de dados.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

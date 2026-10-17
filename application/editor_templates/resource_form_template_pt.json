@@ -1,0 +1,1507 @@
+{
+    "type": "template",
+    "title": "Recursos externos",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "resource_container",
+            "title": "Recurso externo",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "resource_section",
+                    "title": "Descrição do recurso",
+                    "items": [
+                        {
+                            "key": "dctype",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Este elemento define o tipo de recurso externo a documentar. Este elemento desempenha um papel importante no sistema de catalogação (NADA), pois é utilizado para determinar onde e como o recurso será publicado. Deve ser dada especial atenção ao tipo “Ficheiro de microdados” (dat/micro) e a outros tipos de dados, quando os conjuntos de dados forem publicados num catálogo de dados, mas com restrições de acesso). O tipo de recurso deve ser selecionado a partir do vocabulário controlado.",
+                            "is_required": true,
+                            "enum": [
+                                {
+                                    "code": "doc/adm",
+                                    "label": "Documento, administrativo"
+                                },
+                                {
+                                    "code": "doc/anl",
+                                    "label": "Documento, analítico"
+                                },
+                                {
+                                    "code": "doc/qst",
+                                    "label": "Documento, questionário"
+                                },
+                                {
+                                    "code": "doc/ref",
+                                    "label": "Documento, referência"
+                                },
+                                {
+                                    "code": "doc/rep",
+                                    "label": "Documento, relatório"
+                                },
+                                {
+                                    "code": "doc/tec",
+                                    "label": "Documento, técnico"
+                                },
+                                {
+                                    "code": "doc/oth",
+                                    "label": "Documento, outro"
+                                },
+                                {
+                                    "code": "dat",
+                                    "label": "Base de dados (excluindo microdados)"
+                                },
+                                {
+                                    "code": "dat/micro",
+                                    "label": "Microdados"
+                                },
+                                {
+                                    "code": "map",
+                                    "label": "Mapa"
+                                },
+                                {
+                                    "code": "prg",
+                                    "label": "Programa / script"
+                                },
+                                {
+                                    "code": "tbl",
+                                    "label": "Quadro"
+                                },
+                                {
+                                    "code": "pic",
+                                    "label": "Fotografia / imagem"
+                                },
+                                {
+                                    "code": "vid",
+                                    "label": "Vídeo"
+                                },
+                                {
+                                    "code": "aud",
+                                    "label": "Áudio"
+                                },
+                                {
+                                    "code": "web",
+                                    "label": "Sítio web"
+                                }
+                            ],
+                            "display_type": "dropdown"
+                        },
+                        {
+                            "key": "dcformat",
+                            "title": "Formato do recurso",
+                            "type": "string",
+                            "enum": [
+                                {
+                                    "code": "application/x-compressed",
+                                    "label": "Comprimido, genérico"
+                                },
+                                {
+                                    "code": "application/zip",
+                                    "label": "Comprimido, ZIP"
+                                },
+                                {
+                                    "code": "application/x-cspro",
+                                    "label": "Dados, CSPro"
+                                },
+                                {
+                                    "code": "application/dbase",
+                                    "label": "Dados, dBase"
+                                },
+                                {
+                                    "code": "application/msaccess",
+                                    "label": "Dados, Microsoft Access"
+                                },
+                                {
+                                    "code": "application/x-sas",
+                                    "label": "Dados, SAS"
+                                },
+                                {
+                                    "code": "application/x-spss",
+                                    "label": "Dados, SPSS"
+                                },
+                                {
+                                    "code": "application/x-stata",
+                                    "label": "Dados, Stata"
+                                },
+                                {
+                                    "code": "text",
+                                    "label": "Documento, genérico"
+                                },
+                                {
+                                    "code": "text/html",
+                                    "label": "Documento, HTML"
+                                },
+                                {
+                                    "code": "application/msexcel",
+                                    "label": "Documento, Microsoft Excel"
+                                },
+                                {
+                                    "code": "application/mspowerpoint",
+                                    "label": "Documento, Microsoft PowerPoint"
+                                },
+                                {
+                                    "code": "application/msword",
+                                    "label": "Documento, Microsoft Word"
+                                },
+                                {
+                                    "code": "application/pdf",
+                                    "label": "Documento, PDF"
+                                },
+                                {
+                                    "code": "application/postscript",
+                                    "label": "Documento, PostScript"
+                                },
+                                {
+                                    "code": "text/plain",
+                                    "label": "Documento, texto simples"
+                                },
+                                {
+                                    "code": "text/wordperfect",
+                                    "label": "Documento, WordPerfect"
+                                },
+                                {
+                                    "code": "image/gif",
+                                    "label": "Imagem, GIF"
+                                },
+                                {
+                                    "code": "image/jpeg",
+                                    "label": "Imagem, JPEG"
+                                },
+                                {
+                                    "code": "image/png",
+                                    "label": "Imagem, PNG"
+                                },
+                                {
+                                    "code": "image/tiff",
+                                    "label": "Imagem, TIFF"
+                                }
+                            ],
+                            "help_text": "O formato do ficheiro do recurso. Selecione um valor do vocabulário controlado.",
+                            "display_type": "dropdown"
+                        },
+                        {
+                            "key": "title",
+                            "title": "Título",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "O título do recurso.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subtitle",
+                            "title": "Subtítulo",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Um título secundário do recurso, se aplicável.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "id_number",
+                            "title": "Número de ID",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Um identificador único do recurso (por exemplo, um ISBN, DOI ou ID de catálogo).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "author",
+                            "title": "Autor",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "O(s) autor(es) do recurso. Se houver mais do que um, separe os nomes com “;”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "dcdate",
+                            "title": "Data",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "A data em que o recurso foi produzido ou disponibilizado, de preferência introduzida no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                            "display_type": "date"
+                        },
+                        {
+                            "key": "country",
+                            "title": "País",
+                            "type": "string",
+                            "is_recommended": true,
+                            "enum": [
+                                {
+                                    "code": "AFG",
+                                    "label": "Afeganistão"
+                                },
+                                {
+                                    "code": "AFR",
+                                    "label": "África"
+                                },
+                                {
+                                    "code": "AFE",
+                                    "label": "África Oriental e Austral"
+                                },
+                                {
+                                    "code": "AFW",
+                                    "label": "África Ocidental e Central"
+                                },
+                                {
+                                    "code": "ALB",
+                                    "label": "Albânia"
+                                },
+                                {
+                                    "code": "DZA",
+                                    "label": "Argélia"
+                                },
+                                {
+                                    "code": "ASM",
+                                    "label": "Samoa Americana"
+                                },
+                                {
+                                    "code": "AND",
+                                    "label": "Andorra"
+                                },
+                                {
+                                    "code": "AGO",
+                                    "label": "Angola"
+                                },
+                                {
+                                    "code": "ATG",
+                                    "label": "Antígua e Barbuda"
+                                },
+                                {
+                                    "code": "ARB",
+                                    "label": "Mundo Árabe"
+                                },
+                                {
+                                    "code": "ARG",
+                                    "label": "Argentina"
+                                },
+                                {
+                                    "code": "ARM",
+                                    "label": "Arménia"
+                                },
+                                {
+                                    "code": "ABW",
+                                    "label": "Aruba"
+                                },
+                                {
+                                    "code": "AUS",
+                                    "label": "Austrália"
+                                },
+                                {
+                                    "code": "AUT",
+                                    "label": "Áustria"
+                                },
+                                {
+                                    "code": "AZE",
+                                    "label": "Azerbaijão"
+                                },
+                                {
+                                    "code": "BHS",
+                                    "label": "Baamas"
+                                },
+                                {
+                                    "code": "BHR",
+                                    "label": "Barém"
+                                },
+                                {
+                                    "code": "BGD",
+                                    "label": "Bangladexe"
+                                },
+                                {
+                                    "code": "BRB",
+                                    "label": "Barbados"
+                                },
+                                {
+                                    "code": "BLR",
+                                    "label": "Bielorrússia"
+                                },
+                                {
+                                    "code": "BEL",
+                                    "label": "Bélgica"
+                                },
+                                {
+                                    "code": "BLZ",
+                                    "label": "Belize"
+                                },
+                                {
+                                    "code": "BEN",
+                                    "label": "Benim"
+                                },
+                                {
+                                    "code": "BMU",
+                                    "label": "Bermudas"
+                                },
+                                {
+                                    "code": "BTN",
+                                    "label": "Butão"
+                                },
+                                {
+                                    "code": "BOL",
+                                    "label": "Bolívia"
+                                },
+                                {
+                                    "code": "BIH",
+                                    "label": "Bósnia e Herzegovina"
+                                },
+                                {
+                                    "code": "BWA",
+                                    "label": "Botsuana"
+                                },
+                                {
+                                    "code": "BRA",
+                                    "label": "Brasil"
+                                },
+                                {
+                                    "code": "VGB",
+                                    "label": "Ilhas Virgens Britânicas"
+                                },
+                                {
+                                    "code": "BRN",
+                                    "label": "Brunei Darussalam"
+                                },
+                                {
+                                    "code": "BGR",
+                                    "label": "Bulgária"
+                                },
+                                {
+                                    "code": "BFA",
+                                    "label": "Burquina Faso"
+                                },
+                                {
+                                    "code": "BDI",
+                                    "label": "Burúndi"
+                                },
+                                {
+                                    "code": "CPV",
+                                    "label": "Cabo Verde"
+                                },
+                                {
+                                    "code": "KHM",
+                                    "label": "Camboja"
+                                },
+                                {
+                                    "code": "CMR",
+                                    "label": "Camarões"
+                                },
+                                {
+                                    "code": "CAN",
+                                    "label": "Canadá"
+                                },
+                                {
+                                    "code": "CSS",
+                                    "label": "Pequenos Estados das Caraíbas"
+                                },
+                                {
+                                    "code": "CYM",
+                                    "label": "Ilhas Caimão"
+                                },
+                                {
+                                    "code": "CAF",
+                                    "label": "República Centro-Africana"
+                                },
+                                {
+                                    "code": "CEB",
+                                    "label": "Europa Central e Bálticos"
+                                },
+                                {
+                                    "code": "TCD",
+                                    "label": "Chade"
+                                },
+                                {
+                                    "code": "CHI",
+                                    "label": "Ilhas do Canal"
+                                },
+                                {
+                                    "code": "CHL",
+                                    "label": "Chile"
+                                },
+                                {
+                                    "code": "CHN",
+                                    "label": "China"
+                                },
+                                {
+                                    "code": "COL",
+                                    "label": "Colômbia"
+                                },
+                                {
+                                    "code": "COM",
+                                    "label": "Comores"
+                                },
+                                {
+                                    "code": "COD",
+                                    "label": "Congo, Rep. Dem."
+                                },
+                                {
+                                    "code": "COG",
+                                    "label": "Congo, Rep."
+                                },
+                                {
+                                    "code": "CRI",
+                                    "label": "Costa Rica"
+                                },
+                                {
+                                    "code": "CIV",
+                                    "label": "Costa do Marfim"
+                                },
+                                {
+                                    "code": "HRV",
+                                    "label": "Croácia"
+                                },
+                                {
+                                    "code": "CUB",
+                                    "label": "Cuba"
+                                },
+                                {
+                                    "code": "CUW",
+                                    "label": "Curaçau"
+                                },
+                                {
+                                    "code": "CYP",
+                                    "label": "Chipre"
+                                },
+                                {
+                                    "code": "CZE",
+                                    "label": "Chéquia"
+                                },
+                                {
+                                    "code": "DNK",
+                                    "label": "Dinamarca"
+                                },
+                                {
+                                    "code": "DJI",
+                                    "label": "Jibuti"
+                                },
+                                {
+                                    "code": "DMA",
+                                    "label": "Domínica"
+                                },
+                                {
+                                    "code": "DOM",
+                                    "label": "República Dominicana"
+                                },
+                                {
+                                    "code": "EAR",
+                                    "label": "Dividendo demográfico inicial"
+                                },
+                                {
+                                    "code": "EAS",
+                                    "label": "Ásia Oriental e Pacífico"
+                                },
+                                {
+                                    "code": "EAP",
+                                    "label": "Ásia Oriental e Pacífico (excluindo rendimento elevado)"
+                                },
+                                {
+                                    "code": "BEA",
+                                    "label": "Ásia Oriental e Pacífico (apenas países BIRD)"
+                                },
+                                {
+                                    "code": "TEA",
+                                    "label": "Ásia Oriental e Pacífico (países AID e BIRD)"
+                                },
+                                {
+                                    "code": "DEA",
+                                    "label": "Ásia Oriental e Pacífico (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CEA",
+                                    "label": "Ásia Oriental e Pacífico (classificação IFC)"
+                                },
+                                {
+                                    "code": "ECU",
+                                    "label": "Equador"
+                                },
+                                {
+                                    "code": "EGY",
+                                    "label": "Egito, Rep. Árabe"
+                                },
+                                {
+                                    "code": "SLV",
+                                    "label": "El Salvador"
+                                },
+                                {
+                                    "code": "GNQ",
+                                    "label": "Guiné Equatorial"
+                                },
+                                {
+                                    "code": "ERI",
+                                    "label": "Eritreia"
+                                },
+                                {
+                                    "code": "EST",
+                                    "label": "Estónia"
+                                },
+                                {
+                                    "code": "SWZ",
+                                    "label": "Essuatíni"
+                                },
+                                {
+                                    "code": "ETH",
+                                    "label": "Etiópia"
+                                },
+                                {
+                                    "code": "EMU",
+                                    "label": "Área do euro"
+                                },
+                                {
+                                    "code": "ECS",
+                                    "label": "Europa e Ásia Central"
+                                },
+                                {
+                                    "code": "ECA",
+                                    "label": "Europa e Ásia Central (excluindo rendimento elevado)"
+                                },
+                                {
+                                    "code": "BEC",
+                                    "label": "Europa e Ásia Central (apenas países BIRD)"
+                                },
+                                {
+                                    "code": "TEC",
+                                    "label": "Europa e Ásia Central (países AID e BIRD)"
+                                },
+                                {
+                                    "code": "DEC",
+                                    "label": "Europa e Ásia Central (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CEU",
+                                    "label": "Europa e Ásia Central (classificação IFC)"
+                                },
+                                {
+                                    "code": "EUU",
+                                    "label": "União Europeia"
+                                },
+                                {
+                                    "code": "FRO",
+                                    "label": "Ilhas Faroé"
+                                },
+                                {
+                                    "code": "FJI",
+                                    "label": "Fiji"
+                                },
+                                {
+                                    "code": "FIN",
+                                    "label": "Finlândia"
+                                },
+                                {
+                                    "code": "FCS",
+                                    "label": "Situações de fragilidade e afetadas por conflitos"
+                                },
+                                {
+                                    "code": "FRA",
+                                    "label": "França"
+                                },
+                                {
+                                    "code": "PYF",
+                                    "label": "Polinésia Francesa"
+                                },
+                                {
+                                    "code": "GAB",
+                                    "label": "Gabão"
+                                },
+                                {
+                                    "code": "GMB",
+                                    "label": "Gâmbia"
+                                },
+                                {
+                                    "code": "GEO",
+                                    "label": "Geórgia"
+                                },
+                                {
+                                    "code": "DEU",
+                                    "label": "Alemanha"
+                                },
+                                {
+                                    "code": "GHA",
+                                    "label": "Gana"
+                                },
+                                {
+                                    "code": "GIB",
+                                    "label": "Gibraltar"
+                                },
+                                {
+                                    "code": "GRC",
+                                    "label": "Grécia"
+                                },
+                                {
+                                    "code": "GRL",
+                                    "label": "Gronelândia"
+                                },
+                                {
+                                    "code": "GRD",
+                                    "label": "Granada"
+                                },
+                                {
+                                    "code": "GUM",
+                                    "label": "Guame"
+                                },
+                                {
+                                    "code": "GTM",
+                                    "label": "Guatemala"
+                                },
+                                {
+                                    "code": "GIN",
+                                    "label": "Guiné"
+                                },
+                                {
+                                    "code": "GNB",
+                                    "label": "Guiné-Bissau"
+                                },
+                                {
+                                    "code": "GUY",
+                                    "label": "Guiana"
+                                },
+                                {
+                                    "code": "HTI",
+                                    "label": "Haiti"
+                                },
+                                {
+                                    "code": "HPC",
+                                    "label": "Países pobres altamente endividados (PPAE)"
+                                },
+                                {
+                                    "code": "HIC",
+                                    "label": "Rendimento elevado"
+                                },
+                                {
+                                    "code": "HND",
+                                    "label": "Honduras"
+                                },
+                                {
+                                    "code": "HKG",
+                                    "label": "Hong Kong RAE, China"
+                                },
+                                {
+                                    "code": "HUN",
+                                    "label": "Hungria"
+                                },
+                                {
+                                    "code": "BHI",
+                                    "label": "Países BIRD classificados como de rendimento elevado"
+                                },
+                                {
+                                    "code": "IBD",
+                                    "label": "Apenas BIRD"
+                                },
+                                {
+                                    "code": "IBB",
+                                    "label": "BIRD, incluindo mistos"
+                                },
+                                {
+                                    "code": "ISL",
+                                    "label": "Islândia"
+                                },
+                                {
+                                    "code": "IBT",
+                                    "label": "Total AID e BIRD"
+                                },
+                                {
+                                    "code": "IDB",
+                                    "label": "AID mistos"
+                                },
+                                {
+                                    "code": "DFS",
+                                    "label": "Países AID classificados como situações de fragilidade"
+                                },
+                                {
+                                    "code": "FXS",
+                                    "label": "Países AID classificados como situações de fragilidade, excluindo a África Subsariana"
+                                },
+                                {
+                                    "code": "DSF",
+                                    "label": "Países AID da África Subsariana classificados como situações de fragilidade "
+                                },
+                                {
+                                    "code": "DNS",
+                                    "label": "Países AID da África Subsariana não classificados como situações de fragilidade "
+                                },
+                                {
+                                    "code": "DNF",
+                                    "label": "Países AID não classificados como situações de fragilidade"
+                                },
+                                {
+                                    "code": "NXS",
+                                    "label": "Países AID não classificados como situações de fragilidade, excluindo a África Subsariana"
+                                },
+                                {
+                                    "code": "IDX",
+                                    "label": "Apenas AID"
+                                },
+                                {
+                                    "code": "IDA",
+                                    "label": "Total AID"
+                                },
+                                {
+                                    "code": "IND",
+                                    "label": "Índia"
+                                },
+                                {
+                                    "code": "IDN",
+                                    "label": "Indonésia"
+                                },
+                                {
+                                    "code": "IRN",
+                                    "label": "Irão, Rep. Islâmica"
+                                },
+                                {
+                                    "code": "IRQ",
+                                    "label": "Iraque"
+                                },
+                                {
+                                    "code": "IRL",
+                                    "label": "Irlanda"
+                                },
+                                {
+                                    "code": "IMN",
+                                    "label": "Ilha de Man"
+                                },
+                                {
+                                    "code": "ISR",
+                                    "label": "Israel"
+                                },
+                                {
+                                    "code": "ITA",
+                                    "label": "Itália"
+                                },
+                                {
+                                    "code": "JAM",
+                                    "label": "Jamaica"
+                                },
+                                {
+                                    "code": "JPN",
+                                    "label": "Japão"
+                                },
+                                {
+                                    "code": "JOR",
+                                    "label": "Jordânia"
+                                },
+                                {
+                                    "code": "KAZ",
+                                    "label": "Cazaquistão"
+                                },
+                                {
+                                    "code": "KEN",
+                                    "label": "Quénia"
+                                },
+                                {
+                                    "code": "KIR",
+                                    "label": "Quiribáti"
+                                },
+                                {
+                                    "code": "PRK",
+                                    "label": "Coreia, Rep. Pop. Dem."
+                                },
+                                {
+                                    "code": "KOR",
+                                    "label": "Coreia, Rep."
+                                },
+                                {
+                                    "code": "XKX",
+                                    "label": "Kosovo"
+                                },
+                                {
+                                    "code": "KWT",
+                                    "label": "Koweit"
+                                },
+                                {
+                                    "code": "KGZ",
+                                    "label": "República do Quirguistão"
+                                },
+                                {
+                                    "code": "LAO",
+                                    "label": "Laos, RDP"
+                                },
+                                {
+                                    "code": "LTE",
+                                    "label": "Dividendo demográfico tardio"
+                                },
+                                {
+                                    "code": "LCN",
+                                    "label": "América Latina e Caraíbas "
+                                },
+                                {
+                                    "code": "LAC",
+                                    "label": "América Latina e Caraíbas (excluindo rendimento elevado)"
+                                },
+                                {
+                                    "code": "BLA",
+                                    "label": "América Latina e Caraíbas (apenas países BIRD)"
+                                },
+                                {
+                                    "code": "TLA",
+                                    "label": "América Latina e Caraíbas (países AID e BIRD)"
+                                },
+                                {
+                                    "code": "DLA",
+                                    "label": "América Latina e Caraíbas (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CLA",
+                                    "label": "América Latina e Caraíbas (classificação IFC)"
+                                },
+                                {
+                                    "code": "LVA",
+                                    "label": "Letónia"
+                                },
+                                {
+                                    "code": "LDC",
+                                    "label": "Países menos desenvolvidos: classificação da ONU"
+                                },
+                                {
+                                    "code": "LBN",
+                                    "label": "Líbano"
+                                },
+                                {
+                                    "code": "LSO",
+                                    "label": "Lesoto"
+                                },
+                                {
+                                    "code": "LBR",
+                                    "label": "Libéria"
+                                },
+                                {
+                                    "code": "LBY",
+                                    "label": "Líbia"
+                                },
+                                {
+                                    "code": "LIE",
+                                    "label": "Listenstaine"
+                                },
+                                {
+                                    "code": "LTU",
+                                    "label": "Lituânia"
+                                },
+                                {
+                                    "code": "LMY",
+                                    "label": "Rendimento baixo e médio"
+                                },
+                                {
+                                    "code": "LIC",
+                                    "label": "Rendimento baixo"
+                                },
+                                {
+                                    "code": "LMC",
+                                    "label": "Rendimento médio-baixo"
+                                },
+                                {
+                                    "code": "LUX",
+                                    "label": "Luxemburgo"
+                                },
+                                {
+                                    "code": "MAC",
+                                    "label": "Macau RAE, China"
+                                },
+                                {
+                                    "code": "MDG",
+                                    "label": "Madagáscar"
+                                },
+                                {
+                                    "code": "MWI",
+                                    "label": "Maláui"
+                                },
+                                {
+                                    "code": "MYS",
+                                    "label": "Malásia"
+                                },
+                                {
+                                    "code": "MDV",
+                                    "label": "Maldivas"
+                                },
+                                {
+                                    "code": "MLI",
+                                    "label": "Mali"
+                                },
+                                {
+                                    "code": "MLT",
+                                    "label": "Malta"
+                                },
+                                {
+                                    "code": "MHL",
+                                    "label": "Ilhas Marshall"
+                                },
+                                {
+                                    "code": "MRT",
+                                    "label": "Mauritânia"
+                                },
+                                {
+                                    "code": "MUS",
+                                    "label": "Maurícia"
+                                },
+                                {
+                                    "code": "MEX",
+                                    "label": "México"
+                                },
+                                {
+                                    "code": "FSM",
+                                    "label": "Micronésia, Est. Fed."
+                                },
+                                {
+                                    "code": "MDE",
+                                    "label": "Médio Oriente (apenas em desenvolvimento)"
+                                },
+                                {
+                                    "code": "MEA",
+                                    "label": "Médio Oriente e Norte de África"
+                                },
+                                {
+                                    "code": "MNA",
+                                    "label": "Médio Oriente e Norte de África (excluindo rendimento elevado)"
+                                },
+                                {
+                                    "code": "BMN",
+                                    "label": "Médio Oriente e Norte de África (apenas países BIRD)"
+                                },
+                                {
+                                    "code": "TMN",
+                                    "label": "Médio Oriente e Norte de África (países AID e BIRD)"
+                                },
+                                {
+                                    "code": "DMN",
+                                    "label": "Médio Oriente e Norte de África (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CME",
+                                    "label": "Médio Oriente e Norte de África (classificação IFC)"
+                                },
+                                {
+                                    "code": "MIC",
+                                    "label": "Rendimento médio"
+                                },
+                                {
+                                    "code": "MDA",
+                                    "label": "Moldávia"
+                                },
+                                {
+                                    "code": "MCO",
+                                    "label": "Mónaco"
+                                },
+                                {
+                                    "code": "MNG",
+                                    "label": "Mongólia"
+                                },
+                                {
+                                    "code": "MNE",
+                                    "label": "Montenegro"
+                                },
+                                {
+                                    "code": "MAR",
+                                    "label": "Marrocos"
+                                },
+                                {
+                                    "code": "MOZ",
+                                    "label": "Moçambique"
+                                },
+                                {
+                                    "code": "MMR",
+                                    "label": "Mianmar"
+                                },
+                                {
+                                    "code": "NAM",
+                                    "label": "Namíbia"
+                                },
+                                {
+                                    "code": "NRU",
+                                    "label": "Nauru"
+                                },
+                                {
+                                    "code": "NPL",
+                                    "label": "Nepal"
+                                },
+                                {
+                                    "code": "NLD",
+                                    "label": "Países Baixos"
+                                },
+                                {
+                                    "code": "NCL",
+                                    "label": "Nova Caledónia"
+                                },
+                                {
+                                    "code": "NZL",
+                                    "label": "Nova Zelândia"
+                                },
+                                {
+                                    "code": "NIC",
+                                    "label": "Nicarágua"
+                                },
+                                {
+                                    "code": "NER",
+                                    "label": "Níger"
+                                },
+                                {
+                                    "code": "NGA",
+                                    "label": "Nigéria"
+                                },
+                                {
+                                    "code": "NRS",
+                                    "label": "Países da África Subsariana não ricos em recursos"
+                                },
+                                {
+                                    "code": "NAF",
+                                    "label": "Norte de África"
+                                },
+                                {
+                                    "code": "NAC",
+                                    "label": "América do Norte"
+                                },
+                                {
+                                    "code": "MKD",
+                                    "label": "Macedónia do Norte"
+                                },
+                                {
+                                    "code": "MNP",
+                                    "label": "Ilhas Marianas do Norte"
+                                },
+                                {
+                                    "code": "NOR",
+                                    "label": "Noruega"
+                                },
+                                {
+                                    "code": "INX",
+                                    "label": "Não classificado"
+                                },
+                                {
+                                    "code": "OED",
+                                    "label": "Membros da OCDE"
+                                },
+                                {
+                                    "code": "OMN",
+                                    "label": "Omã"
+                                },
+                                {
+                                    "code": "OSS",
+                                    "label": "Outros pequenos Estados"
+                                },
+                                {
+                                    "code": "PSS",
+                                    "label": "Pequenos Estados insulares do Pacífico"
+                                },
+                                {
+                                    "code": "PAK",
+                                    "label": "Paquistão"
+                                },
+                                {
+                                    "code": "PLW",
+                                    "label": "Palau"
+                                },
+                                {
+                                    "code": "PAN",
+                                    "label": "Panamá"
+                                },
+                                {
+                                    "code": "PNG",
+                                    "label": "Papua-Nova Guiné"
+                                },
+                                {
+                                    "code": "PRY",
+                                    "label": "Paraguai"
+                                },
+                                {
+                                    "code": "PER",
+                                    "label": "Peru"
+                                },
+                                {
+                                    "code": "PHL",
+                                    "label": "Filipinas"
+                                },
+                                {
+                                    "code": "POL",
+                                    "label": "Polónia"
+                                },
+                                {
+                                    "code": "PRT",
+                                    "label": "Portugal"
+                                },
+                                {
+                                    "code": "PST",
+                                    "label": "Dividendo pós-demográfico"
+                                },
+                                {
+                                    "code": "PRE",
+                                    "label": "Dividendo pré-demográfico"
+                                },
+                                {
+                                    "code": "PRI",
+                                    "label": "Porto Rico"
+                                },
+                                {
+                                    "code": "QAT",
+                                    "label": "Catar"
+                                },
+                                {
+                                    "code": "RRS",
+                                    "label": "Países da África Subsariana ricos em recursos"
+                                },
+                                {
+                                    "code": "ROU",
+                                    "label": "Roménia"
+                                },
+                                {
+                                    "code": "RUS",
+                                    "label": "Federação Russa"
+                                },
+                                {
+                                    "code": "RWA",
+                                    "label": "Ruanda"
+                                },
+                                {
+                                    "code": "WSM",
+                                    "label": "Samoa"
+                                },
+                                {
+                                    "code": "SMR",
+                                    "label": "São Marinho"
+                                },
+                                {
+                                    "code": "STP",
+                                    "label": "São Tomé e Príncipe"
+                                },
+                                {
+                                    "code": "SAU",
+                                    "label": "Arábia Saudita"
+                                },
+                                {
+                                    "code": "SEN",
+                                    "label": "Senegal"
+                                },
+                                {
+                                    "code": "SRB",
+                                    "label": "Sérvia"
+                                },
+                                {
+                                    "code": "SYC",
+                                    "label": "Seicheles"
+                                },
+                                {
+                                    "code": "SLE",
+                                    "label": "Serra Leoa"
+                                },
+                                {
+                                    "code": "SGP",
+                                    "label": "Singapura"
+                                },
+                                {
+                                    "code": "SXM",
+                                    "label": "São Martinho (parte neerlandesa)"
+                                },
+                                {
+                                    "code": "SVK",
+                                    "label": "República Eslovaca"
+                                },
+                                {
+                                    "code": "SVN",
+                                    "label": "Eslovénia"
+                                },
+                                {
+                                    "code": "SST",
+                                    "label": "Pequenos Estados"
+                                },
+                                {
+                                    "code": "SLB",
+                                    "label": "Ilhas Salomão"
+                                },
+                                {
+                                    "code": "SOM",
+                                    "label": "Somália"
+                                },
+                                {
+                                    "code": "ZAF",
+                                    "label": "África do Sul"
+                                },
+                                {
+                                    "code": "SAS",
+                                    "label": "Ásia do Sul"
+                                },
+                                {
+                                    "code": "TSA",
+                                    "label": "Ásia do Sul (AID e BIRD)"
+                                },
+                                {
+                                    "code": "DSA",
+                                    "label": "Ásia do Sul (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CSA",
+                                    "label": "Ásia do Sul (classificação IFC)"
+                                },
+                                {
+                                    "code": "SSD",
+                                    "label": "Sudão do Sul"
+                                },
+                                {
+                                    "code": "ESP",
+                                    "label": "Espanha"
+                                },
+                                {
+                                    "code": "LKA",
+                                    "label": "Sri Lanka"
+                                },
+                                {
+                                    "code": "KNA",
+                                    "label": "São Cristóvão e Neves"
+                                },
+                                {
+                                    "code": "LCA",
+                                    "label": "Santa Lúcia"
+                                },
+                                {
+                                    "code": "MAF",
+                                    "label": "São Martinho (parte francesa)"
+                                },
+                                {
+                                    "code": "VCT",
+                                    "label": "São Vicente e Granadinas"
+                                },
+                                {
+                                    "code": "SSF",
+                                    "label": "África Subsariana "
+                                },
+                                {
+                                    "code": "SSA",
+                                    "label": "África Subsariana (excluindo rendimento elevado)"
+                                },
+                                {
+                                    "code": "BSS",
+                                    "label": "África Subsariana (apenas países BIRD)"
+                                },
+                                {
+                                    "code": "TSS",
+                                    "label": "África Subsariana (países AID e BIRD)"
+                                },
+                                {
+                                    "code": "DSS",
+                                    "label": "África Subsariana (países elegíveis para a AID)"
+                                },
+                                {
+                                    "code": "CAA",
+                                    "label": "África Subsariana (classificação IFC)"
+                                },
+                                {
+                                    "code": "SXZ",
+                                    "label": "África Subsariana excluindo a África do Sul"
+                                },
+                                {
+                                    "code": "XZN",
+                                    "label": "África Subsariana excluindo a África do Sul e a Nigéria"
+                                },
+                                {
+                                    "code": "SDN",
+                                    "label": "Sudão"
+                                },
+                                {
+                                    "code": "SUR",
+                                    "label": "Suriname"
+                                },
+                                {
+                                    "code": "SWE",
+                                    "label": "Suécia"
+                                },
+                                {
+                                    "code": "CHE",
+                                    "label": "Suíça"
+                                },
+                                {
+                                    "code": "SYR",
+                                    "label": "República Árabe Síria"
+                                },
+                                {
+                                    "code": "TWN",
+                                    "label": "Taiwan, China"
+                                },
+                                {
+                                    "code": "TJK",
+                                    "label": "Tajiquistão"
+                                },
+                                {
+                                    "code": "TZA",
+                                    "label": "Tanzânia"
+                                },
+                                {
+                                    "code": "THA",
+                                    "label": "Tailândia"
+                                },
+                                {
+                                    "code": "TLS",
+                                    "label": "Timor-Leste"
+                                },
+                                {
+                                    "code": "TGO",
+                                    "label": "Togo"
+                                },
+                                {
+                                    "code": "TON",
+                                    "label": "Tonga"
+                                },
+                                {
+                                    "code": "TTO",
+                                    "label": "Trindade e Tobago"
+                                },
+                                {
+                                    "code": "TUN",
+                                    "label": "Tunísia"
+                                },
+                                {
+                                    "code": "TUR",
+                                    "label": "Turquia"
+                                },
+                                {
+                                    "code": "TKM",
+                                    "label": "Turquemenistão"
+                                },
+                                {
+                                    "code": "TCA",
+                                    "label": "Ilhas Turcas e Caicos"
+                                },
+                                {
+                                    "code": "TUV",
+                                    "label": "Tuvalu"
+                                },
+                                {
+                                    "code": "UGA",
+                                    "label": "Uganda"
+                                },
+                                {
+                                    "code": "UKR",
+                                    "label": "Ucrânia"
+                                },
+                                {
+                                    "code": "ARE",
+                                    "label": "Emirados Árabes Unidos"
+                                },
+                                {
+                                    "code": "GBR",
+                                    "label": "Reino Unido"
+                                },
+                                {
+                                    "code": "USA",
+                                    "label": "Estados Unidos"
+                                },
+                                {
+                                    "code": "UMC",
+                                    "label": "Rendimento médio-alto"
+                                },
+                                {
+                                    "code": "URY",
+                                    "label": "Uruguai"
+                                },
+                                {
+                                    "code": "UZB",
+                                    "label": "Usbequistão"
+                                },
+                                {
+                                    "code": "VUT",
+                                    "label": "Vanuatu"
+                                },
+                                {
+                                    "code": "VEN",
+                                    "label": "Venezuela, RB"
+                                },
+                                {
+                                    "code": "VNM",
+                                    "label": "Vietname"
+                                },
+                                {
+                                    "code": "VIR",
+                                    "label": "Ilhas Virgens (EUA)"
+                                },
+                                {
+                                    "code": "PSE",
+                                    "label": "Cisjordânia e Gaza"
+                                },
+                                {
+                                    "code": "WLD",
+                                    "label": "Mundo"
+                                },
+                                {
+                                    "code": "YEM",
+                                    "label": "Iémen, Rep."
+                                },
+                                {
+                                    "code": "ZMB",
+                                    "label": "Zâmbia"
+                                },
+                                {
+                                    "code": "ZWE",
+                                    "label": "Zimbabué"
+                                }
+                            ],
+                            "help_text": "O país a que o recurso se refere, selecionado a partir da lista. Se se aplicar mais do que um país, selecione uma região mais ampla ou o país principal.",
+                            "enum_store_column": "label",
+                            "display_type": "dropdown"
+                        },
+                        {
+                            "key": "language",
+                            "title": "Língua",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "O nome da língua. Se houver mais do que uma, introduza os nomes das línguas separados por “;”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "subjects",
+                            "title": "Assuntos",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Palavras-chave ou termos de assunto que descrevem o recurso. Se houver mais do que um, separe com ';'.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "contributor",
+                            "title": "Colaborador",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Uma lista de colaboradores (texto livre). Se houver mais do que um, introduza os nomes separados por “;”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Lista de colaboradores (texto livre). Se houver mais do que um, introduza os nomes separados por “;”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "rights",
+                            "title": "Direitos",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Os direitos associados ao recurso.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Uma breve descrição do recurso (mas não o resumo, que deve ser introduzido em \"Resumo\").",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "abstract",
+                            "title": "Resumo",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Um resumo do recurso.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "toc",
+                            "title": "Índice",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "O índice do recurso (se o recurso for uma publicação), introduzido como texto livre.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "filename",
+                            "title": "Nome do ficheiro ou URL",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "Um nome de ficheiro ou uma ligação para o recurso (URL).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

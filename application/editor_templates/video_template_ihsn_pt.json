@@ -1,0 +1,2514 @@
+{
+    "type": "template",
+    "title": "Projeto de vídeo",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Informação sobre os metadados",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Informação sobre os metadados",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" da secção \"Descrição do vídeo / Declaração de título\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único do documento de metadados do vídeo. Este identificador tem de ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" da secção \"Descrição do quadro / Declaração de título\", embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" do vídeo for “VDO_0001”, o ID do documento pode ser “IHSN_VDO_001_v1.0”, se os metadados forem produzidos pelo IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "class": "required",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A data em que os metadados deste vídeo foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (YYYY-MM-DD ou YYY-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", uma vez que a informação sobre o produtor e sobre a data de produção dos metadados é útil para efeitos de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A versão do documento de metadados (não a versão do próprio vídeo).",
+                            "display_type": "textarea"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "video_description_container",
+            "title": "Descrição do vídeo",
+            "items": [
+                {
+                    "key": "video_description_container1673387470825",
+                    "title": "Declaração de título",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "rules": [],
+                            "is_required": true,
+                            "help_text": "O \"ID principal\" é um número de identificação único utilizado para identificar inequivocamente um vídeo num catálogo. Ajudará também os utilizadores a citar corretamente o vídeo. A melhor opção é obter um Identificador de Objeto Digital (DOI) para o vídeo, uma vez que garante que o ID é único a nível global. Em alternativa, pode ser um identificador construído por uma organização segundo um esquema coerente. Note-se que o esquema permite fornecer mais do que um identificador para um vídeo (ver identificadores abaixo). ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.title",
+                            "title": "Título",
+                            "type": "string",
+                            "is_required": true,
+                            "help_text": "O título do vídeo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) diferentes do \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI). O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\", pelo que, se for utilizado um DOI ou outro tipo de ID normalizado como identificador principal, recomenda-se repeti-lo aqui com a identificação do tipo).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "O tipo de identificador. Pode ser, por exemplo, “DOI”.",
+                                    "prop_key": "video_description.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "video_description.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.alt_title",
+                            "title": "Título alternativo",
+                            "type": "string",
+                            "rules": [],
+                            "help_text": "Um título alternativo do vídeo (diferente do introduzido em \"Título\"), eventualmente uma versão abreviada. ",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387651932",
+                    "title": "Autores e colaboradores",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.creator",
+                            "title": "Criador",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "Organização ou pessoa que criou/é autora do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.production_company",
+                            "title": "Produtora",
+                            "type": "string",
+                            "help_text": "A produtora ou o estúdio responsável pelo item.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.recorded_at",
+                            "title": "Gravado em",
+                            "type": "string",
+                            "help_text": "Este elemento identifica o evento em que o vídeo foi gravado (por exemplo, uma conferência ou uma demonstração).\n\n",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "O nome do editor do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.translators",
+                            "title": "Tradutores",
+                            "help_text": "Organização ou pessoa que adaptou o vídeo para diferentes línguas. Este elemento corresponde ao elemento translator de VideoObject.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "first_name",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "O nome próprio do tradutor.",
+                                    "prop_key": "video_description.translators.first_name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "initial",
+                                    "title": "Inicial",
+                                    "type": "string",
+                                    "help_text": "As iniciais do tradutor.",
+                                    "prop_key": "video_description.translators.initial",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "last_name",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "O apelido do tradutor.",
+                                    "prop_key": "video_description.translators.last_name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.translators.affiliation",
+                                    "help_text": "A afiliação do tradutor.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.sponsors",
+                            "title": "Patrocinadores",
+                            "help_text": "Este elemento é utilizado para listar as entidades financiadoras/patrocinadores do vídeo. Se diferentes entidades financiadoras tiverem financiado diferentes fases do processo de produção, utilizar o atributo “função” para as distinguir.\n",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do patrocinador (pessoa ou organização).",
+                                    "prop_key": "video_description.sponsors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "video_description.sponsors.abbr",
+                                    "help_text": "A abreviatura (sigla) do patrocinador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "grant",
+                                    "title": "Subvenção",
+                                    "type": "string",
+                                    "prop_key": "video_description.sponsors.grant",
+                                    "help_text": "O número da subvenção (ou do contrato).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do patrocinador.",
+                                    "prop_key": "video_description.sponsors.role",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.contributors",
+                            "title": "Outros colaboradores",
+                            "help_text": "Identifica a(s) pessoa(s) e/ou organização(ões) que contribuíram para a produção do vídeo. O atributo função permite definir qual foi a contribuição específica da pessoa ou organização identificada.\n\n- Nome: \n- Afiliação: \n- Abreviatura: \n- Função: \n- URL: ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do colaborador (pessoa ou organização)",
+                                    "prop_key": "video_description.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.affiliation",
+                                    "help_text": "A afiliação do colaborador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.abbr",
+                                    "help_text": "A abreviatura da instituição indicada como afiliação do colaborador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do colaborador. Pode ser, por exemplo, “Operador de câmara”, “Engenheiro de som”, etc.",
+                                    "prop_key": "video_description.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.uri",
+                                    "help_text": "Um URI (ligação para um sítio web ou endereço de correio eletrónico) do colaborador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.credit_text",
+                            "title": "Créditos",
+                            "type": "string",
+                            "help_text": "Este elemento pode ser utilizado para creditar a(s) pessoa(s) e/ou organização(ões) associada(s) a um vídeo publicado.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.contacts",
+                            "title": "Contactos",
+                            "help_text": "Os utilizadores do vídeo podem necessitar de esclarecimentos e informações adicionais. Esta secção pode incluir o nome, afiliação, e-mail e URI de uma ou várias pessoas de contacto. Este bloco de elementos identifica as pessoas de contacto que podem servir de pessoas de referência relativamente a problemas ou questões colocadas pela comunidade de utilizadores. ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome de uma pessoa ou unidade (como um serviço de apoio aos dados). Normalmente, é preferível indicar um cargo/função em vez do nome real da pessoa. Tenha-se em conta que as pessoas não permanecem para sempre no seu cargo.",
+                                    "prop_key": "video_description.contacts.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica da pessoa ou organização indicada em \"Nome\" no que respeita ao apoio aos utilizadores. Este elemento é utilizado quando são indicados vários nomes, para ajudar os utilizadores a identificar a pessoa ou unidade mais adequada a contactar.",
+                                    "prop_key": "video_description.contacts.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.affiliation",
+                                    "help_text": "Afiliação da pessoa/unidade.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "help_text": "Endereço de correio eletrónico da pessoa.",
+                                    "prop_key": "video_description.contacts.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Telefone",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.telephone",
+                                    "help_text": "Um número de telefone para o qual se pode ligar para obter informações ou dar feedback sobre o quadro. Não deve ser um número de telefone pessoal; deve ser indicado um número institucional (normalmente de um serviço de apoio aos dados).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.uri",
+                                    "help_text": "Uma ligação para um sítio web onde se podem encontrar as informações de contacto do nome.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673389373090",
+                    "title": "Datas e versão",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.date_created",
+                            "title": "Data de criação",
+                            "type": "string",
+                            "help_text": "A data em que o vídeo foi criado. Recomenda-se introduzir a data no formato ISO 8601 (YYYY-MM-DD ou YYYY-MM ou YYYY). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. A data de criação do vídeo refere-se à data em que o vídeo foi produzido e considerado pronto para divulgação.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.date_published",
+                            "title": "Data de publicação",
+                            "type": "string",
+                            "help_text": "A data em que o vídeo foi publicado. Recomenda-se introduzir a data no formato ISO 8601 (YYYY-MM-DD ou YYYY-MM ou YYYY). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "help_text": "A versão do vídeo refere-se à versão publicada do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.status",
+                            "title": "Estado",
+                            "type": "string",
+                            "enum": [
+                                {
+                                    "code": "incomplete",
+                                    "label": "Incompleto"
+                                },
+                                {
+                                    "code": "draft",
+                                    "label": "Rascunho"
+                                },
+                                {
+                                    "code": "published",
+                                    "label": "Publicado"
+                                },
+                                {
+                                    "code": "obsolete",
+                                    "label": "Obsoleto"
+                                }
+                            ],
+                            "help_text": "O estado do vídeo em termos da sua fase no ciclo de vida. Deve ser utilizado um vocabulário controlado. Exemplos de termos incluem {Incompleto, Rascunho, Publicado, Obsoleto}. Algumas organizações definem um conjunto de termos para as fases do seu ciclo de vida de publicação. ",
+                            "display_type": "dropdown-custom"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387842696",
+                    "title": "Conteúdo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "Uma breve descrição do vídeo, normalmente com cerca de um parágrafo (cerca de 150 a 250 palavras).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.genre",
+                            "title": "Género",
+                            "type": "string",
+                            "help_text": "O género do vídeo, canal de difusão ou grupo. Pode ser utilizado um vocabulário controlado.",
+                            "enum": [
+                                {
+                                    "code": "docu",
+                                    "label": "Documentário"
+                                },
+                                {
+                                    "label": "Entretenimento ",
+                                    "code": "ente"
+                                },
+                                {
+                                    "label": "Educativo ",
+                                    "code": "educ"
+                                },
+                                {
+                                    "label": "Promocional ",
+                                    "code": "prom"
+                                },
+                                {
+                                    "label": "Informativo ",
+                                    "code": "info"
+                                }
+                            ],
+                            "display_type": "dropdown-custom"
+                        },
+                        {
+                            "key": "video_description.audience",
+                            "title": "Público-alvo",
+                            "type": "string",
+                            "help_text": "Uma breve descrição do público-alvo do vídeo, ou seja, o grupo para o qual foi criado ou para o qual pode ser adequado.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.name",
+                                    "help_text": "A palavra-chave (ou expressão) propriamente dita. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.vocabulary",
+                                    "help_text": "O vocabulário controlado (incluindo o número de versão ou a data) do qual a palavra-chave é extraída, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.uri",
+                                    "help_text": "O URL do vocabulário controlado do qual a palavra-chave é extraída, se existir.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "As palavras-chave são palavras ou expressões que descrevem aspetos relevantes do tema do vídeo. A adição de palavras-chave pode melhorar significativamente a facilidade de pesquisa dos dados, pelo que é recomendada. As palavras-chave podem resumir e melhorar a descrição do conteúdo ou do assunto de um recurso. Podem ser selecionadas a partir de um tesauro normalizado, de preferência um tesauro internacional e multilingue, ou podem ser sugeridas por modelos de aprendizagem automática. Pode ser definido um vocabulário controlado nos modelos de utilizador."
+                        },
+                        {
+                            "key": "video_description.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.id",
+                                    "help_text": "O identificador único do tema. Pode ser um número sequencial ou o ID do tema num vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Tema",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.name",
+                                    "help_text": "O rótulo do tema. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "Quando é utilizado um vocabulário controlado hierárquico (aninhado), o campo \"ID do nível superior\" pode ser utilizado para indicar um tema de nível superior ao qual este tema pertence.",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.vocabulary",
+                                    "help_text": "A especificação (nome, incluindo a versão e a data) do vocabulário controlado do qual o tema é retirado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.uri",
+                                    "help_text": "Uma ligação (URL) para o sítio web do vocabulário controlado.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os \"Temas\" indicam o(s) tema(s) substantivo(s) geral(is) que o vídeo representa. Uma classificação por temas facilita a referenciação e as pesquisas em catálogos eletrónicos de inquéritos; os temas devem, por isso, ser selecionados de um vocabulário controlado normalizado, por exemplo a classificação de temas do CESSDA (uma tipologia de temas disponível em 11 línguas) ou o sistema de classificação do Journal of Economic Literature (JEL). Note-se que é possível combinar temas de mais do que um vocabulário controlado. "
+                        },
+                        {
+                            "key": "video_description.persons",
+                            "type": "array",
+                            "title": "Pessoas",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.persons.name",
+                                    "help_text": "O nome da pessoa.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "video_description.persons.role",
+                                    "help_text": "A função no vídeo da pessoa indicada em \"Nome\".",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Uma lista das pessoas que aparecem no vídeo."
+                        },
+                        {
+                            "key": "video_description.main_entity",
+                            "title": "Entidade principal",
+                            "type": "string",
+                            "help_text": "Indica a entidade principal descrita no vídeo, se existir.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.transcript",
+                            "title": "Transcrição",
+                            "help_text": "A transcrição do conteúdo do vídeo, fornecida em texto. A inclusão da transcrição nos metadados tornará o vídeo muito mais fácil de encontrar, uma vez que o conteúdo da transcrição pode ser indexado nos catálogos. Note-se que, se o texto for muito longo, uma alternativa é guardá-lo num ficheiro de texto separado e disponibilizá-lo num catálogo de dados como recurso externo. A transcrição pode ser introduzida em várias línguas. Para os códigos e nomes das línguas, recomenda-se a utilização da norma ISO 639-2. ",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "language_code",
+                                    "title": "Código da língua",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.language_code",
+                                    "help_text": "O código da língua da transcrição. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "language_name",
+                                    "title": "Nome da língua",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.language_name",
+                                    "help_text": "O nome da língua da transcrição.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Texto",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.text",
+                                    "help_text": "A própria transcrição, na língua indicada em \"Nome da língua\". ",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.album",
+                            "title": "Álbum",
+                            "help_text": "Quando um vídeo é publicado num catálogo que contém muitos outros vídeos, pode ser conveniente organizá-los por álbum. Os álbuns são coleções de vídeos organizadas por tema, período, local ou outros critérios. Um vídeo pode pertencer a mais do que um álbum. Os álbuns são “coleções virtuais”.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.name",
+                                    "help_text": "O nome (rótulo) do álbum.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.description",
+                                    "help_text": "Uma breve descrição do álbum.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "owner",
+                                    "title": "Proprietário",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.owner",
+                                    "help_text": "O proprietário ou depositário do álbum.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.uri",
+                                    "help_text": "Uma ligação (URL) para o álbum.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.language",
+                            "title": "Línguas",
+                            "help_text": "A língua refere-se à língua em que o vídeo é publicado. A maioria dos vídeos será disponibilizada numa única língua. No entanto, trata-se de um campo repetível, para permitir indicar mais do que uma língua. Para os códigos e nomes das línguas, recomenda-se a utilização da norma ISO 639-2.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da língua.",
+                                    "prop_key": "video_description.language.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "help_text": "O código da língua.",
+                                    "prop_key": "video_description.language.code",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.is_based_on",
+                            "title": "É baseado em",
+                            "type": "string",
+                            "help_text": "Um recurso do qual este vídeo deriva ou do qual é uma modificação ou adaptação.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.is_part_of",
+                            "title": "É parte de",
+                            "type": "string",
+                            "help_text": "Indica outro vídeo do qual este vídeo faz parte.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.relations",
+                            "title": "Relações",
+                            "type": "simple_array",
+                            "enum": [],
+                            "help_text": "Define a relação entre o vídeo documentado e outros recursos.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673389413841",
+                    "title": "Cobertura geográfica e temporal",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.country",
+                            "type": "array",
+                            "title": "País",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.country.name",
+                                    "help_text": "O nome do país/região. O nome e a grafia dos países devem ser coerentes em todos os recursos documentados. Muitas organizações têm as suas próprias políticas sobre a designação de países/regiões/economias/territórios, que os curadores de dados terão de cumprir.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "video_description.country.code",
+                                    "help_text": "O código do país/região (introduzido como cadeia de caracteres, mesmo no caso de códigos numéricos). Recomenda-se a utilização de uma lista normalizada de países e regiões, como a lista de países ISO (ISO 3166).",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A lista de países (ou regiões) abrangidos pelo vídeo, se aplicável. Refere-se ao conteúdo do vídeo e não ao país onde o vídeo foi disponibilizado.",
+                            "is_recommended": true,
+                            "enum": [
+                                {
+                                    "code": "AFG",
+                                    "name": "Afghanistan"
+                                },
+                                {
+                                    "code": "AFR",
+                                    "name": "Africa"
+                                },
+                                {
+                                    "code": "AFE",
+                                    "name": "Africa Eastern and Southern"
+                                },
+                                {
+                                    "code": "AFW",
+                                    "name": "Africa Western and Central"
+                                },
+                                {
+                                    "code": "ALB",
+                                    "name": "Albania"
+                                },
+                                {
+                                    "code": "DZA",
+                                    "name": "Algeria"
+                                },
+                                {
+                                    "code": "ASM",
+                                    "name": "American Samoa"
+                                },
+                                {
+                                    "code": "AND",
+                                    "name": "Andorra"
+                                },
+                                {
+                                    "code": "AGO",
+                                    "name": "Angola"
+                                },
+                                {
+                                    "code": "ATG",
+                                    "name": "Antigua and Barbuda"
+                                },
+                                {
+                                    "code": "ARB",
+                                    "name": "Arab World"
+                                },
+                                {
+                                    "code": "ARG",
+                                    "name": "Argentina"
+                                },
+                                {
+                                    "code": "ARM",
+                                    "name": "Armenia"
+                                },
+                                {
+                                    "code": "ABW",
+                                    "name": "Aruba"
+                                },
+                                {
+                                    "code": "AUS",
+                                    "name": "Australia"
+                                },
+                                {
+                                    "code": "AUT",
+                                    "name": "Austria"
+                                },
+                                {
+                                    "code": "AZE",
+                                    "name": "Azerbaijan"
+                                },
+                                {
+                                    "code": "BHS",
+                                    "name": "Bahamas, The"
+                                },
+                                {
+                                    "code": "BHR",
+                                    "name": "Bahrain"
+                                },
+                                {
+                                    "code": "BGD",
+                                    "name": "Bangladesh"
+                                },
+                                {
+                                    "code": "BRB",
+                                    "name": "Barbados"
+                                },
+                                {
+                                    "code": "BLR",
+                                    "name": "Belarus"
+                                },
+                                {
+                                    "code": "BEL",
+                                    "name": "Belgium"
+                                },
+                                {
+                                    "code": "BLZ",
+                                    "name": "Belize"
+                                },
+                                {
+                                    "code": "BEN",
+                                    "name": "Benin"
+                                },
+                                {
+                                    "code": "BMU",
+                                    "name": "Bermuda"
+                                },
+                                {
+                                    "code": "BTN",
+                                    "name": "Bhutan"
+                                },
+                                {
+                                    "code": "BOL",
+                                    "name": "Bolivia"
+                                },
+                                {
+                                    "code": "BIH",
+                                    "name": "Bosnia and Herzegovina"
+                                },
+                                {
+                                    "code": "BWA",
+                                    "name": "Botswana"
+                                },
+                                {
+                                    "code": "BRA",
+                                    "name": "Brazil"
+                                },
+                                {
+                                    "code": "VGB",
+                                    "name": "British Virgin Islands"
+                                },
+                                {
+                                    "code": "BRN",
+                                    "name": "Brunei Darussalam"
+                                },
+                                {
+                                    "code": "BGR",
+                                    "name": "Bulgaria"
+                                },
+                                {
+                                    "code": "BFA",
+                                    "name": "Burkina Faso"
+                                },
+                                {
+                                    "code": "BDI",
+                                    "name": "Burundi"
+                                },
+                                {
+                                    "code": "CPV",
+                                    "name": "Cabo Verde"
+                                },
+                                {
+                                    "code": "KHM",
+                                    "name": "Cambodia"
+                                },
+                                {
+                                    "code": "CMR",
+                                    "name": "Cameroon"
+                                },
+                                {
+                                    "code": "CAN",
+                                    "name": "Canada"
+                                },
+                                {
+                                    "code": "CSS",
+                                    "name": "Caribbean small states"
+                                },
+                                {
+                                    "code": "CYM",
+                                    "name": "Cayman Islands"
+                                },
+                                {
+                                    "code": "CAF",
+                                    "name": "Central African Republic"
+                                },
+                                {
+                                    "code": "CEB",
+                                    "name": "Central Europe and the Baltics"
+                                },
+                                {
+                                    "code": "TCD",
+                                    "name": "Chad"
+                                },
+                                {
+                                    "code": "CHI",
+                                    "name": "Channel Islands"
+                                },
+                                {
+                                    "code": "CHL",
+                                    "name": "Chile"
+                                },
+                                {
+                                    "code": "CHN",
+                                    "name": "China"
+                                },
+                                {
+                                    "code": "COL",
+                                    "name": "Colombia"
+                                },
+                                {
+                                    "code": "COM",
+                                    "name": "Comoros"
+                                },
+                                {
+                                    "code": "COD",
+                                    "name": "Congo, Dem. Rep."
+                                },
+                                {
+                                    "code": "COG",
+                                    "name": "Congo, Rep."
+                                },
+                                {
+                                    "code": "CRI",
+                                    "name": "Costa Rica"
+                                },
+                                {
+                                    "code": "CIV",
+                                    "name": "Côte d'Ivoire"
+                                },
+                                {
+                                    "code": "HRV",
+                                    "name": "Croatia"
+                                },
+                                {
+                                    "code": "CUB",
+                                    "name": "Cuba"
+                                },
+                                {
+                                    "code": "CUW",
+                                    "name": "Curacao"
+                                },
+                                {
+                                    "code": "CYP",
+                                    "name": "Cyprus"
+                                },
+                                {
+                                    "code": "CZE",
+                                    "name": "Czechia"
+                                },
+                                {
+                                    "code": "DNK",
+                                    "name": "Denmark"
+                                },
+                                {
+                                    "code": "DJI",
+                                    "name": "Djibouti"
+                                },
+                                {
+                                    "code": "DMA",
+                                    "name": "Dominica"
+                                },
+                                {
+                                    "code": "DOM",
+                                    "name": "Dominican Republic"
+                                },
+                                {
+                                    "code": "EAR",
+                                    "name": "Early-demographic dividend"
+                                },
+                                {
+                                    "code": "EAS",
+                                    "name": "East Asia & Pacific"
+                                },
+                                {
+                                    "code": "EAP",
+                                    "name": "East Asia & Pacific (excluding high income)"
+                                },
+                                {
+                                    "code": "BEA",
+                                    "name": "East Asia & Pacific (IBRD-only countries)"
+                                },
+                                {
+                                    "code": "TEA",
+                                    "name": "East Asia & Pacific (IDA & IBRD countries)"
+                                },
+                                {
+                                    "code": "DEA",
+                                    "name": "East Asia & Pacific (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CEA",
+                                    "name": "East Asia and the Pacific (IFC classification)"
+                                },
+                                {
+                                    "code": "ECU",
+                                    "name": "Ecuador"
+                                },
+                                {
+                                    "code": "EGY",
+                                    "name": "Egypt, Arab Rep."
+                                },
+                                {
+                                    "code": "SLV",
+                                    "name": "El Salvador"
+                                },
+                                {
+                                    "code": "GNQ",
+                                    "name": "Equatorial Guinea"
+                                },
+                                {
+                                    "code": "ERI",
+                                    "name": "Eritrea"
+                                },
+                                {
+                                    "code": "EST",
+                                    "name": "Estonia"
+                                },
+                                {
+                                    "code": "SWZ",
+                                    "name": "Eswatini"
+                                },
+                                {
+                                    "code": "ETH",
+                                    "name": "Ethiopia"
+                                },
+                                {
+                                    "code": "EMU",
+                                    "name": "Euro area"
+                                },
+                                {
+                                    "code": "ECS",
+                                    "name": "Europe & Central Asia"
+                                },
+                                {
+                                    "code": "ECA",
+                                    "name": "Europe & Central Asia (excluding high income)"
+                                },
+                                {
+                                    "code": "BEC",
+                                    "name": "Europe & Central Asia (IBRD-only countries)"
+                                },
+                                {
+                                    "code": "TEC",
+                                    "name": "Europe & Central Asia (IDA & IBRD countries)"
+                                },
+                                {
+                                    "code": "DEC",
+                                    "name": "Europe & Central Asia (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CEU",
+                                    "name": "Europe and Central Asia (IFC classification)"
+                                },
+                                {
+                                    "code": "EUU",
+                                    "name": "European Union"
+                                },
+                                {
+                                    "code": "FRO",
+                                    "name": "Faroe Islands"
+                                },
+                                {
+                                    "code": "FJI",
+                                    "name": "Fiji"
+                                },
+                                {
+                                    "code": "FIN",
+                                    "name": "Finland"
+                                },
+                                {
+                                    "code": "FCS",
+                                    "name": "Fragile and conflict affected situations"
+                                },
+                                {
+                                    "code": "FRA",
+                                    "name": "France"
+                                },
+                                {
+                                    "code": "PYF",
+                                    "name": "French Polynesia"
+                                },
+                                {
+                                    "code": "GAB",
+                                    "name": "Gabon"
+                                },
+                                {
+                                    "code": "GMB",
+                                    "name": "Gambia, The"
+                                },
+                                {
+                                    "code": "GEO",
+                                    "name": "Georgia"
+                                },
+                                {
+                                    "code": "DEU",
+                                    "name": "Germany"
+                                },
+                                {
+                                    "code": "GHA",
+                                    "name": "Ghana"
+                                },
+                                {
+                                    "code": "GIB",
+                                    "name": "Gibraltar"
+                                },
+                                {
+                                    "code": "GRC",
+                                    "name": "Greece"
+                                },
+                                {
+                                    "code": "GRL",
+                                    "name": "Greenland"
+                                },
+                                {
+                                    "code": "GRD",
+                                    "name": "Grenada"
+                                },
+                                {
+                                    "code": "GUM",
+                                    "name": "Guam"
+                                },
+                                {
+                                    "code": "GTM",
+                                    "name": "Guatemala"
+                                },
+                                {
+                                    "code": "GIN",
+                                    "name": "Guinea"
+                                },
+                                {
+                                    "code": "GNB",
+                                    "name": "Guinea-Bissau"
+                                },
+                                {
+                                    "code": "GUY",
+                                    "name": "Guyana"
+                                },
+                                {
+                                    "code": "HTI",
+                                    "name": "Haiti"
+                                },
+                                {
+                                    "code": "HPC",
+                                    "name": "Heavily indebted poor countries (HIPC)"
+                                },
+                                {
+                                    "code": "HIC",
+                                    "name": "High income"
+                                },
+                                {
+                                    "code": "HND",
+                                    "name": "Honduras"
+                                },
+                                {
+                                    "code": "HKG",
+                                    "name": "Hong Kong SAR, China"
+                                },
+                                {
+                                    "code": "HUN",
+                                    "name": "Hungary"
+                                },
+                                {
+                                    "code": "BHI",
+                                    "name": "IBRD countries classified as high income"
+                                },
+                                {
+                                    "code": "IBD",
+                                    "name": "IBRD only"
+                                },
+                                {
+                                    "code": "IBB",
+                                    "name": "IBRD, including blend"
+                                },
+                                {
+                                    "code": "ISL",
+                                    "name": "Iceland"
+                                },
+                                {
+                                    "code": "IBT",
+                                    "name": "IDA & IBRD total"
+                                },
+                                {
+                                    "code": "IDB",
+                                    "name": "IDA blend"
+                                },
+                                {
+                                    "code": "DFS",
+                                    "name": "IDA countries classified as Fragile Situations"
+                                },
+                                {
+                                    "code": "FXS",
+                                    "name": "IDA countries classified as fragile situations, excluding Sub-Saharan Africa"
+                                },
+                                {
+                                    "code": "DSF",
+                                    "name": "IDA countries in Sub-Saharan Africa classified as fragile situations "
+                                },
+                                {
+                                    "code": "DNS",
+                                    "name": "IDA countries in Sub-Saharan Africa not classified as fragile situations "
+                                },
+                                {
+                                    "code": "DNF",
+                                    "name": "IDA countries not classified as Fragile Situations"
+                                },
+                                {
+                                    "code": "NXS",
+                                    "name": "IDA countries not classified as fragile situations, excluding Sub-Saharan Africa"
+                                },
+                                {
+                                    "code": "IDX",
+                                    "name": "IDA only"
+                                },
+                                {
+                                    "code": "IDA",
+                                    "name": "IDA total"
+                                },
+                                {
+                                    "code": "IND",
+                                    "name": "India"
+                                },
+                                {
+                                    "code": "IDN",
+                                    "name": "Indonesia"
+                                },
+                                {
+                                    "code": "IRN",
+                                    "name": "Iran, Islamic Rep."
+                                },
+                                {
+                                    "code": "IRQ",
+                                    "name": "Iraq"
+                                },
+                                {
+                                    "code": "IRL",
+                                    "name": "Ireland"
+                                },
+                                {
+                                    "code": "IMN",
+                                    "name": "Isle of Man"
+                                },
+                                {
+                                    "code": "ISR",
+                                    "name": "Israel"
+                                },
+                                {
+                                    "code": "ITA",
+                                    "name": "Italy"
+                                },
+                                {
+                                    "code": "JAM",
+                                    "name": "Jamaica"
+                                },
+                                {
+                                    "code": "JPN",
+                                    "name": "Japan"
+                                },
+                                {
+                                    "code": "JOR",
+                                    "name": "Jordan"
+                                },
+                                {
+                                    "code": "KAZ",
+                                    "name": "Kazakhstan"
+                                },
+                                {
+                                    "code": "KEN",
+                                    "name": "Kenya"
+                                },
+                                {
+                                    "code": "KIR",
+                                    "name": "Kiribati"
+                                },
+                                {
+                                    "code": "PRK",
+                                    "name": "Korea, Dem. People's Rep."
+                                },
+                                {
+                                    "code": "KOR",
+                                    "name": "Korea, Rep."
+                                },
+                                {
+                                    "code": "XKX",
+                                    "name": "Kosovo"
+                                },
+                                {
+                                    "code": "KWT",
+                                    "name": "Kuwait"
+                                },
+                                {
+                                    "code": "KGZ",
+                                    "name": "Kyrgyz Republic"
+                                },
+                                {
+                                    "code": "LAO",
+                                    "name": "Lao PDR"
+                                },
+                                {
+                                    "code": "LTE",
+                                    "name": "Late-demographic dividend"
+                                },
+                                {
+                                    "code": "LCN",
+                                    "name": "Latin America & Caribbean "
+                                },
+                                {
+                                    "code": "LAC",
+                                    "name": "Latin America & Caribbean (excluding high income)"
+                                },
+                                {
+                                    "code": "BLA",
+                                    "name": "Latin America & the Caribbean (IBRD-only countries)"
+                                },
+                                {
+                                    "code": "TLA",
+                                    "name": "Latin America & the Caribbean (IDA & IBRD countries)"
+                                },
+                                {
+                                    "code": "DLA",
+                                    "name": "Latin America & the Caribbean (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CLA",
+                                    "name": "Latin America and the Caribbean (IFC classification)"
+                                },
+                                {
+                                    "code": "LVA",
+                                    "name": "Latvia"
+                                },
+                                {
+                                    "code": "LDC",
+                                    "name": "Least developed countries: UN classification"
+                                },
+                                {
+                                    "code": "LBN",
+                                    "name": "Lebanon"
+                                },
+                                {
+                                    "code": "LSO",
+                                    "name": "Lesotho"
+                                },
+                                {
+                                    "code": "LBR",
+                                    "name": "Liberia"
+                                },
+                                {
+                                    "code": "LBY",
+                                    "name": "Libya"
+                                },
+                                {
+                                    "code": "LIE",
+                                    "name": "Liechtenstein"
+                                },
+                                {
+                                    "code": "LTU",
+                                    "name": "Lithuania"
+                                },
+                                {
+                                    "code": "LMY",
+                                    "name": "Low & middle income"
+                                },
+                                {
+                                    "code": "LIC",
+                                    "name": "Low income"
+                                },
+                                {
+                                    "code": "LMC",
+                                    "name": "Lower middle income"
+                                },
+                                {
+                                    "code": "LUX",
+                                    "name": "Luxembourg"
+                                },
+                                {
+                                    "code": "MAC",
+                                    "name": "Macao SAR, China"
+                                },
+                                {
+                                    "code": "MDG",
+                                    "name": "Madagascar"
+                                },
+                                {
+                                    "code": "MWI",
+                                    "name": "Malawi"
+                                },
+                                {
+                                    "code": "MYS",
+                                    "name": "Malaysia"
+                                },
+                                {
+                                    "code": "MDV",
+                                    "name": "Maldives"
+                                },
+                                {
+                                    "code": "MLI",
+                                    "name": "Mali"
+                                },
+                                {
+                                    "code": "MLT",
+                                    "name": "Malta"
+                                },
+                                {
+                                    "code": "MHL",
+                                    "name": "Marshall Islands"
+                                },
+                                {
+                                    "code": "MRT",
+                                    "name": "Mauritania"
+                                },
+                                {
+                                    "code": "MUS",
+                                    "name": "Mauritius"
+                                },
+                                {
+                                    "code": "MEX",
+                                    "name": "Mexico"
+                                },
+                                {
+                                    "code": "FSM",
+                                    "name": "Micronesia, Fed. Sts."
+                                },
+                                {
+                                    "code": "MDE",
+                                    "name": "Middle East (developing only)"
+                                },
+                                {
+                                    "code": "MEA",
+                                    "name": "Middle East & North Africa"
+                                },
+                                {
+                                    "code": "MNA",
+                                    "name": "Middle East & North Africa (excluding high income)"
+                                },
+                                {
+                                    "code": "BMN",
+                                    "name": "Middle East & North Africa (IBRD-only countries)"
+                                },
+                                {
+                                    "code": "TMN",
+                                    "name": "Middle East & North Africa (IDA & IBRD countries)"
+                                },
+                                {
+                                    "code": "DMN",
+                                    "name": "Middle East & North Africa (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CME",
+                                    "name": "Middle East and North Africa (IFC classification)"
+                                },
+                                {
+                                    "code": "MIC",
+                                    "name": "Middle income"
+                                },
+                                {
+                                    "code": "MDA",
+                                    "name": "Moldova"
+                                },
+                                {
+                                    "code": "MCO",
+                                    "name": "Monaco"
+                                },
+                                {
+                                    "code": "MNG",
+                                    "name": "Mongolia"
+                                },
+                                {
+                                    "code": "MNE",
+                                    "name": "Montenegro"
+                                },
+                                {
+                                    "code": "MAR",
+                                    "name": "Morocco"
+                                },
+                                {
+                                    "code": "MOZ",
+                                    "name": "Mozambique"
+                                },
+                                {
+                                    "code": "MMR",
+                                    "name": "Myanmar"
+                                },
+                                {
+                                    "code": "NAM",
+                                    "name": "Namibia"
+                                },
+                                {
+                                    "code": "NRU",
+                                    "name": "Nauru"
+                                },
+                                {
+                                    "code": "NPL",
+                                    "name": "Nepal"
+                                },
+                                {
+                                    "code": "NLD",
+                                    "name": "Netherlands"
+                                },
+                                {
+                                    "code": "NCL",
+                                    "name": "New Caledonia"
+                                },
+                                {
+                                    "code": "NZL",
+                                    "name": "New Zealand"
+                                },
+                                {
+                                    "code": "NIC",
+                                    "name": "Nicaragua"
+                                },
+                                {
+                                    "code": "NER",
+                                    "name": "Niger"
+                                },
+                                {
+                                    "code": "NGA",
+                                    "name": "Nigeria"
+                                },
+                                {
+                                    "code": "NRS",
+                                    "name": "Non-resource rich Sub-Saharan Africa countries"
+                                },
+                                {
+                                    "code": "NAF",
+                                    "name": "North Africa"
+                                },
+                                {
+                                    "code": "NAC",
+                                    "name": "North America"
+                                },
+                                {
+                                    "code": "MKD",
+                                    "name": "North Macedonia"
+                                },
+                                {
+                                    "code": "MNP",
+                                    "name": "Northern Mariana Islands"
+                                },
+                                {
+                                    "code": "NOR",
+                                    "name": "Norway"
+                                },
+                                {
+                                    "code": "INX",
+                                    "name": "Not classified"
+                                },
+                                {
+                                    "code": "OED",
+                                    "name": "OECD members"
+                                },
+                                {
+                                    "code": "OMN",
+                                    "name": "Oman"
+                                },
+                                {
+                                    "code": "OSS",
+                                    "name": "Other small states"
+                                },
+                                {
+                                    "code": "PSS",
+                                    "name": "Pacific island small states"
+                                },
+                                {
+                                    "code": "PAK",
+                                    "name": "Pakistan"
+                                },
+                                {
+                                    "code": "PLW",
+                                    "name": "Palau"
+                                },
+                                {
+                                    "code": "PAN",
+                                    "name": "Panama"
+                                },
+                                {
+                                    "code": "PNG",
+                                    "name": "Papua New Guinea"
+                                },
+                                {
+                                    "code": "PRY",
+                                    "name": "Paraguay"
+                                },
+                                {
+                                    "code": "PER",
+                                    "name": "Peru"
+                                },
+                                {
+                                    "code": "PHL",
+                                    "name": "Philippines"
+                                },
+                                {
+                                    "code": "POL",
+                                    "name": "Poland"
+                                },
+                                {
+                                    "code": "PRT",
+                                    "name": "Portugal"
+                                },
+                                {
+                                    "code": "PST",
+                                    "name": "Post-demographic dividend"
+                                },
+                                {
+                                    "code": "PRE",
+                                    "name": "Pre-demographic dividend"
+                                },
+                                {
+                                    "code": "PRI",
+                                    "name": "Puerto Rico"
+                                },
+                                {
+                                    "code": "QAT",
+                                    "name": "Qatar"
+                                },
+                                {
+                                    "code": "RRS",
+                                    "name": "Resource rich Sub-Saharan Africa countries"
+                                },
+                                {
+                                    "code": "ROU",
+                                    "name": "Romania"
+                                },
+                                {
+                                    "code": "RUS",
+                                    "name": "Russian Federation"
+                                },
+                                {
+                                    "code": "RWA",
+                                    "name": "Rwanda"
+                                },
+                                {
+                                    "code": "WSM",
+                                    "name": "Samoa"
+                                },
+                                {
+                                    "code": "SMR",
+                                    "name": "San Marino"
+                                },
+                                {
+                                    "code": "STP",
+                                    "name": "Sao Tome and Principe"
+                                },
+                                {
+                                    "code": "SAU",
+                                    "name": "Saudi Arabia"
+                                },
+                                {
+                                    "code": "SEN",
+                                    "name": "Senegal"
+                                },
+                                {
+                                    "code": "SRB",
+                                    "name": "Serbia"
+                                },
+                                {
+                                    "code": "SYC",
+                                    "name": "Seychelles"
+                                },
+                                {
+                                    "code": "SLE",
+                                    "name": "Sierra Leone"
+                                },
+                                {
+                                    "code": "SGP",
+                                    "name": "Singapore"
+                                },
+                                {
+                                    "code": "SXM",
+                                    "name": "Sint Maarten (Dutch part)"
+                                },
+                                {
+                                    "code": "SVK",
+                                    "name": "Slovak Republic"
+                                },
+                                {
+                                    "code": "SVN",
+                                    "name": "Slovenia"
+                                },
+                                {
+                                    "code": "SST",
+                                    "name": "Small states"
+                                },
+                                {
+                                    "code": "SLB",
+                                    "name": "Solomon Islands"
+                                },
+                                {
+                                    "code": "SOM",
+                                    "name": "Somalia"
+                                },
+                                {
+                                    "code": "ZAF",
+                                    "name": "South Africa"
+                                },
+                                {
+                                    "code": "SAS",
+                                    "name": "South Asia"
+                                },
+                                {
+                                    "code": "TSA",
+                                    "name": "South Asia (IDA & IBRD)"
+                                },
+                                {
+                                    "code": "DSA",
+                                    "name": "South Asia (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CSA",
+                                    "name": "South Asia (IFC classification)"
+                                },
+                                {
+                                    "code": "SSD",
+                                    "name": "South Sudan"
+                                },
+                                {
+                                    "code": "ESP",
+                                    "name": "Spain"
+                                },
+                                {
+                                    "code": "LKA",
+                                    "name": "Sri Lanka"
+                                },
+                                {
+                                    "code": "KNA",
+                                    "name": "St. Kitts and Nevis"
+                                },
+                                {
+                                    "code": "LCA",
+                                    "name": "St. Lucia"
+                                },
+                                {
+                                    "code": "MAF",
+                                    "name": "St. Martin (French part)"
+                                },
+                                {
+                                    "code": "VCT",
+                                    "name": "St. Vincent and the Grenadines"
+                                },
+                                {
+                                    "code": "SSF",
+                                    "name": "Sub-Saharan Africa "
+                                },
+                                {
+                                    "code": "SSA",
+                                    "name": "Sub-Saharan Africa (excluding high income)"
+                                },
+                                {
+                                    "code": "BSS",
+                                    "name": "Sub-Saharan Africa (IBRD-only countries)"
+                                },
+                                {
+                                    "code": "TSS",
+                                    "name": "Sub-Saharan Africa (IDA & IBRD countries)"
+                                },
+                                {
+                                    "code": "DSS",
+                                    "name": "Sub-Saharan Africa (IDA-eligible countries)"
+                                },
+                                {
+                                    "code": "CAA",
+                                    "name": "Sub-Saharan Africa (IFC classification)"
+                                },
+                                {
+                                    "code": "SXZ",
+                                    "name": "Sub-Saharan Africa excluding South Africa"
+                                },
+                                {
+                                    "code": "XZN",
+                                    "name": "Sub-Saharan Africa excluding South Africa and Nigeria"
+                                },
+                                {
+                                    "code": "SDN",
+                                    "name": "Sudan"
+                                },
+                                {
+                                    "code": "SUR",
+                                    "name": "Suriname"
+                                },
+                                {
+                                    "code": "SWE",
+                                    "name": "Sweden"
+                                },
+                                {
+                                    "code": "CHE",
+                                    "name": "Switzerland"
+                                },
+                                {
+                                    "code": "SYR",
+                                    "name": "Syrian Arab Republic"
+                                },
+                                {
+                                    "code": "TWN",
+                                    "name": "Taiwan, China"
+                                },
+                                {
+                                    "code": "TJK",
+                                    "name": "Tajikistan"
+                                },
+                                {
+                                    "code": "TZA",
+                                    "name": "Tanzania"
+                                },
+                                {
+                                    "code": "THA",
+                                    "name": "Thailand"
+                                },
+                                {
+                                    "code": "TLS",
+                                    "name": "Timor-Leste"
+                                },
+                                {
+                                    "code": "TGO",
+                                    "name": "Togo"
+                                },
+                                {
+                                    "code": "TON",
+                                    "name": "Tonga"
+                                },
+                                {
+                                    "code": "TTO",
+                                    "name": "Trinidad and Tobago"
+                                },
+                                {
+                                    "code": "TUN",
+                                    "name": "Tunisia"
+                                },
+                                {
+                                    "code": "TUR",
+                                    "name": "Turkiye"
+                                },
+                                {
+                                    "code": "TKM",
+                                    "name": "Turkmenistan"
+                                },
+                                {
+                                    "code": "TCA",
+                                    "name": "Turks and Caicos Islands"
+                                },
+                                {
+                                    "code": "TUV",
+                                    "name": "Tuvalu"
+                                },
+                                {
+                                    "code": "UGA",
+                                    "name": "Uganda"
+                                },
+                                {
+                                    "code": "UKR",
+                                    "name": "Ukraine"
+                                },
+                                {
+                                    "code": "ARE",
+                                    "name": "United Arab Emirates"
+                                },
+                                {
+                                    "code": "GBR",
+                                    "name": "United Kingdom"
+                                },
+                                {
+                                    "code": "USA",
+                                    "name": "United States"
+                                },
+                                {
+                                    "code": "UMC",
+                                    "name": "Upper middle income"
+                                },
+                                {
+                                    "code": "URY",
+                                    "name": "Uruguay"
+                                },
+                                {
+                                    "code": "UZB",
+                                    "name": "Uzbekistan"
+                                },
+                                {
+                                    "code": "VUT",
+                                    "name": "Vanuatu"
+                                },
+                                {
+                                    "code": "VEN",
+                                    "name": "Venezuela, RB"
+                                },
+                                {
+                                    "code": "VNM",
+                                    "name": "Vietnam"
+                                },
+                                {
+                                    "code": "VIR",
+                                    "name": "Virgin Islands (U.S.)"
+                                },
+                                {
+                                    "code": "PSE",
+                                    "name": "West Bank and Gaza"
+                                },
+                                {
+                                    "code": "WLD",
+                                    "name": "World"
+                                },
+                                {
+                                    "code": "YEM",
+                                    "name": "Yemen, Rep."
+                                },
+                                {
+                                    "code": "ZMB",
+                                    "name": "Zambia"
+                                },
+                                {
+                                    "code": "ZWE",
+                                    "name": "Zimbabwe"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.spatial_coverage",
+                            "title": "Cobertura espacial",
+                            "type": "string",
+                            "help_text": "Indica o(s) local(is) representado(s) ou descrito(s) no vídeo. Este elemento complementa o elemento \"País\". Pode ser utilizado para precisar a cobertura geográfica do vídeo, sob a forma de texto livre.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.bbox",
+                            "title": "Retângulo envolvente",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Oeste",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.west",
+                                    "help_text": "Longitude oeste do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Este",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.east",
+                                    "help_text": "Longitude este do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "Sul",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.south",
+                                    "help_text": "Latitude sul do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Norte",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.north",
+                                    "help_text": "Latitude norte do retângulo envolvente.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este elemento é utilizado para definir um ou vários retângulos envolventes geográficos, que constituem a descrição geométrica fundamental retangular da cobertura geográfica do vídeo. Um retângulo envolvente é definido pelas longitudes oeste e este e pelas latitudes norte e sul, e inclui a maior extensão geográfica da cobertura geográfica do vídeo. O retângulo envolvente fornece as coordenadas geográficas dos cantos superior esquerdo (norte/oeste) e inferior direito (sul/este) de uma área retangular. Este elemento pode ser utilizado nos catálogos como primeira etapa de uma pesquisa baseada em coordenadas. O intervalo válido de latitude em graus é -90 e +90 para os hemisférios sul e norte, respetivamente. A longitude situa-se no intervalo -180 e +180, especificando coordenadas a oeste e a este do Meridiano de Greenwich, respetivamente.\n"
+                        },
+                        {
+                            "key": "video_description.content_reference_time",
+                            "title": "Momento de referência",
+                            "type": "string",
+                            "help_text": "O momento específico descrito pelo vídeo, no caso de obras que destacam um determinado momento de um evento.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.temporal_coverage",
+                            "title": "Cobertura temporal",
+                            "type": "string",
+                            "help_text": "Indica o período a que o vídeo se aplica, ou seja, que descreve, quer como Data/Hora quer como cadeia de texto que indica um período no formato de intervalo de tempo ISO 8601.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387532552",
+                    "title": "Acesso e direitos ",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.video_provider",
+                            "title": "Fornecedor do vídeo",
+                            "type": "string",
+                            "help_text": "A pessoa ou organização que fornece o vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.video_url",
+                            "title": "URL do vídeo",
+                            "type": "string",
+                            "help_text": "URL do vídeo.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.embed_url",
+                            "title": "URL de incorporação",
+                            "type": "string",
+                            "help_text": "Um URL que aponta para um leitor de um vídeo específico. Por exemplo, “https://www.youtube.com/embed/7Aif1xjstws”. Para poder ser incorporado, um vídeo tem de estar alojado numa plataforma de partilha de vídeos como o Youtube (www.youtube.com). Para obter a “ligação de incorporação” no Youtube, clicar no botão “Partilhar” e depois em “Incorporar”. Na caixa de resultado, selecionar o conteúdo do elemento \"src =\".",
+                            "display_type": "text",
+                            "rules": {
+                                "is_uri": true
+                            }
+                        },
+                        {
+                            "key": "video_description.repository",
+                            "title": "Repositório",
+                            "type": "string",
+                            "help_text": "O nome do repositório (organização).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.rights",
+                            "title": "Direitos",
+                            "type": "string",
+                            "help_text": "Uma descrição textual dos direitos associados ao vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_holder",
+                            "title": "Titular dos direitos de autor",
+                            "type": "string",
+                            "help_text": "A parte que detém os direitos de autor legais sobre o vídeo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_notice",
+                            "title": "Aviso de direitos de autor",
+                            "type": "string",
+                            "help_text": "Texto de um aviso adequado para descrever os aspetos de direitos de autor do vídeo, indicando idealmente o titular dos direitos de autor.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_year",
+                            "title": "Ano dos direitos de autor",
+                            "type": "string",
+                            "help_text": "O ano em que os direitos de autor reivindicados sobre o vídeo foram afirmados pela primeira vez.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.citation",
+                            "title": "Citação",
+                            "type": "string",
+                            "help_text": "Este elemento fornece uma citação obrigatória ou recomendada do ficheiro de vídeo.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "video_description_section",
+                    "title": "Informação técnica",
+                    "items": [
+                        {
+                            "key": "video_description.media",
+                            "title": "Suporte",
+                            "type": "simple_array",
+                            "enum": [],
+                            "help_text": "Uma descrição do suporte em que a gravação está armazenada (além do formato de ficheiro em linha); por exemplo, “DVD”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.duration",
+                            "title": "Duração",
+                            "type": "string",
+                            "help_text": "A duração do item (filme, gravação áudio, evento, etc.) no formato ISO 8601. As durações ISO 8601 são expressas de acordo com as instruções de formatação abaixo, em que (n) é substituído pelo valor de cada um dos elementos de data e hora que se seguem a (n). Por exemplo: (3)H significa 3 horas.\nInstruções: introduza a duração como:  P(n)Y(n)M(n)DT(n)H(n)M(n)S em que: \n- P é o designador de período e é sempre colocado no início da duração\n- (n)Y representa o número de anos\n- (n)M representa o número de meses\n- (n)W representa o número de semanas\n- (n)D representa o número de dias\n- T é o designador de tempo e precede sempre as componentes horárias\n- (n)H representa o número de horas\n- (n)M representa o número de minutos\n- (n)S representa o número de segundos\nPor exemplo, P1Y2M20DT3H30M8S representa uma duração de um ano, dois meses, vinte dias, três horas, trinta minutos e oito segundos.\nOs elementos de data e hora, incluindo o respetivo designador, podem ser omitidos se o seu valor for zero, e os elementos de ordem inferior também podem ser omitidos para uma precisão reduzida. Por exemplo, “P23DT23H” e “P4Y” são ambas representações de duração aceitáveis.\nComo M pode representar tanto meses como minutos, é utilizado o designador de tempo T. Por exemplo, “P1M” é uma duração de um mês e “PT1M” é uma duração de um minuto.\nFonte: esta informação sobre a ISO 8601 foi adaptada da Wikipédia, onde se pode encontrar informação mais detalhada.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.encoding_format",
+                            "title": "Formato de codificação",
+                            "type": "string",
+                            "help_text": "O formato do ficheiro de vídeo, normalmente expresso através de um formato MIME.",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "key": "document_tags",
+            "title": "Etiquetas",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Um grupo definido pelo utilizador (opcional) ao qual a etiqueta pertence. O agrupamento de etiquetas permite implementar facetas controladas em catálogos de dados.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

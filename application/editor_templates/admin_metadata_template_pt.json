@@ -1,0 +1,45 @@
+{
+    "type": "template",
+    "title": "Modelo de metadados administrativos",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_container",
+            "is_locked": true,
+            "title": "Metadados administrativos",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_section",
+                    "title": "Metadados",
+                    "items": [
+                        {
+                            "key": "options",
+                            "title": "Opções",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "key",
+                                    "title": "Chave",
+                                    "type": "string",
+                                    "help_text": "Chave do elemento de metadados.",
+                                    "prop_key": "options.key",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "title": "Valor",
+                                    "type": "string",
+                                    "prop_key": "options.value",
+                                    "help_text": "Valor do elemento de metadados.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Opções"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

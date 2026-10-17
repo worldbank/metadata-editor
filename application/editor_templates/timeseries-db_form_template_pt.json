@@ -1,0 +1,1534 @@
+{
+    "type": "template",
+    "title": "Base de dados de séries temporais",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Informação sobre os metadados",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information_section",
+                    "title": "Informação sobre os metadados",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "help_text": "O título do documento de metadados (que pode ser o título da própria base de dados). O \"documento de metadados\" é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID do documento",
+                            "type": "string",
+                            "help_text": "Um identificador único do documento de metadados da base de dados. Este identificador deve ser único no catálogo onde os metadados se destinam a ser publicados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" na secção Descrição da base de dados / Declaração de título, embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" da base de dados World Development Indicators (WDI) - abril de 2022 for \"WDI_2022-04, o \"ID do documento\" nas Informações de metadados poderá ser “WB_WDI_2022-04” se os metadados forem produzidos pelo Banco Mundial. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil. "
+                        },
+                        {
+                            "key": "metadata_information.prod_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "A data em que os metadados desta base de dados foram produzidos (não distribuídos ou arquivados), de preferência introduzida no formato ISO 8601 (AAAA-MM-DD ou AAA-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", uma vez que a informação sobre o produtor e sobre a data de produção dos metadados é útil para efeitos de administração do catálogo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "help_text": "A versão do documento de metadados (não a versão da própria base de dados).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "database_description",
+            "title": "Descrição da base de dados",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "database_description_titlestatement",
+                    "title": "Declaração de título",
+                    "items": [
+                        {
+                            "key": "database_description.title_statement.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "class": "required",
+                            "rules": [],
+                            "is_required": true,
+                            "help_text": "Um identificador único da base de dados. Por exemplo, a base de dados World Development Indicators do Banco Mundial publicada em abril de 2020 poderia ter Identificador principal = “WB_WDI_APR_2020”.\nO \"ID principal\" (também designado IDNO) é um número de identificação único utilizado para identificar a base de dados. É necessário um identificador único para efeitos de catalogação, pelo que este elemento é declarado como \"Obrigatório\". O identificador permitirá aos utilizadores citar corretamente a base de dados. O identificador deve ser único no catálogo. Idealmente, deve também ser único a nível global; a opção recomendada é obter um Digital Object Identifier (DOI) para o estudo. Em alternativa, o \"ID principal\" pode ser construído por uma organização utilizando um esquema coerente. Note-se que o esquema permite fornecer mais do que um identificador para um mesmo estudo (no elemento \"Outros identificadores\"); um identificador específico do catálogo não é, portanto, incompatível com um identificador único global como um DOI. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) diferentes do \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI). O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\", pelo que, se for utilizado um DOI ou outro tipo de ID normalizado como identificador principal, recomenda-se repeti-lo aqui com a identificação do tipo).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "O tipo de identificador. Por exemplo: “DOI” ou \"ISBN\". ",
+                                    "prop_key": "database_description.title_statement.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "database_description.title_statement.identifiers.identifier",
+                                    "help_text": "O próprio identificador. ",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.title_statement.title",
+                            "type": "string",
+                            "title": "Título",
+                            "is_required": true,
+                            "help_text": "O título é o nome pelo qual a base de dados é formalmente conhecida. Certifique-se de que utiliza um título único para cada base de dados distinta (ou versão da mesma). É boa prática incluir o ano de produção no título (e possivelmente o mês ou o trimestre, se for disponibilizada uma nova versão da base de dados mais do que uma vez por ano). Por exemplo, “World Development Indicators, abril de 2020”. Preste atenção à utilização coerente de maiúsculas no título.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.sub_title",
+                            "type": "string",
+                            "title": "Subtítulo",
+                            "help_text": "O subtítulo da base de dados pode ser utilizado quando for necessário distinguir características de uma base de dados. Este elemento raramente será utilizado. Preste atenção à utilização coerente de maiúsculas no subtítulo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.alternate_title",
+                            "type": "string",
+                            "title": "Título alternativo",
+                            "help_text": "Pode ser um acrónimo ou um nome alternativo da base de dados. Por exemplo, “WDI April 2020”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.translated_title",
+                            "type": "string",
+                            "title": "Título traduzido",
+                            "help_text": "O título da base de dados numa língua secundária (se existir mais do que uma outra língua, podem ser introduzidas como uma única cadeia de caracteres, uma vez que este elemento não é repetível). Os caracteres especiais devem ser apresentados corretamente, como acentos e outros sinais diacríticos ou alfabetos diferentes.",
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "database_description_overview",
+                    "title": "Descrição",
+                    "items": [
+                        {
+                            "key": "database_description.authoring_entity",
+                            "title": "Entidade autora",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.name",
+                                    "help_text": "O nome da pessoa ou organização que mantém o conteúdo da base de dados (back-end). Escreva o nome por extenso (utilize o elemento \"Abreviatura\" para registar o acrónimo da organização, se for o caso).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "name": "affiliation",
+                                    "prop_key": "database_description.authoring_entity.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.abbreviation",
+                                    "help_text": "Nome abreviado (sigla) da organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.email",
+                                    "help_text": "O contacto de e-mail público da pessoa ou das organizações mencionadas em nome. É boa prática indicar um endereço de e-mail de serviço e não um pessoal.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.uri",
+                                    "help_text": "Uma ligação (URL) para o sítio web da entidade mencionada em nome.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "is_required": false,
+                            "help_text": "Este conjunto de cinco elementos é utilizado para identificar as organizações ou pessoas que são os principais produtores/curadores da base de dados. Note-se que está disponível um elemento semelhante ao nível do indicador/série."
+                        },
+                        {
+                            "key": "database_description.abstract",
+                            "type": "string",
+                            "title": "Resumo",
+                            "help_text": "O resumo é uma breve descrição da base de dados. Pode, por exemplo, incluir uma curta declaração sobre o âmbito e a cobertura da base de dados (sem detalhe, uma vez que existem outros campos para esse fim), os objetivos, o historial e o público-alvo.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.type",
+                            "type": "string",
+                            "title": "Tipo de base de dados",
+                            "help_text": "O tipo de base de dados.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.date_created",
+                            "type": "string",
+                            "title": "Data de criação",
+                            "help_text": "Esta é a data em que a base de dados foi criada. A data deve ser introduzida no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.date_published",
+                            "type": "string",
+                            "title": "Data de publicação",
+                            "help_text": "Esta é a data em que a base de dados foi tornada pública. A data deve ser introduzida no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.version",
+                            "title": "Versão",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "version",
+                                    "title": "Versão",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.version",
+                                    "help_text": "Um rótulo para a versão. A especificação da versão será determinada por um curador ou gestor de dados de acordo com as convenções definidas pela entidade autora.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Data",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.date",
+                                    "help_text": "A data em que a versão foi disponibilizada. A data deve ser introduzida no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "responsibility",
+                                    "title": "Responsabilidade",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.responsibility",
+                                    "help_text": "A organização ou pessoa responsável por esta versão da base de dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.notes",
+                                    "help_text": "Informações adicionais sobre esta versão da base de dados. As notas podem, por exemplo, ser utilizadas para documentar as diferenças entre esta versão e as anteriores.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Uma base de dados raramente permanece estática; será regularmente atualizada e melhorada. O elemento versão é um elemento composto e contém informações importantes sobre a atualização da base de dados. Isto inclui qualquer extensão da base de dados (adição de dados de novas séries), acréscimo a dados existentes, correção de dados existentes, etc."
+                        },
+                        {
+                            "key": "database_description.update_frequency",
+                            "type": "string",
+                            "title": "Frequência de atualização",
+                            "help_text": "Indica a frequência com que a base de dados é atualizada (por exemplo, “anual” ou “trimestral”). Recomenda-se a utilização de um vocabulário controlado. Se uma base de dados contiver muitos indicadores, a frequência de atualização pode variar consoante o indicador (por exemplo, alguns podem ser atualizados mensal ou trimestralmente, enquanto outros só são atualizados anualmente). A informação fornecida em \"Frequência de atualização\" corresponderá à frequência de atualização dos indicadores atualizados com maior frequência.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.update_schedule",
+                            "title": "Calendário de atualizações",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "update",
+                                    "title": "Atualização",
+                                    "type": "string",
+                                    "prop_key": "database_description.update_schedule.update",
+                                    "help_text": "Uma descrição do calendário de atualizações ou uma data introduzida no formato ISO 8601.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "O calendário de atualizações destina-se a fornecer aos utilizadores informação sobre as atualizações programadas. Trata-se de um campo repetível que permite registar datas específicas, mas essa informação teria então de ser atualizada regularmente. Muitas vezes, é utilizada uma única descrição, o que evita ter de atualizar regularmente os metadados. Por exemplo, “A base de dados é atualizada em janeiro, abril, julho e outubro de cada ano.”"
+                        },
+                        {
+                            "key": "database_description.languages",
+                            "type": "array",
+                            "title": "Línguas",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.languages.name",
+                                    "help_text": "O nome oficial da língua suportada; recomenda-se a utilização de um nome da lista de nomes de línguas ISO 639-1.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "database_description.languages.code",
+                                    "help_text": "O código da língua mencionada em \"Nome\", de preferência o código de três letras ISO 639-1.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este conjunto de elementos destina-se a listar as línguas suportadas na base de dados."
+                        },
+                        {
+                            "key": "database_description.themes",
+                            "type": "array",
+                            "title": "Áreas temáticas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.id",
+                                    "help_text": "O identificador único da temática. Pode ser um número sequencial ou o identificador da temática num vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Temática",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.name",
+                                    "help_text": "O rótulo da área temática associada aos dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.parent_id",
+                                    "help_text": "Quando é utilizado um vocabulário controlado hierárquico (aninhado), o campo \"ID do nível superior\" pode ser utilizado para indicar uma área temática de nível superior à qual esta área temática pertence.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.vocabulary",
+                                    "help_text": "O nome do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.uri",
+                                    "help_text": "Uma ligação para o vocabulário controlado mencionado no campo ‘vocabulário’.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "As temáticas dão uma ideia geral da investigação que poderá orientar a criação e/ou a procura da série. Uma temática é ampla e é provavelmente também objeto de uma definição ou lista estabelecida pela comunidade. Deve ser utilizado um vocabulário controlado. Este elemento raramente será utilizado (o elemento \"Temas\" será utilizado com mais frequência)."
+                        },
+                        {
+                            "key": "database_description.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.id",
+                                    "help_text": "O identificador único do tema. Pode ser um número sequencial ou o identificador do tema num vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Tema",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.name",
+                                    "help_text": "O rótulo do tema associado aos dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "Quando é utilizado um vocabulário controlado hierárquico (aninhado), o campo \"ID do nível superior\" pode ser utilizado para indicar um tema de nível superior ao qual este tema pertence.",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.vocabulary",
+                                    "help_text": "O nome do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.uri",
+                                    "help_text": "Uma ligação para o vocabulário controlado mencionado no campo `vocabulário’.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O campo temas indica o(s) tema(s) substantivo(s) geral(ais) abrangido(s) pelo indicador/série. Uma classificação por temas facilita a referenciação e as pesquisas em catálogos eletrónicos de inquéritos. Os temas devem ser selecionados de um vocabulário controlado normalizado, como a classificação de temas do Council of European Social Science Data Archives (CESSDA)."
+                        },
+                        {
+                            "key": "database_description.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.name",
+                                    "help_text": "Uma palavra-chave (ou expressão).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.vocabulary",
+                                    "help_text": "O nome do vocabulário controlado de onde foi extraída a palavra-chave, se for o caso.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.uri",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "help_text": "O URL do vocabulário controlado utilizado, se for o caso.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Palavras ou expressões que descrevem aspetos salientes do conteúdo de uma recolha de dados. Podem ser utilizadas para construir índices de palavras-chave e para efeitos de classificação e pesquisa. As palavras-chave podem ser selecionadas de um tesauro normalizado, de preferência um tesauro internacional e multilingue. A lista de palavras-chave pode incluir palavras-chave extraídas de um ou mais vocabulários controlados e palavras-chave definidas pelo utilizador.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "database_description.dimensions",
+                            "title": "Dimensões",
+                            "help_text": "As dimensões disponíveis para as séries incluídas na base de dados. Por exemplo, \"país, ano\". ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da dimensão.",
+                                    "prop_key": "database_description.dimensions.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Rótulo",
+                                    "type": "string",
+                                    "prop_key": "database_description.dimensions.label",
+                                    "display_type": "text",
+                                    "help_text": "Um rótulo para a dimensão."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.indicators",
+                            "title": "Indicadores",
+                            "type": "array",
+                            "help_text": "Os indicadores incluídos na base de dados.",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.id",
+                                    "help_text": "O identificador do indicador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.name",
+                                    "help_text": "O nome do indicador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.uri",
+                                    "help_text": "Um URL para uma página que descreve ou apresenta o indicador.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.note",
+                                    "help_text": "Informações adicionais sobre o indicador.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.tabulations",
+                            "title": "Tabulações",
+                            "type": "array",
+                            "help_text": "As tabulações cruzadas disponíveis na base de dados.",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.id",
+                                    "help_text": "O identificador da tabulação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.name",
+                                    "help_text": "O nome da tabulação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.uri",
+                                    "help_text": "Um URL para uma página que descreve ou apresenta a tabulação.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.note",
+                                    "help_text": "Informações adicionais sobre a tabulação.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.sponsors",
+                            "title": "Patrocinadores",
+                            "help_text": "A(s) fonte(s) de financiamento da produção e manutenção da base de dados. Se diferentes entidades financiadoras tiverem patrocinado diferentes fases do desenvolvimento da base de dados, utilize o atributo função para distinguir os respetivos contributos.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome da entidade financiadora/patrocinador.",
+                                    "prop_key": "database_description.sponsors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.abbreviation",
+                                    "help_text": "Abreviatura da entidade financiadora/patrocinadora mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função da entidade financiadora/patrocinadora mencionada em \"Nome\".",
+                                    "prop_key": "database_description.sponsors.role",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "grant",
+                                    "title": "Subvenção",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.grant",
+                                    "help_text": "Número da subvenção ou do financiamento. Se uma entidade tiver concedido mais do que uma subvenção, liste todas as subvenções separadas por “;”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.uri",
+                                    "help_text": "URL da entidade patrocinadora mencionada em \"Nome\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.acknowledgments",
+                            "title": "Agradecimentos",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da pessoa ou entidade reconhecida pelo apoio prestado à base de dados.",
+                                    "prop_key": "database_description.acknowledgments.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "database_description.acknowledgments.affiliation",
+                                    "help_text": "Afiliação da pessoa ou entidade reconhecida ou agradecida pelo apoio prestado à base de dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "Função da pessoa ou entidade reconhecida ou agradecida pelo apoio prestado à base de dados.",
+                                    "prop_key": "database_description.acknowledgments.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.acknowledgments.uri",
+                                    "help_text": "URL do sítio web ou e-mail da pessoa ou organização reconhecida ou agradecida pelo apoio prestado à base de dados.",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": "Uma lista discriminada de pessoas e/ou organizações, além dos patrocinadores e colaboradores já mencionados nos elementos de metadados colaboradores e patrocinadores, cujo contributo para a base de dados deve ser reconhecido. NOTA: Está disponível outro elemento (\"Declaração de agradecimento\") como alternativa a esta lista discriminada de agradecimentos."
+                        },
+                        {
+                            "key": "database_description.acknowledgment_statement",
+                            "type": "string",
+                            "title": "Declaração de agradecimento",
+                            "help_text": "Uma declaração geral de agradecimento, que pode ser utilizada como alternativa (ou complemento) à lista discriminada fornecida em \"Agradecimentos\".",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.contacts",
+                            "title": "Contactos",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.name",
+                                    "help_text": "O nome da pessoa a contactar. Em vez do nome de uma pessoa (que estaria sujeito a alterações e exigiria a atualização frequente dos metadados), pode ser indicado aqui um cargo (p. ex. “serviço de apoio aos dados”).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.role",
+                                    "help_text": "A função específica da pessoa de contacto mencionada em \"Nome\". Será utilizada quando estiverem listados vários contactos e destina-se a ajudar os utilizadores a dirigir as suas perguntas e pedidos à pessoa de contacto certa.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.affiliation",
+                                    "help_text": "A organização ou afiliação da pessoa de contacto mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.email",
+                                    "help_text": "O endereço de e-mail da pessoa ou organização mencionada em \"Nome\". Evitar a utilização de contas de e-mail pessoais; recomenda-se a utilização de um e-mail anónimo (p. ex., “helpdesk@….org”)",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Telefone",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.telephone",
+                                    "help_text": "O número de telefone da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.uri",
+                                    "help_text": "O URL da agência (normalmente, um URL para uma página web de “contacte-nos”)",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O elemento contactos constitui a interface pública para questões relacionadas com o desenvolvimento e a manutenção da base de dados. Podem ser indicados vários contactos, consoante a organização."
+                        },
+                        {
+                            "key": "database_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "date",
+                                    "title": "Data",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.date",
+                                    "help_text": "A data em que a errata foi publicada.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.description",
+                                    "help_text": "Uma descrição do erro e das medidas tomadas para o corrigir.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Uma lista de erratas ao nível da base de dados. Note-se que está também disponível um elemento \"errata\" no esquema utilizado para a descrição de indicadores/séries."
+                        },
+                        {
+                            "key": "database_description.notes",
+                            "title": "Notas",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "database_description.notes.note",
+                                    "help_text": "Uma nota em texto livre.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Este elemento destina-se a acrescentar notas relevantes para a descrição da base de dados que não possam ser fornecidas noutros elementos de metadados."
+                        }
+                    ]
+                },
+                {
+                    "key": "database_description1674836265628",
+                    "title": "Cobertura geográfica",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.ref_country",
+                            "type": "array",
+                            "title": "Países",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.ref_country.name",
+                                    "help_text": "O nome do país.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "database_description.ref_country.code",
+                                    "help_text": "O código do país. Recomenda-se a utilização dos códigos ISO 3166-1 alfa-3.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista dos países para os quais existem dados disponíveis na base de dados. Este elemento é algo redundante em relação ao elemento \"Áreas geográficas\". A lista de países deve ser introduzida em \"Países\". ",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "database_description.geographic_units",
+                            "type": "array",
+                            "title": "Áreas geográficas",
+                            "help_text": "Uma lista de áreas geográficas (regiões, estados, províncias, etc.) para as quais existem dados disponíveis na base de dados. Pode conter áreas subnacionais, regiões supranacionais ou nomes de áreas não administrativas. O elemento tipo é utilizado para indicar o tipo de área geográfica. Os países devem ser indicados no elemento \"Países\".",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "help_text": "O nome da área geográfica, por exemplo, \"Mundo\", \"África Subsariana\", \"Países de baixo rendimento\".",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "help_text": "O código da unidade geográfica. ",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.code",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "help_text": "O tipo de área geográfica, por exemplo, \"estado\", \"região\" ou \"província\".",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.type",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.geographic_coverage_note",
+                            "type": "string",
+                            "title": "Nota sobre a cobertura geográfica",
+                            "help_text": "A nota pode ser utilizada para registar informações adicionais sobre a cobertura geográfica da base de dados.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.bbox",
+                            "title": "Retângulos delimitadores",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Oeste",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.west",
+                                    "help_text": "Longitude oeste do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Este",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.east",
+                                    "help_text": "Longitude este do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "Sul",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.south",
+                                    "help_text": "Latitude sul do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Norte",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.north",
+                                    "help_text": "Latitude norte do retângulo envolvente.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este elemento é utilizado para definir um ou vários retângulos envolventes geográficos, que constituem a descrição geométrica fundamental, de forma retangular, da cobertura geográfica dos dados. Um retângulo envolvente é definido pelas longitudes oeste e este e pelas latitudes norte e sul, e inclui a maior extensão geográfica da cobertura geográfica do conjunto de dados. O retângulo envolvente fornece as coordenadas geográficas dos cantos superior esquerdo (norte/oeste) e inferior direito (sul/este) de uma área retangular. Este elemento pode ser utilizado em catálogos como primeira etapa de uma pesquisa baseada em coordenadas. O intervalo válido de latitude em graus é de -90 a +90 para os hemisférios sul e norte, respetivamente. A longitude situa-se no intervalo de -180 a +180, especificando coordenadas a oeste e a este do Meridiano de Greenwich, respetivamente."
+                        },
+                        {
+                            "key": "database_description.geographic_granularity",
+                            "type": "string",
+                            "title": "Granularidade geográfica",
+                            "help_text": "Enquanto o elemento \"Áreas geográficas\" lista os vários níveis geográficos para os quais existem dados na base de dados, o elemento \"Granularidade geográfica\" fornecerá informação sobre os níveis geográficos para os quais existe informação disponível na base de dados. Por exemplo: “A base de dados contém dados aos níveis nacional, provincial (admin 1) e distrital (admin 2).”",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.geographic_area_count",
+                            "type": "string",
+                            "title": "Número de áreas geográficas",
+                            "help_text": "O número de áreas geográficas para as quais são fornecidos dados na base de dados. Os World Development Indicators do Banco Mundial, por exemplo, fornecem dados para 262 áreas diferentes (que incluem países e territórios, regiões geográficas e outros agrupamentos de países).",
+                            "rules": [],
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "database_description1674836355879",
+                    "title": "Cobertura temporal e periodicidade",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.time_coverage",
+                            "title": "Cobertura temporal",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "start",
+                                    "title": "Início",
+                                    "type": "string",
+                                    "prop_key": "database_description.time_coverage.start",
+                                    "help_text": "Indica a data de início do período abrangido pelos dados (em todas as séries) na base de dados. A data deve ser indicada no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "end",
+                                    "title": "Fim",
+                                    "type": "string",
+                                    "prop_key": "database_description.time_coverage.end",
+                                    "help_text": "Indica a data de fim do período abrangido pelos dados (em todas as séries) na base de dados. A data deve ser indicada no formato ISO 8601 (AAAA-MM-DD, AAAA-MM ou AAAA).",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A cobertura temporal é o intervalo de tempo de todos os dados contidos na base de dados, em todas as séries."
+                        },
+                        {
+                            "key": "database_description.time_coverage_note",
+                            "type": "string",
+                            "title": "Nota sobre a cobertura temporal",
+                            "help_text": "O elemento é utilizado para anotar e/ou descrever informação auxiliar relacionada com a cobertura temporal descrita em \"Cobertura temporal\".",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.periodicity",
+                            "title": "Periodicidade",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "period",
+                                    "title": "Período",
+                                    "type": "string",
+                                    "prop_key": "database_description.periodicity.period",
+                                    "help_text": "A periodicidade das séries temporais incluídas na base de dados, por exemplo, “anual”, “trimestral” ou “mensal”.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A periodicidade dos dados descreve a periodicidade dos indicadores contidos na base de dados. Uma base de dados pode conter séries que abrangem diferentes períodos, caso em que a informação será repetida para cada tipo de periodicidade. Deve ser utilizado um vocabulário controlado."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "database_description1674836432597",
+                    "title": "Acesso, licença e direitos",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.access_options",
+                            "type": "array",
+                            "title": "Modos de acesso",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.type",
+                                    "help_text": "O tipo de acesso, por exemplo, “Interface de programação de aplicações (API)”, “Descarregamento em massa em formato CSV”, “Interface de consulta em linha”, etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.uri",
+                                    "help_text": "O URL correspondente ao modo de acesso mencionado em tipo.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.note",
+                                    "help_text": "Este elemento permite anotar qualquer informação específica associada ao modo de acesso mencionado em tipo.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Este conjunto repetível de elementos descreve os diferentes modos e formatos em que a base de dados é disponibilizada. Quando for disponibilizado mais do que um modo de acesso, descreva-os separadamente."
+                        },
+                        {
+                            "key": "database_description.url",
+                            "type": "string",
+                            "title": "URL da base de dados",
+                            "help_text": "A ligação para a interface pública da base de dados (página inicial).",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.links",
+                            "title": "Outras ligações",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.uri",
+                                    "help_text": "O URL da ligação associada.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.description",
+                                    "help_text": "Uma breve descrição da ligação, em relação à base de dados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Este campo permite associar ligações auxiliares referentes à base de dados."
+                        },
+                        {
+                            "key": "database_description.copyright",
+                            "type": "string",
+                            "title": "Direitos de autor",
+                            "help_text": "Os direitos de autor associados à base de dados, se existirem.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.license",
+                            "title": "Licença",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.name",
+                                    "help_text": "O nome da licença, por exemplo “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.uri",
+                                    "help_text": "Um URL para uma descrição da licença, por exemplo, “https://creativecommons.org/licenses/by/4.0/”.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.note",
+                                    "help_text": "Qualquer informação adicional para precisar os requisitos da licença.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Este conjunto de elementos é utilizado para descrever a(s) licença(s) de acesso associada(s) à base de dados."
+                        },
+                        {
+                            "key": "database_description.confidentiality",
+                            "type": "string",
+                            "title": "Declaração de confidencialidade",
+                            "help_text": "Uma declaração de confidencialidade relativa à base de dados.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.confidentiality_status",
+                            "type": "string",
+                            "title": "Estatuto de confidencialidade",
+                            "help_text": "Indica um estatuto de confidencialidade para a série. Deve ser utilizado um vocabulário controlado com as opções possíveis “público”, “apenas para uso oficial”, “confidencial”, “estritamente confidencial”, \"desconhecido\". Quando todas as séries são disponibilizadas publicamente e pertencem a uma base de dados com uma política de acesso aberto ou público, este elemento pode ser ignorado.",
+                            "enum": [
+                                {
+                                    "code": "pub",
+                                    "label": "Público"
+                                },
+                                {
+                                    "code": "off",
+                                    "label": "Apenas para uso oficial"
+                                },
+                                {
+                                    "label": "Restrito",
+                                    "code": "res"
+                                },
+                                {
+                                    "code": "con",
+                                    "label": "Confidencial"
+                                },
+                                {
+                                    "code": "sco",
+                                    "label": "Estritamente confidencial"
+                                },
+                                {
+                                    "code": "unk",
+                                    "label": "Desconhecido"
+                                }
+                            ],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.confidentiality_note",
+                            "type": "string",
+                            "title": "Nota de confidencialidade",
+                            "enum": [],
+                            "help_text": "Este elemento está reservado a notas adicionais relativas à confidencialidade dos dados. Estas podem incluir referências a leis e circunstâncias específicas relativas à utilização dos dados.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.disclaimer",
+                            "type": "string",
+                            "title": "Exoneração de responsabilidade",
+                            "help_text": "Se a entidade responsável pela gestão da base de dados tiver determinado que poderá existir alguma responsabilidade decorrente dos dados, o elemento pode ser utilizado para fornecer uma declaração de exoneração de responsabilidade.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.citation",
+                            "type": "string",
+                            "title": "Requisito de citação",
+                            "help_text": "O requisito de citação da base de dados (ou seja, a forma como os utilizadores devem citar a base de dados em publicações e relatórios).",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Etiquetas",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Um grupo definido pelo utilizador (opcional) ao qual a etiqueta pertence. O agrupamento de etiquetas permite implementar facetas controladas em catálogos de dados.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

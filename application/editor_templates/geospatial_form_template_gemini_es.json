@@ -1,15 +1,4 @@
 {
-"uid": "geospatial-gemini-es",
-"data_type": "geospatial",
-"lang": "es",
-"template_type": "custom",
-"name": "Inspire\/Gemini con elementos adicionales ES",
-"version": "1.0",
-"organization": "World Bank",
-"author": "MA OD",
-"description": "Plantilla geoespacial basada en Inspire y Gemini 2.3 \n\n- https:\/\/agiorguk.github.io\/gemini\/1062-gemini-datasets-and-data-series.html",    
-"template":
-{
     "type": "template",
     "title": "Proyecto geoespacial",
     "items": [
@@ -71,66 +60,66 @@
                                 {
                                     "key": "role",
                                     "type": "string",
-                                    "title": "Role",
+                                    "title": "Función",
                                     "prop_key": "metadata_information.producers.role",
                                     "help_text": "El rol específico de la persona u organización mencionada en \"Nombre\" en la producción de los metadatos DDI.",
                                     "display_type": "dropdown-custom",
                                     "enum": [
                                         {
                                             "code": "resourceProvider",
-                                            "label": "Resource provider"
+                                            "label": "Proveedor del recurso"
                                         },
                                         {
                                             "code": "custodian",
-                                            "label": "Custodian"
+                                            "label": "Custodio"
                                         },
                                         {
                                             "code": "owner",
-                                            "label": "Owner"
+                                            "label": "Propietario"
                                         },
                                         {
                                             "code": "sponsor",
-                                            "label": "Sponsor"
+                                            "label": "Patrocinador"
                                         },
                                         {
                                             "code": "user",
-                                            "label": "User"
+                                            "label": "Usuario"
                                         },
                                         {
                                             "code": "distributor",
-                                            "label": "Distributor"
+                                            "label": "Distribuidor"
                                         },
                                         {
                                             "code": "originator",
-                                            "label": "Originator"
+                                            "label": "Creador"
                                         },
                                         {
                                             "code": "pointOfContact",
-                                            "label": "Point of contact"
+                                            "label": "Punto de contacto"
                                         },
                                         {
                                             "code": "principalInvestigator",
-                                            "label": "Principal investigator"
+                                            "label": "Investigador principal"
                                         },
                                         {
                                             "code": "processor",
-                                            "label": "Processor"
+                                            "label": "Procesador"
                                         },
                                         {
                                             "code": "publisher",
-                                            "label": "Publisher"
+                                            "label": "Publicador"
                                         },
                                         {
                                             "code": "author",
-                                            "label": "Author"
+                                            "label": "Autor"
                                         },
                                         {
                                             "code": "coAuthor",
-                                            "label": "Co-author"
+                                            "label": "Coautor"
                                         },
                                         {
                                             "code": "collaborator",
-                                            "label": "Collaborator"
+                                            "label": "Colaborador"
                                         },
                                         {
                                             "code": "editor",
@@ -138,23 +127,23 @@
                                         },
                                         {
                                             "code": "mediator",
-                                            "label": "Mediator"
+                                            "label": "Mediador"
                                         },
                                         {
                                             "code": "rightsHolder",
-                                            "label": "Rights holder"
+                                            "label": "Titular de los derechos"
                                         },
                                         {
                                             "code": "contributor",
-                                            "label": "Contributor"
+                                            "label": "Contribuidor"
                                         },
                                         {
                                             "code": "funder",
-                                            "label": "Funder"
+                                            "label": "Financiador"
                                         },
                                         {
                                             "code": "stakeholder",
-                                            "label": "Stakeholder"
+                                            "label": "Parte interesada"
                                         }
                                     ],
                                     "enum_store_column": "code"
@@ -201,55 +190,55 @@
                             "enum": [
                                 {
                                     "code": "dataset",
-                                    "label": "Dataset"
+                                    "label": "Conjunto de datos"
                                 },
                                 {
                                     "code": "series",
-                                    "label": "Series"
+                                    "label": "Serie"
                                 },
                                 {
                                     "code": "service",
-                                    "label": "Service"
+                                    "label": "Servicio"
                                 },
                                 {
                                     "code": "attribute",
-                                    "label": "Attribute"
+                                    "label": "Atributo"
                                 },
                                 {
                                     "code": "attributeType",
-                                    "label": "Attribute type"
+                                    "label": "Tipo de atributo"
                                 },
                                 {
                                     "code": "collectionHardware",
-                                    "label": "Collection hardware"
+                                    "label": "Equipo de recolección"
                                 },
                                 {
                                     "code": "collectionSession",
-                                    "label": "Collection session"
+                                    "label": "Sesión de recolección"
                                 },
                                 {
                                     "code": "nonGeographicDataset",
-                                    "label": "Non geographic dataset"
+                                    "label": "Conjunto de datos no geográficos"
                                 },
                                 {
                                     "code": "dimensionGroup",
-                                    "label": "Dimension group"
+                                    "label": "Grupo de dimensiones"
                                 },
                                 {
                                     "code": "feature",
-                                    "label": "Feature"
+                                    "label": "Fenómeno"
                                 },
                                 {
                                     "code": "featureType",
-                                    "label": "Feature type"
+                                    "label": "Tipo de fenómeno"
                                 },
                                 {
                                     "code": "propertyType",
-                                    "label": "Property type"
+                                    "label": "Tipo de propiedad"
                                 },
                                 {
                                     "code": "fieldSession",
-                                    "label": "Field session"
+                                    "label": "Sesión de campo"
                                 },
                                 {
                                     "code": "software",
@@ -257,19 +246,19 @@
                                 },
                                 {
                                     "code": "model",
-                                    "label": "Model"
+                                    "label": "Modelo"
                                 },
                                 {
                                     "code": "tile",
-                                    "label": "Tile"
+                                    "label": "Tesela"
                                 },
                                 {
                                     "code": "initiative",
-                                    "label": "Initiative"
+                                    "label": "Iniciativa"
                                 },
                                 {
                                     "code": "stereomate",
-                                    "label": "Stereomate"
+                                    "label": "Par estereoscópico"
                                 },
                                 {
                                     "code": "sensor",
@@ -277,23 +266,23 @@
                                 },
                                 {
                                     "code": "platformSeries",
-                                    "label": "Platform series"
+                                    "label": "Serie de plataformas"
                                 },
                                 {
                                     "code": "sensorSeries",
-                                    "label": "Sensor series"
+                                    "label": "Serie de sensores"
                                 },
                                 {
                                     "code": "productionSeries",
-                                    "label": "Production series"
+                                    "label": "Serie de producción"
                                 },
                                 {
                                     "code": "transferAggregate",
-                                    "label": "Transfer aggregate"
+                                    "label": "Agregado de transferencia"
                                 },
                                 {
                                     "code": "otherAggregate",
-                                    "label": "Other aggregate"
+                                    "label": "Otro agregado"
                                 }
                             ],
                             "is_recommended": false,
@@ -479,39 +468,39 @@
                             "enum": [
                                 {
                                     "code": "continual",
-                                    "label": "Continual"
+                                    "label": "Continua"
                                 },
                                 {
                                     "code": "daily",
-                                    "label": "Daily"
+                                    "label": "Diaria"
                                 },
                                 {
                                     "code": "weekly",
-                                    "label": "Weekly"
+                                    "label": "Semanal"
                                 },
                                 {
                                     "code": "fortnightly",
-                                    "label": "Fortnightly"
+                                    "label": "Quincenal"
                                 },
                                 {
                                     "code": "monthly",
-                                    "label": "Monthly"
+                                    "label": "Mensual"
                                 },
                                 {
                                     "code": "quarterly",
-                                    "label": "Quarterly"
+                                    "label": "Trimestral"
                                 },
                                 {
                                     "code": "biannually",
-                                    "label": "Biannually"
+                                    "label": "Semestral"
                                 },
                                 {
                                     "code": "annually",
-                                    "label": "Annually"
+                                    "label": "Anual"
                                 },
                                 {
                                     "code": "asNeeded",
-                                    "label": "As needed"
+                                    "label": "Cuando sea necesario"
                                 },
                                 {
                                     "code": "irregular",
@@ -519,11 +508,11 @@
                                 },
                                 {
                                     "code": "notPlanned",
-                                    "label": "Not planned"
+                                    "label": "No planificada"
                                 },
                                 {
                                     "code": "unknown",
-                                    "label": "Unknown"
+                                    "label": "Desconocida"
                                 }
                             ],
                             "help_text": "Los elementos de mantenimiento de metadatos y frecuencia de actualización proporcionan información sobre el mantenimiento de los metadatos, incluida la frecuencia de las actualizaciones. Este es un elemento de texto libre. La información debe elegirse entre los valores recomendados por el vocabulario controlado ISO 19139 con las siguientes opciones: continuo, diario, semanal, quincenal, mensual, trimestral, semestral, anual, según sea necesario, irregular, no planificado, desconocido.",
@@ -733,67 +722,67 @@
                                             "enum": [
                                                 {
                                                     "code": "creation",
-                                                    "label": "Creation"
+                                                    "label": "Creación"
                                                 },
                                                 {
                                                     "code": "publication",
-                                                    "label": "Publication"
+                                                    "label": "Publicación"
                                                 },
                                                 {
                                                     "code": "revision",
-                                                    "label": "Revision"
+                                                    "label": "Revisión"
                                                 },
                                                 {
                                                     "code": "expiry",
-                                                    "label": "Expiry"
+                                                    "label": "Expiración"
                                                 },
                                                 {
                                                     "code": "lastUpdate",
-                                                    "label": "Last update"
+                                                    "label": "Última actualización"
                                                 },
                                                 {
                                                     "code": "lastRevision",
-                                                    "label": "Last revision"
+                                                    "label": "Última revisión"
                                                 },
                                                 {
                                                     "code": "nextUpdate",
-                                                    "label": "Next update"
+                                                    "label": "Próxima actualización"
                                                 },
                                                 {
                                                     "code": "unavailable",
-                                                    "label": "Unavailable"
+                                                    "label": "No disponible"
                                                 },
                                                 {
                                                     "code": "inForce",
-                                                    "label": "In force"
+                                                    "label": "En vigor"
                                                 },
                                                 {
                                                     "code": "adopted",
-                                                    "label": "Adopted"
+                                                    "label": "Adoptado"
                                                 },
                                                 {
                                                     "code": "deprecated",
-                                                    "label": "Deprecated"
+                                                    "label": "En desuso"
                                                 },
                                                 {
                                                     "code": "superseded",
-                                                    "label": "Superseded"
+                                                    "label": "Reemplazado"
                                                 },
                                                 {
                                                     "code": "validityBegins",
-                                                    "label": "Validity begins"
+                                                    "label": "Inicio de validez"
                                                 },
                                                 {
                                                     "code": "validityExpires",
-                                                    "label": "Validity expires"
+                                                    "label": "Fin de validez"
                                                 },
                                                 {
                                                     "code": "released",
-                                                    "label": "Released"
+                                                    "label": "Publicado"
                                                 },
                                                 {
                                                     "code": "distribution",
-                                                    "label": "Distribution"
+                                                    "label": "Distribución"
                                                 }
                                             ],
                                             "display_type": "dropdown",
@@ -828,7 +817,7 @@
                                     "enum": [
                                         {
                                             "code": "farming",
-                                            "label": "Farming"
+                                            "label": "Agricultura"
                                         },
                                         {
                                             "code": "biota",
@@ -836,79 +825,79 @@
                                         },
                                         {
                                             "code": "boundaries",
-                                            "label": "Boundaries"
+                                            "label": "Límites"
                                         },
                                         {
                                             "code": "climatologyMeteorologyAtmosphere",
-                                            "label": "Climatology / meteorology / atmosphere"
+                                            "label": "Climatología / meteorología / atmósfera"
                                         },
                                         {
                                             "code": "economy",
-                                            "label": "Economy"
+                                            "label": "Economía"
                                         },
                                         {
                                             "code": "elevation",
-                                            "label": "Elevation"
+                                            "label": "Elevación"
                                         },
                                         {
                                             "code": "environment",
-                                            "label": "Environment"
+                                            "label": "Medio ambiente"
                                         },
                                         {
                                             "code": "geoscientificInformation",
-                                            "label": "Geoscientific information"
+                                            "label": "Información geocientífica"
                                         },
                                         {
                                             "code": "health",
-                                            "label": "Health"
+                                            "label": "Salud"
                                         },
                                         {
                                             "code": "imageryBaseMapsEarthCover",
-                                            "label": "Imagery base maps earth cover"
+                                            "label": "Imágenes / mapas base / cobertura terrestre"
                                         },
                                         {
                                             "code": "intelligenceMilitary",
-                                            "label": "Intelligence military"
+                                            "label": "Inteligencia / militar"
                                         },
                                         {
                                             "code": "inlandWaters",
-                                            "label": "Inland waters"
+                                            "label": "Aguas continentales"
                                         },
                                         {
                                             "code": "location",
-                                            "label": "Location"
+                                            "label": "Localización"
                                         },
                                         {
                                             "code": "oceans",
-                                            "label": "Oceans"
+                                            "label": "Océanos"
                                         },
                                         {
                                             "code": "planningCadastre",
-                                            "label": "Planning / cadastre"
+                                            "label": "Planificación / catastro"
                                         },
                                         {
                                             "code": "society",
-                                            "label": "Society"
+                                            "label": "Sociedad"
                                         },
                                         {
                                             "code": "structure",
-                                            "label": "Structure"
+                                            "label": "Estructuras"
                                         },
                                         {
                                             "code": "transportation",
-                                            "label": "Transportation"
+                                            "label": "Transporte"
                                         },
                                         {
                                             "code": "utilitiesCommunication",
-                                            "label": "Utilities communication"
+                                            "label": "Servicios públicos / comunicación"
                                         },
                                         {
                                             "code": "extraTerrestrial",
-                                            "label": "Extra terrestrial"
+                                            "label": "Extraterrestre"
                                         },
                                         {
                                             "code": "disaster",
-                                            "label": "Disaster"
+                                            "label": "Desastres"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.topicCategory",
@@ -929,23 +918,23 @@
                                             "enum": [
                                                 {
                                                     "code": "dataCenter",
-                                                    "label": "Data center"
+                                                    "label": "Centro de datos"
                                                 },
                                                 {
                                                     "code": "discipline",
-                                                    "label": "Discipline"
+                                                    "label": "Disciplina"
                                                 },
                                                 {
                                                     "code": "place",
-                                                    "label": "Place"
+                                                    "label": "Lugar"
                                                 },
                                                 {
                                                     "code": "dataResolution",
-                                                    "label": "Data resolution"
+                                                    "label": "Resolución de los datos"
                                                 },
                                                 {
                                                     "code": "stratum",
-                                                    "label": "Stratum"
+                                                    "label": "Estrato"
                                                 },
                                                 {
                                                     "code": "temporal",
@@ -953,39 +942,39 @@
                                                 },
                                                 {
                                                     "code": "theme",
-                                                    "label": "Theme"
+                                                    "label": "Tema"
                                                 },
                                                 {
                                                     "code": "featureType",
-                                                    "label": "Feature type"
+                                                    "label": "Tipo de fenómeno"
                                                 },
                                                 {
                                                     "code": "instrument",
-                                                    "label": "Instrument"
+                                                    "label": "Instrumento"
                                                 },
                                                 {
                                                     "code": "platform",
-                                                    "label": "Platform"
+                                                    "label": "Plataforma"
                                                 },
                                                 {
                                                     "code": "process",
-                                                    "label": "Process"
+                                                    "label": "Proceso"
                                                 },
                                                 {
                                                     "code": "project",
-                                                    "label": "Project"
+                                                    "label": "Proyecto"
                                                 },
                                                 {
                                                     "code": "service",
-                                                    "label": "Service"
+                                                    "label": "Servicio"
                                                 },
                                                 {
                                                     "code": "product",
-                                                    "label": "Product"
+                                                    "label": "Producto"
                                                 },
                                                 {
                                                     "code": "subTopicCategory",
-                                                    "label": "Subtopic category"
+                                                    "label": "Subcategoría temática"
                                                 }
                                             ],
                                             "prop_key": "description.identificationInfo.descriptiveKeywords.type",
@@ -1055,51 +1044,51 @@
                                     "enum": [
                                         {
                                             "code": "documentDigital",
-                                            "label": "Document digital"
+                                            "label": "Documento digital"
                                         },
                                         {
                                             "code": "imageDigital",
-                                            "label": "Image digital"
+                                            "label": "Imagen digital"
                                         },
                                         {
                                             "code": "documentHardcopy",
-                                            "label": "Document hard copy"
+                                            "label": "Documento impreso"
                                         },
                                         {
                                             "code": "imageHardcopy",
-                                            "label": "Image hard copy"
+                                            "label": "Imagen impresa"
                                         },
                                         {
                                             "code": "mapDigital",
-                                            "label": "Map digital"
+                                            "label": "Mapa digital"
                                         },
                                         {
                                             "code": "mapHardcopy",
-                                            "label": "Map hard copy"
+                                            "label": "Mapa impreso"
                                         },
                                         {
                                             "code": "modelDigital",
-                                            "label": "Model digital"
+                                            "label": "Modelo digital"
                                         },
                                         {
                                             "code": "modelHardcopy",
-                                            "label": "Model hard copy"
+                                            "label": "Modelo físico"
                                         },
                                         {
                                             "code": "profileDigital",
-                                            "label": "Profile digital"
+                                            "label": "Perfil digital"
                                         },
                                         {
                                             "code": "profileHardcopy",
-                                            "label": "Profile hard copy"
+                                            "label": "Perfil impreso"
                                         },
                                         {
                                             "code": "tableDigital",
-                                            "label": "Table digital"
+                                            "label": "Tabla digital"
                                         },
                                         {
                                             "code": "tableHardcopy",
-                                            "label": "Table hard copy"
+                                            "label": "Tabla impresa"
                                         },
                                         {
                                             "code": "videoDigital",
@@ -1107,7 +1096,7 @@
                                         },
                                         {
                                             "code": "videoHardcopy",
-                                            "label": "Video hard copy"
+                                            "label": "Video en soporte físico"
                                         },
                                         {
                                             "code": "audioDigital",
@@ -1115,7 +1104,7 @@
                                         },
                                         {
                                             "code": "audioHardcopy",
-                                            "label": "Audio hard copy"
+                                            "label": "Audio en soporte físico"
                                         },
                                         {
                                             "code": "multimediaDigital",
@@ -1123,19 +1112,19 @@
                                         },
                                         {
                                             "code": "multimediaHardcopy",
-                                            "label": "Multimedia hard copy"
+                                            "label": "Multimedia en soporte físico"
                                         },
                                         {
                                             "code": "physicalSample",
-                                            "label": "Physical sample"
+                                            "label": "Muestra física"
                                         },
                                         {
                                             "code": "diagramDigital",
-                                            "label": "Diagram digital"
+                                            "label": "Diagrama digital"
                                         },
                                         {
                                             "code": "diagramHardcopy",
-                                            "label": "Diagram hard copy"
+                                            "label": "Diagrama impreso"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.citation.presentationForm",
@@ -1303,27 +1292,27 @@
                                     "enum": [
                                         {
                                             "code": "discovery",
-                                            "label": "Discovery"
+                                            "label": "Localización"
                                         },
                                         {
                                             "code": "view",
-                                            "label": "View"
+                                            "label": "Visualización"
                                         },
                                         {
                                             "code": "download",
-                                            "label": "Download"
+                                            "label": "Descarga"
                                         },
                                         {
                                             "code": "transformation",
-                                            "label": "Transformation"
+                                            "label": "Transformación"
                                         },
                                         {
                                             "code": "invoke ",
-                                            "label": "Invoke"
+                                            "label": "Invocación"
                                         },
                                         {
                                             "code": "other",
-                                            "label": "Other"
+                                            "label": "Otro"
                                         }
                                     ],
                                     "enum_store_column": "code"
@@ -1403,62 +1392,62 @@
                                                     "enum": [
                                                         {
                                                             "code": "copyright",
-                                                            "label": "Copyright"
+                                                            "label": "Derechos de autor"
                                                         },
                                                         {
-                                                            "label": "Patent",
+                                                            "label": "Patente",
                                                             "code": "patent"
                                                         },
                                                         {
                                                             "code": "patentPending",
-                                                            "label": "Patent pending"
+                                                            "label": "Patente en trámite"
                                                         },
                                                         {
-                                                            "label": "Trademark",
+                                                            "label": "Marca registrada",
                                                             "code": "trademark"
                                                         },
                                                         {
                                                             "code": "license",
-                                                            "label": "License"
+                                                            "label": "Licencia"
                                                         },
                                                         {
-                                                            "label": "Intellectual property rights",
+                                                            "label": "Derechos de propiedad intelectual",
                                                             "code": "intellectualPropertyRights"
                                                         },
                                                         {
-                                                            "label": "Restricted",
+                                                            "label": "Restringido",
                                                             "code": "restricted"
                                                         },
                                                         {
                                                             "code": "otherRestrictions",
-                                                            "label": "Other restrictions"
+                                                            "label": "Otras restricciones"
                                                         },
                                                         {
-                                                            "label": "Unrestricted",
+                                                            "label": "Sin restricciones",
                                                             "code": "unrestricted"
                                                         },
                                                         {
-                                                            "label": "License unrestricted",
+                                                            "label": "Licencia sin restricciones",
                                                             "code": "licenceUnrestricted"
                                                         },
                                                         {
                                                             "code": "licenceEndUser",
-                                                            "label": "License end user"
+                                                            "label": "Licencia de usuario final"
                                                         },
                                                         {
-                                                            "label": "License distributor",
+                                                            "label": "Licencia de distribuidor",
                                                             "code": "licenceDistributor"
                                                         },
                                                         {
-                                                            "label": "Private",
+                                                            "label": "Privado",
                                                             "code": "private"
                                                         },
                                                         {
                                                             "code": "statutory",
-                                                            "label": "Statutory"
+                                                            "label": "Reglamentario"
                                                         },
                                                         {
-                                                            "label": "Confidential",
+                                                            "label": "Confidencial",
                                                             "code": "confidential"
                                                         },
                                                         {
@@ -1466,7 +1455,7 @@
                                                             "label": "SBU"
                                                         },
                                                         {
-                                                            "label": "In-confidence",
+                                                            "label": "En confidencialidad",
                                                             "code": "in-confidence"
                                                         }
                                                     ],
@@ -1559,23 +1548,23 @@
                                             "enum": [
                                                 {
                                                     "code": "dataCenter",
-                                                    "label": "Data center"
+                                                    "label": "Centro de datos"
                                                 },
                                                 {
                                                     "code": "discipline",
-                                                    "label": "Discipline"
+                                                    "label": "Disciplina"
                                                 },
                                                 {
                                                     "code": "place",
-                                                    "label": "Place"
+                                                    "label": "Lugar"
                                                 },
                                                 {
                                                     "code": "dataResolution",
-                                                    "label": "Data resolution"
+                                                    "label": "Resolución de los datos"
                                                 },
                                                 {
                                                     "code": "stratum",
-                                                    "label": "Stratum"
+                                                    "label": "Estrato"
                                                 },
                                                 {
                                                     "code": "temporal",
@@ -1583,39 +1572,39 @@
                                                 },
                                                 {
                                                     "code": "theme",
-                                                    "label": "Theme"
+                                                    "label": "Tema"
                                                 },
                                                 {
                                                     "code": "featureType",
-                                                    "label": "Feature type"
+                                                    "label": "Tipo de fenómeno"
                                                 },
                                                 {
                                                     "code": "instrument",
-                                                    "label": "Instrument"
+                                                    "label": "Instrumento"
                                                 },
                                                 {
                                                     "code": "platform",
-                                                    "label": "Platform"
+                                                    "label": "Plataforma"
                                                 },
                                                 {
                                                     "code": "process",
-                                                    "label": "Process"
+                                                    "label": "Proceso"
                                                 },
                                                 {
                                                     "code": "project",
-                                                    "label": "Project"
+                                                    "label": "Proyecto"
                                                 },
                                                 {
                                                     "code": "service",
-                                                    "label": "Service"
+                                                    "label": "Servicio"
                                                 },
                                                 {
                                                     "code": "product",
-                                                    "label": "Product"
+                                                    "label": "Producto"
                                                 },
                                                 {
                                                     "code": "subTopicCategory",
-                                                    "label": "Sub topic category"
+                                                    "label": "Subcategoría temática"
                                                 }
                                             ],
                                             "prop_key": "description.identificationInfo.serviceIdentification.keywords.type",
@@ -1872,31 +1861,31 @@
                                     "enum": [
                                         {
                                             "code": "completed",
-                                            "label": "Completed"
+                                            "label": "Completado"
                                         },
                                         {
                                             "code": "historicalArchive",
-                                            "label": "Historical archive"
+                                            "label": "Archivo histórico"
                                         },
                                         {
                                             "code": "obsolete",
-                                            "label": "Obsolete"
+                                            "label": "Obsoleto"
                                         },
                                         {
                                             "code": "onGoing",
-                                            "label": "On going"
+                                            "label": "En curso"
                                         },
                                         {
                                             "code": "planned",
-                                            "label": "Planned"
+                                            "label": "Planificado"
                                         },
                                         {
                                             "code": "required",
-                                            "label": "Required"
+                                            "label": "Requerido"
                                         },
                                         {
                                             "code": "underDevelopment",
-                                            "label": "Under development"
+                                            "label": "En desarrollo"
                                         },
                                         {
                                             "code": "final",
@@ -1904,43 +1893,43 @@
                                         },
                                         {
                                             "code": "pending",
-                                            "label": "Pending"
+                                            "label": "Pendiente"
                                         },
                                         {
                                             "code": "retired",
-                                            "label": "Retired"
+                                            "label": "Retirado"
                                         },
                                         {
                                             "code": "superseded",
-                                            "label": "Superseded"
+                                            "label": "Reemplazado"
                                         },
                                         {
                                             "code": "tentative",
-                                            "label": "Tentative"
+                                            "label": "Provisional"
                                         },
                                         {
                                             "code": "valid",
-                                            "label": "Valid"
+                                            "label": "Válido"
                                         },
                                         {
                                             "code": "accepted",
-                                            "label": "Accepted"
+                                            "label": "Aceptado"
                                         },
                                         {
                                             "code": "notAccepted",
-                                            "label": "Not accepted"
+                                            "label": "No aceptado"
                                         },
                                         {
                                             "code": "withdrawn",
-                                            "label": "Withdrawn"
+                                            "label": "Anulado"
                                         },
                                         {
                                             "code": "proposed",
-                                            "label": "Proposed"
+                                            "label": "Propuesto"
                                         },
                                         {
                                             "code": "deprecated",
-                                            "label": "Deprecated"
+                                            "label": "En desuso"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.status",
@@ -2086,15 +2075,15 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "point",
-                                                                    "label": "Point"
+                                                                    "label": "Punto"
                                                                 },
                                                                 {
                                                                     "code": "lineString",
-                                                                    "label": "Line"
+                                                                    "label": "Línea"
                                                                 },
                                                                 {
                                                                     "code": "polygon",
-                                                                    "label": "Polygon"
+                                                                    "label": "Polígono"
                                                                 }
                                                             ],
                                                             "enum_store_column": "code",
@@ -2191,23 +2180,23 @@
                                     "enum": [
                                         {
                                             "code": "vector",
-                                            "label": "Vector"
+                                            "label": "Vectorial"
                                         },
                                         {
                                             "code": "grid",
-                                            "label": "Grid"
+                                            "label": "Malla"
                                         },
                                         {
                                             "code": "textTable",
-                                            "label": "Text table"
+                                            "label": "Tabla de texto"
                                         },
                                         {
                                             "code": "tin",
-                                            "label": "Tin"
+                                            "label": "Red irregular de triángulos (TIN)"
                                         },
                                         {
                                             "code": "stereoModel",
-                                            "label": "Stereo model"
+                                            "label": "Modelo estéreo"
                                         },
                                         {
                                             "code": "video",
@@ -2305,39 +2294,39 @@
                                             "enum": [
                                                 {
                                                     "code": "continual",
-                                                    "label": "Continual"
+                                                    "label": "Continua"
                                                 },
                                                 {
                                                     "code": "daily",
-                                                    "label": "Daily"
+                                                    "label": "Diaria"
                                                 },
                                                 {
                                                     "code": "weekly",
-                                                    "label": "Weekly"
+                                                    "label": "Semanal"
                                                 },
                                                 {
                                                     "code": "fortnightly",
-                                                    "label": "Fortnightly"
+                                                    "label": "Quincenal"
                                                 },
                                                 {
                                                     "code": "monthly",
-                                                    "label": "Monthly"
+                                                    "label": "Mensual"
                                                 },
                                                 {
                                                     "code": "quarterly",
-                                                    "label": "Quarterly"
+                                                    "label": "Trimestral"
                                                 },
                                                 {
                                                     "code": "biannually",
-                                                    "label": "Biannually"
+                                                    "label": "Semestral"
                                                 },
                                                 {
                                                     "code": "annually",
-                                                    "label": "Annually"
+                                                    "label": "Anual"
                                                 },
                                                 {
                                                     "code": "asNeeded",
-                                                    "label": "As needed"
+                                                    "label": "Cuando sea necesario"
                                                 },
                                                 {
                                                     "code": "irregular",
@@ -2345,11 +2334,11 @@
                                                 },
                                                 {
                                                     "code": "notPlanned",
-                                                    "label": "Not planned"
+                                                    "label": "No planificada"
                                                 },
                                                 {
                                                     "code": "unknown",
-                                                    "label": "Unknown"
+                                                    "label": "Desconocida"
                                                 }
                                             ],
                                             "prop_key": "description.identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
@@ -2562,63 +2551,63 @@
                                                     "enum": [
                                                         {
                                                             "code": "copyright",
-                                                            "label": "Copyright"
+                                                            "label": "Derechos de autor"
                                                         },
                                                         {
                                                             "code": "patent",
-                                                            "label": "Patent"
+                                                            "label": "Patente"
                                                         },
                                                         {
                                                             "code": "patentPending",
-                                                            "label": "Patent pending"
+                                                            "label": "Patente en trámite"
                                                         },
                                                         {
                                                             "code": "trademark",
-                                                            "label": "Trademark"
+                                                            "label": "Marca registrada"
                                                         },
                                                         {
                                                             "code": "license",
-                                                            "label": "License"
+                                                            "label": "Licencia"
                                                         },
                                                         {
                                                             "code": "intellectualPropertyRights",
-                                                            "label": "Intellectual property rights"
+                                                            "label": "Derechos de propiedad intelectual"
                                                         },
                                                         {
                                                             "code": "restricted",
-                                                            "label": "Restricted"
+                                                            "label": "Restringido"
                                                         },
                                                         {
                                                             "code": "otherRestrictions",
-                                                            "label": "Other restrictions"
+                                                            "label": "Otras restricciones"
                                                         },
                                                         {
                                                             "code": "unrestricted",
-                                                            "label": "Unrestricted"
+                                                            "label": "Sin restricciones"
                                                         },
                                                         {
                                                             "code": "licenceUnrestricted",
-                                                            "label": "License unrestricted"
+                                                            "label": "Licencia sin restricciones"
                                                         },
                                                         {
                                                             "code": "licenceEndUser",
-                                                            "label": "License end user"
+                                                            "label": "Licencia de usuario final"
                                                         },
                                                         {
                                                             "code": "licenceDistributor",
-                                                            "label": "License distributor"
+                                                            "label": "Licencia de distribuidor"
                                                         },
                                                         {
                                                             "code": "private",
-                                                            "label": "Private"
+                                                            "label": "Privado"
                                                         },
                                                         {
                                                             "code": "statutory",
-                                                            "label": "Statutory"
+                                                            "label": "Reglamentario"
                                                         },
                                                         {
                                                             "code": "confidential",
-                                                            "label": "Confidential"
+                                                            "label": "Confidencial"
                                                         },
                                                         {
                                                             "code": "SBU",
@@ -2626,7 +2615,7 @@
                                                         },
                                                         {
                                                             "code": "in-confidence",
-                                                            "label": "In-confidence"
+                                                            "label": "En confidencialidad"
                                                         }
                                                     ],
                                                     "help_text": "Describe las restricciones legales para acceder al conjunto de datos o al servicio (por ejemplo, debido a privacidad, confidencialidad o licencia). La ISO 19139 proporciona un vocabulario controlado. Estas son las restricciones de acceso aplicadas para asegurar la protección de la privacidad o la propiedad intelectual, y cualquier restricción o limitación especial para la obtención del recurso. Los valores comunes del vocabulario controlado son:\n    - derechos de autor – protegido por derechos de autor\n    - derechos de propiedad intelectual: se aplican los derechos de propiedad intelectual\n    - licencia: se aplican restricciones de licencia\n    - privacidad: limitada a proteger información personal o confidencial\n    - confidencial: solo los usuarios autorizados pueden acceder\n    - restringido: acceso limitado por otros motivos\n    - otras restricciones: se aplican otras restricciones\n    - sin restricciones: sin restricciones de acceso legales",
@@ -2757,39 +2746,39 @@
                                                     "enum": [
                                                         {
                                                             "code": "geometryOnly",
-                                                            "label": "Geometry only"
+                                                            "label": "Solo geometría"
                                                         },
                                                         {
                                                             "code": "topology1D",
-                                                            "label": "Topology 1D"
+                                                            "label": "Topología 1D"
                                                         },
                                                         {
                                                             "code": "planarGraph",
-                                                            "label": "Planar graph"
+                                                            "label": "Grafo plano"
                                                         },
                                                         {
                                                             "code": "fullPlanarGraph",
-                                                            "label": "Full planar graph"
+                                                            "label": "Grafo plano completo"
                                                         },
                                                         {
                                                             "code": "surfaceGraph",
-                                                            "label": "Surface graph"
+                                                            "label": "Grafo de superficie"
                                                         },
                                                         {
                                                             "code": "fullSurfaceGraph",
-                                                            "label": "Full surface graph"
+                                                            "label": "Grafo de superficie completo"
                                                         },
                                                         {
                                                             "code": "topology3D",
-                                                            "label": "Topology 3D"
+                                                            "label": "Topología 3D"
                                                         },
                                                         {
                                                             "code": "fullTopology3D",
-                                                            "label": "Full topology 3D"
+                                                            "label": "Topología 3D completa"
                                                         },
                                                         {
                                                             "code": "abstract",
-                                                            "label": "Abstract"
+                                                            "label": "Abstracto"
                                                         }
                                                     ],
                                                     "prop_key": "description.spatialRepresentationInfo.section-1676484144220.vectorSpatialRepresentation.topologyLevel",
@@ -2811,27 +2800,27 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "complex",
-                                                                    "label": "Complex"
+                                                                    "label": "Complejo"
                                                                 },
                                                                 {
                                                                     "code": "composite",
-                                                                    "label": "Composite"
+                                                                    "label": "Compuesto"
                                                                 },
                                                                 {
                                                                     "code": "curve",
-                                                                    "label": "Curve"
+                                                                    "label": "Curva"
                                                                 },
                                                                 {
                                                                     "code": "point",
-                                                                    "label": "Point"
+                                                                    "label": "Punto"
                                                                 },
                                                                 {
                                                                     "code": "solid",
-                                                                    "label": "Solid"
+                                                                    "label": "Sólido"
                                                                 },
                                                                 {
                                                                     "code": "surface",
-                                                                    "label": "Surface"
+                                                                    "label": "Superficie"
                                                                 }
                                                             ],
                                                             "display_type": "dropdown",
@@ -2884,11 +2873,11 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "row",
-                                                                    "label": "Row"
+                                                                    "label": "Fila"
                                                                 },
                                                                 {
                                                                     "code": "column",
-                                                                    "label": "Column"
+                                                                    "label": "Columna"
                                                                 },
                                                                 {
                                                                     "code": "vertical",
@@ -2896,23 +2885,23 @@
                                                                 },
                                                                 {
                                                                     "code": "track",
-                                                                    "label": "Track"
+                                                                    "label": "Trayectoria"
                                                                 },
                                                                 {
                                                                     "code": "crossTrack",
-                                                                    "label": "Cross track"
+                                                                    "label": "Transversal a la trayectoria"
                                                                 },
                                                                 {
                                                                     "code": "line",
-                                                                    "label": "Line"
+                                                                    "label": "Línea"
                                                                 },
                                                                 {
                                                                     "code": "sample",
-                                                                    "label": "Sample"
+                                                                    "label": "Muestra"
                                                                 },
                                                                 {
                                                                     "code": "time",
-                                                                    "label": "Time"
+                                                                    "label": "Tiempo"
                                                                 }
                                                             ],
                                                             "display_type": "dropdown",
@@ -2948,19 +2937,19 @@
                                                     "enum": [
                                                         {
                                                             "code": "point",
-                                                            "label": "Point"
+                                                            "label": "Punto"
                                                         },
                                                         {
                                                             "code": "area",
-                                                            "label": "Area"
+                                                            "label": "Área"
                                                         },
                                                         {
                                                             "code": "voxel",
-                                                            "label": "Voxel"
+                                                            "label": "Vóxel"
                                                         },
                                                         {
                                                             "code": "stratum",
-                                                            "label": "Stratum"
+                                                            "label": "Estrato"
                                                         }
                                                     ],
                                                     "prop_key": "description.spatialRepresentationInfo.gridSpatialRepresentation.gridSpatialRepresentation.cellGeometry",
@@ -2975,11 +2964,11 @@
                                                     "enum": [
                                                         {
                                                             "code": "true",
-                                                            "label": "True"
+                                                            "label": "Verdadero"
                                                         },
                                                         {
                                                             "code": "false",
-                                                            "label": "False"
+                                                            "label": "Falso"
                                                         }
                                                     ],
                                                     "prop_key": "description.spatialRepresentationInfo.gridSpatialRepresentation.gridSpatialRepresentation.transformationParameterAvailability",
@@ -3017,51 +3006,51 @@
                                     "enum": [
                                         {
                                             "code": "attribute",
-                                            "label": "Attribute"
+                                            "label": "Atributo"
                                         },
                                         {
                                             "code": "attributeType",
-                                            "label": "Attribute type"
+                                            "label": "Tipo de atributo"
                                         },
                                         {
                                             "code": "collectionHardware",
-                                            "label": "Collection hardware"
+                                            "label": "Equipo de recolección"
                                         },
                                         {
                                             "code": "collectionSession",
-                                            "label": "Collection session"
+                                            "label": "Sesión de recolección"
                                         },
                                         {
                                             "code": "dataset",
-                                            "label": "Dataset"
+                                            "label": "Conjunto de datos"
                                         },
                                         {
                                             "code": "series",
-                                            "label": "Series"
+                                            "label": "Serie"
                                         },
                                         {
                                             "code": "nonGeographicDataset",
-                                            "label": "Non geographic dataset"
+                                            "label": "Conjunto de datos no geográficos"
                                         },
                                         {
                                             "code": "dimensionGroup",
-                                            "label": "Dimension group"
+                                            "label": "Grupo de dimensiones"
                                         },
                                         {
                                             "code": "feature",
-                                            "label": "Feature"
+                                            "label": "Fenómeno"
                                         },
                                         {
                                             "code": "featureType",
-                                            "label": "Feature type"
+                                            "label": "Tipo de fenómeno"
                                         },
                                         {
                                             "code": "propertyType",
-                                            "label": "Property type"
+                                            "label": "Tipo de propiedad"
                                         },
                                         {
                                             "code": "fieldSession",
-                                            "label": "Field session"
+                                            "label": "Sesión de campo"
                                         },
                                         {
                                             "code": "software",
@@ -3069,23 +3058,23 @@
                                         },
                                         {
                                             "code": "service",
-                                            "label": "Service"
+                                            "label": "Servicio"
                                         },
                                         {
                                             "code": "model",
-                                            "label": "Model"
+                                            "label": "Modelo"
                                         },
                                         {
                                             "code": "tile",
-                                            "label": "Tile"
+                                            "label": "Tesela"
                                         },
                                         {
                                             "code": "initiative",
-                                            "label": "Initiative"
+                                            "label": "Iniciativa"
                                         },
                                         {
                                             "code": "stereomate",
-                                            "label": "Stereomate"
+                                            "label": "Par estereoscópico"
                                         },
                                         {
                                             "code": "sensor",
@@ -3093,23 +3082,23 @@
                                         },
                                         {
                                             "code": "platformSeries",
-                                            "label": "Platform series"
+                                            "label": "Serie de plataformas"
                                         },
                                         {
                                             "code": "sensorSeries",
-                                            "label": "Sensor series"
+                                            "label": "Serie de sensores"
                                         },
                                         {
                                             "code": "productionSeries",
-                                            "label": "Production series"
+                                            "label": "Serie de producción"
                                         },
                                         {
                                             "code": "transferAggregate",
-                                            "label": "Transfer aggregate"
+                                            "label": "Agregado de transferencia"
                                         },
                                         {
                                             "code": "otherAggregate",
-                                            "label": "Other aggregate"
+                                            "label": "Otro agregado"
                                         }
                                     ],
                                     "prop_key": "description.dataQualityInfo.scope",
@@ -3207,15 +3196,15 @@
                                             "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationMethodType",
                                             "enum": [
                                                 {
-                                                    "label": "Direct internal",
+                                                    "label": "Directo interno",
                                                     "code": "directInternal"
                                                 },
                                                 {
-                                                    "label": "Direct external",
+                                                    "label": "Directo externo",
                                                     "code": "directExternal"
                                                 },
                                                 {
-                                                    "label": "Indirect",
+                                                    "label": "Indirecto",
                                                     "code": "indirect"
                                                 }
                                             ],
@@ -3361,66 +3350,66 @@
                                                         },
                                                         {
                                                             "key": "role",
-                                                            "title": "Role",
+                                                            "title": "Función",
                                                             "type": "string",
                                                             "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.role",
                                                             "display_type": "dropdown-custom",
                                                             "enum": [
                                                                 {
                                                                     "code": "resourceProvider",
-                                                                    "label": "Resource provider"
+                                                                    "label": "Proveedor del recurso"
                                                                 },
                                                                 {
                                                                     "code": "custodian",
-                                                                    "label": "Custodian"
+                                                                    "label": "Custodio"
                                                                 },
                                                                 {
                                                                     "code": "owner",
-                                                                    "label": "Owner"
+                                                                    "label": "Propietario"
                                                                 },
                                                                 {
                                                                     "code": "sponsor",
-                                                                    "label": "Sponsor"
+                                                                    "label": "Patrocinador"
                                                                 },
                                                                 {
                                                                     "code": "user",
-                                                                    "label": "User"
+                                                                    "label": "Usuario"
                                                                 },
                                                                 {
                                                                     "code": "distributor",
-                                                                    "label": "Distributor"
+                                                                    "label": "Distribuidor"
                                                                 },
                                                                 {
                                                                     "code": "originator",
-                                                                    "label": "Originator"
+                                                                    "label": "Creador"
                                                                 },
                                                                 {
                                                                     "code": "pointOfContact",
-                                                                    "label": "Point of contact"
+                                                                    "label": "Punto de contacto"
                                                                 },
                                                                 {
                                                                     "code": "principalInvestigator",
-                                                                    "label": "Principal investigator"
+                                                                    "label": "Investigador principal"
                                                                 },
                                                                 {
                                                                     "code": "processor",
-                                                                    "label": "Processor"
+                                                                    "label": "Procesador"
                                                                 },
                                                                 {
                                                                     "code": "publisher",
-                                                                    "label": "Publisher"
+                                                                    "label": "Publicador"
                                                                 },
                                                                 {
                                                                     "code": "author",
-                                                                    "label": "Author"
+                                                                    "label": "Autor"
                                                                 },
                                                                 {
                                                                     "code": "coAuthor",
-                                                                    "label": "Co-author"
+                                                                    "label": "Coautor"
                                                                 },
                                                                 {
                                                                     "code": "collaborator",
-                                                                    "label": "Collaborator"
+                                                                    "label": "Colaborador"
                                                                 },
                                                                 {
                                                                     "code": "editor",
@@ -3428,23 +3417,23 @@
                                                                 },
                                                                 {
                                                                     "code": "mediator",
-                                                                    "label": "Mediator"
+                                                                    "label": "Mediador"
                                                                 },
                                                                 {
                                                                     "code": "rightsHolder",
-                                                                    "label": "Rights holder"
+                                                                    "label": "Titular de los derechos"
                                                                 },
                                                                 {
                                                                     "code": "contributor",
-                                                                    "label": "Contributor"
+                                                                    "label": "Contribuidor"
                                                                 },
                                                                 {
                                                                     "code": "funder",
-                                                                    "label": "Funder"
+                                                                    "label": "Financiador"
                                                                 },
                                                                 {
                                                                     "code": "stakeholder",
-                                                                    "label": "Stakeholder"
+                                                                    "label": "Parte interesada"
                                                                 }
                                                             ],
                                                             "enum_store_column": "code"
@@ -3544,51 +3533,51 @@
                                                     "enum": [
                                                         {
                                                             "code": "documentDigital",
-                                                            "label": "Document digital"
+                                                            "label": "Documento digital"
                                                         },
                                                         {
                                                             "code": "imageDigital",
-                                                            "label": "Image digital"
+                                                            "label": "Imagen digital"
                                                         },
                                                         {
                                                             "code": "documentHardcopy",
-                                                            "label": "Document hardcopy"
+                                                            "label": "Documento impreso"
                                                         },
                                                         {
                                                             "code": "imageHardcopy",
-                                                            "label": "Image hardcopy"
+                                                            "label": "Imagen impresa"
                                                         },
                                                         {
                                                             "code": "mapDigital",
-                                                            "label": "Map digital"
+                                                            "label": "Mapa digital"
                                                         },
                                                         {
                                                             "code": "mapHardcopy",
-                                                            "label": "Map hardcopy"
+                                                            "label": "Mapa impreso"
                                                         },
                                                         {
                                                             "code": "modelDigital",
-                                                            "label": "Model digital"
+                                                            "label": "Modelo digital"
                                                         },
                                                         {
                                                             "code": "modelHardcopy",
-                                                            "label": "Model hardcopy"
+                                                            "label": "Modelo físico"
                                                         },
                                                         {
                                                             "code": "profileDigital",
-                                                            "label": "Profile digital"
+                                                            "label": "Perfil digital"
                                                         },
                                                         {
                                                             "code": "profileHardcopy",
-                                                            "label": "Profile hardcopy"
+                                                            "label": "Perfil impreso"
                                                         },
                                                         {
                                                             "code": "tableDigital",
-                                                            "label": "Table digital"
+                                                            "label": "Tabla digital"
                                                         },
                                                         {
                                                             "code": "tableHardcopy",
-                                                            "label": "Table hardcopy"
+                                                            "label": "Tabla impresa"
                                                         },
                                                         {
                                                             "code": "videoDigital",
@@ -3596,7 +3585,7 @@
                                                         },
                                                         {
                                                             "code": "videoHardcopy",
-                                                            "label": "Video hardcopy"
+                                                            "label": "Video en soporte físico"
                                                         },
                                                         {
                                                             "code": "audioDigital",
@@ -3604,7 +3593,7 @@
                                                         },
                                                         {
                                                             "code": "audioHardcopy",
-                                                            "label": "Audio hardcopy"
+                                                            "label": "Audio en soporte físico"
                                                         },
                                                         {
                                                             "code": "multimediaDigital",
@@ -3612,19 +3601,19 @@
                                                         },
                                                         {
                                                             "code": "multimediaHardcopy",
-                                                            "label": "Multimedia hardcopy"
+                                                            "label": "Multimedia en soporte físico"
                                                         },
                                                         {
                                                             "code": "physicalSample",
-                                                            "label": "Physical sample"
+                                                            "label": "Muestra física"
                                                         },
                                                         {
                                                             "code": "diagramDigital",
-                                                            "label": "Diagram digital"
+                                                            "label": "Diagrama digital"
                                                         },
                                                         {
                                                             "code": "diagramHardcopy",
-                                                            "label": "Diagram hardcopy"
+                                                            "label": "Diagrama impreso"
                                                         }
                                                     ],
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.presentationForm",
@@ -3649,11 +3638,11 @@
                                                     "enum": [
                                                         {
                                                             "code": "true",
-                                                            "label": "True"
+                                                            "label": "Verdadero"
                                                         },
                                                         {
                                                             "code": "false",
-                                                            "label": "False"
+                                                            "label": "Falso"
                                                         }
                                                     ],
                                                     "display_type": "dropdown",
@@ -3780,66 +3769,66 @@
                                                         },
                                                         {
                                                             "key": "role",
-                                                            "title": "Role",
+                                                            "title": "Función",
                                                             "type": "string",
                                                             "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.role",
                                                             "display_type": "dropdown-custom",
                                                             "enum": [
                                                                 {
                                                                     "code": "resourceProvider",
-                                                                    "label": "Resource provider"
+                                                                    "label": "Proveedor del recurso"
                                                                 },
                                                                 {
                                                                     "code": "custodian",
-                                                                    "label": "Custodian"
+                                                                    "label": "Custodio"
                                                                 },
                                                                 {
                                                                     "code": "owner",
-                                                                    "label": "Owner"
+                                                                    "label": "Propietario"
                                                                 },
                                                                 {
                                                                     "code": "sponsor",
-                                                                    "label": "Sponsor"
+                                                                    "label": "Patrocinador"
                                                                 },
                                                                 {
                                                                     "code": "user",
-                                                                    "label": "User"
+                                                                    "label": "Usuario"
                                                                 },
                                                                 {
                                                                     "code": "distributor",
-                                                                    "label": "Distributor"
+                                                                    "label": "Distribuidor"
                                                                 },
                                                                 {
                                                                     "code": "originator",
-                                                                    "label": "Originator"
+                                                                    "label": "Creador"
                                                                 },
                                                                 {
                                                                     "code": "pointOfContact",
-                                                                    "label": "Point of contact"
+                                                                    "label": "Punto de contacto"
                                                                 },
                                                                 {
                                                                     "code": "principalInvestigator",
-                                                                    "label": "Principal investigator"
+                                                                    "label": "Investigador principal"
                                                                 },
                                                                 {
                                                                     "code": "processor",
-                                                                    "label": "Processor"
+                                                                    "label": "Procesador"
                                                                 },
                                                                 {
                                                                     "code": "publisher",
-                                                                    "label": "Publisher"
+                                                                    "label": "Publicador"
                                                                 },
                                                                 {
                                                                     "code": "author",
-                                                                    "label": "Author"
+                                                                    "label": "Autor"
                                                                 },
                                                                 {
                                                                     "code": "coAuthor",
-                                                                    "label": "Co-author"
+                                                                    "label": "Coautor"
                                                                 },
                                                                 {
                                                                     "code": "collaborator",
-                                                                    "label": "Collaborator"
+                                                                    "label": "Colaborador"
                                                                 },
                                                                 {
                                                                     "code": "editor",
@@ -3847,23 +3836,23 @@
                                                                 },
                                                                 {
                                                                     "code": "mediator",
-                                                                    "label": "Mediator"
+                                                                    "label": "Mediador"
                                                                 },
                                                                 {
                                                                     "code": "rightsHolder",
-                                                                    "label": "Rights holder"
+                                                                    "label": "Titular de los derechos"
                                                                 },
                                                                 {
                                                                     "code": "contributor",
-                                                                    "label": "Contributor"
+                                                                    "label": "Contribuidor"
                                                                 },
                                                                 {
                                                                     "code": "funder",
-                                                                    "label": "Funder"
+                                                                    "label": "Financiador"
                                                                 },
                                                                 {
                                                                     "code": "stakeholder",
-                                                                    "label": "Stakeholder"
+                                                                    "label": "Parte interesada"
                                                                 }
                                                             ],
                                                             "enum_store_column": "code"
@@ -4046,66 +4035,66 @@
                                                                 },
                                                                 {
                                                                     "key": "role",
-                                                                    "title": "Role",
+                                                                    "title": "Función",
                                                                     "type": "string",
                                                                     "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.role",
                                                                     "display_type": "dropdown-custom",
                                                                     "enum": [
                                                                         {
                                                                             "code": "resourceProvider",
-                                                                            "label": "Resource provider"
+                                                                            "label": "Proveedor del recurso"
                                                                         },
                                                                         {
                                                                             "code": "custodian",
-                                                                            "label": "Custodian"
+                                                                            "label": "Custodio"
                                                                         },
                                                                         {
                                                                             "code": "owner",
-                                                                            "label": "Owner"
+                                                                            "label": "Propietario"
                                                                         },
                                                                         {
                                                                             "code": "sponsor",
-                                                                            "label": "Sponsor"
+                                                                            "label": "Patrocinador"
                                                                         },
                                                                         {
                                                                             "code": "user",
-                                                                            "label": "User"
+                                                                            "label": "Usuario"
                                                                         },
                                                                         {
                                                                             "code": "distributor",
-                                                                            "label": "Distributor"
+                                                                            "label": "Distribuidor"
                                                                         },
                                                                         {
                                                                             "code": "originator",
-                                                                            "label": "Originator"
+                                                                            "label": "Creador"
                                                                         },
                                                                         {
                                                                             "code": "pointOfContact",
-                                                                            "label": "Point of contact"
+                                                                            "label": "Punto de contacto"
                                                                         },
                                                                         {
                                                                             "code": "principalInvestigator",
-                                                                            "label": "Principal investigator"
+                                                                            "label": "Investigador principal"
                                                                         },
                                                                         {
                                                                             "code": "processor",
-                                                                            "label": "Processor"
+                                                                            "label": "Procesador"
                                                                         },
                                                                         {
                                                                             "code": "publisher",
-                                                                            "label": "Publisher"
+                                                                            "label": "Publicador"
                                                                         },
                                                                         {
                                                                             "code": "author",
-                                                                            "label": "Author"
+                                                                            "label": "Autor"
                                                                         },
                                                                         {
                                                                             "code": "coAuthor",
-                                                                            "label": "Co-author"
+                                                                            "label": "Coautor"
                                                                         },
                                                                         {
                                                                             "code": "collaborator",
-                                                                            "label": "Collaborator"
+                                                                            "label": "Colaborador"
                                                                         },
                                                                         {
                                                                             "code": "editor",
@@ -4113,23 +4102,23 @@
                                                                         },
                                                                         {
                                                                             "code": "mediator",
-                                                                            "label": "Mediator"
+                                                                            "label": "Mediador"
                                                                         },
                                                                         {
                                                                             "code": "rightsHolder",
-                                                                            "label": "Rights holder"
+                                                                            "label": "Titular de los derechos"
                                                                         },
                                                                         {
                                                                             "code": "contributor",
-                                                                            "label": "Contributor"
+                                                                            "label": "Contribuidor"
                                                                         },
                                                                         {
                                                                             "code": "funder",
-                                                                            "label": "Funder"
+                                                                            "label": "Financiador"
                                                                         },
                                                                         {
                                                                             "code": "stakeholder",
-                                                                            "label": "Stakeholder"
+                                                                            "label": "Parte interesada"
                                                                         }
                                                                     ],
                                                                     "enum_store_column": "code"
@@ -4250,51 +4239,51 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "documentDigital",
-                                                                    "label": "Document digital"
+                                                                    "label": "Documento digital"
                                                                 },
                                                                 {
                                                                     "code": "imageDigital",
-                                                                    "label": "Image digital"
+                                                                    "label": "Imagen digital"
                                                                 },
                                                                 {
                                                                     "code": "documentHardcopy",
-                                                                    "label": "Document hardcopy"
+                                                                    "label": "Documento impreso"
                                                                 },
                                                                 {
                                                                     "code": "imageHardcopy",
-                                                                    "label": "Image hardcopy"
+                                                                    "label": "Imagen impresa"
                                                                 },
                                                                 {
                                                                     "code": "mapDigital",
-                                                                    "label": "Map digital"
+                                                                    "label": "Mapa digital"
                                                                 },
                                                                 {
                                                                     "code": "mapHardcopy",
-                                                                    "label": "Map hardcopy"
+                                                                    "label": "Mapa impreso"
                                                                 },
                                                                 {
                                                                     "code": "modelDigital",
-                                                                    "label": "Model digital"
+                                                                    "label": "Modelo digital"
                                                                 },
                                                                 {
                                                                     "code": "modelHardcopy",
-                                                                    "label": "Model hardcopy"
+                                                                    "label": "Modelo físico"
                                                                 },
                                                                 {
                                                                     "code": "profileDigital",
-                                                                    "label": "Profile digital"
+                                                                    "label": "Perfil digital"
                                                                 },
                                                                 {
                                                                     "code": "profileHardcopy",
-                                                                    "label": "Profile hardcopy"
+                                                                    "label": "Perfil impreso"
                                                                 },
                                                                 {
                                                                     "code": "tableDigital",
-                                                                    "label": "Table digital"
+                                                                    "label": "Tabla digital"
                                                                 },
                                                                 {
                                                                     "code": "tableHardcopy",
-                                                                    "label": "Table hardcopy"
+                                                                    "label": "Tabla impresa"
                                                                 },
                                                                 {
                                                                     "code": "videoDigital",
@@ -4302,7 +4291,7 @@
                                                                 },
                                                                 {
                                                                     "code": "videoHardcopy",
-                                                                    "label": "Video hardcopy"
+                                                                    "label": "Video en soporte físico"
                                                                 },
                                                                 {
                                                                     "code": "audioDigital",
@@ -4310,7 +4299,7 @@
                                                                 },
                                                                 {
                                                                     "code": "audioHardcopy",
-                                                                    "label": "Audio hardcopy"
+                                                                    "label": "Audio en soporte físico"
                                                                 },
                                                                 {
                                                                     "code": "multimediaDigital",
@@ -4318,19 +4307,19 @@
                                                                 },
                                                                 {
                                                                     "code": "multimediaHardcopy",
-                                                                    "label": "Multimedia hardcopy"
+                                                                    "label": "Multimedia en soporte físico"
                                                                 },
                                                                 {
                                                                     "code": "physicalSample",
-                                                                    "label": "Physical sample"
+                                                                    "label": "Muestra física"
                                                                 },
                                                                 {
                                                                     "code": "diagramDigital",
-                                                                    "label": "Diagram digital"
+                                                                    "label": "Diagrama digital"
                                                                 },
                                                                 {
                                                                     "code": "diagramHardcopy",
-                                                                    "label": "Diagram hardcopy"
+                                                                    "label": "Diagrama impreso"
                                                                 }
                                                             ],
                                                             "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.presentationForm",
@@ -4406,19 +4395,19 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "integer",
-                                                                    "label": "Integer"
+                                                                    "label": "Entero"
                                                                 },
                                                                 {
                                                                     "code": "float",
-                                                                    "label": "Float"
+                                                                    "label": "Flotante"
                                                                 },
                                                                 {
                                                                     "code": "double",
-                                                                    "label": "Double"
+                                                                    "label": "Doble"
                                                                 },
                                                                 {
                                                                     "code": "string",
-                                                                    "label": "String"
+                                                                    "label": "Cadena de texto"
                                                                 }
                                                             ],
                                                             "display_type": "dropdown",
@@ -4522,19 +4511,19 @@
                                                             "enum": [
                                                                 {
                                                                     "code": "integer",
-                                                                    "label": "Integer"
+                                                                    "label": "Entero"
                                                                 },
                                                                 {
                                                                     "code": "float",
-                                                                    "label": "Float"
+                                                                    "label": "Flotante"
                                                                 },
                                                                 {
                                                                     "code": "double",
-                                                                    "label": "Double"
+                                                                    "label": "Doble"
                                                                 },
                                                                 {
                                                                     "code": "string",
-                                                                    "label": "String"
+                                                                    "label": "Cadena de texto"
                                                                 }
                                                             ],
                                                             "display_type": "dropdown",
@@ -4709,351 +4698,351 @@
                             "title": "Catálogo de funciones",
                             "type": "section",
                             "items": [
-                        {
-                            "key": "description.feature_catalogue.name",
-                            "title": "Nombre",
-                            "type": "string",
-                            "help_text": "El título oficial o nombre del catálogo de funciones. El propósito es identificar el catálogo al que hace referencia o utilizado el conjunto de datos. Ejemplo: \"Catálogo de características topográficas v2\"",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "description.feature_catalogue.scope",
-                            "title": "Alcance",
-                            "type": "simple_array",
-                            "enum": [],
-                            "help_text": "Describe el tema o dominio cubierto por el catálogo de funciones. El propósito es aclarar la extensión temática o espacial, o el dominio de aplicación (por ejemplo, datos marinos, datos catastrales). Ejemplo: “Datos hidrográficos para la gestión costera”.",
-                            "display_type": "textarea"
-                        },
-                        {
-                            "key": "description.feature_catalogue.fieldOfApplication",
-                            "title": "Campos de aplicación",
-                            "type": "simple_array",
-                            "enum": [],
-                            "help_text": "Describe el tema o dominio cubierto por el catálogo de funciones. El propósito es aclarar la extensión temática o espacial, o el dominio de aplicación (por ejemplo, datos marinos, datos catastrales). Ejemplo: “Datos hidrográficos para la gestión costera”.",
-                            "display_type": "textarea"
-                        },
-                        {
-                            "key": "description.feature_catalogue.versionNumber",
-                            "title": "Número de versión",
-                            "type": "string",
-                            "help_text": "El identificador de la versión específica del catálogo de funciones. El objetivo es garantizar la claridad cuando existen múltiples versiones; esencial para el control de versiones y la trazabilidad. Ejemplo: \"2.1\".",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "description.feature_catalogue.versionDate.date",
-                            "title": "Fecha de versión",
-                            "type": "string",
-                            "help_text": "La fecha en que se publicó o entró en vigor la versión del catálogo de funciones. El objetivo es indicar la actualidad del catálogo. Ejemplo: \"2023-11-01\" (la fecha debe ingresarse en formato ISO 8601).",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "description.feature_catalogue.versionDate.type",
-                            "title": "Tipo de fecha de versión",
-                            "type": "string",
-                            "enum": [
                                 {
-                                    "code": "publication",
-                                    "label": "Publication"
-                                },
-                                {
-                                    "code": "revision",
-                                    "label": "Revision"
-                                },
-                                {
-                                    "code": "creation",
-                                    "label": "Creation"
-                                },
-                                {
-                                    "code": "expiry",
-                                    "label": "Expiry"
-                                },
-                                {
-                                    "code": "lastUpdate",
-                                    "label": "Last update"
-                                },
-                                {
-                                    "code": "lastRevision",
-                                    "label": "Last revision"
-                                },
-                                {
-                                    "code": "deprecated",
-                                    "label": "Deprecated"
-                                }
-                            ],
-                            "display_type": "dropdown-custom",
-                            "help_text": "Especifica el tipo de fecha proporcionada para la versión (por ejemplo, creación, publicación, revisión). Esto generalmente se extrae de tipos de fechas ISO 19115 como: creación; publicación; revisión.",
-                            "enum_store_column": "code"
-                        },
-                        {
-                            "key": "producer_section",
-                            "title": "Productor",
-                            "type": "section",
-                            "items": [
-                                {
-                                    "key": "description.feature_catalogue.producer.individualName",
-                                    "title": "nombre individual",
+                                    "key": "description.feature_catalogue.name",
+                                    "title": "Nombre",
                                     "type": "string",
-                                    "prop_key": "description.contact.individualName",
-                                    "help_text": "El responsable (persona) a cargo de la producción del catálogo de características.",
+                                    "help_text": "El título oficial o nombre del catálogo de funciones. El propósito es identificar el catálogo al que hace referencia o utilizado el conjunto de datos. Ejemplo: \"Catálogo de características topográficas v2\"",
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "description.feature_catalogue.producer.organisationName",
-                                    "title": "Nombre de la organización",
-                                    "type": "string",
-                                    "prop_key": "description.contact.organisationName",
-                                    "help_text": "La parte responsable (organización) a cargo de la producción del catálogo de funciones.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "description.feature_catalogue.producer.contactInfo.address.electronicMailAddress",
-                                    "title": "Correo electrónico",
-                                    "type": "string",
-                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "description.feature_catalogue.producer.contactInfo.phone.voice",
-                                    "title": "Teléfono",
-                                    "type": "string",
-                                    "prop_key": "description.contact.contactInfo.phone.voice",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "producer_section1676490155818",
-                                    "title": "DIRECCIÓN",
-                                    "type": "section",
-                                    "items": [
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.address.deliveryPoint",
-                                            "title": "Punto de entrega",
-                                            "type": "string",
-                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.address.city",
-                                            "title": "Ciudad",
-                                            "type": "string",
-                                            "prop_key": "description.contact.contactInfo.address.city",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.address.postalCode",
-                                            "title": "Código Postal",
-                                            "type": "string",
-                                            "prop_key": "description.contact.contactInfo.address.postalCode",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.address.country",
-                                            "title": "País",
-                                            "type": "string",
-                                            "prop_key": "description.contact.contactInfo.address.country",
-                                            "display_type": "text"
-                                        }
-                                    ],
-                                    "help_text": ""
-                                },
-                                {
-                                    "key": "producer_section1676490192106",
-                                    "title": "recurso en línea",
-                                    "type": "section",
-                                    "items": [
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.name",
-                                            "title": "Nombre",
-                                            "type": "string",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.linkage",
-                                            "title": "URL",
-                                            "type": "string",
-                                            "rules": {
-                                                "is_uri": true
-                                            },
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.description",
-                                            "title": "Descripción",
-                                            "type": "string",
-                                            "display_type": "textarea"
-                                        }
-                                    ],
-                                    "help_text": ""
-                                }
-                            ],
-                            "help_text": "La organización o autoridad responsable de crear y mantener el catálogo de características. El propósito es proporcionar atribución y un punto de contacto para actualizaciones o aclaraciones."
-                        },
-                        {
-                            "key": "description.feature_catalogue.functionalLanguage",
-                            "title": "Lenguaje funcional",
-                            "type": "string",
-                            "help_text": "El elemento de lenguaje funcional especifica los lenguajes naturales principales utilizados dentro del recurso que se describe, como un conjunto de datos, servicio, documento o catálogo de características. Este no es el lenguaje de metadatos (que se registra por separado); se refiere específicamente al lenguaje utilizado dentro del contenido del recurso en sí (por ejemplo, etiquetas, nombres de características, valores de campo o texto descriptivo en un conjunto de datos o servicio). El propósito es ayudar a los usuarios a comprender el contexto lingüístico del recurso y respaldar el descubrimiento, el acceso y la interoperabilidad de datos multilingües. Por ejemplo, un usuario que busca recursos en español puede filtrar los resultados utilizando este elemento de metadatos. En ISO 19139, esto se representará mediante un código de los códigos de idioma de tres letras ISO 639-2. Puede incluir varias entradas si el recurso utiliza más de un idioma.",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "description.feature_catalogue.featureType",
-                            "title": "Tipo de característica",
-                            "type": "nested_array",
-                            "props": [
-                                {
-                                    "key": "typeName",
-                                    "title": "Nombre del tipo",
-                                    "type": "string",
-                                    "prop_key": "description.feature_catalogue.featureType.typeName",
-                                    "help_text": "El nombre único asignado al tipo de característica. El propósito es identificar la clase de entidad (por ejemplo, edificio, carretera, parcela).",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "definition",
-                                    "title": "Definición",
-                                    "type": "string",
-                                    "prop_key": "description.feature_catalogue.featureType.definition",
-                                    "help_text": "Una explicación textual del significado del tipo de característica. El propósito es describir lo que representa la característica en el mundo real. Ejemplo: Un canal natural o artificial por el que fluye agua.",
+                                    "key": "description.feature_catalogue.scope",
+                                    "title": "Alcance",
+                                    "type": "simple_array",
+                                    "enum": [],
+                                    "help_text": "Describe el tema o dominio cubierto por el catálogo de funciones. El propósito es aclarar la extensión temática o espacial, o el dominio de aplicación (por ejemplo, datos marinos, datos catastrales). Ejemplo: “Datos hidrográficos para la gestión costera”.",
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "code",
-                                    "title": "Código",
+                                    "key": "description.feature_catalogue.fieldOfApplication",
+                                    "title": "Campos de aplicación",
+                                    "type": "simple_array",
+                                    "enum": [],
+                                    "help_text": "Describe el tema o dominio cubierto por el catálogo de funciones. El propósito es aclarar la extensión temática o espacial, o el dominio de aplicación (por ejemplo, datos marinos, datos catastrales). Ejemplo: “Datos hidrográficos para la gestión costera”.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "description.feature_catalogue.versionNumber",
+                                    "title": "Número de versión",
                                     "type": "string",
-                                    "prop_key": "description.feature_catalogue.featureType.code",
-                                    "help_text": "Un identificador único para el tipo de característica (usado a menudo en sistemas o estándares). El propósito es permitir la identificación y el mapeo legibles por máquinas en todos los sistemas.",
+                                    "help_text": "El identificador de la versión específica del catálogo de funciones. El objetivo es garantizar la claridad cuando existen múltiples versiones; esencial para el control de versiones y la trazabilidad. Ejemplo: \"2.1\".",
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "isAbstract",
-                                    "title": "es abstracto",
-                                    "type": "boolean",
-                                    "prop_key": "description.feature_catalogue.featureType.isAbstract",
-                                    "help_text": "Indica si este tipo de característica es abstracta. Si es verdadero, este tipo de característica no puede tener instancias; debe ser especializado (subtipificado). Valor: booleano (verdadero/falso)",
-                                    "display_type": "dropdown",
+                                    "key": "description.feature_catalogue.versionDate.date",
+                                    "title": "Fecha de versión",
+                                    "type": "string",
+                                    "help_text": "La fecha en que se publicó o entró en vigor la versión del catálogo de funciones. El objetivo es indicar la actualidad del catálogo. Ejemplo: \"2023-11-01\" (la fecha debe ingresarse en formato ISO 8601).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description.feature_catalogue.versionDate.type",
+                                    "title": "Tipo de fecha de versión",
+                                    "type": "string",
                                     "enum": [
                                         {
-                                            "code": "true",
-                                            "label": "True"
+                                            "code": "publication",
+                                            "label": "Publicación"
                                         },
                                         {
-                                            "code": "false",
-                                            "label": "False"
+                                            "code": "revision",
+                                            "label": "Revisión"
+                                        },
+                                        {
+                                            "code": "creation",
+                                            "label": "Creación"
+                                        },
+                                        {
+                                            "code": "expiry",
+                                            "label": "Expiración"
+                                        },
+                                        {
+                                            "code": "lastUpdate",
+                                            "label": "Última actualización"
+                                        },
+                                        {
+                                            "code": "lastRevision",
+                                            "label": "Última revisión"
+                                        },
+                                        {
+                                            "code": "deprecated",
+                                            "label": "En desuso"
                                         }
                                     ],
+                                    "display_type": "dropdown-custom",
+                                    "help_text": "Especifica el tipo de fecha proporcionada para la versión (por ejemplo, creación, publicación, revisión). Esto generalmente se extrae de tipos de fechas ISO 19115 como: creación; publicación; revisión.",
                                     "enum_store_column": "code"
                                 },
                                 {
-                                    "key": "aliases",
-                                    "title": "Alias",
-                                    "type": "simple_array",
-                                    "prop_key": "description.feature_catalogue.featureType.aliases",
-                                    "enum": [],
-                                    "help_text": "Nombres alternativos utilizados para el tipo de característica. El objetivo es apoyar la interoperabilidad y la usabilidad en entornos multilingües o multiestándar. Ejemplo: arroyo, arroyo (como alias de curso de agua)",
+                                    "key": "producer_section",
+                                    "title": "Productor",
+                                    "type": "section",
+                                    "items": [
+                                        {
+                                            "key": "description.feature_catalogue.producer.individualName",
+                                            "title": "nombre individual",
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName",
+                                            "help_text": "El responsable (persona) a cargo de la producción del catálogo de características.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description.feature_catalogue.producer.organisationName",
+                                            "title": "Nombre de la organización",
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName",
+                                            "help_text": "La parte responsable (organización) a cargo de la producción del catálogo de funciones.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description.feature_catalogue.producer.contactInfo.address.electronicMailAddress",
+                                            "title": "Correo electrónico",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description.feature_catalogue.producer.contactInfo.phone.voice",
+                                            "title": "Teléfono",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "producer_section1676490155818",
+                                            "title": "DIRECCIÓN",
+                                            "type": "section",
+                                            "items": [
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.address.deliveryPoint",
+                                                    "title": "Punto de entrega",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.address.city",
+                                                    "title": "Ciudad",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.city",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.address.postalCode",
+                                                    "title": "Código Postal",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.postalCode",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.address.country",
+                                                    "title": "País",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.country",
+                                                    "display_type": "text"
+                                                }
+                                            ],
+                                            "help_text": ""
+                                        },
+                                        {
+                                            "key": "producer_section1676490192106",
+                                            "title": "recurso en línea",
+                                            "type": "section",
+                                            "items": [
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.onlineResource.name",
+                                                    "title": "Nombre",
+                                                    "type": "string",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.onlineResource.linkage",
+                                                    "title": "URL",
+                                                    "type": "string",
+                                                    "rules": {
+                                                        "is_uri": true
+                                                    },
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "description.feature_catalogue.producer.contactInfo.onlineResource.description",
+                                                    "title": "Descripción",
+                                                    "type": "string",
+                                                    "display_type": "textarea"
+                                                }
+                                            ],
+                                            "help_text": ""
+                                        }
+                                    ],
+                                    "help_text": "La organización o autoridad responsable de crear y mantener el catálogo de características. El propósito es proporcionar atribución y un punto de contacto para actualizaciones o aclaraciones."
+                                },
+                                {
+                                    "key": "description.feature_catalogue.functionalLanguage",
+                                    "title": "Lenguaje funcional",
+                                    "type": "string",
+                                    "help_text": "El elemento de lenguaje funcional especifica los lenguajes naturales principales utilizados dentro del recurso que se describe, como un conjunto de datos, servicio, documento o catálogo de características. Este no es el lenguaje de metadatos (que se registra por separado); se refiere específicamente al lenguaje utilizado dentro del contenido del recurso en sí (por ejemplo, etiquetas, nombres de características, valores de campo o texto descriptivo en un conjunto de datos o servicio). El propósito es ayudar a los usuarios a comprender el contexto lingüístico del recurso y respaldar el descubrimiento, el acceso y la interoperabilidad de datos multilingües. Por ejemplo, un usuario que busca recursos en español puede filtrar los resultados utilizando este elemento de metadatos. En ISO 19139, esto se representará mediante un código de los códigos de idioma de tres letras ISO 639-2. Puede incluir varias entradas si el recurso utiliza más de un idioma.",
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "carrierOfCharacteristics",
-                                    "title": "Portador de características",
+                                    "key": "description.feature_catalogue.featureType",
+                                    "title": "Tipo de característica",
                                     "type": "nested_array",
                                     "props": [
                                         {
-                                            "key": "memberName",
-                                            "title": "Nombre del miembro",
+                                            "key": "typeName",
+                                            "title": "Nombre del tipo",
                                             "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.memberName",
-                                            "help_text": "El nombre del atributo o característica. Ejemplo: caudal, nombre, longitud",
+                                            "prop_key": "description.feature_catalogue.featureType.typeName",
+                                            "help_text": "El nombre único asignado al tipo de característica. El propósito es identificar la clase de entidad (por ejemplo, edificio, carretera, parcela).",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "definition",
                                             "title": "Definición",
                                             "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.definition",
-                                            "help_text": "Descripción del significado o función del atributo. Ejemplo: el volumen de agua que pasa por un punto por unidad de tiempo.",
+                                            "prop_key": "description.feature_catalogue.featureType.definition",
+                                            "help_text": "Una explicación textual del significado del tipo de característica. El propósito es describir lo que representa la característica en el mundo real. Ejemplo: Un canal natural o artificial por el que fluye agua.",
                                             "display_type": "textarea"
-                                        },
-                                        {
-                                            "key": "cardinality.lower",
-                                            "title": "Cardinalidad inferior",
-                                            "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.lower",
-                                            "help_text": "El número mínimo de veces que este atributo puede aparecer para una única instancia de entidad. Ejemplo: 0 (opcional), 1 (obligatorio).",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "cardinality.upper",
-                                            "title": "Cardinalidad superior",
-                                            "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.upper",
-                                            "help_text": "El número máximo de veces que este atributo puede ocurrir. Ejemplo: 1, * (ilimitado)",
-                                            "display_type": "text"
                                         },
                                         {
                                             "key": "code",
                                             "title": "Código",
                                             "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.code",
-                                            "help_text": "Un identificador único para el atributo dentro del catálogo de características. Esto corresponde al nombre de columna real en una tabla de atributos.",
+                                            "prop_key": "description.feature_catalogue.featureType.code",
+                                            "help_text": "Un identificador único para el tipo de característica (usado a menudo en sistemas o estándares). El propósito es permitir la identificación y el mapeo legibles por máquinas en todos los sistemas.",
                                             "display_type": "text"
                                         },
                                         {
-                                            "key": "valueMeasurementUnit",
-                                            "title": "Unidad de medida",
-                                            "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.valueMeasurementUnit",
-                                            "help_text": "La unidad de medida del atributo, si es cuantitativo. Ejemplo: m³/s para caudal",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "valueType",
-                                            "title": "Tipo de valor",
-                                            "type": "string",
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.valueType",
-                                            "help_text": "El tipo de datos del valor del atributo. Ejemplos: cadena de caracteres, entero, real, fecha, booleano",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "listedValue",
-                                            "title": "Valores listados",
-                                            "type": "array",
-                                            "props": [
+                                            "key": "isAbstract",
+                                            "title": "es abstracto",
+                                            "type": "boolean",
+                                            "prop_key": "description.feature_catalogue.featureType.isAbstract",
+                                            "help_text": "Indica si este tipo de característica es abstracta. Si es verdadero, este tipo de característica no puede tener instancias; debe ser especializado (subtipificado). Valor: booleano (verdadero/falso)",
+                                            "display_type": "dropdown",
+                                            "enum": [
                                                 {
-                                                    "key": "label",
-                                                    "title": "Etiqueta",
-                                                    "type": "string",
-                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.label",
-                                                    "display_type": "text",
-                                                    "help_text": "El nombre legible por humanos del valor. Ejemplo: perenne"
+                                                    "code": "true",
+                                                    "label": "Verdadero"
                                                 },
                                                 {
-                                                    "key": "code",
-                                                    "title": "Código",
+                                                    "code": "false",
+                                                    "label": "Falso"
+                                                }
+                                            ],
+                                            "enum_store_column": "code"
+                                        },
+                                        {
+                                            "key": "aliases",
+                                            "title": "Alias",
+                                            "type": "simple_array",
+                                            "prop_key": "description.feature_catalogue.featureType.aliases",
+                                            "enum": [],
+                                            "help_text": "Nombres alternativos utilizados para el tipo de característica. El objetivo es apoyar la interoperabilidad y la usabilidad en entornos multilingües o multiestándar. Ejemplo: arroyo, arroyo (como alias de curso de agua)",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "carrierOfCharacteristics",
+                                            "title": "Portador de características",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "memberName",
+                                                    "title": "Nombre del miembro",
                                                     "type": "string",
-                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.code",
-                                                    "display_type": "text",
-                                                    "help_text": "Un identificador del valor legible por máquina. Ejemplo: POR"
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.memberName",
+                                                    "help_text": "El nombre del atributo o característica. Ejemplo: caudal, nombre, longitud",
+                                                    "display_type": "text"
                                                 },
                                                 {
                                                     "key": "definition",
                                                     "title": "Definición",
                                                     "type": "string",
-                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.definition",
-                                                    "display_type": "textarea",
-                                                    "help_text": "La descripción de lo que significa el código/etiqueta. Ejemplo: Un curso de agua que fluye continuamente durante todo el año."
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.definition",
+                                                    "help_text": "Descripción del significado o función del atributo. Ejemplo: el volumen de agua que pasa por un punto por unidad de tiempo.",
+                                                    "display_type": "textarea"
+                                                },
+                                                {
+                                                    "key": "cardinality.lower",
+                                                    "title": "Cardinalidad inferior",
+                                                    "type": "string",
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.lower",
+                                                    "help_text": "El número mínimo de veces que este atributo puede aparecer para una única instancia de entidad. Ejemplo: 0 (opcional), 1 (obligatorio).",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "cardinality.upper",
+                                                    "title": "Cardinalidad superior",
+                                                    "type": "string",
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.upper",
+                                                    "help_text": "El número máximo de veces que este atributo puede ocurrir. Ejemplo: 1, * (ilimitado)",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "code",
+                                                    "title": "Código",
+                                                    "type": "string",
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.code",
+                                                    "help_text": "Un identificador único para el atributo dentro del catálogo de características. Esto corresponde al nombre de columna real en una tabla de atributos.",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "valueMeasurementUnit",
+                                                    "title": "Unidad de medida",
+                                                    "type": "string",
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.valueMeasurementUnit",
+                                                    "help_text": "La unidad de medida del atributo, si es cuantitativo. Ejemplo: m³/s para caudal",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "valueType",
+                                                    "title": "Tipo de valor",
+                                                    "type": "string",
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.valueType",
+                                                    "help_text": "El tipo de datos del valor del atributo. Ejemplos: cadena de caracteres, entero, real, fecha, booleano",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "listedValue",
+                                                    "title": "Valores listados",
+                                                    "type": "array",
+                                                    "props": [
+                                                        {
+                                                            "key": "label",
+                                                            "title": "Etiqueta",
+                                                            "type": "string",
+                                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.label",
+                                                            "display_type": "text",
+                                                            "help_text": "El nombre legible por humanos del valor. Ejemplo: perenne"
+                                                        },
+                                                        {
+                                                            "key": "code",
+                                                            "title": "Código",
+                                                            "type": "string",
+                                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.code",
+                                                            "display_type": "text",
+                                                            "help_text": "Un identificador del valor legible por máquina. Ejemplo: POR"
+                                                        },
+                                                        {
+                                                            "key": "definition",
+                                                            "title": "Definición",
+                                                            "type": "string",
+                                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue.definition",
+                                                            "display_type": "textarea",
+                                                            "help_text": "La descripción de lo que significa el código/etiqueta. Ejemplo: Un curso de agua que fluye continuamente durante todo el año."
+                                                        }
+                                                    ],
+                                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue",
+                                                    "help_text": "Lista de valores controlados utilizados en el miembro del atributo. Cada valor corresponde a un objeto compuesto por 1) una etiqueta, 2) un código (tal como está contenido en el conjunto de datos), 3) una definición. Este elemento se utilizará cuando el miembro de la característica se relacione con conjuntos de datos de referencia, como listas de códigos o registros. por ejemplo, lista de países, tipos de cobertura terrestre, etc."
                                                 }
                                             ],
-                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.listedValue",
-                                            "help_text": "Lista de valores controlados utilizados en el miembro del atributo. Cada valor corresponde a un objeto compuesto por 1) una etiqueta, 2) un código (tal como está contenido en el conjunto de datos), 3) una definición. Este elemento se utilizará cuando el miembro de la característica se relacione con conjuntos de datos de referencia, como listas de códigos o registros. por ejemplo, lista de países, tipos de cobertura terrestre, etc."
+                                            "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics",
+                                            "help_text": "Un portador de características define los atributos o propiedades asociados con el tipo de característica (a veces se les llama atributos de característica o propiedades de característica)."
                                         }
                                     ],
-                                    "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics",
-                                    "help_text": "Un portador de características define los atributos o propiedades asociados con el tipo de característica (a veces se les llama atributos de característica o propiedades de característica)."
+                                    "help_text": "Un tipo de característica define una categoría de entidades geográficas del mundo real que comparten características comunes (atributos, relaciones y operaciones). Los tipos de características son los elementos centrales de un catálogo de características, que describe la estructura y la semántica de los datos en un conjunto de datos geográficos."
                                 }
                             ],
-                            "help_text": "Un tipo de característica define una categoría de entidades geográficas del mundo real que comparten características comunes (atributos, relaciones y operaciones). Los tipos de características son los elementos centrales de un catálogo de características, que describe la estructura y la semántica de los datos en un conjunto de datos geográficos."
-                        }
-                    ],
-                    "help_text": "Un catálogo de características define los tipos de características y sus atributos utilizados en un conjunto de datos. Describe el contenido y la estructura de las características geográficas, lo que permite coherencia, interoperabilidad y comprensión al compartir o utilizar datos."
+                            "help_text": "Un catálogo de características define los tipos de características y sus atributos utilizados en un conjunto de datos. Describe el contenido y la estructura de las características geográficas, lo que permite coherencia, interoperabilidad y comprensión al compartir o utilizar datos."
                         }
                     ]
                 }
@@ -5443,5 +5432,4 @@
             "items": []
         }
     ]
-}
 }

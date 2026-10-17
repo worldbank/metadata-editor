@@ -1,0 +1,1750 @@
+{
+    "type": "template",
+    "title": "Esquema de quadro",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Informação de metadados",
+            "class": "mandatory recommended",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Informação sobre os metadados",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "type": "string",
+                            "title": "Título do documento",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" na secção \"Descrição do quadro / Declaração de título\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "type": "string",
+                            "title": "ID do documento",
+                            "help_text": "Um identificador único para o documento de metadados do quadro. Este identificador deve ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" na secção \"Descrição do quadro / Declaração de título\", embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" do quadro for “TBL_0001”, o ID do documento pode ser “IHSN_TBL_001_v1.0” se os metadados forem produzidos pelo IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "class": "required",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "type": "string",
+                                    "title": "Afiliação",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Data de produção",
+                            "help_text": "A data em que os metadados deste quadro foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Trata-se de um elemento \"Recomendado\", uma vez que a informação sobre o produtor e a data de produção dos metadados é útil para fins de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Versão",
+                            "help_text": "A versão do documento de metadados (não a versão do próprio quadro).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "table_description_container",
+            "title": "Descrição do quadro",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "table_title_statement",
+                    "title": "Declaração de título",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.title_statement.idno",
+                            "title": "ID principal",
+                            "help_text": "Um identificador único do quadro. O \"ID principal\" (também designado IDNO) é um número de identificação único utilizado para identificar o quadro. É necessário um identificador único para efeitos de catalogação, pelo que este elemento é declarado como \"Obrigatório\". O identificador permitirá aos utilizadores citar corretamente o quadro. O identificador deve ser único dentro do catálogo. Idealmente, deve também ser globalmente único. Pode ser utilizado um Digital Object Identifier (DOI). para o estudo. Em alternativa, o \"ID principal\" pode ser construído por uma organização utilizando um esquema coerente. Note-se que o esquema permite indicar mais do que um identificador para um mesmo quadro (no elemento \"Outros identificadores\"); um identificador específico do catálogo não é, portanto, incompatível com um identificador globalmente único como um DOI. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. Pode ser definida uma regra de validação (utilizando uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "type": "string",
+                            "rules": [],
+                            "name": "idno",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) diferentes do \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI). O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\"; assim, se for utilizado como identificador principal um DOI ou outro tipo de ID normalizado, recomenda-se repeti-lo aqui com a identificação do tipo). ",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "O tipo de identificador. Por exemplo: “DOI” ou \"ISBN\". ",
+                                    "prop_key": "table_description.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "table_description.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.title_statement.table_number",
+                            "title": "Número do quadro",
+                            "type": "string",
+                            "help_text": "O número do quadro começa normalmente pela palavra “Quadro” seguida de um identificador numérico, como: Quadro 1 ou Quadro 2.1, etc. Diferentes publicações podem utilizar diferentes formas de referenciar um quadro. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.title",
+                            "title": "Título",
+                            "type": "string",
+                            "rules": [],
+                            "name": "title",
+                            "is_required": true,
+                            "help_text": "O título do quadro. O título fornece uma breve descrição do conteúdo do quadro. Deve ser conciso e incluir os elementos principais apresentados no quadro. Existem vários estilos para redigir o título de um quadro. Deve ser aplicado um estilo coerente a todos os quadros publicados num catálogo. Deve ter-se atenção à utilização coerente de maiúsculas no título. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.sub_title",
+                            "title": "Subtítulo",
+                            "type": "string",
+                            "help_text": "O subtítulo do quadro pode ser utilizado quando é necessário distinguir características do quadro. Um subtítulo pode fornecer conteúdo descritivo ou explicativo adicional ao quadro. Deve ter-se atenção à utilização coerente de maiúsculas no subtítulo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.alternate_title",
+                            "title": "Título alternativo",
+                            "type": "string",
+                            "help_text": "Um título diferente do título principal (por exemplo, um acrónimo ou abreviatura — não o número do quadro, que pertence a \"Número do quadro\"). Qualquer forma substituta ou alternativa do título formal. Raramente utilizado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.translated_title",
+                            "title": "Título traduzido",
+                            "type": "string",
+                            "help_text": "O elemento de título traduzido é normalmente utilizado para fornecer uma tradução do título nos casos em que é utilizada mais do que uma língua oficial ou se uma publicação for amplamente divulgada em duas línguas. Os caracteres especiais devem ser apresentados corretamente, como acentos e outros sinais diacríticos ou alfabetos diferentes.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.table_series",
+                            "type": "array",
+                            "title": "Série",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.name",
+                                    "help_text": "O nome (rótulo) da série.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "maintainer",
+                                    "title": "Responsável pela manutenção",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.maintainer",
+                                    "help_text": "A pessoa ou organização responsável pela manutenção da série. Será frequentemente a mesma pessoa/organização que produz e publica o quadro. Este elemento opcional será frequentemente ignorado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.uri",
+                                    "help_text": "Um URL para a informação sobre a série. ",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.description",
+                                    "help_text": "Uma descrição da série.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Os quadros podem ser organizados em séries."
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_auth_contributors",
+                    "title": "Autores e colaboradores",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.authoring_entity",
+                            "title": "Entidade autora",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.name",
+                                    "help_text": "O nome da(s) pessoa(s) ou organização responsável pela produção e pelo conteúdo do quadro.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.affiliation",
+                                    "help_text": "A afiliação da(s) pessoa(s) ou organização(ões) mencionada(s) em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.abbreviation",
+                                    "help_text": "A abreviatura (acrónimo) da organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.uri",
+                                    "help_text": "O URI pode ser uma ligação para o sítio web, ou o endereço de e-mail, da entidade autora mencionada no nome.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "ID do autor",
+                                    "help_text": "O identificador do autor num registo de investigadores académicos, como o Open Researcher and Contributor ID (ORCID).",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "string",
+                                            "title": "Tipo",
+                                            "prop_key": "table_description.authoring_entity.author_id.type",
+                                            "help_text": "O tipo de identificador, ou seja, a identificação do registo que atribuiu o identificador do autor, por exemplo, “ORCID”.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "string",
+                                            "title": "ID",
+                                            "prop_key": "table_description.authoring_entity.author_id.id",
+                                            "help_text": "O identificador do autor no registo mencionado no tipo.",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "table_description.authoring_entity.author_id"
+                                }
+                            ],
+                            "help_text": "A entidade autora identifica a(s) pessoa(s) ou organização(ões) responsável(eis) pela produção do quadro. Uma entidade autora é identificada pelo seu nome, afiliação, abreviatura, URI e identificadores de autor (se existirem).",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "table_description.contributors",
+                            "title": "Colaboradores",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do colaborador (pessoa ou organização).",
+                                    "prop_key": "table_description.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "table_description.contributors.affiliation",
+                                    "help_text": "A afiliação do colaborador mencionado no nome. Pode ser um organismo governamental, uma universidade ou um departamento de uma universidade, etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "help_text": "A abreviatura da instituição indicada como afiliação do colaborador.",
+                                    "type": "string",
+                                    "prop_key": "table_description.contributors.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do colaborador mencionado no nome. Pode ser, por exemplo, \"Assistente de investigação”, “Especialista técnico”, “Programador” ou “Revisor”.",
+                                    "prop_key": "table_description.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "help_text": "Um URL (ligação para um sítio web ou endereço de e-mail) do colaborador mencionado no nome.",
+                                    "prop_key": "table_description.contributors.uri",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este conjunto de elementos identifica a(s) pessoa(s) e/ou organização(ões), além da entidade autora, que contribuíram para a produção do quadro."
+                        },
+                        {
+                            "key": "table_description.publisher",
+                            "title": "Editor",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do editor (pessoa ou organização).",
+                                    "prop_key": "table_description.publisher.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "table_description.publisher.affiliation",
+                                    "help_text": "A afiliação do editor. Pode ser um organismo governamental, uma universidade ou um departamento de uma universidade, etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "help_text": "A abreviatura da instituição indicada como afiliação do editor.",
+                                    "type": "string",
+                                    "prop_key": "table_description.publisher.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do editor (é pouco provável que este elemento seja utilizado, uma vez que a função é óbvia).",
+                                    "prop_key": "table_description.publisher.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URI",
+                                    "help_text": "Um URI (ligação para um sítio web ou endereço de e-mail) do editor.",
+                                    "prop_key": "table_description.publisher.uri",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A entidade responsável pela publicação do quadro."
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_date",
+                    "title": "Datas e versão",
+                    "items": [
+                        {
+                            "key": "table_description.date_created",
+                            "type": "string",
+                            "title": "Data de criação",
+                            "help_text": "A data em que o quadro foi criado. Recomenda-se introduzir a data no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM ou AAAA). A data de criação do quadro refere-se à data em que o resultado foi produzido e considerado pronto para publicação.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.date_published",
+                            "type": "string",
+                            "title": "Data de publicação",
+                            "help_text": "A data em que o quadro foi publicado. Recomenda-se introduzir a data no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM ou AAAA). Se o quadro estiver contido num documento (relatório, artigo, livro, etc.), a data de publicação do quadro está associada à data de publicação desse documento. Se o quadro constar, por exemplo, de um anuário estatístico, a data de publicação será a data em que o anuário foi publicado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.date_modified",
+                            "type": "string",
+                            "title": "Data da última modificação",
+                            "help_text": "A data da última modificação do quadro. Recomenda-se introduzir a data no formato ISO 8601 (AAAA-MM-DD ou AAAA-MM ou AAAA). As modificações, revisões ou republicações do quadro são registadas neste elemento.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "A versão do quadro refere-se à versão publicada do quadro. Se, por algum motivo, os dados de um quadro publicado forem revistos, a versão do quadro é registada neste elemento.",
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "key": "table_description_container1674846809398",
+                    "title": "Cobertura temporal e geográfica",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.time_periods",
+                            "type": "array",
+                            "title": "Períodos",
+                            "props": [
+                                {
+                                    "key": "from",
+                                    "title": "Data de início",
+                                    "help_text": "A data de início do período abrangido pelo quadro, preferencialmente introduzida no formato ISO 8601 (AAAA, ou AAAA-MM, ou AAAA-MM-DD).",
+                                    "type": "string",
+                                    "prop_key": "table_description.time_periods.from",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "to",
+                                    "title": "Data de fim",
+                                    "help_text": "A data de fim do período abrangido pelo quadro, preferencialmente introduzida no formato ISO 8601 (AAAA, ou AAAA-MM, ou AAAA-MM-DD).",
+                                    "type": "string",
+                                    "prop_key": "table_description.time_periods.to",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os períodos consistem numa lista de períodos (intervalo de anos / trimestres / meses / dias) a que os dados se referem, preferencialmente introduzidos no formato ISO 8601 (AAAA, ou AAAA-MM, ou AAAA-MM-DD). Se os dados forem trimestrais, devem ser convertidos para o formato ISO 8601 (por exemplo, o primeiro trimestre de 2020 seria \"de 2020-01 a 2020-03). Este campo é repetível. Se os períodos forem, por exemplo, 1990, 2000 a 2004 e 2014 a junho de 2019, não se deve introduzir o período como um único intervalo 1990-2019, pois incluiria períodos irrelevantes. Deve ser introduzido como três intervalos separados, como no exemplo abaixo. Para dados relativos a uma data específica (por exemplo, a população de um país à data do recenseamento), introduzir a data nos campos de início e de fim."
+                        },
+                        {
+                            "key": "table_description.ref_country",
+                            "type": "array",
+                            "title": "Países",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.ref_country.name",
+                                    "help_text": "O nome de um país para o qual existem dados no quadro.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "table_description.ref_country.code",
+                                    "help_text": "O código do país mencionado no nome, preferencialmente um código de país ISO 3166.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "Este elemento é utilizado para documentar a lista de países para os quais existem dados no quadro. Este elemento serve para garantir que o nome e o código do país são facilmente localizáveis e contribuem para um catálogo nacional virtual. Se o quadro se referir apenas a parte de um país (por exemplo, uma cidade), o campo \"Países\" deve ainda assim ser preenchido. É disponibilizado outro elemento, denominado \"Áreas geográficas\", para registar informação mais detalhada sobre a cobertura geográfica do quadro.\n\nNOTA: Este campo refere-se ao país ou países sobre os quais o quadro fornece dados. Se um quadro contiver, por exemplo, dados sobre a população da Bélgica por país de nascimento, apenas \"Bélgica\" será introduzido neste elemento, e não a lista de países de nascimento."
+                        },
+                        {
+                            "key": "table_description.geographic_units",
+                            "type": "array",
+                            "title": "Áreas geográficas",
+                            "help_text": "Uma lista discriminada das áreas geográficas abrangidas pelos dados do quadro, além do país/países que devem ser introduzidos em \"Países\".\n",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "help_text": "O nome da unidade geográfica, por exemplo \"Mundo\" ou \"Oceano Atlântico\".",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "help_text": "O código da unidade geográfica.",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.code",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "help_text": "Tipo de unidade geográfica, por exemplo, país, estado, região, província, etc.",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.type",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.geographic_granularity",
+                            "type": "string",
+                            "title": "Granularidade geográfica",
+                            "help_text": "Uma descrição dos níveis geográficos para os quais são apresentados dados no quadro. Não se trata de uma lista de áreas geográficas específicas, mas de uma lista do(s) nível(eis) administrativo(s) que correspondem a essas áreas geográficas.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.bbox",
+                            "title": "Retângulos delimitadores",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Oeste",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.west",
+                                    "help_text": "Longitude oeste do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Este",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.east",
+                                    "help_text": "Longitude este do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "Sul",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.south",
+                                    "help_text": "Latitude sul do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Norte",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.north",
+                                    "help_text": "Latitude norte do retângulo envolvente.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este elemento é utilizado para definir um ou vários retângulos envolventes geográficos, que constituem a descrição geométrica fundamental, de forma retangular, da cobertura geográfica dos dados. Um retângulo envolvente é definido pelas longitudes oeste e este e pelas latitudes norte e sul, e inclui a maior extensão geográfica da cobertura geográfica do conjunto de dados. O retângulo envolvente fornece as coordenadas geográficas dos cantos superior esquerdo (norte/oeste) e inferior direito (sul/este) de uma área retangular. Este elemento pode ser utilizado em catálogos como primeira etapa de uma pesquisa baseada em coordenadas. O intervalo válido de latitude em graus é de -90 a +90 para os hemisférios sul e norte, respetivamente. A longitude situa-se no intervalo de -180 a +180, especificando coordenadas a oeste e a este do Meridiano de Greenwich, respetivamente."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "table_description_container1674846846185",
+                    "title": "Âmbito e universo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "help_text": "Uma breve descrição do quadro. A descrição pode conter informação sobre o conteúdo, a finalidade, o processo de produção ou outra informação relevante.",
+                            "enum": [],
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.table_columns",
+                            "type": "array",
+                            "title": "Colunas do quadro",
+                            "help_text": "A descrição das colunas é composta pelos cabeçalhos agrupadores de colunas e pelos cabeçalhos de coluna. Os cabeçalhos agrupadores agrupam os cabeçalhos de coluna de forma lógica para apresentar os dados ao utilizador. Nem todas as colunas apresentadas num quadro terão um cabeçalho agrupador. Os cabeçalhos agrupadores podem tornar-se bastante complexos; quando um quadro é documentado, a informação encontrada nos cabeçalhos agrupadores e nos cabeçalhos de coluna pode ser fundida e editada. O importante não é documentar a estrutura exata do quadro, mas garantir que o texto dos cabeçalhos agrupadores e dos cabeçalhos de coluna é incluído nos metadados, uma vez que este texto será utilizado pelos motores de pesquisa para encontrar quadros em catálogos de dados.",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Rótulo",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.label",
+                                    "help_text": "Os rótulos das colunas do quadro (ou legendas das colunas) são fundamentais para a localização. Os rótulos das colunas incluirão tanto os cabeçalhos agrupadores como os cabeçalhos de coluna. Os cabeçalhos agrupadores são legendas que reúnem vários cabeçalhos de coluna.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Conjunto de dados",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.dataset",
+                                    "help_text": "Refere-se ao conjunto de dados (normalmente microdados) utilizado para produzir o quadro. Se o conjunto de dados estiver disponível num catálogo e tiver um identificador único (DOI ou outro), esse identificador pode ser introduzido aqui. Em alternativa, pode ser indicado o título do conjunto de dados ou um URI permanente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "var_name",
+                                    "title": "Nome da variável",
+                                    "help_text": "Refere-se ao nome das variáveis encontradas no conjunto de dados (normalmente microdados) utilizado para produzir o quadro. O objetivo deste campo opcional é ajudar a estabelecer uma ligação entre o conjunto de dados de origem e o quadro, de modo a promover a reprodutibilidade.",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.var_name",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": false
+                        },
+                        {
+                            "key": "table_description.table_rows",
+                            "type": "array",
+                            "title": "Linhas do quadro",
+                            "help_text": "Tal como os cabeçalhos agrupadores e os cabeçalhos de coluna, a secção \"Linhas do quadro\" é composta pelo cabeçalho da coluna de rótulos e pelos rótulos de linha (legendas das linhas). Os rótulos de linha são as legendas das linhas de dados e o cabeçalho da coluna de rótulos é o rótulo que agrupa as linhas de forma lógica. Tal como em \"Colunas do quadro\" , a informação encontrada nos rótulos de linha pode ser fundida e editada para ser otimizada em termos de clareza e localização.",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Rótulo",
+                                    "type": "string",
+                                    "is_required": true,
+                                    "prop_key": "table_description.table_rows.label",
+                                    "help_text": "Tal como nos rótulos das colunas, o conteúdo de \"Rótulo\" destina-se a incluir o cabeçalho da coluna de rótulos, os rótulos de linha e quaisquer legendas incluídas.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "Refere-se ao conjunto de dados (normalmente microdados) utilizado para produzir o quadro. Se o conjunto de dados estiver disponível num catálogo e tiver um identificador único (DOI ou outro), esse identificador pode ser introduzido aqui. Em alternativa, pode ser indicado o título do conjunto de dados ou um URI permanente. Note-se também que o esquema disponibiliza um elemento \"Fontes de dados\" (ver abaixo) para descrever com mais pormenor as fontes dos dados. O conteúdo do elemento do conjunto de dados deve ser compatível com a informação fornecida nesse outro elemento.",
+                                    "prop_key": "table_description.table_rows.dataset",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "var_name",
+                                    "title": "Nome da variável",
+                                    "help_text": "Tal como nas variáveis das colunas, este elemento opcional destina-se a identificar as variáveis do conjunto de dados de origem que estão associadas à linha de dados.",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_rows.var_name",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.table_footnotes",
+                            "type": "array",
+                            "title": "Notas de rodapé do quadro",
+                            "help_text": "Notas de rodapé do quadro",
+                            "props": [
+                                {
+                                    "key": "number",
+                                    "title": "Número",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_footnotes.number",
+                                    "help_text": "O número da nota de rodapé. As notas de rodapé são normalmente numeradas sequencialmente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Texto",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_footnotes.text",
+                                    "help_text": "O texto da nota de rodapé.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.statistics",
+                            "type": "array",
+                            "title": "Estatísticas",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Tipo de estatísticas",
+                                    "type": "string",
+                                    "prop_key": "table_description.statistics.value",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os metadados do quadro não conterão dados. O elemento de estatísticas refere-se ao tipo de estatísticas incluídas no quadro. Alguns quadros podem conter apenas contagens, como um quadro da população por grupo etário e sexo (que apresenta contagens de pessoas; outros quadros podem ser contagens de agregados familiares, estabelecimentos ou qualquer outra unidade de observação). Mas os quadros estatísticos podem conter muitos outros tipos de estatísticas descritivas. Este elemento é utilizado para listar esses tipos de estatísticas.\n\nRecomenda-se a utilização de um vocabulário controlado. Esta lista pode conter (mas não tem de se limitar a):\nContagem (frequências) | Número de valores em falta | Média | Mediana | Moda | Valor mínimo | Valor máximo | Amplitude | Desvio-padrão | Variância | Intervalo de confiança (95%) - Limite inferior | Intervalo de confiança (95%) - Limite superior | Erro-padrão | Soma | Amplitude interquartil (IQR) | Percentil (possivelmente com especificação, por exemplo, “percentil 10”) | Desvio absoluto médio | Desvio absoluto médio em relação à mediana (MADM) | Coeficiente de variação (COV) | Coeficiente de dispersão (COD) | Assimetria | Curtose | Entropia | Coeficiente de regressão | R-quadrado | R-quadrado ajustado | Pontuação Z | Exatidão | Precisão | Erro quadrático logarítmico médio (MSLE)"
+                        },
+                        {
+                            "key": "table_description.unit_observation",
+                            "type": "array",
+                            "title": "Unidades de observação",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Tipo de unidade ",
+                                    "type": "string",
+                                    "prop_key": "table_description.unit_observation.value",
+                                    "help_text": "Um rótulo que descreve o tipo de unidade de observação, por exemplo, “indivíduo” ou “pessoa”, “agregado familiar”, “alojamento”, empresa, “país”, etc.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O elemento fornece informação sobre a(s) unidade(s) de observação que correspondem aos valores apresentados no quadro."
+                        },
+                        {
+                            "key": "table_description.universe",
+                            "type": "array",
+                            "title": "Universo",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Universo",
+                                    "type": "string",
+                                    "prop_key": "table_description.universe.value",
+                                    "help_text": "Uma descrição textual do universo abrangido pelos dados.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O universo de um quadro refere-se à população (ou inquiridos) abrangida pelos dados. Não tem de ser uma população de indivíduos; pode ser, por exemplo, uma população de agregados familiares, estabelecimentos, empresas, grupos de pessoas ou mesmo objetos. A descrição do universo deve informar claramente os utilizadores dos dados sobre inclusões e exclusões com que possam não contar."
+                        },
+                        {
+                            "key": "table_description.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.name",
+                                    "help_text": "A própria palavra-chave.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.vocabulary",
+                                    "help_text": "O vocabulário controlado (incluindo o número de versão ou a data) do qual a palavra-chave é extraída, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.uri",
+                                    "help_text": "O URL do vocabulário controlado do qual a palavra-chave é extraída, se existir.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de palavras-chave que fornecem informação sobre o conteúdo principal do quadro. As palavras-chave constituem uma solução prática para melhorar a localização do quadro, pois permitem que termos e expressões não presentes no próprio quadro sejam indexados e que um quadro seja localizável por motores de pesquisa baseados em texto. Será preferencialmente utilizado um vocabulário controlado (embora não seja obrigatório), como o Tesauro da UNESCO. A lista aqui fornecida pode combinar palavras-chave de vários vocabulários controlados e palavras-chave definidas pelo utilizador.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "table_description.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.id",
+                                    "help_text": "O identificador do tópico, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Tema",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.name",
+                                    "help_text": "O nome (rótulo) do tópico, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O identificador ascendente do tópico (identificador do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informação sobre os temas abrangidos pelo quadro. Será preferencialmente utilizado um vocabulário controlado, por exemplo a classificação de temas CESSDA (CESSDA Topics), uma tipologia de temas disponível em 11 línguas; ou o Journal of Economic Literature (JEL) Classification System, ou a classificação de temas do Banco Mundial. Note-se que pode ser utilizado mais do que um vocabulário controlado. "
+                        },
+                        {
+                            "key": "table_description.themes",
+                            "type": "array",
+                            "title": "Áreas temáticas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.id",
+                                    "help_text": "O ID do tema, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Temática",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.name",
+                                    "help_text": "O nome (rótulo) do tema, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O ID ascendente do tema (ID do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de temáticas abrangidas pelo quadro. Será preferencialmente utilizado um vocabulário controlado. Note-se que as temáticas serão raramente utilizadas, uma vez que o elemento \"Temas\" é frequentemente mais adequado. "
+                        },
+                        {
+                            "key": "table_description.disciplines",
+                            "type": "array",
+                            "title": "Disciplinas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.id",
+                                    "help_text": "O identificador da disciplina, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.name",
+                                    "help_text": "O nome (rótulo) da disciplina, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O identificador ascendente da disciplina (identificador do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informação sobre as disciplinas académicas relacionadas com o conteúdo do quadro. Será preferencialmente utilizado um vocabulário controlado, por exemplo o fornecido pela lista de áreas académicas da Wikipédia. "
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "table_description_container1674846984679",
+                    "title": "Acesso e direitos",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.publications",
+                            "type": "array",
+                            "title": "Publicações",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "prop_key": "table_description.publications.title",
+                                    "help_text": "O título da publicação (incluindo o produtor e o ano).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.publications.uri",
+                                    "help_text": "Uma ligação para a publicação.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este elemento identifica a(s) publicação(ões) em que o quadro é publicado. Pode ser, por exemplo, um anuário estatístico, um relatório, um artigo, etc."
+                        },
+                        {
+                            "key": "table_description.links",
+                            "type": "array",
+                            "title": "Ligações",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.links.uri",
+                                    "help_text": "O URL de um recurso externo.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "table_description.links.description",
+                                    "help_text": "Uma breve descrição do recurso.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Uma lista de ligações associadas relacionadas com o quadro."
+                        },
+                        {
+                            "key": "table_description.api_documentation",
+                            "type": "array",
+                            "title": "Documentação da API",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.api_documentation.uri",
+                                    "help_text": "O URL da documentação da API.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "table_description.api_documentation.description",
+                                    "help_text": "Este elemento não conterá a documentação da API propriamente dita, mas sim informação sobre a documentação disponível.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Os dados são cada vez mais disponibilizados através de interfaces de programação de aplicações (API). A API associada a uma série deve ser documentada."
+                        },
+                        {
+                            "key": "table_description.rights",
+                            "title": "Direitos",
+                            "type": "string",
+                            "help_text": "Informação sobre os direitos ou os direitos de autor aplicáveis ao quadro.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.license",
+                            "title": "Licença",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.license.name",
+                                    "help_text": "O nome da licença, por exemplo “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.license.uri",
+                                    "help_text": "Um URL para uma descrição da licença, por exemplo, “https://creativecommons.org/licenses/by/4.0/”.",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": "Um quadro pode exigir uma licença para ser utilizado ou reproduzido. Isto é feito para proteger o conteúdo intelectual do produto de investigação. A entidade licenciadora pode ser diferente do investigador ou do editor. É a entidade que detém os direitos intelectuais sobre o(s) quadro(s) e que concederia direitos ou imporia restrições à reutilização do quadro."
+                        },
+                        {
+                            "key": "table_description.citation",
+                            "title": "Requisito de citação",
+                            "type": "string",
+                            "help_text": "Um requisito de citação do quadro (ou seja, uma indicação de como o quadro deve ser citado em publicações).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.confidentiality",
+                            "title": "Confidencialidade",
+                            "type": "string",
+                            "help_text": "Um quadro publicado pode estar protegido por um acordo de confidencialidade entre o editor e o investigador. Esse acordo pode também determinar certos direitos relativos à utilização da investigação e dos dados apresentados no quadro. Os dados podem também apresentar informação confidencial produzida para públicos seletivos. Este elemento é utilizado para fornecer uma declaração sobre quaisquer limitações ou restrições à utilização do quadro com base em dados ou acordos confidenciais.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.sdc",
+                            "title": "Controlo da divulgação estatística",
+                            "type": "string",
+                            "help_text": "Informação sobre as medidas de controlo da divulgação estatística (SDC) aplicadas ao quadro. Pode incluir a supressão de células ou outras técnicas. Foram desenvolvidos pacotes especializados para este fim, como sdcTable: Methods for Statistical Disclosure Control in Tabular Data e https://cran.r-project.org/web/packages/sdcTable/sdcTable.pdf\n\nA informação aqui fornecida deve ser tal que não forneça a intrusos informação útil para a engenharia inversa das medidas de proteção aplicadas ao quadro.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_section",
+                    "title": "Outras informações",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.data_sources",
+                            "type": "array",
+                            "title": "Fontes de dados",
+                            "help_text": "As fontes de dados são frequentemente citadas na secção de notas de rodapé de um quadro. Os elementos nome, ID da fonte e URL são opcionais, mas pelo menos um deles deve ser fornecido.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.name",
+                                    "help_text": "O nome (título) da fonte de dados. Por exemplo, os dados de um quadro podem ser extraídos do “Recenseamento da População 2020”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.abbreviation",
+                                    "help_text": "A abreviatura (acrónimo) da fonte de dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "source_id",
+                                    "title": "ID da fonte",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.source_id",
+                                    "help_text": "Um identificador único da fonte, como um Digital Object Identifier (DOI).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.note",
+                                    "help_text": "Uma nota que descreve a forma como a fonte foi utilizada, eventualmente mencionando problemas na utilização da fonte.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.uri",
+                                    "help_text": "Uma ligação (URL) para o conjunto de dados de origem.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.languages",
+                            "type": "array",
+                            "title": "Línguas",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.languages.name",
+                                    "help_text": "O nome da(s) língua(s) em que o quadro é publicado, preferencialmente extraído da nomenclatura normalizada de línguas ISO 639.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "table_description.languages.code",
+                                    "help_text": "O código da língua, preferencialmente da lista de códigos ISO 639.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A maioria dos quadros será disponibilizada apenas numa língua. No entanto, este campo é repetível, para permitir a indicação de mais do que uma língua."
+                        },
+                        {
+                            "key": "table_description.definitions",
+                            "type": "array",
+                            "title": "Definições",
+                            "help_text": "Definições ou conceitos abrangidos pelo quadro.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.name",
+                                    "help_text": "O nome (ou rótulo) do termo, indicador ou conceito a definir.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "definition",
+                                    "title": "Definição",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.definition",
+                                    "help_text": "A definição do termo, indicador ou conceito.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.uri",
+                                    "help_text": "Uma ligação para a fonte da definição ou para um sítio que forneça uma definição mais detalhada.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.classifications",
+                            "type": "array",
+                            "title": "Classificações",
+                            "help_text": "O elemento é utilizado para documentar a utilização de classificações normalizadas (ou “ontologias”, ou “taxonomias”) no quadro.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.name",
+                                    "help_text": "Nome (rótulo) da classificação, ontologia ou taxonomia.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Versão",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.version",
+                                    "help_text": "Versão da classificação, ontologia ou taxonomia utilizada no quadro.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "organization",
+                                    "title": "Organização",
+                                    "help_text": "Organização responsável pela custódia da classificação, ontologia ou taxonomia.",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.organization",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.uri",
+                                    "help_text": "Ligação para um recurso externo onde pode ser obtida informação detalhada sobre a classificação, ontologia ou taxonomia.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.relations",
+                            "title": "Relações",
+                            "help_text": "Se o quadro tiver uma relação com outros recursos (por exemplo, se for um subconjunto de outro recurso ou uma tradução de outro recurso), a(s) relação(ões) e os recursos associados podem ser listados neste elemento.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.relations.name",
+                                    "help_text": "O recurso relacionado. A prática recomendada é identificar o recurso relacionado através de um URI. Se tal não for possível ou viável, pode ser fornecida uma cadeia de caracteres conforme a um sistema formal de identificação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "enum": [
+                                        {
+                                            "code": "isPartOf",
+                                            "label": "É parte de"
+                                        },
+                                        {
+                                            "code": "hasPart",
+                                            "label": "Tem parte"
+                                        },
+                                        {
+                                            "code": "isVersionOf",
+                                            "label": "É versão de"
+                                        },
+                                        {
+                                            "code": "isFormatOf",
+                                            "label": "É formato de"
+                                        },
+                                        {
+                                            "code": "hasFormat",
+                                            "label": "Tem formato"
+                                        },
+                                        {
+                                            "code": "references",
+                                            "label": "Referencia"
+                                        },
+                                        {
+                                            "code": "isReferencedBy",
+                                            "label": "É referenciado por"
+                                        },
+                                        {
+                                            "code": "isBasedOn",
+                                            "label": "É baseado em"
+                                        },
+                                        {
+                                            "code": "isBasisFor",
+                                            "label": "É base para"
+                                        },
+                                        {
+                                            "code": "requires",
+                                            "label": "Requer"
+                                        },
+                                        {
+                                            "code": "isRequiredBy",
+                                            "label": "É requerido por"
+                                        }
+                                    ],
+                                    "prop_key": "table_description.relations.type",
+                                    "help_text": "O tipo de relação. Recomenda-se a utilização de um vocabulário controlado. O Dublin Core propõe o seguinte vocabulário: isPartOf, hasPart, isVersionOf, isFormatOf, hasFormat, references, isReferencedBy, isBasedOn, isBasisFor, replaces, isReplacedBy, requires, isRequiredBy.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.notes",
+                            "title": "Notas",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "table_description.notes.note",
+                                    "help_text": "A nota propriamente dita.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "As notas proporcionam um espaço para incluir observações ou conteúdo livre que possa ser relevante para a compreensão do quadro e que não tenha sido registado noutros elementos do esquema."
+                        }
+                    ]
+                },
+                {
+                    "key": "table_description_container1674847167756",
+                    "title": "Contactos",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.contacts",
+                            "title": "Contactos",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.name",
+                                    "help_text": "Nome de uma pessoa ou unidade (como um serviço de apoio aos dados). Normalmente, é preferível indicar um cargo/função em vez do nome real da pessoa. Tenha-se em conta que as pessoas não permanecem para sempre no seu cargo.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.role",
+                                    "help_text": "A função específica do nome, no que diz respeito ao apoio aos utilizadores. Este elemento é utilizado quando são indicados vários nomes, para ajudar os utilizadores a identificar a pessoa ou unidade mais adequada a contactar.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.affiliation",
+                                    "help_text": "Afiliação da pessoa/unidade.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.email",
+                                    "help_text": "Endereço de correio eletrónico da pessoa.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Telefone",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.telephone",
+                                    "help_text": "Um número de telefone para o qual se pode ligar para obter informações ou dar feedback sobre o quadro. Nunca deve ser um número de telefone pessoal; deve ser indicado um número institucional (normalmente de um serviço de apoio aos dados).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.uri",
+                                    "help_text": "Uma ligação para um sítio web onde se podem encontrar as informações de contacto do nome.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os utilizadores dos dados podem necessitar de esclarecimentos e informações adicionais. Esta secção pode incluir o nome, a afiliação, o e-mail e o URI de uma ou várias pessoas de contacto. Este bloco de elementos identifica as pessoas de contacto que podem servir de referência relativamente a problemas ou questões levantados pela comunidade de utilizadores. O atributo URI deve ser utilizado para indicar um URN ou URL da página inicial da pessoa de contacto. O atributo email é utilizado para indicar um endereço de e-mail da pessoa de contacto. Recomenda-se evitar a indicação do nome real das pessoas. As informações aqui fornecidas devem ser válidas a longo prazo. Por isso, é preferível identificar as pessoas de contacto por um cargo. O mesmo se aplica ao campo de e-mail. Idealmente, deve ser indicado um endereço de e-mail “genérico”. É fácil configurar um servidor de correio de forma a que todas as mensagens enviadas para o endereço de e-mail genérico sejam automaticamente reencaminhadas para alguns membros do pessoal."
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Etiquetas",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Um grupo definido pelo utilizador (opcional) ao qual a etiqueta pertence. O agrupamento de etiquetas permite implementar facetas controladas em catálogos de dados.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

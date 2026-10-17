@@ -23,6 +23,13 @@ $config['microdata'][]=array(
 );
 
 $config['microdata'][]=array(
+    'template' => 'survey_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'microdata-system-pt',
+    'name'=>'Microdados DDI 2.5 PT'
+);
+
+$config['microdata'][]=array(
     'template' => 'survey_template_ihsn_2.5_v1_fr.json',
     'lang'=>'fr',
     'uid'=>'232ea3aaece0cdf1db157f797f6b92e5fr',
@@ -61,6 +68,18 @@ $config['microdata'][]=array(
 );
 
 $config['microdata'][]=array(
+    'template' => 'survey_template_ihsn_2.5_v1_pt.json',
+    'lang'=>'pt',
+    'uid'=>'232ea3aaece0cdf1db157f797f6b92e5pt',
+    'name'=>'IHSN DDI 2.5 Modelo v01 PT',
+    "version"=> "1.0",
+    "organization"=> "IHSN \/ Banco Mundial, Development Data Group",
+    "author"=> "MA TB OD MW",
+    "description"=> "Modelo baseado na norma DDI 2.5 (DDI Codebook), recomendado pela International Household Survey Network (IHSN) para a documentação de conjuntos de dados de inquéritos e recenseamentos.",
+    "created"=>"1687445920"
+);
+
+$config['microdata'][]=array(
     'template' => 'microdata_template_uzbek.json',
     "uid"=> "6740f5f920502baf3f6cbcaa5c113uzbek",
     "data_type"=> "microdata",
@@ -82,6 +101,15 @@ $config['indicator'][]=array(
     'version'=>'1.0',
     'description'=>'This template contains all elements available in the metadata schema developed by the IHSN for the documentation of indicators and time series of indicators. It can be used as basis for the production of user templates consisting of a subset of the available elements, with customized labels, instructions, ordering and grouping of metadata elements, controlled vocabularies, validation rules, and default values.'
 ); 
+
+$config['indicator'][]=array(
+    'template' => 'timeseries_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'timeseries-system-pt',
+    'name'=>'Esquema de indicadores 1.0 PT',
+    'version'=>'1.0',
+    'description'=>'Este modelo contém todos os elementos disponíveis no esquema de metadados desenvolvido pela IHSN para a documentação de indicadores e de séries temporais de indicadores. Pode servir de base à produção de modelos de utilizador constituídos por um subconjunto dos elementos disponíveis, com rótulos, instruções, ordem e agrupamento de elementos, vocabulários controlados, regras de validação e valores predefinidos personalizados.'
+);
 
 $config['indicator'][]=array(
     'template' => 'timeseries_template_ihsn.json',    
@@ -109,6 +137,18 @@ $config['indicator'][]=array(
     "description"=> "Un modèle pour la documentation des indicateurs (ou des séries temporelles).",
 ); 
 
+$config['indicator'][]=array(
+    'template' => 'timeseries_template_ihsn_pt.json',
+    "uid"=> "b576eb7519fe8e761a239f9d36f032c3pt",
+    "data_type"=> "indicator",
+    "lang"=> "pt",
+    "name"=> "IHSN INDICADOR 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Modelo para a documentação de indicadores (ou séries temporais).",
+);
+
 
 
 $config['indicator-db'][]=array(
@@ -117,6 +157,13 @@ $config['indicator-db'][]=array(
     'uid'=>'timeseries-db-system-en',
     'name'=>'Database Schema 1.0 EN'
 ); 
+
+$config['indicator-db'][]=array(
+    'template' => 'timeseries-db_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'timeseries-db-system-pt',
+    'name'=>'Esquema de base de dados 1.0 PT'
+);
 
 
 $config['indicator-db'][]=array(
@@ -144,12 +191,31 @@ $config['indicator-db'][]=array(
     "description"=> "This template contains all elements of the metadata schema developed by the IHSN for the documentation of databases of indicators and time series. It can be used as basis for the production of user templates where agency-specific controlled vocabularies, validation rules, default values can be applied to a selected subset of the available metadata elements.\nThis schema is used to complement the \"Indicator\" metadata schema. It is used to provide information on the database that serves as \"container\" for the indicators.",
 ); 
 
+$config['indicator-db'][]=array(
+    'template' => 'timeseries-db_template_ihsn_pt.json',
+    "uid"=> "776d77524fe8130f520035fb9b077d82pt",
+    "data_type"=> "indicator-db",
+    "lang"=> "pt",
+    "name"=> "IHSN BASE DE DADOS 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Este modelo contém todos os elementos do esquema de metadados desenvolvido pela IHSN para a documentação de bases de dados de indicadores e de séries temporais. Pode servir de base à produção de modelos de utilizador em que vocabulários controlados, regras de validação e valores predefinidos próprios de cada organismo são aplicados a um subconjunto dos elementos de metadados disponíveis.\nEste esquema complementa o esquema de metadados \"Indicador\" e fornece informação sobre a base de dados que serve de \"contentor\" aos indicadores.",
+);
+
 $config['script'][]=array(
     'template' => 'script_form_template.json',
     'lang'=>'en',
     'uid'=>'script-system-en',
     'name'=>'Script IHSN Schema 1.0 EN'
 ); 
+
+$config['script'][]=array(
+    'template' => 'script_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'script-system-pt',
+    'name'=>'Script IHSN Esquema 1.0 PT'
+);
 
 
 $config['script'][]=array(
@@ -176,6 +242,18 @@ $config['script'][]=array(
     "description"=> "This template contains all elements available in the metadata schema developed by the IHSN for the documentation of research and analysis projects and scripts. It can be used as basis for the production of user templates consisting of a subset of the available elements, with customized labels, instructions, ordering and grouping of metadata elements, controlled vocabularies, validation rules, and default values.",    
 ); 
 
+$config['script'][]=array(
+    'template' => 'script_template_ihsn_pt.json',
+    "uid"=> "d31789f2d6dcdf3c7dc07a5729d09ac9pt",
+    "data_type"=> "script",
+    "lang"=> "pt",
+    "name"=> "IHSN SCRIPT 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Este modelo contém todos os elementos disponíveis no esquema de metadados desenvolvido pela IHSN para a documentação de projetos e scripts de investigação e análise. Pode servir de base à produção de modelos de utilizador constituídos por um subconjunto dos elementos disponíveis, com rótulos, instruções, ordem e agrupamento de elementos, vocabulários controlados, regras de validação e valores predefinidos personalizados.",
+);
+
 
 //geospatial
 $config['geospatial'][]=array(
@@ -197,6 +275,29 @@ $config['geospatial'][]=array(
     "description"=> "Geospatial template based on Inspire and Gemini 2.3 \n\n- https://agiorguk.github.io/gemini/1062-gemini-datasets-and-data-series.html",    
 );
 
+$config['geospatial'][]=array(
+    'template' => 'geospatial_form_template_gemini_es.json',
+    "uid"=> "geospatial-gemini-es",
+    "data_type"=> "geospatial",
+    "lang"=> "es",
+    "name"=> "Inspire/Gemini con elementos adicionales ES",
+    "version"=> "1.0",
+    "organization"=> "World Bank",
+    "author"=> "MA OD",
+    "description"=> "Plantilla geoespacial basada en Inspire y Gemini 2.3 \n\n- https://agiorguk.github.io/gemini/1062-gemini-datasets-and-data-series.html",
+);
+
+$config['geospatial'][]=array(
+    'template' => 'geospatial_form_template_gemini_pt.json',
+    "uid"=> "geospatial-gemini-inspire-pt",
+    "data_type"=> "geospatial",
+    "lang"=> "pt",
+    "name"=> "Inspire/Gemini com elementos adicionais PT",
+    "version"=> "1.0",
+    "organization"=> "Banco Mundial",
+    "author"=> "MA OD",
+    "description"=> "Modelo geoespacial baseado no INSPIRE e no GEMINI 2.3 \n\n- https://agiorguk.github.io/gemini/1062-gemini-datasets-and-data-series.html",
+);
 
 //document
 $config['document'][]=array(
@@ -204,6 +305,13 @@ $config['document'][]=array(
     'lang'=>'en',
     'uid'=>'document-system-en',
     'name'=>'Document IHSN Schema 1.0 EN'
+);
+
+$config['document'][]=array(
+    'template' => 'document_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'document-system-pt',
+    'name'=>'Documento IHSN Esquema 1.0 PT'
 );
 
 $config['document'][]=array(
@@ -243,6 +351,18 @@ $config['document'][]=array(
     "description"=> "Template containing all elements of the metadata schema developed for the documentation of documents (books, publications, papers, reports, manuals, etc.) This template can be used as basis for the production of custom templates where agency-specific controlled vocabularies, validation rules, default values can be applied to a selected subset of the available metadata elements. The template makes use of elements from the Dublin Core (by the Dublin Core Metadata Initiative), BibTex, MARC21 (by the US Library of Congress), and other standards and schemas. ",
 );
 
+$config['document'][]=array(
+    'template' => 'document_template_ihsn_pt.json',
+    "uid"=> "4915f93564fbde26945dd9022b9d7fc1pt",
+    "data_type"=> "document",
+    "lang"=> "pt",
+    "name"=> "IHSN DOCUMENTO 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Modelo com todos os elementos do esquema de metadados desenvolvido para a documentação de documentos (livros, publicações, artigos, relatórios, manuais, etc.). Pode servir de base à produção de modelos personalizados em que vocabulários controlados, regras de validação e valores predefinidos próprios de cada organismo são aplicados a um subconjunto dos elementos de metadados disponíveis. O modelo utiliza elementos do Dublin Core (Dublin Core Metadata Initiative), BibTeX, MARC21 (Biblioteca do Congresso dos EUA) e de outras normas e esquemas.",
+);
+
 
 
 
@@ -253,6 +373,13 @@ $config['table'][]=array(
     'lang'=>'en',
     'uid'=>'table-system-en',
     'name'=>'Table IHSN Schema 1.0 EN'
+);
+
+$config['table'][]=array(
+    'template' => 'table_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'table-system-pt',
+    'name'=>'Quadro IHSN Esquema 1.0 PT'
 );
 
 $config['table'][]=array(
@@ -279,6 +406,18 @@ $config['table'][]=array(
     "description"=> "Ce modèle contient tous les éléments disponibles dans le schéma de métadonnées développé par l'IHSN pour la documentation des tableaux statistiques (tableaux croisés). Il peut être utilisé comme base pour la production de modèles d'utilisateurs constitués d'un sous-ensemble des éléments disponibles, avec des étiquettes personnalisées, des instructions, l'ordre et le regroupement des éléments de métadonnées, des vocabulaires contrôlés, des règles de validation et des valeurs par défaut.",
 );
 
+$config['table'][]=array(
+    'template' => 'table_template_ihsn_pt.json',
+    "uid"=> "9454eee369c79c65cdc0b4ee23aed4e8pt",
+    "data_type"=> "table",
+    "lang"=> "pt",
+    "name"=> "IHSN QUADRO 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Este modelo contém todos os elementos disponíveis no esquema de metadados desenvolvido pela IHSN para a documentação de quadros estatísticos (tabulações cruzadas). Pode servir de base à produção de modelos de utilizador constituídos por um subconjunto dos elementos disponíveis, com rótulos, instruções, ordem e agrupamento de elementos, vocabulários controlados, regras de validação e valores predefinidos personalizados.",
+);
+
 
 
 
@@ -292,6 +431,13 @@ $config['image'][]=array(
 ); 
 
 $config['image'][]=array(
+    'template' => 'image_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'image-system-pt',
+    'name'=> 'Imagem IHSN Esquema (DCMI e IPTC) PT'
+); 
+
+$config['image'][]=array(
     'template' => 'image_dcmi_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-dcmi',
@@ -299,10 +445,24 @@ $config['image'][]=array(
 ); 
 
 $config['image'][]=array(
+    'template' => 'image_dcmi_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'image-system-dcmi-pt',
+    'name'=> 'Imagem IHSN Esquema (opção DCMI) 1.0 PT'
+); 
+
+$config['image'][]=array(
     'template' => 'image_iptc_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-iptc',
     'name'=> 'Image IHSN Schema (IPTC option) 1.0 EN'
+); 
+
+$config['image'][]=array(
+    'template' => 'image_iptc_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'image-system-iptc-pt',
+    'name'=> 'Imagem IHSN Esquema (opção IPTC) 1.0 PT'
 ); 
 
 
@@ -357,6 +517,30 @@ $config['image'][]=array(
     "description"=> "Template containing all elements of the IHSN metadata schema for the documentation of images, based on IPTC 2022.1 elements (another option is to use the Dublin Core\/DCMI-based template). This template can be used as basis for the production of custom templates where agency-specific controlled vocabularies, validation rules, default values can be applied to a selected subset of the available metadata elements.",
 ); 
 
+$config['image'][]=array(
+    'template' => 'image_dcmi_template_ihsn_pt.json',
+    "uid"=> "6192765f2dbddb6bd93f3f92a29129d3pt",
+    "data_type"=> "image",
+    "lang"=> "pt",
+    "name"=> "IHSN IMAGEM DCMI Modelo 1.0 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Modelo com todos os elementos do esquema de metadados da IHSN para a documentação de imagens, baseado em elementos DCMI (outra opção é utilizar o modelo baseado em IPTC). Pode servir de base à produção de modelos personalizados em que vocabulários controlados, regras de validação e valores predefinidos próprios de cada organismo são aplicados a um subconjunto dos elementos de metadados disponíveis.",
+);
+
+$config['image'][]=array(
+    'template' => 'image_iptc_template_ihsn_pt.json',
+    "uid"=> "21769091754bb7c998a1caf0fa75800cpt",
+    "data_type"=> "image",
+    "lang"=> "pt",
+    "name"=> "IHSN IMAGEM IPTC 2022.1 Modelo v01 PT",
+    "version"=> "1.0 - IPTC 2022.1",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Modelo com todos os elementos do esquema de metadados da IHSN para a documentação de imagens, baseado em elementos IPTC 2022.1 (outra opção é utilizar o modelo baseado em Dublin Core/DCMI). Pode servir de base à produção de modelos personalizados em que vocabulários controlados, regras de validação e valores predefinidos próprios de cada organismo são aplicados a um subconjunto dos elementos de metadados disponíveis.",
+);
+
 
 
 
@@ -377,6 +561,13 @@ $config['video'][]=array(
     'uid'=>'video-system-en',
     'name'=>'Video IHSN Schema 1.0 EN'
 ); 
+
+$config['video'][]=array(
+    'template' => 'video_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'video-system-pt',
+    'name'=>'Vídeo IHSN Esquema 1.0 PT'
+);
 
 
 $config['video'][]=array(
@@ -403,6 +594,18 @@ $config['video'][]=array(
     "description"=> "This template contains all elements available in the metadata schema developed by the IHSN for the documentation of video recordings. It makes use of elements from the Dublin Core and from schema.org\/videoObject. The template can be used as basis for the production of user templates consisting of a subset of the available elements, with customized labels, instructions, ordering and grouping of metadata elements, controlled vocabularies, validation rules, and default values.",
 );
 
+$config['video'][]=array(
+    'template' => 'video_template_ihsn_pt.json',
+    "uid"=> "e3e5a1d8bd0338c1b3a5d6bfff8e5517pt",
+    "data_type"=> "video",
+    "lang"=> "pt",
+    "name"=> "IHSN VÍDEO 1.0 Modelo v01 PT",
+    "version"=> "1.0",
+    "organization"=> "IHSN",
+    "author"=> "MA OD",
+    "description"=> "Este modelo contém todos os elementos disponíveis no esquema de metadados desenvolvido pela IHSN para a documentação de gravações de vídeo. Utiliza elementos do Dublin Core e de schema.org\/videoObject. Pode servir de base à produção de modelos de utilizador constituídos por um subconjunto dos elementos disponíveis, com rótulos, instruções, ordem e agrupamento de elementos, vocabulários controlados, regras de validação e valores predefinidos personalizados.",
+);
+
 
 $config['resource'][]=array(
     'template' => 'resource_form_template.json',
@@ -410,6 +613,13 @@ $config['resource'][]=array(
     'uid'=>'resource-system-en',
     'name'=>'resource-system-en'
 ); 
+
+$config['resource'][]=array(
+    'template' => 'resource_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'resource-system-pt',
+    'name'=>'Recursos externos IHSN Esquema 1.0 PT'
+);
 
 
 $config['resource'][]=array(
@@ -437,6 +647,18 @@ $config['resource'][]=array(
     "description"=> "Modèle utilisé pour documenter les ressources externes. Ce modèle est utilisé en combinaison avec tous les autres standards\/schémas.",
 ); 
 
+$config['resource'][]=array(
+    'template' => 'resource_template_ihsn_pt.json',
+    "uid"=> "453a8bf9f800465f3cb8dc37699cb574pt",
+    "data_type"=> "resource",
+    "lang"=> "pt",
+    "name"=> "IHSN RECURSOS EXT 1.0 Modelo v01 PT",
+    "version"=> "v01",
+    "organization"=> "IHSN",
+    "author"=> "MA TB OD",
+    "description"=> "Modelo utilizado para documentar recursos externos. Este modelo é utilizado em combinação com todas as outras normas\/esquemas.",
+);
+
 
 $config['admin_meta'][]=array(
     'template' => 'admin_metadata_template.json',
@@ -450,6 +672,18 @@ $config['admin_meta'][]=array(
     "description"=> "Base template for the documentation of administrative metadata.",
 ); 
 
+$config['admin_meta'][]=array(
+    'template' => 'admin_metadata_template_pt.json',
+    "uid"=> "system-core-admin-meta-pt",
+    "data_type"=> "admin_meta",
+    "lang"=> "pt",
+    "name"=> "Modelo principal de metadados administrativos PT",
+    "version"=> "1.0.0",
+    "organization"=> "",
+    "author"=> "",
+    "description"=> "Modelo base para a documentação de metadados administrativos.",
+);
+
 $config['custom'][]=array(
     'template' => 'custom_form_template.json',
     'lang'=>'en',
@@ -457,6 +691,14 @@ $config['custom'][]=array(
     'name'=>'Custom schema template',
     'description'=>'Flexible starter template for documenting resources that do not match existing schema types.'
 ); 
+
+$config['custom'][]=array(
+    'template' => 'custom_form_template_pt.json',
+    'lang'=>'pt',
+    'uid'=>'custom-system-pt',
+    'name'=>'Modelo de esquema personalizado PT',
+    'description'=>'Modelo inicial flexível para documentar recursos que não correspondem a nenhum dos tipos de esquema existentes.'
+);
 
 /*
 | Default core template uid per data type (used at install and when a project has no template_uid).

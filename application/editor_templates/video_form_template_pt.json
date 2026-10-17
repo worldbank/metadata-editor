@@ -1,0 +1,1316 @@
+{
+    "type": "template",
+    "title": "Projeto de vídeo",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Informação sobre os metadados",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Informação sobre os metadados",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Título do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" da secção \"Descrição do vídeo / Declaração de título\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID do documento",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "Um identificador único do documento de metadados do vídeo. Este identificador tem de ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser único a nível global. É diferente do \"ID principal\" da secção \"Descrição do quadro / Declaração de título\", embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" do vídeo for “VDO_0001”, o ID do documento pode ser “IHSN_VDO_001_v1.0”, se os metadados forem produzidos pelo IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "class": "required",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "title": "Data de produção",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A data em que os metadados deste vídeo foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (YYYY-MM-DD ou YYY-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", uma vez que a informação sobre o produtor e sobre a data de produção dos metadados é útil para efeitos de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "class": "required",
+                            "help_text": "A versão do documento de metadados (não a versão do próprio vídeo).",
+                            "display_type": "textarea"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "video_description_container",
+            "title": "Descrição do vídeo",
+            "items": [
+                {
+                    "key": "video_description_container1673387470825",
+                    "title": "Declaração de título",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "rules": [],
+                            "is_required": true,
+                            "help_text": "O \"ID principal\" é um número de identificação único utilizado para identificar inequivocamente um vídeo num catálogo. Ajudará também os utilizadores a citar corretamente o vídeo. A melhor opção é obter um Identificador de Objeto Digital (DOI) para o vídeo, uma vez que garante que o ID é único a nível global. Em alternativa, pode ser um identificador construído por uma organização segundo um esquema coerente. Note-se que o esquema permite fornecer mais do que um identificador para um vídeo (ver identificadores abaixo). ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.title",
+                            "title": "Título",
+                            "type": "string",
+                            "is_required": true,
+                            "help_text": "O título do vídeo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) diferentes do \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI). O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\", pelo que, se for utilizado um DOI ou outro tipo de ID normalizado como identificador principal, recomenda-se repeti-lo aqui com a identificação do tipo).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "O tipo de identificador. Pode ser, por exemplo, “DOI”.",
+                                    "prop_key": "video_description.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "video_description.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.alt_title",
+                            "title": "Título alternativo",
+                            "type": "string",
+                            "rules": [],
+                            "help_text": "Um título alternativo do vídeo (diferente do introduzido em \"Título\"), eventualmente uma versão abreviada. ",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387651932",
+                    "title": "Autores e colaboradores",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.creator",
+                            "title": "Criador",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "Organização ou pessoa que criou/é autora do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.production_company",
+                            "title": "Produtora",
+                            "type": "string",
+                            "help_text": "A produtora ou o estúdio responsável pelo item.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.recorded_at",
+                            "title": "Gravado em",
+                            "type": "string",
+                            "help_text": "Este elemento identifica o evento em que o vídeo foi gravado (por exemplo, uma conferência ou uma demonstração).\n\n",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "O nome do editor do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.translators",
+                            "title": "Tradutores",
+                            "help_text": "Organização ou pessoa que adaptou o vídeo para diferentes línguas. Este elemento corresponde ao elemento translator de VideoObject.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "first_name",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "O nome próprio do tradutor.",
+                                    "prop_key": "video_description.translators.first_name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "initial",
+                                    "title": "Inicial",
+                                    "type": "string",
+                                    "help_text": "As iniciais do tradutor.",
+                                    "prop_key": "video_description.translators.initial",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "last_name",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "O apelido do tradutor.",
+                                    "prop_key": "video_description.translators.last_name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.translators.affiliation",
+                                    "help_text": "A afiliação do tradutor.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.sponsors",
+                            "title": "Patrocinadores",
+                            "help_text": "Este elemento é utilizado para listar as entidades financiadoras/patrocinadores do vídeo. Se diferentes entidades financiadoras tiverem financiado diferentes fases do processo de produção, utilizar o atributo “função” para as distinguir.\n",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do patrocinador (pessoa ou organização).",
+                                    "prop_key": "video_description.sponsors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "video_description.sponsors.abbr",
+                                    "help_text": "A abreviatura (sigla) do patrocinador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "grant",
+                                    "title": "Subvenção",
+                                    "type": "string",
+                                    "prop_key": "video_description.sponsors.grant",
+                                    "help_text": "O número da subvenção (ou do contrato).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do patrocinador.",
+                                    "prop_key": "video_description.sponsors.role",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.contributors",
+                            "title": "Outros colaboradores",
+                            "help_text": "Identifica a(s) pessoa(s) e/ou organização(ões) que contribuíram para a produção do vídeo. O atributo função permite definir qual foi a contribuição específica da pessoa ou organização identificada.\n\n- Nome: \n- Afiliação: \n- Abreviatura: \n- Função: \n- URL: ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome do colaborador (pessoa ou organização)",
+                                    "prop_key": "video_description.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.affiliation",
+                                    "help_text": "A afiliação do colaborador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.abbr",
+                                    "help_text": "A abreviatura da instituição indicada como afiliação do colaborador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica do colaborador. Pode ser, por exemplo, “Operador de câmara”, “Engenheiro de som”, etc.",
+                                    "prop_key": "video_description.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "video_description.contributors.uri",
+                                    "help_text": "Um URI (ligação para um sítio web ou endereço de correio eletrónico) do colaborador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.credit_text",
+                            "title": "Créditos",
+                            "type": "string",
+                            "help_text": "Este elemento pode ser utilizado para creditar a(s) pessoa(s) e/ou organização(ões) associada(s) a um vídeo publicado.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.contacts",
+                            "title": "Contactos",
+                            "help_text": "Os utilizadores do vídeo podem necessitar de esclarecimentos e informações adicionais. Esta secção pode incluir o nome, afiliação, e-mail e URI de uma ou várias pessoas de contacto. Este bloco de elementos identifica as pessoas de contacto que podem servir de pessoas de referência relativamente a problemas ou questões colocadas pela comunidade de utilizadores. ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome de uma pessoa ou unidade (como um serviço de apoio aos dados). Normalmente, é preferível indicar um cargo/função em vez do nome real da pessoa. Tenha-se em conta que as pessoas não permanecem para sempre no seu cargo.",
+                                    "prop_key": "video_description.contacts.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica da pessoa ou organização indicada em \"Nome\" no que respeita ao apoio aos utilizadores. Este elemento é utilizado quando são indicados vários nomes, para ajudar os utilizadores a identificar a pessoa ou unidade mais adequada a contactar.",
+                                    "prop_key": "video_description.contacts.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.affiliation",
+                                    "help_text": "Afiliação da pessoa/unidade.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "help_text": "Endereço de correio eletrónico da pessoa.",
+                                    "prop_key": "video_description.contacts.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Telefone",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.telephone",
+                                    "help_text": "Um número de telefone para o qual se pode ligar para obter informações ou dar feedback sobre o quadro. Não deve ser um número de telefone pessoal; deve ser indicado um número institucional (normalmente de um serviço de apoio aos dados).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.contacts.uri",
+                                    "help_text": "Uma ligação para um sítio web onde se podem encontrar as informações de contacto do nome.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673389373090",
+                    "title": "Datas e versão",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.date_created",
+                            "title": "Data de criação",
+                            "type": "string",
+                            "help_text": "A data em que o vídeo foi criado. Recomenda-se introduzir a data no formato ISO 8601 (YYYY-MM-DD ou YYYY-MM ou YYYY). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. A data de criação do vídeo refere-se à data em que o vídeo foi produzido e considerado pronto para divulgação.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.date_published",
+                            "title": "Data de publicação",
+                            "type": "string",
+                            "help_text": "A data em que o vídeo foi publicado. Recomenda-se introduzir a data no formato ISO 8601 (YYYY-MM-DD ou YYYY-MM ou YYYY). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "help_text": "A versão do vídeo refere-se à versão publicada do vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.status",
+                            "title": "Estado",
+                            "type": "string",
+                            "enum": [
+                                {
+                                    "code": "incomplete",
+                                    "label": "Incompleto"
+                                },
+                                {
+                                    "code": "draft",
+                                    "label": "Rascunho"
+                                },
+                                {
+                                    "code": "published",
+                                    "label": "Publicado"
+                                },
+                                {
+                                    "code": "obsolete",
+                                    "label": "Obsoleto"
+                                }
+                            ],
+                            "help_text": "O estado do vídeo em termos da sua fase no ciclo de vida. Deve ser utilizado um vocabulário controlado. Exemplos de termos incluem {Incompleto, Rascunho, Publicado, Obsoleto}. Algumas organizações definem um conjunto de termos para as fases do seu ciclo de vida de publicação. ",
+                            "display_type": "dropdown-custom"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387842696",
+                    "title": "Conteúdo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.description",
+                            "title": "Descrição",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "Uma breve descrição do vídeo, normalmente com cerca de um parágrafo (cerca de 150 a 250 palavras).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.genre",
+                            "title": "Género",
+                            "type": "string",
+                            "help_text": "O género do vídeo, canal de difusão ou grupo. Pode ser utilizado um vocabulário controlado.",
+                            "enum": [
+                                {
+                                    "code": "docu",
+                                    "label": "Documentário"
+                                },
+                                {
+                                    "label": "Entretenimento ",
+                                    "code": "ente"
+                                },
+                                {
+                                    "label": "Educativo ",
+                                    "code": "educ"
+                                },
+                                {
+                                    "label": "Promocional ",
+                                    "code": "prom"
+                                },
+                                {
+                                    "label": "Informativo ",
+                                    "code": "info"
+                                }
+                            ],
+                            "display_type": "dropdown-custom"
+                        },
+                        {
+                            "key": "video_description.audience",
+                            "title": "Público-alvo",
+                            "type": "string",
+                            "help_text": "Uma breve descrição do público-alvo do vídeo, ou seja, o grupo para o qual foi criado ou para o qual pode ser adequado.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.name",
+                                    "help_text": "A palavra-chave (ou expressão) propriamente dita. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.vocabulary",
+                                    "help_text": "O vocabulário controlado (incluindo o número de versão ou a data) do qual a palavra-chave é extraída, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.keywords.uri",
+                                    "help_text": "O URL do vocabulário controlado do qual a palavra-chave é extraída, se existir.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "As palavras-chave são palavras ou expressões que descrevem aspetos relevantes do tema do vídeo. A adição de palavras-chave pode melhorar significativamente a facilidade de pesquisa dos dados, pelo que é recomendada. As palavras-chave podem resumir e melhorar a descrição do conteúdo ou do assunto de um recurso. Podem ser selecionadas a partir de um tesauro normalizado, de preferência um tesauro internacional e multilingue, ou podem ser sugeridas por modelos de aprendizagem automática. Pode ser definido um vocabulário controlado nos modelos de utilizador."
+                        },
+                        {
+                            "key": "video_description.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.id",
+                                    "help_text": "O identificador único do tema. Pode ser um número sequencial ou o ID do tema num vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Tema",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.name",
+                                    "help_text": "O rótulo do tema. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "Quando é utilizado um vocabulário controlado hierárquico (aninhado), o campo \"ID do nível superior\" pode ser utilizado para indicar um tema de nível superior ao qual este tema pertence.",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.vocabulary",
+                                    "help_text": "A especificação (nome, incluindo a versão e a data) do vocabulário controlado do qual o tema é retirado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.topics.uri",
+                                    "help_text": "Uma ligação (URL) para o sítio web do vocabulário controlado.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Os \"Temas\" indicam o(s) tema(s) substantivo(s) geral(is) que o vídeo representa. Uma classificação por temas facilita a referenciação e as pesquisas em catálogos eletrónicos de inquéritos; os temas devem, por isso, ser selecionados de um vocabulário controlado normalizado, por exemplo a classificação de temas do CESSDA (uma tipologia de temas disponível em 11 línguas) ou o sistema de classificação do Journal of Economic Literature (JEL). Note-se que é possível combinar temas de mais do que um vocabulário controlado. "
+                        },
+                        {
+                            "key": "video_description.persons",
+                            "type": "array",
+                            "title": "Pessoas",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.persons.name",
+                                    "help_text": "O nome da pessoa.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "video_description.persons.role",
+                                    "help_text": "A função no vídeo da pessoa indicada em \"Nome\".",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Uma lista das pessoas que aparecem no vídeo."
+                        },
+                        {
+                            "key": "video_description.main_entity",
+                            "title": "Entidade principal",
+                            "type": "string",
+                            "help_text": "Indica a entidade principal descrita no vídeo, se existir.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.transcript",
+                            "title": "Transcrição",
+                            "help_text": "A transcrição do conteúdo do vídeo, fornecida em texto. A inclusão da transcrição nos metadados tornará o vídeo muito mais fácil de encontrar, uma vez que o conteúdo da transcrição pode ser indexado nos catálogos. Note-se que, se o texto for muito longo, uma alternativa é guardá-lo num ficheiro de texto separado e disponibilizá-lo num catálogo de dados como recurso externo. A transcrição pode ser introduzida em várias línguas. Para os códigos e nomes das línguas, recomenda-se a utilização da norma ISO 639-2. ",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "language_code",
+                                    "title": "Código da língua",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.language_code",
+                                    "help_text": "O código da língua da transcrição. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "language_name",
+                                    "title": "Nome da língua",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.language_name",
+                                    "help_text": "O nome da língua da transcrição.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Texto",
+                                    "type": "string",
+                                    "prop_key": "video_description.transcript.text",
+                                    "help_text": "A própria transcrição, na língua indicada em \"Nome da língua\". ",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.album",
+                            "title": "Álbum",
+                            "help_text": "Quando um vídeo é publicado num catálogo que contém muitos outros vídeos, pode ser conveniente organizá-los por álbum. Os álbuns são coleções de vídeos organizadas por tema, período, local ou outros critérios. Um vídeo pode pertencer a mais do que um álbum. Os álbuns são “coleções virtuais”.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.name",
+                                    "help_text": "O nome (rótulo) do álbum.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.description",
+                                    "help_text": "Uma breve descrição do álbum.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "owner",
+                                    "title": "Proprietário",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.owner",
+                                    "help_text": "O proprietário ou depositário do álbum.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "video_description.album.uri",
+                                    "help_text": "Uma ligação (URL) para o álbum.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.language",
+                            "title": "Línguas",
+                            "help_text": "A língua refere-se à língua em que o vídeo é publicado. A maioria dos vídeos será disponibilizada numa única língua. No entanto, trata-se de um campo repetível, para permitir indicar mais do que uma língua. Para os códigos e nomes das línguas, recomenda-se a utilização da norma ISO 639-2.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da língua.",
+                                    "prop_key": "video_description.language.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "help_text": "O código da língua.",
+                                    "prop_key": "video_description.language.code",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_description.is_based_on",
+                            "title": "É baseado em",
+                            "type": "string",
+                            "help_text": "Um recurso do qual este vídeo deriva ou do qual é uma modificação ou adaptação.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.is_part_of",
+                            "title": "É parte de",
+                            "type": "string",
+                            "help_text": "Indica outro vídeo do qual este vídeo faz parte.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.relations",
+                            "title": "Relações",
+                            "type": "simple_array",
+                            "enum": [],
+                            "help_text": "Define a relação entre o vídeo documentado e outros recursos.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673389413841",
+                    "title": "Cobertura geográfica e temporal",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.country",
+                            "type": "array",
+                            "title": "País",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "video_description.country.name",
+                                    "help_text": "O nome do país/região. O nome e a grafia dos países devem ser coerentes em todos os recursos documentados. Muitas organizações têm as suas próprias políticas sobre a designação de países/regiões/economias/territórios, que os curadores de dados terão de cumprir.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "video_description.country.code",
+                                    "help_text": "O código do país/região (introduzido como cadeia de caracteres, mesmo no caso de códigos numéricos). Recomenda-se a utilização de uma lista normalizada de países e regiões, como a lista de países ISO (ISO 3166).",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A lista de países (ou regiões) abrangidos pelo vídeo, se aplicável. Refere-se ao conteúdo do vídeo e não ao país onde o vídeo foi disponibilizado.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "video_description.spatial_coverage",
+                            "title": "Cobertura espacial",
+                            "type": "string",
+                            "help_text": "Indica o(s) local(is) representado(s) ou descrito(s) no vídeo. Este elemento complementa o elemento \"País\". Pode ser utilizado para precisar a cobertura geográfica do vídeo, sob a forma de texto livre.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "video_description.bbox",
+                            "title": "Retângulo envolvente",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Oeste",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.west",
+                                    "help_text": "Longitude oeste do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Este",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.east",
+                                    "help_text": "Longitude este do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "Sul",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.south",
+                                    "help_text": "Latitude sul do retângulo envolvente.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Norte",
+                                    "type": "string",
+                                    "prop_key": "video_description.bbox.north",
+                                    "help_text": "Latitude norte do retângulo envolvente.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Este elemento é utilizado para definir um ou vários retângulos envolventes geográficos, que constituem a descrição geométrica fundamental retangular da cobertura geográfica do vídeo. Um retângulo envolvente é definido pelas longitudes oeste e este e pelas latitudes norte e sul, e inclui a maior extensão geográfica da cobertura geográfica do vídeo. O retângulo envolvente fornece as coordenadas geográficas dos cantos superior esquerdo (norte/oeste) e inferior direito (sul/este) de uma área retangular. Este elemento pode ser utilizado nos catálogos como primeira etapa de uma pesquisa baseada em coordenadas. O intervalo válido de latitude em graus é -90 e +90 para os hemisférios sul e norte, respetivamente. A longitude situa-se no intervalo -180 e +180, especificando coordenadas a oeste e a este do Meridiano de Greenwich, respetivamente.\n"
+                        },
+                        {
+                            "key": "video_description.content_reference_time",
+                            "title": "Momento de referência",
+                            "type": "string",
+                            "help_text": "O momento específico descrito pelo vídeo, no caso de obras que destacam um determinado momento de um evento.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.temporal_coverage",
+                            "title": "Cobertura temporal",
+                            "type": "string",
+                            "help_text": "Indica o período a que o vídeo se aplica, ou seja, que descreve, quer como Data/Hora quer como cadeia de texto que indica um período no formato de intervalo de tempo ISO 8601.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "video_description_container1673387532552",
+                    "title": "Acesso e direitos ",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "video_description.video_provider",
+                            "title": "Fornecedor do vídeo",
+                            "type": "string",
+                            "help_text": "A pessoa ou organização que fornece o vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.video_url",
+                            "title": "URL do vídeo",
+                            "type": "string",
+                            "help_text": "URL do vídeo.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.embed_url",
+                            "title": "URL de incorporação",
+                            "type": "string",
+                            "help_text": "Um URL que aponta para um leitor de um vídeo específico. Por exemplo, “https://www.youtube.com/embed/7Aif1xjstws”. Para poder ser incorporado, um vídeo tem de estar alojado numa plataforma de partilha de vídeos como o Youtube (www.youtube.com). Para obter a “ligação de incorporação” no Youtube, clicar no botão “Partilhar” e depois em “Incorporar”. Na caixa de resultado, selecionar o conteúdo do elemento \"src =\".",
+                            "display_type": "text",
+                            "rules": {
+                                "is_uri": true
+                            }
+                        },
+                        {
+                            "key": "video_description.repository",
+                            "title": "Repositório",
+                            "type": "string",
+                            "help_text": "O nome do repositório (organização).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.rights",
+                            "title": "Direitos",
+                            "type": "string",
+                            "help_text": "Uma descrição textual dos direitos associados ao vídeo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_holder",
+                            "title": "Titular dos direitos de autor",
+                            "type": "string",
+                            "help_text": "A parte que detém os direitos de autor legais sobre o vídeo. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_notice",
+                            "title": "Aviso de direitos de autor",
+                            "type": "string",
+                            "help_text": "Texto de um aviso adequado para descrever os aspetos de direitos de autor do vídeo, indicando idealmente o titular dos direitos de autor.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.copyright_year",
+                            "title": "Ano dos direitos de autor",
+                            "type": "string",
+                            "help_text": "O ano em que os direitos de autor reivindicados sobre o vídeo foram afirmados pela primeira vez.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.citation",
+                            "title": "Citação",
+                            "type": "string",
+                            "help_text": "Este elemento fornece uma citação obrigatória ou recomendada do ficheiro de vídeo.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "video_description_section",
+                    "title": "Informação técnica",
+                    "items": [
+                        {
+                            "key": "video_description.media",
+                            "title": "Suporte",
+                            "type": "simple_array",
+                            "enum": [],
+                            "help_text": "Uma descrição do suporte em que a gravação está armazenada (além do formato de ficheiro em linha); por exemplo, “DVD”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.duration",
+                            "title": "Duração",
+                            "type": "string",
+                            "help_text": "A duração do item (filme, gravação áudio, evento, etc.) no formato ISO 8601. As durações ISO 8601 são expressas de acordo com as instruções de formatação abaixo, em que (n) é substituído pelo valor de cada um dos elementos de data e hora que se seguem a (n). Por exemplo: (3)H significa 3 horas.\nInstruções: introduza a duração como:  P(n)Y(n)M(n)DT(n)H(n)M(n)S em que: \n- P é o designador de período e é sempre colocado no início da duração\n- (n)Y representa o número de anos\n- (n)M representa o número de meses\n- (n)W representa o número de semanas\n- (n)D representa o número de dias\n- T é o designador de tempo e precede sempre as componentes horárias\n- (n)H representa o número de horas\n- (n)M representa o número de minutos\n- (n)S representa o número de segundos\nPor exemplo, P1Y2M20DT3H30M8S representa uma duração de um ano, dois meses, vinte dias, três horas, trinta minutos e oito segundos.\nOs elementos de data e hora, incluindo o respetivo designador, podem ser omitidos se o seu valor for zero, e os elementos de ordem inferior também podem ser omitidos para uma precisão reduzida. Por exemplo, “P23DT23H” e “P4Y” são ambas representações de duração aceitáveis.\nComo M pode representar tanto meses como minutos, é utilizado o designador de tempo T. Por exemplo, “P1M” é uma duração de um mês e “PT1M” é uma duração de um minuto.\nFonte: esta informação sobre a ISO 8601 foi adaptada da Wikipédia, onde se pode encontrar informação mais detalhada.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "video_description.encoding_format",
+                            "title": "Formato de codificação",
+                            "type": "string",
+                            "help_text": "O formato do ficheiro de vídeo, normalmente expresso através de um formato MIME.",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "key": "document_tags",
+            "title": "Etiquetas",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Um grupo definido pelo utilizador (opcional) ao qual a etiqueta pertence. O agrupamento de etiquetas permite implementar facetas controladas em catálogos de dados.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,1983 @@
+{
+    "type": "template",
+    "title": "Esquema de script",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "doc_desc_container",
+            "title": "Informação sobre os metadados",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "doc_desc_section",
+                    "title": "Informação sobre os metadados",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "doc_desc.title",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Título do documento",
+                            "help_text": "O título do documento de metadados (que normalmente será igual ao elemento \"Título\" na secção \"Descrição do projeto / Declaração de título\"). O documento de metadados é o ficheiro de metadados (ficheiro XML ou JSON) que está a ser gerado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.idno",
+                            "type": "string",
+                            "class": "required",
+                            "title": "ID do documento",
+                            "help_text": "Um identificador único do documento de metadados do projeto. Este identificador deve ser único no catálogo onde se pretende publicar os metadados. Idealmente, o identificador deve também ser globalmente único. É diferente do \"ID principal\" na secção Descrição do projeto / Declaração de título, embora seja boa prática gerar identificadores que estabeleçam uma ligação clara entre estes dois identificadores. O ID do documento pode também incluir o identificador da versão do documento de metadados. Por exemplo, se o \"ID principal\" do projeto de investigação reprodutível “Mapeamento da Pobreza em Madagáscar 2022” for \"RR_MDG_POVMAP_2022”, o ID do documento poderá ser “IHSN_RR_MDG_POVMAP_2022_v1.0” se os metadados forem produzidos pela IHSN e se esta for a versão 1.0 dos metadados. Cada organização deve estabelecer regras sistemáticas para gerar estes ID. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.producers",
+                            "class": "required",
+                            "title": "Produtores de metadados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da pessoa ou organização que produziu os metadados ou contribuiu para a sua produção.",
+                                    "class": "required",
+                                    "prop_key": "doc_desc.producers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "doc_desc.producers.abbr",
+                                    "help_text": "A abreviatura (ou sigla) da organização referida em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "type": "string",
+                                    "title": "Afiliação",
+                                    "prop_key": "doc_desc.producers.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização mencionada em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "doc_desc.producers.role",
+                                    "help_text": "A função específica da pessoa ou organização mencionada em \"Nome\" na produção dos metadados.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "O produtor de metadados é a pessoa ou organização com a responsabilidade financeira e/ou administrativa pelos processos através dos quais o documento de metadados foi criado. Este é um elemento \"Recomendado\". Para efeitos de administração do catálogo, a informação sobre o produtor e sobre a data de produção dos metadados é útil.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "doc_desc.prod_date",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Data de produção",
+                            "help_text": "A data em que os metadados deste projeto foram produzidos (não distribuídos nem arquivados), de preferência introduzida no formato ISO 8601 (YYYY-MM-DD ou YYY-MM). Pode ser definida uma regra de validação nos modelos de utilizador para impor um formato de data. Este é um elemento \"Recomendado\", pois a informação sobre o produtor e sobre a data de produção dos metadados é útil para fins de administração do catálogo.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.version",
+                            "type": "string",
+                            "class": "",
+                            "title": "Versão",
+                            "help_text": "A versão do documento de metadados (não a versão do próprio projeto).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "project_desc_container",
+            "title": "Descrição do projeto",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "project_desc_title_statement",
+                    "title": "Declaração de título",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.title_statement.idno",
+                            "title": "ID principal",
+                            "help_text": "Um identificador único do projeto. O \"ID principal\" (também designado IDNO) é um número de identificação único utilizado para identificar a base de dados. É necessário um identificador único para fins de catalogação, pelo que este elemento é declarado como \"Obrigatório\". O identificador permitirá aos utilizadores citar corretamente o indicador/série. O identificador deve ser único no catálogo. Idealmente, deve também ser globalmente único; a opção recomendada é obter um Digital Object Identifier (DOI) para o estudo. Em alternativa, o \"ID principal\" pode ser construído por uma organização utilizando um esquema coerente. Note-se que o esquema permite indicar mais do que um identificador para um mesmo estudo (no elemento \"Outros identificadores\"); um identificador específico do catálogo não é, portanto, incompatível com um identificador globalmente único como um DOI. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. Pode ser definida uma regra de validação (através de uma expressão regular) nos modelos de utilizador para impor um formato de ID específico. O identificador não pode conter espaços em branco.\n",
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.identifiers",
+                            "title": "Outros identificadores",
+                            "type": "array",
+                            "help_text": "Este elemento repetível é utilizado para introduzir identificadores (ID) diferentes do \"ID principal\" (IDNO). Pode ser, por exemplo, um Digital Object Identifier (DOI). O \"ID principal\" pode ser repetido aqui (o \"ID principal\" não dispõe de um parâmetro \"Tipo\"; assim, se for utilizado como identificador principal um DOI ou outro tipo de ID normalizado, recomenda-se repeti-lo aqui com a identificação do tipo). ",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "O tipo de identificador. Por exemplo: “DOI” ou \"ISBN\". ",
+                                    "prop_key": "project_desc.title_statement.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identificador",
+                                    "type": "string",
+                                    "prop_key": "project_desc.title_statement.identifiers.identifier",
+                                    "help_text": "O próprio identificador.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.title_statement.title",
+                            "title": "Título",
+                            "type": "string",
+                            "help_text": "O título é o nome oficial do projeto, tal como pode figurar em relatórios, artigos ou outros documentos. Deve utilizar-se um nome único para cada projeto distinto. O título pode corresponder ao título de um artigo académico, de uma avaliação de impacto de um projeto, etc. Deve ter-se atenção à utilização coerente de maiúsculas no título.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.sub_title",
+                            "title": "Subtítulo",
+                            "type": "string",
+                            "help_text": "O subtítulo do projeto/script pode ser utilizado quando é necessário distinguir características de um projeto. Este elemento raramente será utilizado. Deve ter-se atenção à utilização coerente de maiúsculas no subtítulo.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.alternate_title",
+                            "title": "Título alternativo",
+                            "type": "string",
+                            "help_text": "Um título alternativo do projeto. Trata-se de qualquer título alternativo que ajude a encontrar o projeto de investigação. Pode ser, por exemplo, um acrónimo pelo qual o projeto é frequentemente designado.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.translated_title",
+                            "title": "Título traduzido",
+                            "type": "string",
+                            "help_text": "Uma versão traduzida do título (será utilizada, por exemplo, quando um catálogo documenta todas as entradas em inglês, mas pretende preservar o título de um projeto na sua língua original quando esta não é o inglês). Os carateres especiais devem ser apresentados corretamente, como acentos e outros sinais diacríticos ou alfabetos diferentes.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.project_website",
+                            "title": "Sítio web do projeto",
+                            "help_text": "URL do sítio web do projeto.",
+                            "type": "simple_array",
+                            "enum": [],
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "project_desc_reproducibility_status",
+                    "title": "Estado de reprodutibilidade",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.reproducibility_status.status",
+                            "title": "Estado",
+                            "help_text": "Informação sobre o estado de reprodutibilidade do projeto, utilizando um vocabulário controlado",
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.reproducibility_status.note",
+                            "title": "Nota sobre a reprodutibilidade",
+                            "help_text": "Nota",
+                            "type": "string",
+                            "is_required": false,
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "key": "project_desc_container1674844564813",
+                    "title": "Autores e colaboradores",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.authoring_entity",
+                            "title": "Entidade autora",
+                            "help_text": "Esta secção identifica a(s) pessoa(s) e/ou organização(ões) responsável(eis) pelo conteúdo intelectual do projeto de investigação e especifica a respetiva função.",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome da pessoa ou organização responsável pelo projeto de investigação.",
+                                    "prop_key": "project_desc.authoring_entity.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "Função específica da pessoa ou organização indicada em \"Nome\".",
+                                    "prop_key": "project_desc.authoring_entity.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.authoring_entity.affiliation",
+                                    "help_text": "Entidade ou organização de afiliação do autor/investigador principal indicado em \"Nome\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "help_text": "Abreviatura utilizada para identificar a entidade indicada em \"Afiliação\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.authoring_entity.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "Correio eletrónico",
+                                    "help_text": "Consoante as políticas da entidade, um investigador pode indicar um e-mail pessoal ou um e-mail da entidade para responder a pedidos de informação relacionados com o projeto.",
+                                    "prop_key": "project_desc.authoring_entity.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "ID do autor",
+                                    "help_text": "Identificador único de um autor, que pode ser fornecido por serviços como o ORCID ou outros",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "string",
+                                            "title": "Tipo",
+                                            "prop_key": "project_desc.authoring_entity.author_id.type",
+                                            "help_text": "O tipo de identificador, por exemplo \"ORCID\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "string",
+                                            "title": "ID",
+                                            "prop_key": "project_desc.authoring_entity.author_id.id",
+                                            "help_text": "Um número/código de identificação único da entidade autora.",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.authoring_entity.author_id"
+                                }
+                            ],
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.contributors",
+                            "title": "Colaboradores",
+                            "help_text": "Esta secção destina-se a registar outros colaboradores do projeto de investigação e a reconhecer as funções que desempenharam.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome da pessoa, pessoa coletiva ou entidade que contribuiu para o conteúdo intelectual do projeto (além da entidade autora/investigador principal). Ao introduzir o nome de uma pessoa, inverter o nome próprio e o apelido e utilizar vírgulas.",
+                                    "prop_key": "project_desc.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "Título da pessoa (se existir) responsável pelo conteúdo substantivo e intelectual da obra.",
+                                    "prop_key": "project_desc.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contributors.affiliation",
+                                    "help_text": "Entidade ou organização de afiliação do colaborador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "help_text": "Abreviatura utilizada para identificar a entidade indicada em \"Afiliação\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contributors.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "Correio eletrónico",
+                                    "help_text": "Consoante as políticas da entidade, um investigador pode indicar um e-mail pessoal ou um e-mail da entidade para responder a pedidos de informação relacionados com o projeto.",
+                                    "prop_key": "project_desc.contributors.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "url",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.contributors.url",
+                                    "help_text": "O URL que fornece informação sobre o colaborador ou a sua entidade de afiliação",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.sponsors",
+                            "title": "Patrocinadores",
+                            "help_text": "A(s) fonte(s) de financiamento para a produção da obra. Se diferentes entidades financiadoras patrocinaram diferentes fases do processo de produção, utilizar o atributo ‘função’ para as distinguir.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.name",
+                                    "help_text": "Nome da entidade financiadora/patrocinador.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abreviatura",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.abbr",
+                                    "help_text": "Abreviatura da entidade financiadora/patrocinadora.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.role",
+                                    "help_text": "Função específica da entidade financiadora/patrocinadora.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "grant_no",
+                                    "title": "N.º da subvenção",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.grant_no",
+                                    "help_text": "Número da subvenção ou do financiamento atribuído.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.curators",
+                            "title": "Curadores",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "O nome da pessoa ou organização.",
+                                    "prop_key": "project_desc.curators.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "help_text": "A função específica da pessoa ou organização na curadoria dos recursos do projeto.",
+                                    "prop_key": "project_desc.curators.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.curators.affiliation",
+                                    "help_text": "A afiliação da pessoa ou organização.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abreviatura",
+                                    "help_text": "Um acrónimo da organização, caso tenha sido introduzida uma organização em \"Nome\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.curators.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "Correio eletrónico",
+                                    "help_text": "O endereço de correio eletrónico da pessoa ou organização indicada em \"Nome\". Deve evitar-se a utilização de endereços de correio eletrónico pessoais.",
+                                    "prop_key": "project_desc.curators.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "url",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.curators.url",
+                                    "help_text": "Uma ligação para o sítio web da pessoa ou organização indicada em \"Nome\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de pessoas e/ou organizações responsáveis pela curadoria dos recursos associados ao projeto."
+                        },
+                        {
+                            "key": "project_desc.acknowledgements",
+                            "title": "Agradecimentos",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgements.name",
+                                    "help_text": "O nome da pessoa ou entidade reconhecida pelo apoio prestado ao projeto.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgements.affiliation",
+                                    "help_text": "A afiliação da pessoa ou entidade a quem se agradece.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgements.role",
+                                    "help_text": "Uma breve descrição da função da pessoa ou entidade que é reconhecida ou a quem se agradece pelo apoio prestado ao projeto.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Este bloco repetível de elementos é utilizado para fornecer uma lista discriminada das pessoas e organizações cujo contributo para o projeto deve ser reconhecido. Note-se que existem elementos de metadados específicos para listar os patrocinadores financeiros e os principais colaboradores do estudo. Uma alternativa a este campo é o campo \"Declaração de agradecimentos\" (ver abaixo), que pode ser utilizado para apresentar os agradecimentos sob a forma de texto não estruturado."
+                        },
+                        {
+                            "key": "project_desc.acknowledgement_statement",
+                            "title": "Declaração de agradecimento",
+                            "type": "string",
+                            "help_text": "Este campo é utilizado para apresentar os agradecimentos sob a forma de texto não estruturado. É uma alternativa ao elemento \"Agradecimentos\", que permite discriminar os agradecimentos.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844693452",
+                    "title": "Declaração de versão",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.production_date",
+                            "title": "Data de conclusão do projeto",
+                            "help_text": "A data, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD), em que o projeto foi concluído (refere-se à versão que está a ser documentada e disponibilizada.)",
+                            "type": "string",
+                            "enum": [],
+                            "display_type": "text",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.version_statement.version",
+                            "title": "Versão",
+                            "type": "string",
+                            "help_text": "Um rótulo que descreve a versão. Por exemplo, “Versão 1.2”.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_date",
+                            "title": "Data da versão",
+                            "type": "string",
+                            "help_text": "A data, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD), em que a versão foi disponibilizada.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_resp",
+                            "title": "Responsabilidade",
+                            "help_text": "Pessoa(s) ou organização(ões) responsável(eis) por esta versão.",
+                            "type": "string",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_notes",
+                            "title": "Nota sobre a versão",
+                            "type": "string",
+                            "help_text": "Informação adicional sobre a versão, se existir; é boa prática descrever o que distingue esta versão da(s) anterior(es). ",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844638082",
+                    "title": "Âmbito e cobertura",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.abstract",
+                            "title": "Resumo",
+                            "type": "string",
+                            "help_text": "O resumo deve apresentar uma síntese clara das finalidades, objetivos e conteúdo do projeto. Um resumo pode fazer referência aos vários resultados associados ao projeto de investigação.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.geographic_units",
+                            "title": "Áreas geográficas",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.name",
+                                    "help_text": "O nome da área geográfica.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.code",
+                                    "help_text": "O código da área geográfica. Para os países, recomenda-se a utilização dos códigos e nomes de países ISO 3166.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.type",
+                                    "help_text": "O tipo de área geográfica. Por exemplo: \"país\", \"província\", \"campo de refugiados\", etc. ",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "As áreas geográficas abrangidas pelo projeto. Quando o projeto diz respeito a um ou mais países, ou a parte de um ou mais países, é importante indicar o nome do país. Isto significa que, para um projeto relativo a uma província ou cidade específica de um país, o nome do país será introduzido para além da província ou cidade (como entradas separadas neste bloco repetível de elementos). Note-se que a área não tem de ser uma área administrativa; pode ser, por exemplo, um oceano).",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.keywords",
+                            "type": "array",
+                            "title": "Palavras-chave",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Palavra-chave",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.name",
+                                    "help_text": "A palavra-chave propriamente dita (uma palavra ou uma expressão).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.vocabulary",
+                                    "help_text": "O vocabulário controlado (incluindo o número de versão ou a data) do qual a palavra-chave é extraída, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.uri",
+                                    "help_text": "O URL do vocabulário controlado do qual a palavra-chave é extraída, se existir.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de palavras-chave que fornecem informação sobre o âmbito central e os objetivos do projeto de investigação. As palavras-chave são uma solução prática para melhorar a localização da investigação, pois permitem indexar termos e expressões que não constam noutras partes dos metadados e tornar um projeto localizável por motores de pesquisa baseados em texto. Será utilizado de preferência (embora não obrigatoriamente) um vocabulário controlado, como o Tesauro da UNESCO. A lista aqui apresentada pode combinar palavras-chave de vários vocabulários controlados e palavras-chave definidas pelo utilizador.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.themes",
+                            "type": "array",
+                            "title": "Áreas temáticas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.id",
+                                    "help_text": "O ID do tema, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.name",
+                                    "help_text": "O nome (rótulo) do tema, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O ID ascendente do tema (ID do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Uma lista de temas abrangidos pelo projeto de investigação. Será utilizado de preferência um vocabulário controlado. Note-se que os temas raramente serão utilizados, uma vez que os elementos tópicos e disciplinas são mais adequados para a maioria das utilizações. "
+                        },
+                        {
+                            "key": "project_desc.topics",
+                            "type": "array",
+                            "title": "Temas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.id",
+                                    "help_text": "O identificador do tópico, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.name",
+                                    "help_text": "O nome (rótulo) do tópico, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O identificador ascendente do tópico (identificador do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informação sobre os tópicos abrangidos pelo projeto de investigação. Será utilizado de preferência um vocabulário controlado, por exemplo a classificação de tópicos CESSDA (CESSDA Topics), uma tipologia de tópicos disponível em 11 línguas; ou o Journal of Economic Literature (JEL) Classification System, ou a classificação de tópicos do Banco Mundial. Note-se que pode ser utilizado mais do que um vocabulário controlado. "
+                        },
+                        {
+                            "key": "project_desc.disciplines",
+                            "type": "array",
+                            "title": "Disciplinas",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.id",
+                                    "help_text": "O identificador da disciplina, retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.name",
+                                    "help_text": "O nome (rótulo) da disciplina, de preferência retirado de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID do nível superior",
+                                    "help_text": "O identificador ascendente da disciplina (identificador do item um nível acima na hierarquia), caso seja utilizado um vocabulário controlado hierárquico.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulário",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.vocabulary",
+                                    "help_text": "O nome (incluindo o número de versão) do vocabulário controlado utilizado, se aplicável.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.uri",
+                                    "help_text": "O URL do vocabulário controlado utilizado, se aplicável.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informação sobre as disciplinas académicas relacionadas com o conteúdo do projeto de investigação. Será utilizado de preferência um vocabulário controlado, por exemplo o fornecido pela lista de áreas académicas da Wikipédia."
+                        },
+                        {
+                            "key": "project_desc.related_projects",
+                            "title": "Projetos relacionados",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.name",
+                                    "help_text": "O nome (título) do projeto relacionado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.uri",
+                                    "help_text": "Uma ligação (URL) para a página web do projeto relacionado.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.note",
+                                    "help_text": "Uma breve descrição ou outra informação relevante sobre o projeto relacionado.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "O objetivo deste bloco é fornecer ligações (URL) para outros projetos relacionados, que podem ser documentados e divulgados no mesmo catálogo ou em qualquer outro local na Internet."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844845378",
+                    "title": "Processos e resultados",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.process",
+                            "title": "Tratamento",
+                            "help_text": "Este elemento é utilizado para documentar o ciclo de vida do projeto de investigação, desde a sua conceção e início até à sua conclusão. Pode incluir fases de angariação de fundos, aprovação por uma comissão de revisão, revisão da nota de conceito, aquisição de dados, análise, publicação de um documento de trabalho, revisão por pares, publicação em revista, apresentação em conferências, publicação, avaliação, prestação de informação aos patrocinadores, etc. Recomenda-se apresentar estas etapas por ordem cronológica.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.name",
+                                    "help_text": "Este é um cabeçalho para a fase do processo.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_start",
+                                    "title": "Data de início",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_start",
+                                    "help_text": "Data em que a fase começou, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_end",
+                                    "title": "Data de fim",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_end",
+                                    "help_text": "Data em que a fase terminou, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.description",
+                                    "help_text": "Uma breve descrição da fase.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.review_board",
+                            "title": "Comissão de ética institucional",
+                            "help_text": "Informação sobre se e quando o projeto foi submetido, revisto e aprovado por uma comissão de ética institucional (ou comissão de ética independente, comissão de revisão ética (ERB), comissão de ética em investigação ou equivalente).",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.approval_process",
+                            "title": "Processo de aprovação",
+                            "help_text": "O \"Processo de aprovação\" é um grupo de seis elementos utilizado para descrever o(s) processo(s) formal(is) de aprovação (se existirem) a que o projeto teve de ser sujeito. Pode incluir, por exemplo, uma aprovação por uma Comissão de Ética para recolher novos dados, seguida de um processo de revisão interna para validar os resultados.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "approval_phase",
+                                    "title": "Nome da fase",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_phase",
+                                    "help_text": "Um rótulo que descreve a fase de aprovação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_authority",
+                                    "title": "Autoridade",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_authority",
+                                    "help_text": "Identificação da(s) pessoa(s) ou organização(ões) cuja aprovação foi exigida ou solicitada.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "submission_date",
+                                    "title": "Data de submissão",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.submission_date",
+                                    "help_text": "A data, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD), em que o projeto (ou uma componente do mesmo) foi submetido para aprovação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "reviewer",
+                                    "title": "Revisor",
+                                    "type": "string",
+                                    "help_text": "Identificação do(s) revisor(es).",
+                                    "prop_key": "project_desc.approval_process.reviewer",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "review_status",
+                                    "title": "Estado da revisão",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.review_status",
+                                    "help_text": "Estado da aprovação.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_date",
+                                    "title": "Data de aprovação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_date",
+                                    "help_text": "Data em que a aprovação foi formalmente recebida, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.reviews_comments",
+                            "title": "Revisões e comentários",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "comment_date",
+                                    "title": "Data",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_date",
+                                    "help_text": "A data em que o comentário foi apresentado, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD ou YYYY-MM).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_by",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_by",
+                                    "help_text": "O nome da pessoa ou organização que apresentou o comentário.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_description",
+                                    "title": "Comentário",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_description",
+                                    "help_text": "O texto do próprio comentário, na sua formulação original ou numa versão resumida.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "comment_response",
+                                    "title": "Resposta",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_response",
+                                    "help_text": "A resposta dada pela equipa/pessoa de investigação ao comentário, na sua formulação original ou numa versão resumida.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Muitos projetos de investigação estarão sujeitos a um processo de revisão, que pode ocorrer em diferentes fases da execução do projeto (desde a conceção até à revisão do resultado final). Este bloco destina-se a documentar os comentários recebidos dos revisores durante este processo. É um bloco repetível de elementos de metadados, que pode ser utilizado para documentar os comentários com um elevado grau de detalhe."
+                        },
+                        {
+                            "key": "project_desc.output",
+                            "title": "Resultados",
+                            "help_text": "Este elemento descreve e referencia todos os produtos substanciais/previstos do projeto de investigação, que podem incluir publicações, relatórios, sítios web, conjuntos de dados, aplicações interativas, apresentações, visualizações, entre outros. Um resultado pode também ser designado por “produto final”.",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "Tipo de resultado. O tipo de resultado relaciona-se com o meio utilizado para transmitir ou comunicar os resultados, constatações ou conclusões pretendidos do projeto de investigação. Este campo pode ser regido por um vocabulário controlado. O tipo de conteúdo pode ser “Documento de trabalho”, “Base de dados”, etc.",
+                                    "prop_key": "project_desc.output.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.title",
+                                    "help_text": "Título formal do resultado. Consoante o tipo de resultado, o título terá maior ou menor grau de formalidade.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "title": "Autores",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.authors",
+                                    "help_text": "Autores do resultado; se forem vários, serão listados num mesmo campo de texto.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.description",
+                                    "help_text": "Uma breve descrição do resultado (mas não um resumo, que seria introduzido em \"Resumo\").",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "abstract",
+                                    "type": "string",
+                                    "title": "Resumo",
+                                    "prop_key": "project_desc.output.abstract",
+                                    "help_text": "Se o resultado consistir num documento, o resumo será introduzido aqui.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.output.uri",
+                                    "help_text": "Uma ligação (URL) onde se pode encontrar o resultado ou informação sobre o resultado.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "doi",
+                                    "type": "string",
+                                    "title": "DOI",
+                                    "prop_key": "project_desc.output.doi",
+                                    "help_text": "O Digital Object Identifier (DOI) do resultado, se disponível.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license",
+                                    "type": "string",
+                                    "title": "Licença",
+                                    "prop_key": "project_desc.output.license",
+                                    "help_text": "A licença do resultado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license_uri",
+                                    "type": "string",
+                                    "title": "URI da licença",
+                                    "prop_key": "project_desc.output.license_uri",
+                                    "help_text": "O URI da licença do resultado.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.language",
+                            "title": "Língua",
+                            "help_text": "Um bloco de dois elementos que descreve a(s) língua(s) do projeto. Deve ser indicado pelo menos um dos dois elementos para cada língua listada. ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.name",
+                                    "help_text": "O nome da língua.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Código",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.code",
+                                    "help_text": "O código da língua. Os códigos numéricos devem ser introduzidos como cadeias de carateres. Recomenda-se a utilização da norma ISO 639-2 (o código alfa-3 em Codes for the representation of names of languages).",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.errata",
+                            "title": "Errata",
+                            "help_text": "Este campo é utilizado para listar e descrever erratas.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "date",
+                                    "title": "Data",
+                                    "type": "string",
+                                    "prop_key": "project_desc.errata.date",
+                                    "help_text": "A data, de preferência introduzida no formato ISO 8601 (YYYY-MM-DD), em que a errata foi disponibilizada.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "project_desc.errata.description",
+                                    "help_text": "Descrição do(s) erro(s) e das medidas tomadas para o(s) corrigir.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845183788",
+                    "title": "Dados",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.data_statement",
+                            "title": "Declaração sobre os dados",
+                            "help_text": "Uma declaração geral sobre os dados utilizados no projeto. É disponibilizado um campo separado para listar e documentar a origem e as principais características dos conjuntos de dados.",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.datasets",
+                            "title": "Conjuntos de dados",
+                            "help_text": "Este campo é utilizado para fornecer uma lista discriminada dos conjuntos de dados utilizados no projeto. Os dados não são documentados aqui (existem metadados específicos para documentar dados de diferentes tipos, como o DDI para microdados, a ISO 19139 para conjuntos de dados geográficos, etc.)",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.name",
+                                    "help_text": "O nome (título) do conjunto de dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "idno",
+                                    "title": "ID do conjunto de dados",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.idno",
+                                    "help_text": "O identificador único do conjunto de dados. Se o conjunto de dados tiver vários identificadores, incluindo um DOI, deve ser utilizado aqui o DOI.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.note",
+                                    "help_text": "Uma breve descrição do conjunto de dados.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "access_type",
+                                    "title": "Política de acesso",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.access_type",
+                                    "help_text": "A política de acesso aplicada ao conjunto de dados.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "Licença",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license",
+                                    "help_text": "A licença de acesso ou de utilização dos dados aplicável ao conjunto de dados.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license_uri",
+                                    "title": "URL da licença",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license_uri",
+                                    "help_text": "O URL de uma página web onde se pode obter mais informação sobre a licença.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL dos dados",
+                                    "prop_key": "project_desc.datasets.uri",
+                                    "help_text": "O URL onde se pode obter o conjunto de dados (ou uma descrição detalhada do mesmo). Pode ser uma ligação para um catálogo de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "citation",
+                                    "title": "Citação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.citation",
+                                    "help_text": "Uma referência bibliográfica do conjunto de dados.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845066822",
+                    "title": "Métodos, software e scripts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.methods",
+                            "title": "Métodos",
+                            "help_text": "Uma lista dos métodos analíticos, estatísticos, econométricos e de aprendizagem automática utilizados no projeto. O objetivo é permitir aos utilizadores encontrar projetos com base numa pesquisa sobre os métodos aplicados, por exemplo, responder a uma consulta como “previsão da pobreza com random forest”.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.name",
+                                    "help_text": "Um nome abreviado para o método descrito.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Nota",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.note",
+                                    "help_text": "Qualquer informação adicional sobre o método.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.software",
+                            "title": "Software",
+                            "help_text": "Este campo é utilizado para listar o software e os pacotes e bibliotecas/pacotes especializados que foram utilizados para executar o projeto e que são necessários para reproduzir os scripts. Incluem-se as bibliotecas carregadas pelos scripts (por exemplo, através do comando \"require\" ou \"library\" do R) (não todas as respetivas dependências, que se pressupõe serem instaladas automaticamente).",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.name",
+                                    "help_text": "O nome do software. Por exemplo: \"Python\" ou \"R\". Recomenda-se a utilização de um vocabulário controlado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Versão",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.version",
+                                    "help_text": "A versão do software.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "library",
+                                    "title": "Bibliotecas",
+                                    "help_text": "Uma lista de bibliotecas/pacotes necessários para executar os scripts. Note-se que a versão específica de cada pacote não é documentada aqui; espera-se que conste do script ou das instruções de reprodução.",
+                                    "type": "simple_array",
+                                    "prop_key": "project_desc.software.library",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.scripts",
+                            "title": "Scripts",
+                            "help_text": "Este campo é utilizado para descrever os scripts escritos pelos autores do projeto. Pressupõe-se que todos os scripts foram escritos com software listado no campo software.\n",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "file_name",
+                                    "title": "Nome do ficheiro",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.file_name",
+                                    "help_text": "Nome do ficheiro de script (para utilizadores de R, incluirá normalmente ficheiros com a extensão [.R], para utilizadores de Stata serão ficheiros com a extensão [.do], para utilizadores de Python …). Mas pode também incluir outros ficheiros relacionados e necessários para executar os scripts (por exemplo, ficheiros CSV de consulta, etc.) Não inclui os ficheiros de dados, que são descritos num campo específico.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "zip_package",
+                                    "title": "Pacote zip",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.zip_package",
+                                    "help_text": "Se os ficheiros de script tiverem sido guardados como ficheiro comprimido ou dentro de um ficheiro comprimido (zip, rar ou equivalente), indica-se aqui o nome do ficheiro zip que contém o script.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.title",
+                                    "help_text": "Um título (rótulo) atribuído ao ficheiro de script.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "type": "array",
+                                    "title": "Autores",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.name",
+                                            "help_text": "Nome do autor (pessoa ou organização) do script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "abbr",
+                                            "title": "Abreviatura",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.abbr",
+                                            "help_text": "O acrónimo da organização autora do script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Função",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.role",
+                                            "help_text": "Função específica da pessoa ou organização na produção do script.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.authors",
+                                    "help_text": "Este é um bloco repetível que permite introduzir uma lista de autores e coautores de um script"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Data",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.date",
+                                    "help_text": "Data em que o script foi produzido, de preferência introduzida no formato ISO 8601 (AAAA-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "format",
+                                    "title": "Formato",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.format",
+                                    "help_text": "Formato do ficheiro",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "software",
+                                    "title": "Software",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.software",
+                                    "help_text": "Software utilizado para executar o script",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Descrição",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.description",
+                                    "help_text": "Breve descrição do script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "methods",
+                                    "title": "Métodos",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.methods",
+                                    "help_text": "Métodos estatísticos/analíticos incluídos no script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "dependencies",
+                                    "title": "Dependências",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.dependencies",
+                                    "help_text": "Quaisquer dependências (pacotes/bibliotecas) de que o script depende. Este campo não é necessário se as dependências tiverem sido descritas no elemento de bibliotecas.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "instructions",
+                                    "title": "Instruções",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.instructions",
+                                    "help_text": "Instruções para executar o script. A informação sobre a sequência pela qual os scripts devem ser executados é fundamental.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "source_code_repo",
+                                    "title": "Repositório",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.source_code_repo",
+                                    "help_text": "Repositório (por exemplo, repositório GitHub) onde o script foi publicado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.notes",
+                                    "help_text": "Qualquer informação adicional sobre o script.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "Licença",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.name",
+                                            "help_text": "Nome (rótulo) da licença",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.uri",
+                                            "help_text": "URL da licença",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.license",
+                                    "help_text": "Licença, se existir, ao abrigo da qual o script é publicado."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.repository_uri",
+                            "title": "Repositório",
+                            "help_text": "No processo de produção dos resultados do projeto de investigação, um investigador pode querer partilhar o seu código-fonte por razões de transparência e replicabilidade. Este repositório fornece informação para encontrar o repositório onde o código-fonte está guardado.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "help_text": "O nome do repositório onde o código está alojado.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.repository_uri.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Tipo",
+                                    "type": "string",
+                                    "help_text": "Tipo de repositório, por exemplo, \"GitHub\", \"Bitbucket\", etc.",
+                                    "prop_key": "project_desc.repository_uri.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.repository_uri.uri",
+                                    "help_text": "Uma ligação para o repositório do código-fonte/scripts do projeto.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc_container16748450668221674845089408",
+                            "title": "Reprodutibilidade",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "project_desc.technology_environment",
+                                    "title": "Ambiente tecnológico",
+                                    "help_text": "Este campo é utilizado para fornecer uma descrição (tão detalhada quanto possível) do ambiente computacional no qual os scripts foram implementados e no qual se espera que sejam reprodutíveis. Um desafio substancial na reprodução de análises é a instalação e configuração da rede de dependências de versões específicas de várias ferramentas analíticas. As máquinas virtuais (um computador dentro de um computador) permitem partilhar de forma eficiente todo o ambiente computacional com todas as dependências intactas. (https://ropensci.github.io/reproducibility-guide/sections/introduction/)",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.technology_requirements",
+                                    "title": "Requisitos tecnológicos",
+                                    "help_text": "Requisitos de software/hardware ou outros requisitos tecnológicos necessários para executar os scripts e replicar os resultados.",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.reproduction_instructions",
+                                    "title": "Instruções de reprodução",
+                                    "type": "string",
+                                    "help_text": "Instruções para a replicação ou reprodução do trabalho.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": ""
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844764972",
+                    "title": "Acesso e direitos",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.disclaimer",
+                            "type": "string",
+                            "title": "Exoneração de responsabilidade",
+                            "help_text": "Uma exoneração de responsabilidade limita a responsabilidade da organização editora ou dos investigadores associados ao projeto de investigação. Uma exoneração de responsabilidade assegura que qualquer investigação no domínio público produzida por uma organização tem repercussões limitadas para a organização editora. Uma exoneração de responsabilidade destina-se a evitar a responsabilidade por quaisquer efeitos decorrentes de atos ou omissões na investigação.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.confidentiality",
+                            "type": "string",
+                            "title": "Confidencialidade",
+                            "help_text": "Uma declaração de confidencialidade vincula o editor a considerações éticas relativas aos sujeitos da investigação. Na maioria dos casos, a identidade individual de uma pessoa que é sujeito da investigação não pode ser divulgada, sendo necessário um esforço especial para assegurar a preservação da privacidade.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.citation_requirement",
+                            "type": "string",
+                            "title": "Requisito de citação",
+                            "help_text": "O requisito de citação é específico do resultado e constitui uma forma abreviada ou um meio preferido para referir a publicação ou o bem publicado.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.license",
+                            "title": "Licença",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.license.name",
+                                    "help_text": "O nome da licença, por exemplo “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.license.uri",
+                                    "help_text": "Um URL para uma descrição da licença, por exemplo, “https://creativecommons.org/licenses/by/4.0/”.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informação sobre a(s) licença(s) associada(s) aos recursos do projeto de investigação, que define(m) as suas condições de utilização."
+                        },
+                        {
+                            "key": "project_desc.copyright",
+                            "title": "Direitos de autor",
+                            "type": "string",
+                            "help_text": "Informação sobre os direitos de autor, se existirem, aplicáveis aos metadados do projeto de investigação.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "project_desc_others",
+                    "title": "Contactos",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.contacts",
+                            "title": "Contactos",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.name",
+                                    "help_text": "O nome da pessoa de contacto que deve ser contactada consoante a função definida abaixo.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Função",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.role",
+                                    "help_text": "Função da pessoa de contacto. Um projeto de investigação pode ter pessoas de contacto consoante o resultado ou alguns dos contributos técnicos. Alguns projetos complexos podem ter vários processos de recolha de dados com diferentes canais de tratamento e contactos. Esta secção deve indicar uma interface pública principal que possa encaminhar os pedidos do público ou fornecer um conjunto de pontos de entrada.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.affiliation",
+                                    "help_text": "A organização ou afiliação da pessoa de contacto. Trata-se normalmente da organização que a pessoa de contacto representa.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Correio eletrónico",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.email",
+                                    "help_text": "Endereço de correio eletrónico da pessoa, instituição ou divisão responsável pelo projeto de investigação ou pelo resultado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Telefone",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.telephone",
+                                    "help_text": "Número de telefone da pessoa, instituição ou divisão responsável pelo projeto de investigação ou pelo resultado.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.uri",
+                                    "help_text": "URL da agência ou organização de contacto. Pode ser o mesmo que a página web do projeto ou pode ser um nome de contacto permanente a nível institucional e não relacionado com o projeto. Eventualmente, o sítio web de um projeto pode ser removido, mas pode continuar a ser necessário dispor de um contacto. Neste caso, recomenda-se indicar um contacto permanente.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "O elemento de contactos fornece a interface pública para questões associadas ao projeto de investigação. Podem ser indicados vários contactos, consoante a organização. É importante assegurar que são indicados os contactos adequados para encaminhar os pedidos do público."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Etiquetas",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Etiquetas",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Etiqueta",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Uma etiqueta definida pelo utilizador.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Grupo de etiquetas",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "display_type": "text",
+                            "help_text": "O nome de um grupo de etiquetas. "
+                        }
+                    ],
+                    "help_text": "As etiquetas, especialmente quando organizadas em grupos de etiquetas, constituem uma solução poderosa e flexível para permitir facetas (filtros) personalizadas nos catálogos de dados. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "Handle DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefixo",
+                            "type": "string",
+                            "help_text": "Prefixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Sufixo",
+                            "type": "string",
+                            "help_text": "Sufixo DOI",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Criadores",
+                            "type": "nested_array",
+                            "help_text": "Criadores",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Nome",
+                                    "type": "string",
+                                    "help_text": "Nome",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Tipo de nome",
+                                    "type": "string",
+                                    "help_text": "Tipo de nome. Valores válidos: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Nome próprio",
+                                    "type": "string",
+                                    "help_text": "Nome próprio",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Apelido",
+                                    "type": "string",
+                                    "help_text": "Apelido",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Afiliação",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "affiliationIdentifier",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+                                            "title": "Identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "Identifica de forma unívoca a afiliação organizacional do criador.",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "affiliationIdentifierScheme",
+                                            "prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+                                            "title": "Esquema do identificador da afiliação",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "name",
+                                            "prop_key": "datacite.creators.affiliation.name",
+                                            "title": "Nome",
+                                            "type": "string",
+                                            "help_text": "",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        },
+                                        {
+                                            "key": "schemeUri",
+                                            "prop_key": "datacite.creators.affiliation.schemeUri",
+                                            "title": "URI do esquema",
+                                            "type": "string",
+                                            "help_text": "O URI do esquema do identificador do nome. \n\nExemplos: \n- https://orcid.org/\n- https://ror.org/",
+                                            "display_type": "text",
+                                            "isProp": true
+                                        }
+                                    ],
+                                    "prop_key": "datacite.creators.affiliation",
+                                    "isProp": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Títulos",
+                            "type": "array",
+                            "help_text": "Títulos",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Título",
+                                    "type": "string",
+                                    "help_text": "Título",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Tipo de título",
+                                    "type": "string",
+                                    "help_text": "Tipo de título. Valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Língua",
+                                    "type": "string",
+                                    "help_text": "Língua",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Editor",
+                            "type": "string",
+                            "help_text": "Editor",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Ano de publicação",
+                            "type": "string",
+                            "help_text": "Ano de publicação",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Tipo de recurso",
+                            "type": "string",
+                            "help_text": "Tipo de recurso",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Tipo geral de recurso",
+                            "type": "string",
+                            "help_text": "Valores válidos: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Língua",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Proveniência",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Proveniência",
+                    "type": "section",
+                    "help_text": "A informação de proveniência é utilizada para documentar a origem dos metadados.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Repositório original",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório original onde os metadados foram criados pela primeira vez.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Nome do repositório",
+                                    "type": "string",
+                                    "help_text": "O nome do repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "O URL do repositório original ou do conjunto de dados.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Identificador do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O identificador do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "O Digital Object Identifier (DOI) do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Título do conjunto de dados",
+                                    "type": "string",
+                                    "help_text": "O título do conjunto de dados no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Data de publicação do conjunto de dados (AAAA-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "A data em que o conjunto de dados foi publicado no repositório original.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notas",
+                                    "type": "string",
+                                    "help_text": "Informação adicional sobre o repositório original.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Repositório de origem",
+                            "type": "section",
+                            "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Repositórios de origem",
+                                    "type": "nested_array",
+                                    "help_text": "Informação sobre o repositório de origem a partir do qual os metadados foram recolhidos.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Nome do repositório",
+                                            "type": "string",
+                                            "help_text": "O nome do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "O URL do repositório de origem ou do conjunto de dados.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Identificador do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O identificador do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Título do conjunto de dados",
+                                            "type": "string",
+                                            "help_text": "O título do conjunto de dados no repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Data de aquisição (AAAA-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "A data em que os metadados foram obtidos a partir do repositório de origem.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Modo de aquisição",
+                                            "type": "string",
+                                            "help_text": "O modo de aquisição dos metadados a partir do repositório de origem, por exemplo, OAI-PMH, API, introdução manual, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notas",
+                                            "type": "string",
+                                            "help_text": "Informação adicional sobre o repositório de origem."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
