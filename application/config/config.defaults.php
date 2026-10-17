@@ -28,6 +28,7 @@ $config['supported_languages'] = json_encode(array(
     array('folder' => 'english', 'code' => 'en', 'display' => 'English',  'direction' => 'ltr'),
     array('folder' => 'french',  'code' => 'fr', 'display' => 'Français', 'direction' => 'ltr'),
     array('folder' => 'spanish', 'code' => 'es', 'display' => 'Español',  'direction' => 'ltr'),
+    array('folder' => 'portuguese', 'code' => 'pt', 'display' => 'Português', 'direction' => 'ltr'),
     array('folder' => 'uzbek',   'code' => 'uz', 'display' => 'Uzbek',    'direction' => 'ltr'),
 ));
 

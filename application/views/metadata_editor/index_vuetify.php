@@ -530,7 +530,7 @@
           if (features && features.length > 0){
             for (let feature of features){
               features_array.push({
-                title: feature.name || feature.file_name || 'Unnamed Feature',
+                title: feature.name || feature.file_name || this.$t('unnamed_feature'),
                 type:'geospatial-feature',
                 key:'feature-catalogue/features/'+feature.id,
                 file:'datafile',
@@ -951,7 +951,7 @@
               key: 'home',
               "items":[
                 {
-                title: 'Preview',
+                title: this.$t('preview'),
                 type:'preview',
                 file: 'txt',
                 key: 'page-preview'
