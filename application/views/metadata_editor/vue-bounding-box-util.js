@@ -182,7 +182,8 @@ var BoundingBoxUtil = (function () {
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             options: {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: zoom
+                maxZoom: zoom,
+                referrerPolicy: 'strict-origin-when-cross-origin'
             }
         };
     }
