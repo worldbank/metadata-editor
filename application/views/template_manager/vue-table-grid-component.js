@@ -83,15 +83,25 @@ Vue.component('table-grid-component', {
         },
         copyTsv: function()
         {
-            this.copyToClipBoard(this.jsonToTsv(this.local));
-            this.showToast("Copied to clipboard");
+            let vm=this;
+            Promise.resolve(this.copyToClipBoard(this.jsonToTsv(this.local))).then(function () {
+                vm.showToast("Copied to clipboard");
+            }).catch(function (err) {
+                alert(err && err.message ? err.message : "Unable to copy to the clipboard.");
+            });
         },
         pasteTsv: function(pasteMode='replace')
         {
             let vm=this;
-            let tsv='';
             this.pasteFromClipBoard().then((result) => {
-                tsv=result;
+                if (result == null) {
+                    return;
+                }
+                let tsv=result;
+                if (!String(tsv).trim()) {
+                    alert("Nothing to paste.");
+                    return;
+                }
                 let json=this.tsvToArray(tsv);
 
                 if (json===false){
@@ -106,6 +116,8 @@ Vue.component('table-grid-component', {
                 }else{
                     vm.$emit('input', JSON.parse(JSON.stringify(json)));
                 }
+            }).catch(function (err) {
+                alert(err && err.message ? err.message : "Unable to paste from the clipboard.");
             });
         },
         undoPaste: function(){

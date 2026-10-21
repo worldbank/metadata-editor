@@ -31,20 +31,158 @@
                     return output.trim();
                 },
                 copyToClipBoard: function(textToCopy){
-                    const tmpTextField = document.createElement("textarea")
-                    tmpTextField.textContent = textToCopy
-                    tmpTextField.setAttribute("style","position:absolute; right:200%;")
-                    document.body.appendChild(tmpTextField)
-                    tmpTextField.select()
-                    tmpTextField.setSelectionRange(0, 99999) /*For mobile devices*/
-                    document.execCommand("copy")
-                    tmpTextField.remove();
+                    var text = textToCopy == null ? '' : String(textToCopy);
+                    function copyWithExecCommand() {
+                        var tmpTextField = document.createElement("textarea");
+                        tmpTextField.value = text;
+                        tmpTextField.setAttribute("readonly", "");
+                        tmpTextField.style.position = "fixed";
+                        tmpTextField.style.left = "-9999px";
+                        tmpTextField.style.top = "0";
+                        document.body.appendChild(tmpTextField);
+                        tmpTextField.focus();
+                        tmpTextField.select();
+                        tmpTextField.setSelectionRange(0, text.length);
+                        var ok = false;
+                        try {
+                            ok = document.execCommand("copy");
+                        } finally {
+                            tmpTextField.remove();
+                        }
+                        if (!ok) {
+                            throw new Error("Unable to copy to the clipboard.");
+                        }
+                    }
+
+                    if (window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+                        return navigator.clipboard.writeText(text).catch(function () {
+                            try {
+                                copyWithExecCommand();
+                            } catch (e) {
+                                throw new Error("Unable to copy to the clipboard.");
+                            }
+                        });
+                    }
+
+                    return new Promise(function (resolve, reject) {
+                        try {
+                            copyWithExecCommand();
+                            resolve();
+                        } catch (e) {
+                            reject(new Error("Unable to copy to the clipboard."));
+                        }
+                    });
                 },
 
-                pasteFromClipBoard: async function() 
+                pasteFromClipBoard: function()
                 {
-                    const text = await navigator.clipboard.readText();
-                    return text;                    
+                    var vm = this;
+                    function fallback() {
+                        return vm.promptPasteFromClipBoard();
+                    }
+                    try {
+                        if (window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.readText === "function") {
+                            return navigator.clipboard.readText().catch(function () {
+                                return fallback();
+                            });
+                        }
+                    } catch (e) {
+                        return fallback();
+                    }
+                    return fallback();
+                },
+                promptPasteFromClipBoard: function()
+                {
+                    return new Promise(function (resolve) {
+                        var existing = document.getElementById("grid-paste-fallback");
+                        if (existing) {
+                            resolve(null);
+                            return;
+                        }
+
+                        var overlay = document.createElement("div");
+                        overlay.id = "grid-paste-fallback";
+                        overlay.setAttribute("role", "presentation");
+                        overlay.style.cssText = "position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;";
+
+                        var dialog = document.createElement("div");
+                        dialog.setAttribute("role", "dialog");
+                        dialog.setAttribute("aria-modal", "true");
+                        dialog.setAttribute("aria-labelledby", "grid-paste-fallback-title");
+                        dialog.style.cssText = "background:#fff;color:#212121;max-width:560px;width:100%;padding:16px 20px;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.25);";
+
+                        var title = document.createElement("div");
+                        title.id = "grid-paste-fallback-title";
+                        title.textContent = "Paste values";
+                        title.style.cssText = "font-size:16px;font-weight:600;margin-bottom:8px;";
+
+                        var message = document.createElement("p");
+                        message.textContent = "The browser could not read the clipboard. This happens on pages that are not HTTPS, and when clipboard access is blocked. Paste the values into the box below, then choose Apply.";
+                        message.style.cssText = "margin:0 0 12px;font-size:14px;line-height:1.4;";
+
+                        var textarea = document.createElement("textarea");
+                        textarea.rows = 8;
+                        textarea.setAttribute("aria-label", "Values to paste");
+                        textarea.style.cssText = "width:100%;box-sizing:border-box;font-family:monospace;font-size:13px;padding:8px;";
+
+                        var error = document.createElement("div");
+                        error.setAttribute("role", "alert");
+                        error.style.cssText = "color:#b00020;font-size:13px;min-height:18px;margin-top:6px;";
+
+                        var actions = document.createElement("div");
+                        actions.style.cssText = "display:flex;justify-content:flex-end;gap:8px;margin-top:8px;";
+
+                        var cancelBtn = document.createElement("button");
+                        cancelBtn.type = "button";
+                        cancelBtn.textContent = "Cancel";
+                        cancelBtn.style.cssText = "padding:6px 14px;cursor:pointer;";
+
+                        var applyBtn = document.createElement("button");
+                        applyBtn.type = "button";
+                        applyBtn.textContent = "Apply";
+                        applyBtn.style.cssText = "padding:6px 14px;cursor:pointer;background:#1976d2;color:#fff;border:0;border-radius:2px;";
+
+                        function close(value) {
+                            document.removeEventListener("keydown", onKey);
+                            if (overlay.parentNode) {
+                                overlay.parentNode.removeChild(overlay);
+                            }
+                            resolve(value);
+                        }
+                        function onKey(e) {
+                            if (e.key === "Escape") {
+                                e.preventDefault();
+                                close(null);
+                            }
+                        }
+
+                        cancelBtn.addEventListener("click", function () { close(null); });
+                        applyBtn.addEventListener("click", function () {
+                            if (!textarea.value || !String(textarea.value).trim()) {
+                                error.textContent = "Nothing to paste.";
+                                textarea.focus();
+                                return;
+                            }
+                            close(textarea.value);
+                        });
+                        overlay.addEventListener("click", function (e) {
+                            if (e.target === overlay) {
+                                close(null);
+                            }
+                        });
+
+                        actions.appendChild(cancelBtn);
+                        actions.appendChild(applyBtn);
+                        dialog.appendChild(title);
+                        dialog.appendChild(message);
+                        dialog.appendChild(textarea);
+                        dialog.appendChild(error);
+                        dialog.appendChild(actions);
+                        overlay.appendChild(dialog);
+                        document.body.appendChild(overlay);
+                        document.addEventListener("keydown", onKey);
+                        textarea.focus();
+                    });
                 },
                 CSVToArray: function ( strData, strDelimiter )
                 {
