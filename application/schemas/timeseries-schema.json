@@ -1458,10 +1458,26 @@
 		"data_notes": {
 			"type": "array",
 			"title": "Data notes",
-			"description": "Data notes",
+			"description": "Notes on the data. Cells reference a note by its `id` from a footnote column (DSD component with display_role 'footnote'); `filters` is reserved for notes that apply to a slice of the data.",
 			"items": {
 				"type": "object",
 				"properties": {
+					"id": {
+						"title": "Note ID",
+						"description": "Identifier referenced from the data (e.g. N01). Unique within the project.",
+						"type": "string"
+					},
+					"scope": {
+						"title": "Scope",
+						"description": "'cell' (default): referenced by cells through a footnote column. 'table': applies to the whole indicator and is shown under every chart and table.",
+						"type": "string",
+						"enum": ["cell", "table"]
+					},
+					"column": {
+						"title": "Footnote column",
+						"description": "Optional. Name of the footnote column the note is intended for (e.g. NOTE_ID, SOURCE_NOTE_ID).",
+						"type": "string"
+					},
 					"filters": {
 						"type": "array",
 						"title": "Filters",

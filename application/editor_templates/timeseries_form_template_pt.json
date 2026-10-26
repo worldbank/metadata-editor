@@ -2214,6 +2214,38 @@
         },
         {
             "type": "section_container",
+            "id": "data_notes_container",
+            "key": "data_notes_container",
+            "title": "Notas dos dados",
+            "items": [
+                {
+                    "key": "data_notes",
+                    "title": "Notas dos dados",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "id",
+                            "title": "ID da nota",
+                            "type": "string",
+                            "prop_key": "data_notes.id",
+                            "help_text": "Identificador utilizado nos dados para referenciar esta nota (por exemplo, N01). Deve ser único no projeto.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "note",
+                            "title": "Nota",
+                            "type": "string",
+                            "prop_key": "data_notes.note",
+                            "help_text": "Texto da nota, apresentado como nota de rodapé sempre que uma célula referencia o seu ID.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": "Notas de rodapé para células de dados. Os dados referenciam as notas por ID numa coluna de notas de rodapé (um ou mais IDs separados por ';'); o texto é guardado aqui uma única vez."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
             "id": "tags",
             "key": "tags_container",
             "title": "Etiquetas",

@@ -914,7 +914,11 @@ class Editor_publish_model extends ci_model {
 			throw new Exception('No published indicator data in DuckDB. Import data in the editor first.');
 		}
 
-		$csvBody = $this->indicator_duckdb_service->timeseries_export_csv_body($project_id);
+		$this->load->model('Indicator_dsd_model');
+		$csvBody = $this->indicator_duckdb_service->timeseries_export_csv_body(
+			$project_id,
+			$this->Indicator_dsd_model->get_dsd_column_names_for_csv((int) $project_id)
+		);
 		$tmpPath = tempnam(sys_get_temp_dir(), 'me_nada_ts_');
 		if ($tmpPath === false) {
 			throw new Exception('Could not create temporary CSV file');

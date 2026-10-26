@@ -445,6 +445,9 @@ class Data_structure_json_import {
 		if (!empty($comp['assignment_status'])) {
 			$meta['assignment_status'] = trim((string) $comp['assignment_status']);
 		}
+		if (!empty($comp['display_role']) && strtolower(trim((string) $comp['display_role'])) !== 'none') {
+			$meta['display_role'] = strtolower(trim((string) $comp['display_role']));
+		}
 
 		$row = [
 			'name'               => trim((string) $comp['name']),

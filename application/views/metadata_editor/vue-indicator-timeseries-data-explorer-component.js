@@ -17,6 +17,10 @@ Vue.component('indicator-timeseries-data-explorer', {
             errors: [],
             dsdColumns: [],
             dsdLoading: false,
+            /** Upper-cased names of footnote columns (display_role = footnote). */
+            footnoteColumns: [],
+            /** Project data notes: id => text */
+            noteTextById: {},
             pagePayload: null,
             /** @type {Object.<string, string[]>} physical column name -> selected values (server IN filter) */
             columnValueFilters: {},
@@ -36,6 +40,7 @@ Vue.component('indicator-timeseries-data-explorer', {
     mounted: function() {
         this.fid = this.$route.params.file_id || this.file_id;
         this.loadDsd();
+        this.loadNotes();
         this.loadPage(0);
     },
     watch: {
@@ -208,6 +213,38 @@ Vue.component('indicator-timeseries-data-explorer', {
         }
     },
     methods: {
+        loadNotes: function() {
+            var vm = this;
+            axios.get(CI.base_url + '/api/indicator_dsd/notes/' + this.ProjectID)
+                .then(function(res) {
+                    var d = res.data || {};
+                    vm.footnoteColumns = (d.footnote_columns || []).map(function(c) {
+                        return String(c).trim().toUpperCase();
+                    });
+                    var byId = {};
+                    (d.notes || []).forEach(function(n) {
+                        if (n && n.id) {
+                            byId[String(n.id).trim()] = n.note ? String(n.note) : '';
+                        }
+                    });
+                    vm.noteTextById = byId;
+                })
+                .catch(function() {
+                    vm.footnoteColumns = [];
+                    vm.noteTextById = {};
+                });
+        },
+        /** Note ids in a footnote column cell, or [] for other columns / empty cells. */
+        cellNoteIds: function(colName, value) {
+            if (this.footnoteColumns.indexOf(String(colName).trim().toUpperCase()) === -1) {
+                return [];
+            }
+            return IndicatorNotesUtil.splitIds(value);
+        },
+        noteText: function(id) {
+            var t = this.noteTextById[id];
+            return t ? t : (this.$t('data_note_missing_text') || 'No text defined for this note.');
+        },
         loadDsd: function() {
             var vm = this;
             this.dsdLoading = true;
@@ -634,7 +671,17 @@ Vue.component('indicator-timeseries-data-explorer', {
                                         <tr v-for="(row, idx) in records" :key="pageOffset + idx">
                                             <td class="text-right text-muted">{{ pageOffset + idx + 1 }}</td>
                                             <td v-for="col in displayTableColumns" :key="col.name">
-                                                <span class="d-inline-block text-truncate" style="max-width: 220px;" :title="row[col.name]">
+                                                <v-tooltip v-if="cellNoteIds(col.name, row[col.name]).length" bottom max-width="420">
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <span v-bind="attrs" v-on="on" class="d-inline-block text-truncate indicator-ts-note-cell" style="max-width: 220px;">
+                                                            <v-icon x-small color="primary" class="mr-1">mdi-note-text-outline</v-icon>{{ row[col.name] }}
+                                                        </span>
+                                                    </template>
+                                                    <div v-for="id in cellNoteIds(col.name, row[col.name])" :key="id">
+                                                        <strong>{{ id }}</strong>: <span :class="{ 'warning--text': !noteTextById[id] }">{{ noteText(id) }}</span>
+                                                    </div>
+                                                </v-tooltip>
+                                                <span v-else class="d-inline-block text-truncate" style="max-width: 220px;" :title="row[col.name]">
                                                     {{ row[col.name] }}
                                                 </span>
                                             </td>

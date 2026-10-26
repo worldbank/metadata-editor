@@ -221,9 +221,9 @@ Vue.component('indicator-dsd-import', {
         goToDsd: function() {
             this.$router.push('/indicator-dsd-overview');
         },
-        onImportComplete: function() {
+        onImportComplete: function(result) {
             if (this.embedded) {
-                this.$emit('imported');
+                this.$emit('imported', result || {});
                 return;
             }
             this.$router.push('/data-explorer/INDICATOR_DATA?tab=browse');
@@ -466,7 +466,7 @@ Vue.component('indicator-dsd-import', {
                         }
                         EventBus.$emit('onSuccess', successMsg);
                     }
-                    vm.onImportComplete();
+                    vm.onImportComplete(d);
                 })
                 .catch(function(err) {
                     if (err && err.message === 'empty') {

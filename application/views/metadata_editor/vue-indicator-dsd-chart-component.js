@@ -50,6 +50,7 @@ Vue.component('indicator-dsd-chart', {
             chartContext: [],
             /** Series without a numeric value in single-period bars */
             chartHiddenCount: 0,
+            chartNotes: [],
             /** A measure-type dimension varies, so different units may share one axis */
             chartMixedMeasures: false,
             suppressFilterAutoApply: false,
@@ -137,6 +138,36 @@ Vue.component('indicator-dsd-chart', {
             .indicator-dsd-chart-component .chart-tab {
                 height: 100% !important;
                 padding: 0 !important;
+            }
+            .indicator-dsd-chart-component .indicator-note-marker {
+                font-size: 0.7em;
+                margin-left: 2px;
+                color: #1565c0;
+            }
+            .indicator-dsd-chart-component .indicator-noted-cell {
+                cursor: help;
+                border-bottom: 1px dotted rgba(0, 0, 0, 0.35);
+            }
+            .indicator-dsd-chart-component .indicator-notes-list {
+                margin-top: 16px !important;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.12);
+                font-size: 0.875rem;
+                line-height: 1.55;
+                max-width: 960px;
+            }
+            .indicator-dsd-chart-component .indicator-notes-list .text-subtitle-2 {
+                margin-bottom: 8px !important;
+            }
+            .indicator-dsd-chart-component .indicator-notes-list .indicator-table-note {
+                margin: 0 0 10px !important;
+            }
+            .indicator-dsd-chart-component .indicator-notes-list ol {
+                padding-left: 1.75rem;
+                margin: 0;
+            }
+            .indicator-dsd-chart-component .indicator-notes-list li + li {
+                margin-top: 4px;
             }
             .indicator-dsd-chart-component .tab-pane {
                 height: 100% !important;
@@ -342,6 +373,7 @@ Vue.component('indicator-dsd-chart', {
         clearChartData: function() {
             this.rawData = null;
             this.chartLegendItems = [];
+            this.chartNotes = [];
             this.error = null;
             if (this.chart) {
                 this.chart.destroy();
@@ -512,7 +544,8 @@ Vue.component('indicator-dsd-chart', {
             const rows = chartData.datasets.map(ds => ({
                 sid: ds.sid,
                 label: ds.label,
-                value: ds.data[0]
+                value: ds.data[0],
+                noteIds: ds.noteIds ? ds.noteIds[0] : []
             }));
             const hidden = rows.filter(r => r.value === null).length;
             const valid = rows.filter(r => r.value !== null);
@@ -525,6 +558,7 @@ Vue.component('indicator-dsd-chart', {
                     datasets: [{
                         label: String(period),
                         data: valid.map(r => r.value),
+                        noteIds: valid.map(r => r.noteIds),
                         backgroundColor: INDICATOR_CHART_LINE_COLORS[0],
                         borderColor: INDICATOR_CHART_LINE_COLORS[0],
                         borderWidth: 0
@@ -543,6 +577,7 @@ Vue.component('indicator-dsd-chart', {
             const categories = [];
             const groups = [];
             const values = {};
+            const noteIdsByKey = {};
             valid.forEach(r => {
                 const parts = dimInfo.partsBySid[r.sid];
                 const cat = categoryDims.map(i => parts[i]).join(' · ');
@@ -554,6 +589,7 @@ Vue.component('indicator-dsd-chart', {
                     groups.push(grp);
                 }
                 values[cat + '\u0000' + grp] = r.value;
+                noteIdsByKey[cat + '\u0000' + grp] = r.noteIds;
             });
 
             const datasets = groups.map((grp, gi) => {
@@ -564,6 +600,7 @@ Vue.component('indicator-dsd-chart', {
                         const v = values[cat + '\u0000' + grp];
                         return v === undefined ? null : v;
                     }),
+                    noteIds: categories.map(cat => noteIdsByKey[cat + '\u0000' + grp] || []),
                     backgroundColor: color,
                     borderColor: color,
                     borderWidth: 0
@@ -587,6 +624,7 @@ Vue.component('indicator-dsd-chart', {
             }
 
             const seriesData = {};
+            const seriesNotes = {};
             const seriesDisplay = {};
             const timePeriods = new Set();
 
@@ -600,9 +638,11 @@ Vue.component('indicator-dsd-chart', {
                 }
                 if (!seriesData[sid]) {
                     seriesData[sid] = {};
+                    seriesNotes[sid] = {};
                     seriesDisplay[sid] = this.chartSeriesDisplay(record);
                 }
                 seriesData[sid][timePeriod] = value;
+                seriesNotes[sid][timePeriod] = IndicatorNotesUtil.cellNoteIds(record);
                 timePeriods.add(timePeriod);
             });
 
@@ -621,6 +661,7 @@ Vue.component('indicator-dsd-chart', {
                     sid: sid,
                     label: this.shortSeriesLabel(dimInfo, sid, seriesDisplay[sid] || sid),
                     data: data,
+                    noteIds: labels.map(timePeriod => seriesNotes[sid][timePeriod] || []),
                     borderColor: color,
                     backgroundColor: color,
                     borderWidth: 2,
@@ -640,7 +681,11 @@ Vue.component('indicator-dsd-chart', {
 
             return { labels: labels, datasets: datasets, legendItems: legendItems };
         },
-        transformToTableData: function(records) {
+        /**
+         * Horizontal layout: one row per time period, a column per series.
+         * Cells referenced by notes get `_notes[column] = "1,3"`; noted cells without a value show '..'.
+         */
+        transformToTableData: function(records, numbering) {
             if (!records || !Array.isArray(records) || records.length === 0) {
                 return [];
             }
@@ -648,6 +693,7 @@ Vue.component('indicator-dsd-chart', {
             const seriesIds = new Set();
             const timePeriods = new Set();
             const dataMap = {};
+            const notesMap = {};
             const idToDisplay = {};
 
             records.forEach(record => {
@@ -666,8 +712,10 @@ Vue.component('indicator-dsd-chart', {
 
                 if (!dataMap[timePeriod]) {
                     dataMap[timePeriod] = {};
+                    notesMap[timePeriod] = {};
                 }
                 dataMap[timePeriod][sid] = value;
+                notesMap[timePeriod][sid] = IndicatorNotesUtil.cellNoteIds(record);
             });
 
             const sortedTimePeriods = Array.from(timePeriods).sort();
@@ -677,24 +725,65 @@ Vue.component('indicator-dsd-chart', {
 
             return sortedTimePeriods.map(timePeriod => {
                 const row = {
-                    time_period: timePeriod
+                    time_period: timePeriod,
+                    _notes: {},
+                    _noteNums: {}
                 };
                 sortedSeriesIds.forEach(sid => {
-                    const value = dataMap[timePeriod] && dataMap[timePeriod][sid] !== undefined
-                        ? dataMap[timePeriod][sid]
-                        : null;
-                    if (value !== null && typeof value === 'number') {
-                        row[sid] = value.toLocaleString(undefined, {maximumFractionDigits: 2});
-                    } else {
-                        row[sid] = value !== null ? String(value) : '-';
+                    const hasRecord = !!(dataMap[timePeriod] && Object.prototype.hasOwnProperty.call(dataMap[timePeriod], sid));
+                    row[sid] = this.formatTableValue(hasRecord ? dataMap[timePeriod][sid] : undefined, hasRecord);
+                    if (hasRecord && numbering) {
+                        const nums = numbering.markers(notesMap[timePeriod][sid]);
+                        if (nums.length) {
+                            row._notes[sid] = IndicatorNotesUtil.formatMarkers(nums);
+                            row._noteNums[sid] = nums;
+                        }
                     }
                 });
                 return row;
             });
         },
-        formatTableValue: function(value) {
+        /** Horizontal layout headers: time period, then one column per series (sorted by label). */
+        horizontalTableHeaders: function(records) {
+            const seriesIds = new Set();
+            const idToDisplay = {};
+            records.forEach(record => {
+                if (!record) {
+                    return;
+                }
+                const sid = this.chartSeriesId(record);
+                if (!sid) {
+                    return;
+                }
+                seriesIds.add(sid);
+                if (!idToDisplay[sid]) {
+                    idToDisplay[sid] = this.chartSeriesDisplay(record);
+                }
+            });
+
+            const sortedIds = Array.from(seriesIds).sort((a, b) =>
+                String(idToDisplay[a] || a).localeCompare(String(idToDisplay[b] || b), undefined, { sensitivity: 'base' })
+            );
+
+            const headers = [
+                { text: this.$t('time_period') || 'Time Period', value: 'time_period', sortable: true }
+            ];
+
+            sortedIds.forEach(sid => {
+                headers.push({
+                    text: idToDisplay[sid] || sid,
+                    value: sid,
+                    sortable: true,
+                    align: 'right'
+                });
+            });
+
+            return headers;
+        },
+        /** hasRecord: the observation exists but has no value (kept because it carries notes) -> '..'. */
+        formatTableValue: function(value, hasRecord) {
             if (value === null || value === undefined) {
-                return '-';
+                return hasRecord ? '..' : '-';
             }
             if (typeof value === 'number') {
                 return value.toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -702,13 +791,14 @@ Vue.component('indicator-dsd-chart', {
             return String(value);
         },
         /** Vertical layout: one row per series, a column per slice dimension, then a column per time period. */
-        transformToVerticalTable: function(records) {
+        transformToVerticalTable: function(records, numbering) {
             if (!records || !Array.isArray(records) || records.length === 0) {
                 return { headers: [], items: [] };
             }
 
             const dimInfo = this.buildSeriesDimensions(records);
             const values = {};
+            const cellNotes = {};
             const idToDisplay = {};
             const timePeriods = new Set();
 
@@ -719,9 +809,11 @@ Vue.component('indicator-dsd-chart', {
                 }
                 if (!values[sid]) {
                     values[sid] = {};
+                    cellNotes[sid] = {};
                     idToDisplay[sid] = this.chartSeriesDisplay(record);
                 }
                 values[sid][record.time_period] = record.observation_value;
+                cellNotes[sid][record.time_period] = IndicatorNotesUtil.cellNoteIds(record);
                 timePeriods.add(record.time_period);
             });
 
@@ -738,7 +830,7 @@ Vue.component('indicator-dsd-chart', {
             });
 
             const items = sids.map(sid => {
-                const row = {};
+                const row = { _notes: {}, _noteNums: {} };
                 if (dimInfo.dims.length) {
                     dimInfo.partsBySid[sid].forEach((part, i) => {
                         row['dim_' + i] = part;
@@ -747,12 +839,61 @@ Vue.component('indicator-dsd-chart', {
                     row.series = idToDisplay[sid] || sid;
                 }
                 periods.forEach((p, i) => {
-                    row['p_' + i] = this.formatTableValue(values[sid][p]);
+                    const hasRecord = Object.prototype.hasOwnProperty.call(values[sid], p);
+                    row['p_' + i] = this.formatTableValue(values[sid][p], hasRecord);
+                    if (hasRecord && numbering) {
+                        const nums = numbering.markers(cellNotes[sid][p]);
+                        if (nums.length) {
+                            row._notes['p_' + i] = IndicatorNotesUtil.formatMarkers(nums);
+                            row._noteNums['p_' + i] = nums;
+                        }
+                    }
                 });
                 return row;
             });
 
             return { headers: headers, items: items };
+        },
+        /**
+         * Number the notes of the plotted points (by category, then series) and store per-point markers on
+         * each dataset (`noteMarkers`), shown in the tooltip and listed under the chart.
+         */
+        applyChartNotes: function(datasets, labels, chartData) {
+            const numbering = IndicatorNotesUtil.createNumbering(this.rawData ? this.rawData.notes : null);
+            datasets.forEach(ds => {
+                ds.noteMarkers = (ds.noteIds || []).map(() => []);
+            });
+            labels.forEach((label, i) => {
+                datasets.forEach(ds => {
+                    const ids = ds.noteIds && ds.noteIds[i];
+                    // Only plotted points; notes on values without data are shown in the Table tab.
+                    if (ids && ids.length && ds.data[i] !== null && ds.data[i] !== undefined) {
+                        ds.noteMarkers[i] = numbering.markers(ids);
+                    }
+                });
+            });
+            return { notes: numbering.list() };
+        },
+        /** Tooltip footer: text of the notes on the hovered points, once each. */
+        chartTooltipNoteLines: function(items) {
+            const seen = [];
+            (items || []).forEach(item => {
+                const nums = item.dataset.noteMarkers && item.dataset.noteMarkers[item.dataIndex];
+                (nums || []).forEach(n => {
+                    if (seen.indexOf(n) === -1) {
+                        seen.push(n);
+                    }
+                });
+            });
+            seen.sort((a, b) => a - b);
+            return IndicatorNotesUtil.noteLines(seen, this.chartNotes, this.noteMissingText(), 90);
+        },
+        /** Table cell tooltip: full text of the cell's notes. */
+        tableCellNoteLines: function(numbers) {
+            return IndicatorNotesUtil.noteLines(numbers, this.tableNotes, this.noteMissingText(), 0);
+        },
+        noteMissingText: function() {
+            return this.$t('data_note_missing_text') || 'No text defined for this note.';
         },
         /** Concrete chart type for the selected mode; 'auto' picks by number of periods and series. */
         resolveChartType: function(periodCount, seriesCount) {
@@ -817,6 +958,9 @@ Vue.component('indicator-dsd-chart', {
                 legendItems = bars.legendItems;
                 hiddenCount = bars.hidden;
             }
+
+            const notesView = this.applyChartNotes(datasets, labels, chartData);
+            this.chartNotes = notesView.notes;
 
             this.renderedChartType = type;
             this.chartLegendItems = legendItems;
@@ -888,7 +1032,21 @@ Vue.component('indicator-dsd-chart', {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             padding: 12,
                             titleFont: { size: 14 },
-                            bodyFont: { size: 13 }
+                            bodyFont: { size: 13 },
+                            footerFont: { size: 12, weight: 'normal' },
+                            callbacks: {
+                                label: function(item) {
+                                    let line = (item.dataset.label || '') + ': ' + item.formattedValue;
+                                    const nums = item.dataset.noteMarkers && item.dataset.noteMarkers[item.dataIndex];
+                                    if (nums && nums.length) {
+                                        line += '  [' + IndicatorNotesUtil.formatMarkers(nums) + ']';
+                                    }
+                                    return line;
+                                },
+                                footer: function(items) {
+                                    return vm.chartTooltipNoteLines(items);
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -986,63 +1144,33 @@ Vue.component('indicator-dsd-chart', {
                 Array.isArray(this.dimensionFilters[k]) && this.dimensionFilters[k].length > 0
             );
         },
-        verticalTable: function() {
-            if (this.tableLayout !== 'vertical' || !this.rawData || !this.rawData.records) {
-                return { headers: [], items: [] };
+        /** Table tab: headers, rows and the notes used (numbered in row/column order of the current layout). */
+        tableModel: function() {
+            const records = this.rawData && Array.isArray(this.rawData.records) ? this.rawData.records : [];
+            if (records.length === 0) {
+                return { headers: [], items: [], notes: [] };
             }
-            return this.transformToVerticalTable(this.rawData.records);
+            const numbering = IndicatorNotesUtil.createNumbering(this.rawData.notes);
+            if (this.tableLayout === 'vertical') {
+                const vt = this.transformToVerticalTable(records, numbering);
+                return { headers: vt.headers, items: vt.items, notes: numbering.list() };
+            }
+            const headers = this.horizontalTableHeaders(records);
+            const items = this.transformToTableData(records, numbering);
+            return { headers: headers, items: items, notes: numbering.list() };
         },
         tableData: function() {
-            if (!this.rawData || !this.rawData.records) {
-                return [];
-            }
-            if (this.tableLayout === 'vertical') {
-                return this.verticalTable.items;
-            }
-            return this.transformToTableData(this.rawData.records);
+            return this.tableModel.items;
         },
         tableHeaders: function() {
-            if (!this.rawData || !this.rawData.records || !Array.isArray(this.rawData.records) || this.rawData.records.length === 0) {
-                return [];
-            }
-            if (this.tableLayout === 'vertical') {
-                return this.verticalTable.headers;
-            }
-
-            const seriesIds = new Set();
-            const idToDisplay = {};
-            this.rawData.records.forEach(record => {
-                if (!record) {
-                    return;
-                }
-                const sid = this.chartSeriesId(record);
-                if (!sid) {
-                    return;
-                }
-                seriesIds.add(sid);
-                if (!idToDisplay[sid]) {
-                    idToDisplay[sid] = this.chartSeriesDisplay(record);
-                }
-            });
-
-            const sortedIds = Array.from(seriesIds).sort((a, b) =>
-                String(idToDisplay[a] || a).localeCompare(String(idToDisplay[b] || b), undefined, { sensitivity: 'base' })
-            );
-
-            const headers = [
-                { text: this.$t('time_period') || 'Time Period', value: 'time_period', sortable: true }
-            ];
-
-            sortedIds.forEach(sid => {
-                headers.push({
-                    text: idToDisplay[sid] || sid,
-                    value: sid,
-                    sortable: true,
-                    align: 'right'
-                });
-            });
-
-            return headers;
+            return this.tableModel.headers;
+        },
+        tableNotes: function() {
+            return this.tableModel.notes;
+        },
+        /** Table notes (scope = table): shown under every chart and table view, without markers. */
+        indicatorTableNotes: function() {
+            return this.rawData && Array.isArray(this.rawData.table_notes) ? this.rawData.table_notes : [];
         }
     },
     template: `
@@ -1356,6 +1484,17 @@ Vue.component('indicator-dsd-chart', {
                                         <span class="chart-legend-label">{{ item.label }}</span>
                                     </div>
                                 </div>
+                                <div v-if="chartNotes.length || indicatorTableNotes.length" class="indicator-notes-list mt-2">
+                                    <div class="text-subtitle-2 mb-1">{{ $t('data_notes_title') || 'Notes' }}</div>
+                                    <p v-for="tn in indicatorTableNotes" :key="'tn-' + tn.id" class="mb-1 indicator-table-note">{{ tn.note }}</p>
+                                    <ol v-if="chartNotes.length" class="mb-0">
+                                        <li v-for="n in chartNotes" :key="n.id" :value="n.number">
+                                            <span v-if="!n.missing">{{ n.text }}</span>
+                                            <span v-else class="warning--text">{{ $t('data_note_missing_text') || 'No text defined for this note.' }}</span>
+                                            <span class="grey--text text-caption ml-1">[{{ n.id }}]</span>
+                                        </li>
+                                    </ol>
+                                </div>
                             </div>
                         </v-tab-item>
                         
@@ -1396,10 +1535,32 @@ Vue.component('indicator-dsd-chart', {
                                             'items-per-page-text': $t('rows_per_page') || 'Rows per page'
                                         }"
                                     >
-                                        <template v-slot:item.time_period="{ item }">
-                                            <strong>{{ item.time_period }}</strong>
+                                        <template v-slot:item="{ item, headers }">
+                                            <tr>
+                                                <td v-for="h in headers" :key="h.value" :class="h.align === 'right' ? 'text-right' : ''">
+                                                    <v-tooltip v-if="item._noteNums && item._noteNums[h.value]" bottom max-width="420">
+                                                        <template v-slot:activator="{ on, attrs }">
+                                                            <span v-bind="attrs" v-on="on" class="indicator-noted-cell">{{ item[h.value] }}<sup class="indicator-note-marker">{{ item._notes[h.value] }}</sup></span>
+                                                        </template>
+                                                        <div v-for="line in tableCellNoteLines(item._noteNums[h.value])" :key="line">{{ line }}</div>
+                                                    </v-tooltip>
+                                                    <strong v-else-if="h.value === 'time_period'">{{ item.time_period }}</strong>
+                                                    <template v-else>{{ item[h.value] }}</template>
+                                                </td>
+                                            </tr>
                                         </template>
                                     </v-data-table>
+                                    <div v-if="tableNotes.length || indicatorTableNotes.length" class="indicator-notes-list mt-3">
+                                        <div class="text-subtitle-2 mb-1">{{ $t('data_notes_title') || 'Notes' }}</div>
+                                        <p v-for="tn in indicatorTableNotes" :key="'tn-' + tn.id" class="mb-1 indicator-table-note">{{ tn.note }}</p>
+                                        <ol v-if="tableNotes.length" class="mb-0">
+                                            <li v-for="n in tableNotes" :key="n.id" :value="n.number">
+                                                <span v-if="!n.missing">{{ n.text }}</span>
+                                                <span v-else class="warning--text">{{ $t('data_note_missing_text') || 'No text defined for this note.' }}</span>
+                                                <span class="grey--text text-caption ml-1">[{{ n.id }}]</span>
+                                            </li>
+                                        </ol>
+                                    </div>
                                 </div>
                             </div>
                         </v-tab-item>

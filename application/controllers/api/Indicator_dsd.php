@@ -151,6 +151,22 @@ class Indicator_dsd extends MY_REST_Controller
 				$response['data_validation'] = $result['data_validation'];
 			}
 
+			$this->load->library('Indicator_data_notes');
+			$notes_checks = $this->indicator_data_notes->check_references($sid);
+			if (!empty($notes_checks['footnote_columns']) || !empty($notes_checks['warnings'])) {
+				$response['data_notes'] = $notes_checks;
+				foreach ($notes_checks['errors'] as $msg) {
+					$response['errors'][] = 'Data notes: ' . $msg;
+				}
+				foreach ($notes_checks['warnings'] as $msg) {
+					$response['warnings'][] = 'Data notes: ' . $msg;
+				}
+				if (!empty($notes_checks['errors'])) {
+					$response['valid'] = false;
+					$response['status'] = 'failed';
+				}
+			}
+
 			// Always return 200 for validation report, regardless of validation result
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
@@ -511,7 +527,10 @@ class Indicator_dsd extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
 
 			$this->load->library('indicator_duckdb_service');
-			$body = $this->indicator_duckdb_service->timeseries_export_csv_body($sid);
+			$body = $this->indicator_duckdb_service->timeseries_export_csv_body(
+				$sid,
+				$this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid)
+			);
 
 			$this->load->helper('download');
 			$name = 'indicator_timeseries_' . (int) $sid . '.csv';
@@ -783,7 +802,12 @@ class Indicator_dsd extends MY_REST_Controller
 			$keep_extra = $this->parse_bool_request_flag($this->input->post('keep_extra_csv_columns'), false);
 
 			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
-			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
+			$this->load->library('Indicator_data_notes');
+			$generatable = Indicator_data_notes::generatable_footnote_columns(
+				$this->indicator_data_notes->get_footnote_columns($sid),
+				$this->Indicator_dsd_model->read_csv_header_names($real_path)
+			);
+			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected, $generatable);
 
 			if (empty($validation['valid'])) {
 				$this->set_response(array(
@@ -915,6 +939,12 @@ class Indicator_dsd extends MY_REST_Controller
 				false
 			);
 
+			// Fill missing note IDs from note text columns (may add the footnote column) before validation.
+			$this->load->library('Indicator_data_notes');
+			$generated_ids = $this->indicator_data_notes->generate_missing_ids(
+				$sid, $real_path, $ready['indicator_column'], $indicator_value
+			);
+
 			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
 			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
 			if (empty($validation['valid'])) {
@@ -982,12 +1012,140 @@ class Indicator_dsd extends MY_REST_Controller
 				if (!empty($finalize['export_warning'])) {
 					$result['export_warning'] = $finalize['export_warning'];
 				}
+				$this->load->library('Indicator_data_notes');
+				$notes_report = $this->indicator_data_notes->process_after_data_import(
+					$sid, $real_path, $ready['indicator_column'], $indicator_value, $user_id, $generated_ids
+				);
+				if ($notes_report !== null) {
+					$result['data_notes'] = $notes_report;
+				}
 				$result['message'] = 'Timeseries data imported successfully';
 			} else {
 				$result['message'] = 'Replace-from-csv queued; poll GET /api/indicator_dsd/job/{sid}?job_id=';
 			}
 
 			$this->set_response($result, REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Import cell notes from a notes CSV into project data_notes.
+	 *
+	 * POST /api/indicator_dsd/notes_import/{sid}
+	 * multipart: file or upload_id; optional delimiter, dry_run (0|1), replace (0|1).
+	 * CSV columns: note_id, note; optional indicator_id (rows for other indicators are skipped),
+	 * scope (only 'cell' or empty is imported), column.
+	 * Default merges by note_id (adds and updates); replace=1 also removes notes not in the file.
+	 */
+	function notes_import_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$dry_run = $this->parse_bool_request_flag($this->input->post('dry_run'), false);
+			$replace = $this->parse_bool_request_flag($this->input->post('replace'), false);
+			$delimiter = $this->input->post('delimiter');
+			if ($delimiter === null || $delimiter === '' || strlen($delimiter) !== 1) {
+				$delimiter = ',';
+			}
+
+			$this->load->model('Editor_project_dsd_model');
+			$binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+			$indicator_id_value = $binding && isset($binding['indicator_id_value']) && trim((string) $binding['indicator_id_value']) !== ''
+				? trim((string) $binding['indicator_id_value']) : null;
+
+			$path = $this->save_indicator_csv_upload($sid, 'data/indicator_notes_upload.csv', false);
+
+			$this->load->library('Indicator_data_notes');
+			$parsed = Indicator_data_notes::parse_notes_csv($path, $indicator_id_value, $delimiter);
+			if (!empty($parsed['errors'])) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => 'Notes CSV has errors; nothing was imported.',
+					'errors' => $parsed['errors'],
+				), REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
+
+			$existing = $this->indicator_data_notes->get_notes($sid);
+			$merge = Indicator_data_notes::merge_notes($existing, $parsed['notes'], $replace);
+			$changed = !empty($merge['added']) || !empty($merge['updated']) || !empty($merge['removed']);
+			if (!$dry_run && $changed) {
+				$this->indicator_data_notes->save_notes($sid, $merge['notes'], $this->get_api_user_id());
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'dry_run' => $dry_run,
+				'replace' => $replace,
+				'indicator_id_value' => $indicator_id_value,
+				'summary' => array(
+					'added' => $merge['added'],
+					'updated' => $merge['updated'],
+					'unchanged' => $merge['unchanged'],
+					'removed' => $merge['removed'],
+					'skipped_other_indicator' => $parsed['skipped_other_indicator'],
+					'skipped_scope' => $parsed['skipped_scope'],
+					'conflicts' => $parsed['conflicts'],
+				),
+				'notes_count' => count($merge['notes']),
+				'checks' => $this->indicator_data_notes->check_references($sid, $merge['notes']),
+			), REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Project data notes and footnote columns.
+	 *
+	 * GET /api/indicator_dsd/notes/{sid}
+	 */
+	function notes_get($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
+
+			$this->load->library('Indicator_data_notes');
+			$this->set_response(array(
+				'status' => 'success',
+				'footnote_columns' => $this->indicator_data_notes->get_footnote_columns($sid),
+				'notes' => $this->indicator_data_notes->get_notes($sid),
+			), REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Check note IDs used in the data against project data notes.
+	 *
+	 * GET /api/indicator_dsd/notes_check/{sid}
+	 */
+	function notes_check_get($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
+
+			$this->load->library('Indicator_data_notes');
+			$checks = $this->indicator_data_notes->check_references($sid);
+			$checks['status'] = 'success';
+			$checks['valid'] = empty($checks['errors']);
+			$this->set_response($checks, REST_Controller::HTTP_OK);
 		} catch (Throwable $e) {
 			$this->set_response(array(
 				'status' => 'failed',
@@ -1176,7 +1334,7 @@ class Indicator_dsd extends MY_REST_Controller
 	 * @return string Absolute path
 	 * @throws Exception
 	 */
-	protected function save_indicator_csv_upload($sid)
+	protected function save_indicator_csv_upload($sid, $relative_path = 'data/indicator_staging_upload.csv', $rewrite_headers = true)
 	{
 		$upload_id_raw = $this->input->post('upload_id');
 		$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
@@ -1187,7 +1345,7 @@ class Indicator_dsd extends MY_REST_Controller
 		}
 
 		$this->Editor_model->create_project_folder($sid);
-		$dest = $this->Editor_model->resolve_project_file_path($sid, 'data/indicator_staging_upload.csv');
+		$dest = $this->Editor_model->resolve_project_file_path($sid, $relative_path);
 		if (!$dest) {
 			throw new Exception('Project folder not available');
 		}
@@ -1228,7 +1386,9 @@ class Indicator_dsd extends MY_REST_Controller
 			throw new Exception('Could not resolve CSV path');
 		}
 
-		$this->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
+		if ($rewrite_headers) {
+			$this->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
+		}
 
 		return $real_path;
 	}

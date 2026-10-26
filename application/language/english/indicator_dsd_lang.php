@@ -83,6 +83,10 @@ $lang['dsd_assignment_status'] = 'Value presence';
 $lang['dsd_assignment_status_hint'] = 'Mandatory = a value must always be present in exported data; Conditional = value can be absent. Defaults to Conditional if not set.';
 $lang['dsd_assignment_mandatory'] = 'Mandatory';
 $lang['dsd_assignment_conditional'] = 'Conditional';
+$lang['dsd_display_role'] = 'Display as';
+$lang['dsd_display_role_none'] = 'None';
+$lang['dsd_display_role_footnote'] = 'Footnote (cells hold note IDs)';
+$lang['dsd_display_role_hint'] = "Footnote = cells hold one or more note IDs separated by ';' (e.g. N01;N03); the note text is stored in the project's Data notes.";
 
 $lang['delete_data'] = 'Delete data';
 $lang['delete_data_title'] = 'Delete data?';

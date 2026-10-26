@@ -117,6 +117,7 @@ class Data_structure_csv_import {
 					'label' => isset($comp['label']) ? trim((string) $comp['label']) : null,
 					'column_type' => trim((string) $comp['column_type']),
 					'csv_column' => trim((string) $comp['csv_column']),
+					'display_role' => isset($comp['display_role']) ? trim((string) $comp['display_role']) : null,
 					'codelist_id' => $codelist_id,
 				);
 			}
@@ -144,6 +145,9 @@ class Data_structure_csv_import {
 					'column_type' => trim((string) $comp['column_type']),
 					'codelist_id' => $codelist_id !== null && $codelist_id > 0 ? (int) $codelist_id : null,
 				);
+				if (array_key_exists('display_role', $comp)) {
+					$row['display_role'] = $comp['display_role'];
+				}
 				if ($user_id) {
 					$row['updated_by'] = (int) $user_id;
 				}

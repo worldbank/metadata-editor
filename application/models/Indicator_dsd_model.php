@@ -212,12 +212,14 @@ class Indicator_dsd_model extends CI_Model {
      * @param string[] $expected_column_names Normalized DSD column names
      * @return array valid, missing_in_csv, ignored_columns, extra_in_csv, csv_columns, expected_columns, message?
      */
-    public function validate_csv_headers_for_dsd($csv_path, array $expected_column_names)
+    public function validate_csv_headers_for_dsd($csv_path, array $expected_column_names, array $optional_column_names = array())
     {
         $csv_headers = $this->read_csv_header_names($csv_path);
         $expected = $this->normalize_duckdb_staging_column_names($expected_column_names);
+        $optional = array_map('strtoupper', $this->normalize_duckdb_staging_column_names($optional_column_names));
 
         $missing = array();
+        $missing_optional = array();
         $matched_csv = array();
 
         foreach ($expected as $exp) {
@@ -230,7 +232,11 @@ class Indicator_dsd_model extends CI_Model {
                 }
             }
             if (!$found) {
-                $missing[] = $exp;
+                if (in_array(strtoupper($exp), $optional, true)) {
+                    $missing_optional[] = $exp;
+                } else {
+                    $missing[] = $exp;
+                }
             }
         }
 
@@ -249,6 +255,8 @@ class Indicator_dsd_model extends CI_Model {
             'extra_in_csv' => $ignored,
             'csv_columns' => $csv_headers,
             'expected_columns' => $expected,
+            // Footnote columns absent from the CSV whose IDs will be generated from their text columns.
+            'generated_columns' => $missing_optional,
         );
 
         if (!$valid) {
@@ -2064,7 +2072,99 @@ class Indicator_dsd_model extends CI_Model {
             $body['use_ts_year_for_time_filter'] = $filters['use_ts_year_for_time_filter'] ? true : false;
         }
 
+        // Footnote columns ride along per record; noted cells with an empty value are kept.
+        $include = array();
+        foreach ($this->chart_footnote_columns($sid, $page) as $phys) {
+            if (!in_array($phys, $slice_phys, true) && $phys !== $phys_time && $phys !== $phys_val) {
+                $include[] = $phys;
+            }
+        }
+        if (!empty($include)) {
+            $body['include_columns'] = $include;
+            $body['include_missing_with_columns'] = true;
+        }
+
         return $body;
+    }
+
+    /**
+     * Footnote columns (display_role = footnote) present in the timeseries table: DSD name => physical name.
+     *
+     * @param int $sid
+     * @param array $page timeseries_page first page (columns)
+     * @return array
+     */
+    private function chart_footnote_columns($sid, $page)
+    {
+        $this->load->library('Indicator_data_notes');
+        $key_map = $this->timeseries_page_column_upper_to_physical($page);
+        $out = array();
+        foreach ($this->indicator_data_notes->get_footnote_columns($sid) as $name) {
+            $u = strtoupper(trim((string) $name));
+            if (isset($key_map[$u])) {
+                $out[$name] = $key_map[$u];
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Replace FastAPI `attributes` on chart records with `notes` ({DSD footnote column => ids[]}) and
+     * return the dictionary of notes used: { id => { note, column? } }. IDs without text are listed in $missing.
+     *
+     * @param int   $sid
+     * @param array $page
+     * @param array $records  modified in place
+     * @param array $missing  set to ids used in records but not defined in data_notes
+     * @return array
+     */
+    private function attach_chart_notes($sid, $page, array &$records, &$missing)
+    {
+        $missing = array();
+        $phys_to_name = array_flip($this->chart_footnote_columns($sid, $page));
+        $used = array();
+        foreach ($records as $i => $rec) {
+            $attrs = isset($rec['attributes']) && is_array($rec['attributes']) ? $rec['attributes'] : array();
+            unset($records[$i]['attributes']);
+            $notes = array();
+            foreach ($attrs as $phys => $value) {
+                if (!isset($phys_to_name[$phys])) {
+                    continue;
+                }
+                $ids = Indicator_data_notes::split_ids($value);
+                if (!empty($ids)) {
+                    $notes[$phys_to_name[$phys]] = $ids;
+                    foreach ($ids as $id) {
+                        $used[$id] = true;
+                    }
+                }
+            }
+            if (!empty($notes)) {
+                $records[$i]['notes'] = $notes;
+            }
+        }
+
+        $dictionary = array();
+        if (empty($used)) {
+            return $dictionary;
+        }
+        foreach ($this->indicator_data_notes->get_notes($sid) as $n) {
+            $id = isset($n['id']) ? trim((string) $n['id']) : '';
+            if ($id === '' || !isset($used[$id])) {
+                continue;
+            }
+            $entry = array('note' => isset($n['note']) ? (string) $n['note'] : '');
+            if (!empty($n['column'])) {
+                $entry['column'] = (string) $n['column'];
+            }
+            $dictionary[$id] = $entry;
+        }
+        foreach (array_keys($used) as $id) {
+            if (!isset($dictionary[$id])) {
+                $missing[] = (string) $id;
+            }
+        }
+        return $dictionary;
     }
 
     /**
@@ -2515,15 +2615,24 @@ class Indicator_dsd_model extends CI_Model {
 
         $slice_dimensions = $this->enrich_chart_aggregate_records_from_dsd($sid, $page, $records, $metadata);
 
+        $notes_missing = array();
+        $notes = !empty($metadata['include_columns'])
+            ? $this->attach_chart_notes($sid, $page, $records, $notes_missing)
+            : array();
+
         $out = array(
             'records' => $records,
             'filter_options' => isset($raw['filter_options']) && is_array($raw['filter_options'])
                 ? $raw['filter_options']
                 : array(),
             'metadata' => $metadata,
+            'notes' => (object) $notes,
         );
         $out['metadata']['source'] = 'duckdb';
         $out['metadata']['slice_dimensions'] = $slice_dimensions;
+        $out['metadata']['footnote_columns'] = array_keys($this->chart_footnote_columns($sid, $page));
+        $out['metadata']['notes_missing'] = $notes_missing;
+        unset($out['metadata']['include_columns']);
 
         return $out;
     }
@@ -2570,9 +2679,13 @@ class Indicator_dsd_model extends CI_Model {
         $page = $this->indicator_duckdb_service->timeseries_page($sid, 0, 1);
         $duck_ok = is_array($page) && empty($page['error']) && !empty($page['columns']) && is_array($page['columns']);
 
+        $this->load->library('Indicator_data_notes');
+        $table_notes = $this->indicator_data_notes->get_table_notes($sid);
+
         if ($duck_ok) {
             $agg = $this->try_get_chart_data_duckdb($sid, $filters, $page);
             if ($agg !== null) {
+                $agg['table_notes'] = $table_notes;
                 return $agg;
             }
         }
@@ -2585,7 +2698,11 @@ class Indicator_dsd_model extends CI_Model {
             }
         }
 
-        return $this->get_chart_data_from_csv($sid, $filters);
+        $csv_data = $this->get_chart_data_from_csv($sid, $filters);
+        if (is_array($csv_data)) {
+            $csv_data['table_notes'] = $table_notes;
+        }
+        return $csv_data;
     }
 
     /**

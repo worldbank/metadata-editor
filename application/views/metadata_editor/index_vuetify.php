@@ -1027,6 +1027,9 @@
                 }
               ]
             });
+
+            //data notes section right below the data structure
+            this.move_item_to_end(tree_data, 'data_notes_container');
           }
           
           tree_data.push({

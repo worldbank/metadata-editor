@@ -27,6 +27,12 @@ class Data_structure_component_model extends CI_Model {
 		'periodicity',
 	];
 
+	/** Allowed metadata.display_role values ('none' / empty = no special display). */
+	public static $allowed_display_roles = ['footnote'];
+
+	/** Column types that may carry a display_role. */
+	public static $display_role_column_types = ['attribute', 'annotation'];
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -278,6 +284,11 @@ class Data_structure_component_model extends CI_Model {
 			$codelist_id = null;
 		}
 
+		$metadata = isset($data['metadata']) ? $data['metadata'] : null;
+		if (array_key_exists('display_role', $data)) {
+			$metadata = $this->_apply_display_role($metadata, $data['display_role'], $column_type);
+		}
+
 		$now = time();
 		$insert = [
 			'data_structure_id'   => $structure_id,
@@ -288,7 +299,7 @@ class Data_structure_component_model extends CI_Model {
 			'data_type'           => $data_type,
 			'column_type'         => $column_type,
 			'codelist_id'         => $codelist_id,
-			'metadata'            => $this->_normalize_metadata_for_db(isset($data['metadata']) ? $data['metadata'] : null),
+			'metadata'            => $this->_normalize_metadata_for_db($metadata),
 			'created'             => isset($data['created']) ? (int) $data['created'] : $now,
 			'updated'             => isset($data['updated']) ? (int) $data['updated'] : $now,
 			'created_by'          => $this->_optional_user_id(isset($data['created_by']) ? $data['created_by'] : null),
@@ -372,6 +383,14 @@ class Data_structure_component_model extends CI_Model {
 		if (array_key_exists('metadata', $data)) {
 			$upd['metadata'] = $this->_normalize_metadata_for_db($data['metadata']);
 		}
+		if (array_key_exists('display_role', $data)) {
+			// Merge into the incoming metadata when given, else into the stored metadata.
+			$base = array_key_exists('metadata', $data) ? $data['metadata'] : $existing['metadata'];
+			$ct = isset($upd['column_type']) ? $upd['column_type'] : $existing['column_type'];
+			$upd['metadata'] = $this->_normalize_metadata_for_db(
+				$this->_apply_display_role($base, $data['display_role'], $ct)
+			);
+		}
 		if (array_key_exists('updated', $data)) {
 			$upd['updated'] = (int) $data['updated'];
 		} else {
@@ -443,6 +462,40 @@ class Data_structure_component_model extends CI_Model {
 		if (!$this->Codelists_model->get_by_id($codelist_id)) {
 			throw new Exception('Codelist not found.');
 		}
+	}
+
+	/**
+	 * Set or clear metadata.display_role. Empty / 'none' removes the key.
+	 *
+	 * @param mixed  $metadata    array, JSON string or null
+	 * @param mixed  $display_role
+	 * @param string $column_type
+	 * @return array|null
+	 * @throws Exception
+	 */
+	private function _apply_display_role($metadata, $display_role, $column_type)
+	{
+		if (is_string($metadata) && $metadata !== '') {
+			$metadata = json_decode($metadata, true);
+		}
+		if (!is_array($metadata)) {
+			$metadata = [];
+		}
+
+		$role = $display_role === null ? '' : strtolower(trim((string) $display_role));
+		if ($role === '' || $role === 'none') {
+			unset($metadata['display_role']);
+		} else {
+			if (!in_array($role, self::$allowed_display_roles, true)) {
+				throw new Exception('Invalid display_role: ' . $role);
+			}
+			if (!in_array($column_type, self::$display_role_column_types, true)) {
+				throw new Exception('display_role is only allowed on attribute or annotation columns.');
+			}
+			$metadata['display_role'] = $role;
+		}
+
+		return !empty($metadata) ? $metadata : null;
 	}
 
 	/**

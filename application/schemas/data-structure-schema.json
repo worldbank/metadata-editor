@@ -222,6 +222,12 @@
 					"title": "Value presence",
 					"type": "string",
 					"enum": ["Mandatory", "Conditional"]
+				},
+				"display_role": {
+					"title": "Display as",
+					"description": "How attribute/annotation values are shown. 'footnote': the column holds note IDs (separated by ';') whose text is in the project's data_notes.",
+					"type": "string",
+					"enum": ["none", "footnote"]
 				}
 			},
 			"required": ["name", "column_type"],

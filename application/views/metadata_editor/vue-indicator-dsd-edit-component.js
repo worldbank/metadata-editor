@@ -587,6 +587,18 @@ Vue.component('indicator-dsd-edit', {
                             </select>
                             <small class="form-text text-muted">{{$t('dsd_assignment_status_hint') || 'Mandatory = a value must always be present in exported data; Conditional = value can be absent. Defaults to Conditional if not set.'}}</small>
                         </div>
+                        <div class="form-group form-field">
+                            <label>{{$t('dsd_display_role') || 'Display as'}}</label>
+                            <select
+                                class="form-control form-control-sm form-field-dropdown"
+                                :value="metaSelectValue('display_role')"
+                                @change="setMetaString('display_role', $event.target.value)"
+                            >
+                                <option value="">{{$t('dsd_display_role_none') || 'None'}}</option>
+                                <option value="footnote">{{$t('dsd_display_role_footnote') || 'Footnote (cells hold note IDs)'}}</option>
+                            </select>
+                            <small class="form-text text-muted">{{$t('dsd_display_role_hint') || "Footnote = cells hold one or more note IDs separated by ';' (e.g. N01;N03); the note text is stored in the project's Data notes."}}</small>
+                        </div>
                     </template>
 
                     <!-- Codelist type: none / global registry -->
