@@ -52,6 +52,15 @@ class Editor_publish_model extends ci_model {
 		$import_ddi_url=$conn_info['url'].'/index.php/api/datasets/import_ddi';
 		$catalog_api_key=$conn_info['api_key'];
 		
+		// Write the project JSON from the current metadata (the UI used to do this as a separate step;
+		// scripts and the publish job did not, and publishing then failed or used a stale file).
+		try {
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'json');
+		} catch (Exception $e) {
+			log_message('error', 'Project JSON generation before publish failed for project ' . $sid . ': ' . $e->getMessage());
+		}
+
 		//project metadata (NADA: JSON create; on failure for survey, fallback to import_ddi)
 		$result = $this->publish_metadata(
 			$sid,

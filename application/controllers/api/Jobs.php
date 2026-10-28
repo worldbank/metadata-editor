@@ -664,6 +664,7 @@ class Jobs extends MY_REST_Controller
 				'publish_resources' => isset($input['publish_resources']) ? $input['publish_resources'] : true,
 				'publish_dsd' => !empty($input['publish_dsd']),
 				'dsd_overwrite' => !empty($input['dsd_overwrite']),
+				'dsd_force' => !empty($input['dsd_force']),
 				'publish_indicator_data' => !empty($input['publish_indicator_data']),
 				'delete_nada_resources' => !empty($input['delete_nada_resources']),
 			);
