@@ -1117,6 +1117,7 @@
                                 },
                                 {
                                     "key": "study_desc.method.data_collection.instru_development",
+                                    "type": "string",
                                     "title": "Desarrollo del instrumento de captura de datos",
                                     "help_text": "Describa cualquier trabajo de desarrollo realizado en el instrumento de recolección de datos. Esto puede incluir una descripción del proceso de revisión, los estándares seguidos y una lista de las agencias o personas consultadas.",
                                     "_ddi_xpath": "stdyDscr.method.dataColl.instrumentDevelopment",
@@ -1125,6 +1126,7 @@
                                 },
                                 {
                                     "key": "study_desc.method.data_collection.instru_development_type",
+                                    "type": "string",
                                     "title": "Tipo de desarrollo del instrumento de captura de datos",
                                     "help_text": "El tipo de desarrollo del instrumento. Este elemento se utilizará cuando esté disponible una lista predefinida de opciones (vocabulario controlado).",
                                     "_ddi_xpath": "stdyDscr.method.dataColl.instrumentDevelopment.@type",
@@ -1182,6 +1184,7 @@
                                 },
                                 {
                                     "key": "study_desc.method.data_collection.control_operations",
+                                    "type": "string",
                                     "title": "Operaciones de control",
                                     "help_text": "Este elemento contiene información sobre la supervisión de la recolección de datos, es decir, sobre los métodos implementados para facilitar el control de datos, generalmente realizados por el investigador principal.",
                                     "_ddi_xpath": "stdyDscr.method.dataColl.ConOps",
@@ -1551,12 +1554,14 @@
                                 },
                                 {
                                     "key": "study_desc.study_info.ex_post_evaluation.evaluation_process",
+                                    "type": "string",
                                     "title": "Proceso de evaluación",
                                     "help_text": "Una descripción del proceso de evaluación ex-post. Esto puede incluir información sobre el período en que se realizó la evaluación, el costo\/presupuesto, la relevancia, los arreglos institucionales o legales, etc.",
                                     "display_type": "textarea"
                                 },
                                 {
                                     "key": "study_desc.study_info.ex_post_evaluation.outcomes",
+                                    "type": "string",
                                     "title": "Resultados de la evaluación",
                                     "help_text": "Una descripción de los resultados de la evaluación ex-post. Puede incluir una referencia a un informe de evaluación.",
                                     "display_type": "textarea"
