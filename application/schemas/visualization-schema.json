@@ -971,13 +971,9 @@
       ]
     }
     },
-    "provenance":{
-      "type":"array",
-      "description":"Provenance",
-      "items":{
-        "$ref":"provenance-schema.json"
-      }
-      },
+    "provenance": {
+      "$ref": "provenance-schema.json"
+    },
     "tags": {
       "type": "array",
       "title": "Tags",
