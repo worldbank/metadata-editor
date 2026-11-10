@@ -74,6 +74,7 @@ class PublishProjectJob implements JobHandlerInterface
             'publish_resources' => !empty($payload['publish_resources']) ? 1 : 0,
             'publish_dsd' => !empty($payload['publish_dsd']) ? 1 : 0,
             'dsd_overwrite' => !empty($payload['dsd_overwrite']) ? 1 : 0,
+            'dsd_force' => !empty($payload['dsd_force']) ? 1 : 0,
             'publish_indicator_data' => !empty($payload['publish_indicator_data']) ? 1 : 0,
             'delete_nada_resources' => !empty($payload['delete_nada_resources']) ? 1 : 0,
         );
@@ -106,6 +107,8 @@ class PublishProjectJob implements JobHandlerInterface
         $publish_resources = isset($payload['publish_resources']) ? $payload['publish_resources'] : true;
         $publish_dsd = !empty($payload['publish_dsd']);
         $dsd_overwrite = !empty($payload['dsd_overwrite']);
+        // Re-import the DSD even when NADA's copy is unchanged (normally skipped).
+        $dsd_force = !empty($payload['dsd_force']);
         $publish_indicator_data = !empty($payload['publish_indicator_data']);
         $delete_nada_resources = !empty($payload['delete_nada_resources']);
 
@@ -159,6 +162,7 @@ class PublishProjectJob implements JobHandlerInterface
                     array(
                         'publish_dsd' => true,
                         'dsd_overwrite' => $dsd_overwrite,
+                        'dsd_force' => $dsd_force,
                         'publish_indicator_data' => false,
                     )
                 )['dsd'];

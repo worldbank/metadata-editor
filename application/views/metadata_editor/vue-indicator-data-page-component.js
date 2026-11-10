@@ -10,7 +10,10 @@ Vue.component('indicator-data-page', {
             showImport: false,
             binding: null,
             bindingLoading: true,
-            hasPublishedData: false
+            hasPublishedData: false,
+            showNotesImport: false,
+            /** data_notes report from the last data import (notes read from the data CSV + checks) */
+            dataImportNotes: null
         };
     },
     watch: {
@@ -56,8 +59,9 @@ Vue.component('indicator-data-page', {
             delete q.tab;
             this.$router.replace({ path: this.$route.path, query: q }).catch(function() {});
         },
-        onImported: function() {
+        onImported: function(result) {
             var vm = this;
+            vm.dataImportNotes = result && result.data_notes ? result.data_notes : null;
             vm.loadBinding();
             vm.showBrowseView();
             vm.$nextTick(function() {
@@ -68,6 +72,13 @@ Vue.component('indicator-data-page', {
             });
             if (typeof EventBus !== 'undefined') {
                 EventBus.$emit('onSuccess', 'Indicator data imported');
+            }
+        },
+        onNotesImported: function() {
+            this.dataImportNotes = null;
+            var explorer = this.$refs.explorer;
+            if (explorer && typeof explorer.loadNotes === 'function') {
+                explorer.loadNotes();
             }
         },
         onExplorerDataState: function(state) {
@@ -116,6 +127,10 @@ Vue.component('indicator-data-page', {
                             <v-icon left small>mdi-upload</v-icon>
                             {{ $t('import_indicator_data') || 'Import data' }}
                         </v-btn>
+                        <v-btn color="primary" outlined small :disabled="bindingLoading" @click="showNotesImport = true">
+                            <v-icon left small>mdi-note-text-outline</v-icon>
+                            {{ $t('import_data_notes') || 'Import notes' }}
+                        </v-btn>
                         <v-btn
                             v-if="hasPublishedData"
                             color="primary"
@@ -141,6 +156,20 @@ Vue.component('indicator-data-page', {
                     </div>
                 </div>
 
+                <div v-if="dataImportNotes" class="mb-3" style="position:relative;">
+                    <indicator-notes-report
+                        :summary="dataImportNotes.from_data_csv"
+                        :checks="dataImportNotes.checks"
+                        :notes-count="typeof dataImportNotes.notes_count === 'number' ? dataImportNotes.notes_count : null"
+                        :warning="dataImportNotes.warning || ''"
+                        :generated="dataImportNotes.generated_ids || null"
+                        source="data_csv"
+                    ></indicator-notes-report>
+                    <v-btn icon x-small style="position:absolute; top:6px; right:6px;" @click="dataImportNotes = null" title="Close">
+                        <v-icon x-small>mdi-close</v-icon>
+                    </v-btn>
+                </div>
+
                 <v-progress-linear v-if="bindingLoading" indeterminate color="primary" class="mb-3"></v-progress-linear>
                 <indicator-timeseries-data-explorer
                     v-if="!bindingLoading"
@@ -153,6 +182,7 @@ Vue.component('indicator-data-page', {
                 ></indicator-timeseries-data-explorer>
             </template>
 
+            <indicator-notes-import v-model="showNotesImport" @imported="onNotesImported"></indicator-notes-import>
         </div>
     `
 });

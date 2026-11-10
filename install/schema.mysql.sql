@@ -1277,4 +1277,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260909224300);
+INSERT INTO `migrations` (`version`) VALUES (20261103000001);

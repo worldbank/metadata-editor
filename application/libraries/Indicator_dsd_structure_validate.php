@@ -116,6 +116,14 @@ class Indicator_dsd_structure_validate {
             $errors[] = $msg;
         }
 
+        foreach ($this->collect_display_role_issues($columns) as $issue) {
+            if ($issue['level'] === 'error') {
+                $errors[] = $issue['message'];
+            } else {
+                $warnings[] = $issue['message'];
+            }
+        }
+
         $result = array(
             'valid' => count($errors) === 0,
             'errors' => $errors,
@@ -181,6 +189,47 @@ class Indicator_dsd_structure_validate {
         }
 
         return $this->validate_columns($columns, array('include_role_checklist' => true));
+    }
+
+    /**
+     * metadata.display_role checks: known value, allowed column type, footnote columns without codelist.
+     *
+     * @param array $columns
+     * @return array list of { level: error|warning, message }
+     */
+    public function collect_display_role_issues(array $columns)
+    {
+        $issues = array();
+        $allowed_roles = array('footnote');
+        $allowed_types = array('attribute', 'annotation');
+
+        foreach ($columns as $column) {
+            if (!is_array($column)) {
+                continue;
+            }
+            $meta = isset($column['metadata']) && is_array($column['metadata']) ? $column['metadata'] : array();
+            $role = isset($meta['display_role']) ? strtolower(trim((string) $meta['display_role'])) : '';
+            if ($role === '' || $role === 'none') {
+                continue;
+            }
+            $name = isset($column['name']) ? $column['name'] : '?';
+            $type = isset($column['column_type']) ? (string) $column['column_type'] : '';
+
+            if (!in_array($role, $allowed_roles, true)) {
+                $issues[] = array('level' => 'error', 'message' => "Column '{$name}': display_role '{$role}' is not a recognised value (none, footnote).");
+                continue;
+            }
+            if (!in_array($type, $allowed_types, true)) {
+                $issues[] = array('level' => 'error', 'message' => "Column '{$name}': display_role '{$role}' is only allowed on attribute or annotation columns (found '{$type}').");
+                continue;
+            }
+            $has_codelist = isset($column['codelist_type']) && $column['codelist_type'] !== '' && $column['codelist_type'] !== 'none';
+            if ($role === 'footnote' && $has_codelist) {
+                $issues[] = array('level' => 'warning', 'message' => "Column '{$name}': footnote columns hold note IDs whose text comes from the project's data notes; the attached codelist is not used for display.");
+            }
+        }
+
+        return $issues;
     }
 
     /**

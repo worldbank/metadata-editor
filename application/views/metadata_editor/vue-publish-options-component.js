@@ -62,8 +62,8 @@ Vue.component('publish-options', {
                         "direct": this.$t("direct_access"),
                         "public": this.$t("public_use_files"),
                         "licensed": this.$t("licensed_data_files"),
-                        "remote": this.$t("data_accessible_only_in_data_enclave"),
-                        "enclave": this.$t("data_available_from_external_repository"),
+                        "remote": this.$t("data_available_from_external_repository"),
+                        "enclave": this.$t("data_accessible_only_in_data_enclave"),
                         "": this.$t("data_not_available"),
                         "open": this.$t("open_access")
                     }

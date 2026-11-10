@@ -2214,6 +2214,65 @@
         },
         {
             "type": "section_container",
+            "id": "data_notes_container",
+            "key": "data_notes_container",
+            "title": "Data notes",
+            "items": [
+                {
+                    "key": "data_notes",
+                    "title": "Data notes",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "column",
+                            "title": "Column",
+                            "type": "string",
+                            "prop_key": "data_notes.column",
+                            "help_text": "Optional. Footnote column the note is intended for (e.g. NOTE_ID). Used to warn when the ID appears in another column.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "id",
+                            "title": "Note ID",
+                            "type": "string",
+                            "prop_key": "data_notes.id",
+                            "help_text": "Identifier used in the data to reference this note (e.g. N01). Must be unique within the project.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "scope",
+                            "title": "Scope",
+                            "type": "string",
+                            "prop_key": "data_notes.scope",
+                            "enum": [
+                                {
+                                    "code": "cell",
+                                    "label": "Cell"
+                                },
+                                {
+                                    "code": "table",
+                                    "label": "Table"
+                                }
+                            ],
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "help_text": "Cell (default): referenced by cells through a footnote column. Table: applies to the whole indicator and is shown under every chart and table."
+                        },
+                        {
+                            "key": "note",
+                            "title": "Note",
+                            "type": "string",
+                            "prop_key": "data_notes.note",
+                            "help_text": "Text of the note, shown as a footnote wherever a cell references its ID.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": "Footnotes for data cells. The data references notes by ID in a footnote column (one or more IDs separated by ';'); the text is stored here once."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
             "id": "tags",
             "key": "tags_container",
             "title": "Tags",

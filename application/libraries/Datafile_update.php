@@ -90,8 +90,10 @@ class Datafile_update
 			}
 		}
 
+		// Replacing data opts the file back into storage; otherwise store_data=0 cleanup would delete it
 		$update_fields=array_merge(array(
-			'file_physical_name'=>basename($target_filepath)
+			'file_physical_name'=>basename($target_filepath),
+			'store_data'=>1
 		), $source_update);
 
 		$this->ci->Editor_datafile_model->update($datafile['id'],$update_fields);

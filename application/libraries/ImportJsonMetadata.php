@@ -1236,6 +1236,11 @@ class ImportJsonMetadata
                 $file_id_mapping[$datafile['file_id']]=$file_id;
                 $datafile['file_id']=$file_id;
 
+                //keep the input order of data files
+                if (!isset($datafile['wght']) || !is_numeric($datafile['wght'])){
+                    $datafile['wght']=$this->ci->Editor_datafile_model->max_wght($sid)+1;
+                }
+
                 if ($validate){
                     $this->ci->Editor_datafile_model->validate($datafile);
                 }

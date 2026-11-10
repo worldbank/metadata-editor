@@ -1825,6 +1825,155 @@
                             "help_text": "Les tags, en particulier lorsqu'ils sont organisés en groupes, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
                         }
                     ]
+                },
+                {
+                    "type": "section_container",
+                    "id": "provenance",
+                    "key": "provenance_container",
+                    "title": "Provenance",
+                    "items": [
+                        {
+                            "key": "provenance",
+                            "title": "Provenance",
+                            "type": "section",
+                            "help_text": "Les informations de provenance sont utilisées pour documenter l'origine des métadonnées.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository",
+                                    "title": "Dépôt d'origine",
+                                    "type": "section",
+                                    "help_text": "Informations sur le dépôt d'origine où les métadonnées ont été créées pour la première fois.",
+                                    "items": [
+                                        {
+                                            "key": "provenance.original_repository.repository_name",
+                                            "title": "Nom du dépôt",
+                                            "type": "string",
+                                            "help_text": "Le nom du dépôt d'origine.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "L'URL du dépôt d'origine ou du jeu de données.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.dataset_identifier",
+                                            "title": "Identifiant du jeu de données",
+                                            "type": "string",
+                                            "help_text": "L'identifiant du jeu de données dans le dépôt d'origine.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.doi",
+                                            "title": "DOI",
+                                            "type": "string",
+                                            "help_text": "L'identifiant d'objet numérique (DOI) du jeu de données dans le dépôt d'origine.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.dataset_title",
+                                            "title": "Titre du jeu de données",
+                                            "type": "string",
+                                            "help_text": "Le titre du jeu de données dans le dépôt d'origine.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.date_published",
+                                            "title": "Date de publication du jeu de données (AAAA-MM-JJ)",
+                                            "type": "string",
+                                            "help_text": "La date de publication du jeu de données dans le dépôt d'origine.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "provenance.original_repository.notes",
+                                            "title": "Notes",
+                                            "type": "string",
+                                            "help_text": "Informations complémentaires sur le dépôt d'origine.",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "provenance.source_repository_section",
+                                    "title": "Dépôt source",
+                                    "type": "section",
+                                    "help_text": "Informations sur le dépôt source à partir duquel les métadonnées ont été moissonnées.",
+                                    "items": [
+                                        {
+                                            "key": "provenance.source_repository",
+                                            "title": "Dépôts sources",
+                                            "type": "nested_array",
+                                            "help_text": "Informations sur le dépôt source à partir duquel les métadonnées ont été moissonnées.",
+                                            "props": [
+                                                {
+                                                    "key": "repository_name",
+                                                    "prop_key": "provenance.source_repository.repository_name",
+                                                    "title": "Nom du dépôt",
+                                                    "type": "string",
+                                                    "help_text": "Le nom du dépôt source.",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "url",
+                                                    "prop_key": "provenance.source_repository.url",
+                                                    "title": "URL",
+                                                    "type": "string",
+                                                    "help_text": "L'URL du dépôt source ou du jeu de données.",
+                                                    "rules": {
+                                                        "is_uri": true
+                                                    },
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataset_identifier",
+                                                    "prop_key": "provenance.source_repository.dataset_identifier",
+                                                    "title": "Identifiant du jeu de données",
+                                                    "type": "string",
+                                                    "help_text": "L'identifiant du jeu de données dans le dépôt source.",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataset_title",
+                                                    "prop_key": "provenance.source_repository.dataset_title",
+                                                    "title": "Titre du jeu de données",
+                                                    "type": "string",
+                                                    "help_text": "Le titre du jeu de données dans le dépôt source.",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "date_acquired",
+                                                    "prop_key": "provenance.source_repository.date_acquired",
+                                                    "title": "Date d'acquisition (AAAA-MM-JJ)",
+                                                    "type": "string",
+                                                    "help_text": "La date à laquelle les métadonnées ont été acquises depuis le dépôt source.",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "acquisition_mode",
+                                                    "prop_key": "provenance.source_repository.acquisition_mode",
+                                                    "title": "Mode d'acquisition",
+                                                    "type": "string",
+                                                    "help_text": "Mode d'acquisition des métadonnées depuis le dépôt source (par ex. OAI-PMH, API, saisie manuelle, etc.)"
+                                                },
+                                                {
+                                                    "key": "notes",
+                                                    "prop_key": "provenance.source_repository.notes",
+                                                    "title": "Notes",
+                                                    "type": "string",
+                                                    "help_text": "Informations complémentaires sur le dépôt source."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }

@@ -680,17 +680,10 @@ class Issues extends MY_REST_Controller {
                 throw new Exception('status is required');
             }
 
-            // Get first issue to check project access (assuming all belong to same project)
-            $first_issue = $this->Project_issues_model->get_by_id($input['ids'][0]);
-            if (!$first_issue) {
-                throw new Exception('Issue not found');
-            }
-
-            // Check edit access
-            $this->editor_acl->user_has_project_access($first_issue['project_id'], 'edit', $this->api_user);
+            $ids = $this->_resolve_bulk_issue_ids_for_edit($input['ids']);
 
             $affected = $this->Project_issues_model->bulk_update_status(
-                $input['ids'], 
+                $ids,
                 $input['status'], 
                 $this->api_user_id
             );
@@ -723,16 +716,9 @@ class Issues extends MY_REST_Controller {
                 throw new Exception('ids array is required');
             }
 
-            // Get first issue to check project access (assuming all belong to same project)
-            $first_issue = $this->Project_issues_model->get_by_id($input['ids'][0]);
-            if (!$first_issue) {
-                throw new Exception('Issue not found');
-            }
+            $ids = $this->_resolve_bulk_issue_ids_for_edit($input['ids']);
 
-            // Check edit access
-            $this->editor_acl->user_has_project_access($first_issue['project_id'], 'edit', $this->api_user);
-
-            $affected = $this->Project_issues_model->bulk_delete($input['ids']);
+            $affected = $this->Project_issues_model->bulk_delete($ids);
 
             $response = array(
                 'status'   => 'success',
@@ -746,6 +732,42 @@ class Issues extends MY_REST_Controller {
                 'message' => $e->getMessage(),
             ), REST_Controller::HTTP_BAD_REQUEST);
         }
+    }
+
+    /**
+     * Normalize issue IDs, ensure each exists, and require edit on every involved project.
+     *
+     * @param array $raw_ids Issue IDs from request body
+     * @return array Unique positive integer IDs
+     * @throws Exception
+     */
+    private function _resolve_bulk_issue_ids_for_edit($raw_ids)
+    {
+        if (empty($raw_ids) || !is_array($raw_ids)) {
+            throw new Exception('ids array is required');
+        }
+
+        $ids = array_values(array_unique(array_filter(array_map('intval', $raw_ids))));
+
+        if (empty($ids)) {
+            throw new Exception('ids array is required');
+        }
+
+        $issues = $this->Project_issues_model->get_by_ids($ids);
+        $found_ids = array_map('intval', array_column($issues, 'id'));
+        $missing = array_diff($ids, $found_ids);
+
+        if (!empty($missing)) {
+            throw new Exception('One or more issues not found');
+        }
+
+        $project_ids = array_unique(array_map('intval', array_column($issues, 'project_id')));
+
+        foreach ($project_ids as $project_id) {
+            $this->editor_acl->user_has_project_access($project_id, 'edit', $this->api_user);
+        }
+
+        return $ids;
     }
 
     /**

@@ -544,6 +544,9 @@ class Editor extends MY_REST_Controller
 			if (isset($options['created'])){
 				unset($options['created']);
 			}
+			if (isset($options['thumbnail'])){
+				unset($options['thumbnail']);
+			}
 
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -678,7 +681,7 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+			$this->editor_acl->user_has_project_access($sid, $permission='admin', $this->api_user());
 			$this->Editor_model->delete_project($sid);
 				
 			$response=array(
@@ -1326,7 +1329,7 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -1430,26 +1433,44 @@ class Editor extends MY_REST_Controller
 	 */	
 	function populate_category_labels_get($sid=null)
 	{
-		try{
-			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+		try {
+			throw new Exception('Use POST /api/editor/populate_category_labels/{sid}');
+		}
+		catch (Exception $e) {
+			$error_output = array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 
-			$result=$this->Editor_variable_model->populate_categry_labels($sid);			
-				
-			if(!$result){
-				throw new Exception("PROJECT_NOT_FOUND");
+	/**
+	 * Populate variable category value/labels from var_catgry (writes variable metadata).
+	 * POST /api/editor/populate_category_labels/{sid}
+	 */
+	function populate_category_labels_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user());
+
+			$result = $this->Editor_variable_model->populate_categry_labels($sid);
+
+			if (!$result) {
+				throw new Exception('PROJECT_NOT_FOUND');
 			}
 
-			$response=array(
-				'status'=>'success',
-				'result'=>$result
-			);			
+			$response = array(
+				'status' => 'success',
+				'result' => $result,
+			);
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
+		catch (Exception $e) {
+			$error_output = array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}

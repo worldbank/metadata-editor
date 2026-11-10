@@ -511,14 +511,19 @@ class Indicator_duckdb_service {
 	 * @return string
 	 * @throws Exception on HTTP or network error
 	 */
-	public function timeseries_export_csv_body($sid)
+	public function timeseries_export_csv_body($sid, $columns = null)
 	{
 		$url = $this->base_url . 'timeseries/indicators/timeseries/export';
 		$client = new Client(array('timeout' => 600, 'http_errors' => false));
+		$query = array(
+			'project_id' => (string) (int) $sid,
+		);
+		// DSD columns in DSD order; leaves out internal columns such as _ts_year / _ts_freq.
+		if (is_array($columns) && !empty($columns)) {
+			$query['columns'] = implode(',', $columns);
+		}
 		$response = $client->request('GET', $url, array(
-			'query' => array(
-				'project_id' => (string) (int) $sid,
-			),
+			'query' => $query,
 		));
 		$code = (int) $response->getStatusCode();
 		if ($code !== 200) {

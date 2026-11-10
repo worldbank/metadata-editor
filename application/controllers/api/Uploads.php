@@ -73,7 +73,8 @@ class Uploads extends MY_REST_Controller
 				$total_size,
 				$provided_total_chunks,
 				$chunk_size,
-				$metadata
+				$metadata,
+				$this->get_api_user_id()
 			);
 			
 			$response = array(
@@ -141,6 +142,8 @@ class Uploads extends MY_REST_Controller
 			if (empty($upload_id)) {
 				throw new Exception("INVALID_INPUT: upload_id is required (or provide init parameters for first chunk)");
 			}
+
+			$this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
 			
 			// Read chunk data from request body
 			// Check Content-Type to determine how to read chunk data
@@ -215,12 +218,8 @@ class Uploads extends MY_REST_Controller
 			if (empty($upload_id)) {
 				throw new Exception("INVALID_INPUT: upload_id is required");
 			}
-			
-			$metadata = $this->uploader->get_upload_metadata($upload_id);
-			
-			if (!$metadata) {
-				throw new Exception("UPLOAD_NOT_FOUND");
-			}
+
+			$metadata = $this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
 			
 			$uploaded_chunks = $this->uploader->get_uploaded_chunks($upload_id);
 			$progress = count($uploaded_chunks) / $metadata['total_chunks'];
@@ -270,12 +269,8 @@ class Uploads extends MY_REST_Controller
 			if (empty($upload_id)) {
 				throw new Exception("INVALID_INPUT: upload_id is required");
 			}
-			
-			$metadata = $this->uploader->get_upload_metadata($upload_id);
-			
-			if (!$metadata) {
-				throw new Exception("UPLOAD_NOT_FOUND");
-			}
+
+			$metadata = $this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
 			
 			if ($metadata['status'] != 'completed') {
 				throw new Exception("UPLOAD_NOT_COMPLETED");
@@ -312,6 +307,8 @@ class Uploads extends MY_REST_Controller
 			if (empty($upload_id)) {
 				throw new Exception("INVALID_INPUT: upload_id is required");
 			}
+
+			$this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
 			
 			$result = $this->uploader->delete_upload($upload_id);
 			
@@ -579,7 +576,8 @@ class Uploads extends MY_REST_Controller
 			$total_size_int,
 			$provided_total_chunks,
 			$chunk_size_int,
-			$metadata
+			$metadata,
+			$this->get_api_user_id()
 		);
 		
 		return $upload_id;

@@ -167,6 +167,15 @@ class Project_search
 				$sort_by='editor_projects.changed';
 				$sort_order='desc';
 				break;
+			// stable order for paging through all projects (API clients)
+			case 'id_asc':
+				$sort_by='editor_projects.id';
+				$sort_order='asc';
+				break;
+			case 'id_desc':
+				$sort_by='editor_projects.id';
+				$sort_order='desc';
+				break;
 			default:
 				$sort_by='editor_projects.changed';
 				$sort_order='desc';

@@ -75,6 +75,36 @@ class Project_issues_model extends CI_Model {
     }
 
     /**
+     * Load issue id and project_id for a set of primary keys (bulk ACL checks).
+     *
+     * @param array $ids Issue IDs
+     * @return array Rows with keys id, project_id
+     */
+    public function get_by_ids(array $ids)
+    {
+        if (empty($ids) || !is_array($ids)) {
+            return array();
+        }
+
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        if (empty($ids)) {
+            return array();
+        }
+
+        $this->db->select('id, project_id');
+        $this->db->where_in('id', $ids);
+        $query = $this->db->get('project_issues');
+
+        if ($query === false) {
+            return array();
+        }
+
+        return $query->result_array();
+    }
+
+    /**
      * Get all issues for a project
      *
      * @param int $project_id Project ID

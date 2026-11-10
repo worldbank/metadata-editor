@@ -96,6 +96,8 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         }
 
         $this->ci->load->library('Resumable_upload', null, 'uploader');
+        $owner_id = isset($job['user_id']) ? (int) $job['user_id'] : 0;
+        $this->ci->uploader->assert_upload_access($upload_id, $owner_id);
         $completed = $this->ci->uploader->get_completed_upload($upload_id);
         if (!$completed) {
             throw new Exception('Resumable upload not found or not yet complete: ' . $upload_id);
@@ -118,6 +120,12 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         }
 
         $this->ci->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
+
+        // Fill missing note IDs from note text columns (may add the footnote column) before validation.
+        $this->ci->load->library('Indicator_data_notes');
+        $generated_ids = $this->ci->indicator_data_notes->generate_missing_ids(
+            $sid, $real_path, $ready['indicator_column'], $indicator_value
+        );
 
         $expected = $this->ci->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
         $validation = $this->ci->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
@@ -196,6 +204,14 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         );
         if (!empty($finalize['export_warning'])) {
             $result['export_warning'] = $finalize['export_warning'];
+        }
+
+        $this->ci->load->library('Indicator_data_notes');
+        $notes_report = $this->ci->indicator_data_notes->process_after_data_import(
+            $sid, $real_path, $ready['indicator_column'], $indicator_value, $user_id, $generated_ids
+        );
+        if ($notes_report !== null) {
+            $result['data_notes'] = $notes_report;
         }
 
         return $result;

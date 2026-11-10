@@ -331,6 +331,10 @@ class Geospatial_features_model extends CI_Model {
                 $filtered_data[$field] = $data[$field];
             }
         }
+
+        if (isset($filtered_data['data_file'])) {
+            $filtered_data['data_file'] = $this->sanitize_data_file_name($filtered_data['data_file']);
+        }
         
         // Use filtered data for the rest of the method
         $data = $filtered_data;
@@ -1032,17 +1036,77 @@ class Geospatial_features_model extends CI_Model {
         if (!$feature['data_file']) {
             throw new Exception('No data file available for this feature');
         }
-        
-        // Load Editor_model to get project folder
-        $this->load->model('Editor_model');
-        $project_dir = $this->Editor_model->get_project_folder($feature['sid']);
-        $csv_path = $project_dir . '/geospatial/' . $feature['data_file'];
-        
-        if (!file_exists($csv_path)) {
-            throw new Exception('Data file not found: ' . $csv_path);
-        }
+
+        $csv_path = $this->resolve_geospatial_data_file_path($feature['sid'], $feature['data_file'], true);
         
         return $this->read_csv_file($csv_path, $offset, $limit);
+    }
+
+    /**
+     * Store only the file name (no directories) for geospatial CSV paths.
+     *
+     * @param string $data_file
+     * @return string
+     */
+    public function sanitize_data_file_name($data_file)
+    {
+        $name = basename((string) $data_file);
+        if ($name === '' || $name === '.' || $name === '..') {
+            throw new Exception('Invalid data file name');
+        }
+        return $name;
+    }
+
+    /**
+     * Resolve a feature data_file to an absolute path under the project's geospatial/ folder.
+     *
+     * @param int $sid
+     * @param string $data_file
+     * @param bool $must_exist
+     * @return string
+     */
+    public function resolve_geospatial_data_file_path($sid, $data_file, $must_exist = true)
+    {
+        $name = $this->sanitize_data_file_name($data_file);
+
+        $this->load->model('Editor_model');
+        $project_dir = $this->Editor_model->get_project_folder($sid);
+        $project_real = $project_dir ? realpath($project_dir) : false;
+        if ($project_real === false || !is_dir($project_real)) {
+            throw new Exception('Project folder not found');
+        }
+
+        $geospatial_rel = 'geospatial';
+        $geospatial_dir = $project_real . DIRECTORY_SEPARATOR . $geospatial_rel;
+        if (!is_dir($geospatial_dir)) {
+            if ($must_exist) {
+                throw new Exception('Data file not found');
+            }
+            if (!@mkdir($geospatial_dir, 0755, true)) {
+                throw new Exception('Geospatial folder not found');
+            }
+        }
+
+        $geospatial_real = realpath($geospatial_dir);
+        if ($geospatial_real === false) {
+            throw new Exception('Geospatial folder not found');
+        }
+
+        $candidate = $geospatial_real . DIRECTORY_SEPARATOR . $name;
+        $prefix = $geospatial_real . DIRECTORY_SEPARATOR;
+
+        if ($must_exist) {
+            $resolved = realpath($candidate);
+            if ($resolved === false || !is_file($resolved)) {
+                throw new Exception('Data file not found');
+            }
+            if (strpos($resolved, $prefix) !== 0) {
+                throw new Exception('Invalid data file path');
+            }
+            return $resolved;
+        }
+
+        return $candidate;
     }
 
     /**

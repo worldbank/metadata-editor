@@ -309,6 +309,7 @@
             echo $this->load->view("metadata_editor/vue-datafile-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-data-explorer-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-indicator-notes-util.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-timeseries-data-explorer-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-data-explorer-host-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-export-component.js",null,true);
@@ -424,6 +425,7 @@
             echo $this->load->view("metadata_editor/vue-indicator-dsd-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-chart-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-overview-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-indicator-notes-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-data-page-component.js",null,true);
         ?>
 

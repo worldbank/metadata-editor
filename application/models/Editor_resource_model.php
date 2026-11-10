@@ -245,6 +245,9 @@ class Editor_resource_model extends ci_model {
 	{
 		// Load resumable upload library
 		$this->load->library('Resumable_upload', null, 'uploader');
+
+		$user_id = $this->get_resumable_upload_user_id();
+		$this->uploader->assert_upload_access($upload_id, $user_id);
 		
 		// Get completed upload information
 		$upload_info = $this->uploader->get_completed_upload($upload_id);
@@ -254,8 +257,8 @@ class Editor_resource_model extends ci_model {
 		}
 		
 		$temp_file_path = $upload_info['file_path'];
-		$sanitized_filename = $upload_info['filename'];  // Use sanitized filename from upload library
-		$original_filename = $upload_info['original_filename'];
+		$sanitized_filename = basename($upload_info['filename']);
+		$original_filename = basename($upload_info['original_filename']);
 		
 		// Ensure project folder exists
 		$survey_folder = $this->Editor_model->get_project_folder($sid);
@@ -269,8 +272,13 @@ class Editor_resource_model extends ci_model {
 			throw new Exception('EDITOR_FOLDER_NOT_FOUND: ' . $survey_folder);
 		}
 		
+		$file_type = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $file_type);
+		if (!in_array($file_type, array('documentation', 'data', 'thumbnail'), true)) {
+			throw new Exception('Invalid file type');
+		}
+
 		$survey_folder_type = $survey_folder . '/' . $file_type;
-		@mkdir($survey_folder_type, 0777, $recursive=true);
+		@mkdir($survey_folder_type, 0755, $recursive=true);
 		
 		if (!file_exists($survey_folder_type)) {
 			throw new Exception('EDITOR_SUB_FOLDER_NOT_FOUND: ' . $survey_folder_type);
@@ -328,6 +336,18 @@ class Editor_resource_model extends ci_model {
 	 * @param string $dest
 	 * @return bool
 	 */
+	private function get_resumable_upload_user_id()
+	{
+		$CI =& get_instance();
+		if ($CI && method_exists($CI, 'get_api_user_id')) {
+			$id = $CI->get_api_user_id();
+			if ($id) {
+				return (int) $id;
+			}
+		}
+		throw new Exception('UPLOAD_ACCESS_DENIED');
+	}
+
 	private function move_uploaded_file($source, $dest)
 	{
 		@set_time_limit(0);
@@ -1387,37 +1407,65 @@ class Editor_resource_model extends ci_model {
 
 	function unzip_file($sid,$file_name)
 	{
-		$project_folder=$this->Editor_model->get_project_folder($sid);
-		
-		$file_name=substr($file_name,1);
-		$file_parts=explode("/",$file_name);
-
-		if (!in_array($file_parts[0],array_keys($this->documentation_types))){
+		$file_name = ltrim((string) $file_name, '/\\');
+		if ($file_name === '' || strpos($file_name, '..') !== false) {
 			throw new Exception("Invalid file path");
 		}
 
-		$file_path=$project_folder.'/'.$file_name;
+		$file_name = str_replace('\\', '/', $file_name);
+		$file_parts = explode('/', $file_name);
+		$root = isset($file_parts[0]) ? $file_parts[0] : '';
 
-		if (!file_exists($file_path)){
+		if (!in_array($root, array('documentation', 'data'), true)) {
+			throw new Exception("Invalid file path");
+		}
+
+		$project_folder = $this->Editor_model->get_project_folder($sid);
+		$project_real = $project_folder ? realpath($project_folder) : false;
+		if ($project_real === false) {
+			throw new Exception("Project folder not found");
+		}
+
+		$allowed_dir = realpath($project_real . DIRECTORY_SEPARATOR . $root);
+		if ($allowed_dir === false || !is_dir($allowed_dir)) {
 			throw new Exception("File not found");
 		}
 
-		$ext=pathinfo($file_path, PATHINFO_EXTENSION);
-		$basename_no_ext=pathinfo($file_path, PATHINFO_FILENAME);
+		$file_path = realpath($project_real . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_name));
+		if ($file_path === false || !is_file($file_path)) {
+			throw new Exception("File not found");
+		}
 
-		if ($ext!=='zip'){
+		$allowed_prefix = $allowed_dir . DIRECTORY_SEPARATOR;
+		if (strpos($file_path, $allowed_prefix) !== 0) {
+			throw new Exception("Invalid file path");
+		}
+
+		$ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+		if ($ext !== 'zip') {
 			throw new Exception("Not a zip file");
 		}
+
+		$basename_no_ext = basename(pathinfo($file_path, PATHINFO_FILENAME));
+		$tmp_dir = $project_real . DIRECTORY_SEPARATOR . 'tmp';
+		if (!is_dir($tmp_dir)) {
+			@mkdir($tmp_dir, 0755, true);
+		}
+		$tmp_real = realpath($tmp_dir);
+		if ($tmp_real === false) {
+			throw new Exception("Failed to create temp folder");
+		}
+		$extract_to = $tmp_real . DIRECTORY_SEPARATOR . $basename_no_ext;
 
 		$zip = new ZipArchive;
 		$res = $zip->open($file_path);
 		if ($res === TRUE) {
-			$zip->extractTo($project_folder.'/tmp/'.$basename_no_ext);
+			$zip->extractTo($extract_to);
 			$zip->close();
 			return true;
-		} else {
-			throw new Exception("Failed to extract zip file");
-		}		
+		}
+
+		throw new Exception("Failed to extract zip file");
 	}
 
 

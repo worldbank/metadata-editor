@@ -839,11 +839,7 @@
 			"$ref": "datacite-schema.json"
 		},
 		"provenance": {
-			"type": "array",
-			"description": "Provenance",
-			"items": {
-				"$ref": "provenance-schema.json"
-			}
+			"$ref": "provenance-schema.json"
 		},
 		"additional": {
 			"type": "object",

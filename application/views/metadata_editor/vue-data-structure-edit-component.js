@@ -117,6 +117,16 @@ Vue.component('data-structure-edit', {
                 { value: 'boolean', text: 'Boolean' }
             ];
         },
+        displayRoleItems: function () {
+            return [
+                { value: '', text: 'None' },
+                { value: 'footnote', text: 'Footnote (cells hold note IDs)' }
+            ];
+        },
+        activeSupportsDisplayRole: function () {
+            var ct = this.activeComponent ? this.activeComponent.column_type : '';
+            return ct === 'attribute' || ct === 'annotation';
+        },
         statusSelectItems: function () {
             return [
                 { value: 'draft', text: 'Draft' },
@@ -570,6 +580,7 @@ Vue.component('data-structure-edit', {
                 column_type: c.column_type || 'dimension',
                 data_type: c.data_type || '',
                 codelist_id: codelistId && !isNaN(codelistId) ? codelistId : null,
+                display_role: c.display_role && c.display_role !== 'none' ? c.display_role : '',
                 codelist_display: codelistDisplay,
                 codelist_agency: codelistAgency,
                 codelist_name: codelistName
@@ -587,6 +598,7 @@ Vue.component('data-structure-edit', {
                 column_type: 'dimension',
                 data_type: '',
                 codelist_id: null,
+                display_role: '',
                 codelist_display: '',
                 codelist_agency: '',
                 codelist_name: ''
@@ -1262,7 +1274,9 @@ Vue.component('data-structure-edit', {
                 description: (row.description || '').trim() || null,
                 column_type: row.column_type,
                 data_type: row.data_type || null,
-                codelist_id: this.normalizeCodelistId(row.codelist_id)
+                codelist_id: this.normalizeCodelistId(row.codelist_id),
+                display_role: (row.column_type === 'attribute' || row.column_type === 'annotation')
+                    ? (row.display_role || '') : ''
             };
             if (p.data_type === '') {
                 p.data_type = null;
@@ -1281,6 +1295,7 @@ Vue.component('data-structure-edit', {
             row.column_type = p.column_type || 'dimension';
             row.data_type = p.data_type || '';
             Vue.set(row, 'codelist_id', p.codelist_id || null);
+            Vue.set(row, 'display_role', p.display_role || '');
         },
         refreshStructureValidation: function () {
             var panel = this.$refs.validationPanel;
@@ -1384,6 +1399,7 @@ Vue.component('data-structure-edit', {
             row.column_type = p.column_type || 'dimension';
             row.data_type = p.data_type || '';
             row.codelist_id = p.codelist_id || null;
+            row.display_role = p.display_role || '';
             if (row.codelist_id && this.codelistCache[row.codelist_id]) {
                 var cl = this.codelistCache[row.codelist_id];
                 row.codelist_display = cl.title || '';
@@ -1834,6 +1850,16 @@ Vue.component('data-structure-edit', {
                                             item-value="value" item-text="text" dense outlined
                                             hide-details :disabled="!canEditComponents"
                                             class="ds-compact-control ds-field-stack"></v-select>
+                                    </v-col>
+                                    <v-col cols="12" v-if="activeSupportsDisplayRole">
+                                        <div class="ds-field-label">Display as</div>
+                                        <v-select v-model="activeComponent.display_role" :items="displayRoleItems"
+                                            item-value="value" item-text="text" dense outlined
+                                            hide-details :disabled="!canEditComponents"
+                                            class="ds-compact-control ds-field-stack"></v-select>
+                                        <div v-if="activeComponent.display_role === 'footnote'" class="text-caption grey--text mt-1">
+                                            Cells hold one or more note IDs separated by ';' (e.g. N01;N03). The note text is stored in the project's Data notes.
+                                        </div>
                                     </v-col>
                                     <v-col cols="12">
                                         <div class="ds-field-label">Codelist</div>

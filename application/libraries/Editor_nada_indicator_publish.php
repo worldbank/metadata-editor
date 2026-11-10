@@ -182,7 +182,7 @@ class Editor_nada_indicator_publish {
 	 * @param bool $overwrite
 	 * @return array
 	 */
-	public function publish_dsd($sid, $user_id, $catalog_connection_id, $overwrite = false)
+	public function publish_dsd($sid, $user_id, $catalog_connection_id, $overwrite = false, $force = false)
 	{
 		$this->ci->data_structure_util->resolve_project_reference($sid, true);
 
@@ -224,6 +224,19 @@ class Editor_nada_indicator_publish {
 			$overwrite
 		);
 
+		// Re-importing a DSD on NADA flags every study that uses it for re-sync, so an unchanged
+		// structure is not re-imported (codelists above are still synced). dsd_force skips this check.
+		if (!empty($nadaStatus['exists']) && $overwrite && !$force
+			&& $this->nada_dsd_matches_local($client, $idno, (int) $context['data_structure_id'])) {
+			return array(
+				'status' => 'skipped',
+				'reason' => 'DSD on NADA is unchanged',
+				'idno' => $idno,
+				'codelists' => $codelists,
+				'nada_dsd' => $nadaStatus,
+			);
+		}
+
 		$response = $client->post_json('admin/data_structures/import_json', $payload);
 
 		return array(
@@ -233,6 +246,79 @@ class Editor_nada_indicator_publish {
 			'codelists' => $codelists,
 			'response' => $response,
 		);
+	}
+
+	/**
+	 * True when the components of the DSD on NADA match the local registry DSD.
+	 *
+	 * @param Nada_catalog_client $client
+	 * @param string $idno
+	 * @param int    $local_structure_id
+	 * @return bool
+	 */
+	public function nada_dsd_matches_local(Nada_catalog_client $client, $idno, $local_structure_id)
+	{
+		try {
+			$response = $client->get('admin/data_structures/' . rawurlencode($idno) . '?with_components=1');
+		} catch (Exception $e) {
+			return false;
+		}
+		$remote = isset($response['result']['data_structure']['components'])
+			? $response['result']['data_structure']['components']
+			: (isset($response['data_structure']['components']) ? $response['data_structure']['components'] : null);
+		if (!is_array($remote)) {
+			return false;
+		}
+		$this->ci->load->model('Data_structure_component_model');
+		$local = $this->ci->Data_structure_component_model->get_components_by_structure_id((int) $local_structure_id);
+		return self::dsd_components_fingerprint($local) === self::dsd_components_fingerprint($remote);
+	}
+
+	/**
+	 * Comparable fingerprint of DSD component rows (editor or NADA shape): order, name, label, description,
+	 * column type, data type, whether a codelist is attached, and the metadata keys NADA keeps.
+	 * Codelist identity is not compared (ids differ between the two registries; codelists are synced separately).
+	 *
+	 * @param array $components
+	 * @return string
+	 */
+	public static function dsd_components_fingerprint(array $components)
+	{
+		$meta_keys = array('paired_time_column', 'value_label_column', 'attachment_level', 'assignment_status', 'display_role');
+		$rows = array();
+		foreach ($components as $c) {
+			if (!is_array($c) || empty($c['name'])) {
+				continue;
+			}
+			$meta = isset($c['metadata']) ? $c['metadata'] : null;
+			if (is_string($meta) && $meta !== '') {
+				$meta = json_decode($meta, true);
+			}
+			$kept = array();
+			foreach ($meta_keys as $k) {
+				if (is_array($meta) && isset($meta[$k]) && $meta[$k] !== '') {
+					$kept[$k] = (string) $meta[$k];
+				}
+			}
+			$rows[] = array(
+				'sort'     => isset($c['sort_order']) ? (int) $c['sort_order'] : 0,
+				'name'     => (string) $c['name'],
+				'label'    => isset($c['label']) ? (string) $c['label'] : '',
+				'desc'     => isset($c['description']) ? (string) $c['description'] : '',
+				'type'     => isset($c['column_type']) ? (string) $c['column_type'] : '',
+				'dtype'    => isset($c['data_type']) ? (string) $c['data_type'] : '',
+				'codelist' => !empty($c['codelist_id']),
+				'meta'     => $kept,
+			);
+		}
+		usort($rows, function ($a, $b) {
+			return $a['sort'] === $b['sort'] ? strcmp($a['name'], $b['name']) : $a['sort'] - $b['sort'];
+		});
+		foreach ($rows as &$r) {
+			unset($r['sort']);
+		}
+		unset($r);
+		return md5(json_encode($rows));
 	}
 
 	/**
@@ -327,7 +413,10 @@ class Editor_nada_indicator_publish {
 
 		$conn = $this->get_connection($user_id, $catalog_connection_id);
 		$client = Nada_catalog_client::from_connection($conn);
-		$csvBody = $this->ci->indicator_duckdb_service->timeseries_export_csv_body($sid);
+		$csvBody = $this->ci->indicator_duckdb_service->timeseries_export_csv_body(
+			$sid,
+			$this->ci->Indicator_dsd_model->get_dsd_column_names_for_csv($sid)
+		);
 
 		$tmpPath = tempnam(sys_get_temp_dir(), 'me_nada_ts_');
 		if ($tmpPath === false) {
@@ -377,7 +466,13 @@ class Editor_nada_indicator_publish {
 		$dsd_overwrite = $this->parse_bool_option($options, 'dsd_overwrite', false);
 
 		if ($publish_dsd) {
-			$out['dsd'] = $this->publish_dsd($sid, $user_id, $catalog_connection_id, $dsd_overwrite);
+			$out['dsd'] = $this->publish_dsd(
+				$sid,
+				$user_id,
+				$catalog_connection_id,
+				$dsd_overwrite,
+				$this->parse_bool_option($options, 'dsd_force', false)
+			);
 		}
 		if ($publish_data) {
 			if (!empty($options['nada_upload_id'])) {

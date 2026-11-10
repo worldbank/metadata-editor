@@ -117,10 +117,13 @@ class Admin_metadata extends MY_REST_Controller
     {
         try{
 
+            $project_id = $this->get_sid($project_id);
+
             if (!$project_id){
-                throw new Exception("Missing parameter: project_id");
+                throw new Exception("Project not found");
             }
 
+            $this->editor_acl->user_has_project_access($project_id, $permission='view', $this->api_user);
             $this->has_access($resource_='template_manager',$privilege='view');
             $result= $this->Admin_metadata_model->get_admin_metadata_templates_by_acl($this->api_user->id);
             array_walk($result, 'unix_date_to_gmt',array('created','changed'));
@@ -188,6 +191,10 @@ class Admin_metadata extends MY_REST_Controller
 
             if (!empty($project_id)){
                 $project_id=$this->get_sid($project_id);
+                if (!$project_id){
+                    throw new Exception("Project not found");
+                }
+                $this->editor_acl->user_has_project_access($project_id, $permission='view', $this->api_user);
             }
 
             //get templates for active user
@@ -262,6 +269,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Project not found");
             }
 
+            $this->editor_acl->user_has_project_access($project_id, $permission='view', $this->api_user);
+
             $output_format=$this->input->get('output_format');
 
             if (!in_array($output_format, array('raw','metadata'))){
@@ -274,7 +283,7 @@ class Admin_metadata extends MY_REST_Controller
                 $template_id=$this->Editor_template_model->get_id_by_uid($admin_template_uid);
 
                 if (!$template_id){
-                    throw new Exception("Template not found: " . $template_uid);
+                    throw new Exception("Template not found: " . $admin_template_uid);
                 }
                 
                 $this->editor_acl->user_has_admin_metadata_access($template_id,$permission='view',$this->api_user);
@@ -338,7 +347,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Template not found: " . $options['template_uid']);
             }
 
-            //$this->editor_acl->user_has_metadata_type_access($metadata_type_id,$permission='edit',$this->api_user);
+            $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='edit', $this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='edit', $this->api_user);
 
             //metadata
             if (!isset($options['metadata'])){
@@ -412,6 +422,7 @@ class Admin_metadata extends MY_REST_Controller
             }
 
             $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='edit', $this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='edit', $this->api_user);
 
             $options['changed_by']=$this->api_user->id;
             $options['changed']=date("U");
@@ -457,8 +468,11 @@ class Admin_metadata extends MY_REST_Controller
             $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
 
             if (!$template_id){
-                throw new Exception("Template not found: " . $template_uid);
+                throw new Exception("Template not found: " . $options['template_uid']);
             }
+
+            $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='edit', $this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='edit', $this->api_user);
 
 			$result=$this->Admin_metadata_model->delete($template_id, $project_id);            
 
@@ -709,12 +723,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Template not found: " . $options['template_uid']);
             }
 
-            // Allow system template_manager role OR users with explicit ACL access to this template
-            try {
-                $this->has_access($resource_='template_manager', $privilege='view');
-            } catch (Exception $e) {
-                $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='view', $this->api_user);
-            }
+            $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='edit', $this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='edit', $this->api_user);
 
             $result=$this->Admin_metadata_projects_model->attach($project_id, $template_id);
 
@@ -767,12 +777,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Template not found: " . $options['template_uid']);
             }
 
-            // Allow system template_manager role OR users with explicit ACL access to this template
-            try {
-                $this->has_access($resource_='template_manager', $privilege='view');
-            } catch (Exception $e) {
-                $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='view', $this->api_user);
-            }
+            $this->editor_acl->user_has_admin_metadata_access($template_id, $permission='edit', $this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='edit', $this->api_user);
 
             $result=$this->Admin_metadata_projects_model->delete($project_id, $template_id);
 
@@ -825,6 +831,7 @@ class Admin_metadata extends MY_REST_Controller
             $limit = $pagination['limit'];
 
             $this->editor_acl->user_has_admin_metadata_access($template_id,$permission='view',$this->api_user);
+            $this->editor_acl->user_has_project_access($project_id, $permission='view', $this->api_user);
 
             $filter = array(
                 'obj_type' => 'admin-metadata',

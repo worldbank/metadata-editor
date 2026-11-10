@@ -617,7 +617,8 @@ paths:
         - name: sort_by
           in: query
           title: Sort results
-          description: Sort results
+          description: Sort results. Use `id_asc` for a stable order when paging
+            through all projects.
           schema:
             type: string
             enum:
@@ -625,6 +626,8 @@ paths:
               - title_desc
               - updated_asc
               - updated_desc
+              - id_asc
+              - id_desc
         - name: collection
           in: query
           title: Collections
@@ -657,6 +660,24 @@ paths:
           title: Users filter
           description: Filter projects by users who created or modified them. Provide
             comma-separated user IDs e.g. 1,2,3
+          schema:
+            type: string
+        - name: tag
+          in: query
+          title: Tags filter
+          description: Filter by tags. Provide comma-separated tag IDs e.g. 1,2,3
+          schema:
+            type: string
+        - name: created_by
+          in: query
+          title: Created by
+          description: Filter by creator. Provide comma-separated user IDs e.g. 1,2,3
+          schema:
+            type: string
+        - name: changed_by
+          in: query
+          title: Changed by
+          description: Filter by last editor. Provide comma-separated user IDs e.g. 1,2,3
           schema:
             type: string
       responses:

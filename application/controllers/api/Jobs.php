@@ -329,8 +329,7 @@ class Jobs extends MY_REST_Controller
 			$priority = isset($input['priority']) ? (int)$input['priority'] : 0;
 			$max_attempts = isset($input['max_attempts']) ? (int)$input['max_attempts'] : 3;
 
-			// Convenience for API clients that omit user_id (same as publish_to_nada_post).
-			if (empty($payload['user_id']) && !empty($this->user_id)) {
+			if (!empty($this->user_id)) {
 				$payload['user_id'] = $this->user_id;
 			}
 			
@@ -351,6 +350,7 @@ class Jobs extends MY_REST_Controller
 			}
 
 			$payload = $this->enforce_enqueue_project_access($job_type, $payload);
+			$payload = $this->enforce_enqueue_publish_credentials($job_type, $payload);
 
 			if ($job_type === 'metadata_assessment_result') {
 				$limit_error = $this->get_metadata_assessment_limit_error();
@@ -664,6 +664,7 @@ class Jobs extends MY_REST_Controller
 				'publish_resources' => isset($input['publish_resources']) ? $input['publish_resources'] : true,
 				'publish_dsd' => !empty($input['publish_dsd']),
 				'dsd_overwrite' => !empty($input['dsd_overwrite']),
+				'dsd_force' => !empty($input['dsd_force']),
 				'publish_indicator_data' => !empty($input['publish_indicator_data']),
 				'delete_nada_resources' => !empty($input['delete_nada_resources']),
 			);
@@ -1791,6 +1792,32 @@ class Jobs extends MY_REST_Controller
 		$resolved_sid = $this->get_sid((string) $payload['project_id']);
 		$this->editor_acl->user_has_project_access($resolved_sid, 'edit', $this->api_user);
 		$payload['project_id'] = (int) $resolved_sid;
+
+		return $payload;
+	}
+
+	/**
+	 * For publish jobs, require a catalog connection the caller may use (with API key).
+	 *
+	 * @param string $job_type
+	 * @param array $payload
+	 * @return array
+	 */
+	private function enforce_enqueue_publish_credentials($job_type, $payload)
+	{
+		if ($job_type !== 'publish_project') {
+			return $payload;
+		}
+
+		if (empty($payload['catalog_connection_id'])) {
+			return $payload;
+		}
+
+		$this->load->model('Catalog_connections_model');
+		$this->Catalog_connections_model->require_connection(
+			$this->user_id,
+			$payload['catalog_connection_id']
+		);
 
 		return $payload;
 	}
