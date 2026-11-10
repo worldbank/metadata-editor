@@ -820,6 +820,13 @@ class Editor_model extends CI_Model {
 			}
 		}
 
+		if (array_key_exists('thumbnail', $options) && $options['thumbnail'] !== null && $options['thumbnail'] !== '') {
+			$options['thumbnail'] = basename((string) $options['thumbnail']);
+			if ($options['thumbnail'] === '' || $options['thumbnail'] === '.' || $options['thumbnail'] === '..') {
+				unset($options['thumbnail']);
+			}
+		}
+
 		//idno
 		if (isset($options['idno']) && $this->idno_exists($options['idno'], $sid)){
 			throw new Exception("IDNO_EXISTS: ". $options['idno']);
@@ -1930,28 +1937,14 @@ class Editor_model extends CI_Model {
 	
 	function download_project_thumbnail($sid)
 	{				
-		$project_folder=$this->get_project_folder($sid);
-		$thumbnail=$this->get_thumbnail($sid);
-
-		if(!$thumbnail){
+		$thumbnail_path = $this->resolve_project_thumbnail_path($sid, true);
+		if (!$thumbnail_path) {
 			throw new Exception("Thumbnail not found");
 		}
 
-		if (!$project_folder || !file_exists($project_folder)){
-			throw new Exception("Project folder not found");
-		}
-
-		$thumbnail_path=$project_folder.'/'.$thumbnail;
-
-		if(file_exists($thumbnail_path)){
-			header('Content-type: image/jpeg');
-			readfile($thumbnail_path);
-			die();
-			//$this->load->helper("download");
-			//force_download2($thumbnail_path);			
-		}else{
-			throw new Exception("Thumbnail not found");
-		}
+		header('Content-type: image/jpeg');
+		readfile($thumbnail_path);
+		die();
 	}
 
 
@@ -1968,21 +1961,57 @@ class Editor_model extends CI_Model {
 
 	function get_thumbnail_file($sid)
 	{
-		$project_folder=$this->get_project_folder($sid);
-		$thumbnail=$this->get_thumbnail($sid);
+		try {
+			return $this->resolve_project_thumbnail_path($sid, true);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
 
-		if(!$thumbnail){
+	/**
+	 * Absolute path to project thumbnail inside the project folder.
+	 *
+	 * @param int $sid
+	 * @param bool $must_exist
+	 * @return string|false
+	 */
+	function resolve_project_thumbnail_path($sid, $must_exist = true)
+	{
+		$thumbnail = $this->get_thumbnail($sid);
+		if (!$thumbnail) {
 			return false;
 		}
 
-		if (!$project_folder){
+		$thumbnail = basename((string) $thumbnail);
+		if ($thumbnail === '' || $thumbnail === '.' || $thumbnail === '..') {
 			return false;
 		}
 
-		$thumbnail_path=$project_folder.'/'.$thumbnail;
+		$project_folder = $this->get_project_folder($sid);
+		$project_real = $project_folder ? realpath($project_folder) : false;
+		if ($project_real === false || !is_dir($project_real)) {
+			if ($must_exist) {
+				throw new Exception('Project folder not found');
+			}
+			return false;
+		}
 
-		if(file_exists($thumbnail_path)){
-			return $thumbnail_path;
+		$candidate = $project_real . DIRECTORY_SEPARATOR . $thumbnail;
+		$prefix = $project_real . DIRECTORY_SEPARATOR;
+		$resolved = realpath($candidate);
+
+		if ($resolved !== false) {
+			if (strpos($resolved, $prefix) !== 0 || !is_file($resolved)) {
+				if ($must_exist) {
+					throw new Exception('Thumbnail not found');
+				}
+				return false;
+			}
+			return $resolved;
+		}
+
+		if ($must_exist) {
+			throw new Exception('Thumbnail not found');
 		}
 
 		return false;

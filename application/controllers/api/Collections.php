@@ -175,7 +175,10 @@ class Collections extends MY_REST_Controller
 
 			// Check user has edit access to this specific collection
 			$this->editor_acl->user_has_collection_acl_access($id, 'edit', $this->api_user);
-			$options=$this->raw_json_input();			
+			$options=$this->raw_json_input();
+
+			unset($options['created_by'], $options['created'], $options['pid']);
+
 			$options['changed_by']=$this->user_id;
 			$options['changed']=time();
 			$result=$this->Collection_model->update($id,$options);
@@ -484,8 +487,9 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Missing parameter: permissions");
 			}
 
-			// Check user has access to this specific collection
-			$this->editor_acl->user_has_collection_acl_access($options['collection_id'], 'edit', $this->api_user);
+			if (!$this->editor_acl->user_can_manage_collection_acl($options['collection_id'], $this->api_user)) {
+				throw new Exception("You don't have permission to manage ACL for this collection");
+			}
 
 			$permissions=(array)$options['permissions'];
 			foreach($permissions as $permission){
@@ -562,8 +566,9 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Missing parameter: user_id");
 			}
 
-			// Check user has access to this specific collection
-			$this->editor_acl->user_has_collection_acl_access($options['collection_id'], 'edit', $this->api_user);
+			if (!$this->editor_acl->user_can_manage_collection_acl($options['collection_id'], $this->api_user)) {
+				throw new Exception("You don't have permission to manage ACL for this collection");
+			}
 
 			$this->load->helper('notification');
 			$previous=$this->Collection_project_acl_model->get_user_permission(

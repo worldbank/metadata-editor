@@ -59,7 +59,7 @@ class Resumable_upload {
 	 * @param array $metadata Optional metadata
 	 * @return string upload_id
 	 */
-	public function init_upload($filename, $total_size, $total_chunks, $chunk_size, $metadata = array())
+	public function init_upload($filename, $total_size, $total_chunks, $chunk_size, $metadata = array(), $owner_user_id = null)
 	{
 		// Validate inputs
 		if (empty($filename)) {
@@ -125,6 +125,7 @@ class Resumable_upload {
 		// Create metadata
 		$metadata_data = array(
 			'upload_id' => $upload_id,
+			'user_id' => $owner_user_id !== null ? (int) $owner_user_id : null,
 			'filename' => $filename,
 			'original_filename' => $original_filename,
 			'total_size' => (int)$total_size,
@@ -172,6 +173,23 @@ class Resumable_upload {
 			return false;
 		}
 		
+		return $this->normalize_upload_metadata($metadata);
+	}
+
+	/**
+	 * Ensure the caller owns this upload session.
+	 *
+	 * @param string $upload_id
+	 * @param int $user_id
+	 * @return array Metadata
+	 */
+	public function assert_upload_access($upload_id, $user_id)
+	{
+		$metadata = $this->get_upload_metadata($upload_id);
+		if (!$metadata) {
+			throw new Exception('UPLOAD_NOT_FOUND');
+		}
+		$this->assert_upload_owner($metadata, $user_id);
 		return $metadata;
 	}
 	
@@ -490,7 +508,7 @@ class Resumable_upload {
 		
 		$upload_path = $this->get_upload_path($upload_id);
 		$assembly_path = $this->get_assembly_temp_path($upload_id, $metadata['filename']);
-		$final_file = unix_path($upload_path . '/' . $metadata['filename']);
+		$final_file = $this->resolve_path_under_directory($upload_path, $metadata['filename']);
 		
 		if (!file_exists($assembly_path)) {
 			// Legacy uploads that still have chunk parts but no assembly file.
@@ -907,7 +925,69 @@ class Resumable_upload {
 	 */
 	private function get_upload_path($upload_id)
 	{
+		$this->assert_valid_upload_id($upload_id);
 		return unix_path($this->temp_path . '/' . $upload_id);
+	}
+
+	private function assert_valid_upload_id($upload_id)
+	{
+		if ($upload_id === null || $upload_id === '') {
+			throw new Exception('INVALID_UPLOAD_ID');
+		}
+		$upload_id = (string) $upload_id;
+		if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $upload_id)) {
+			throw new Exception('INVALID_UPLOAD_ID');
+		}
+	}
+
+	private function assert_upload_owner($metadata, $user_id)
+	{
+		if ($user_id === null || $user_id === '' || (int) $user_id === 0) {
+			throw new Exception('UPLOAD_ACCESS_DENIED');
+		}
+		if (!isset($metadata['user_id']) || (int) $metadata['user_id'] === 0) {
+			throw new Exception('UPLOAD_ACCESS_DENIED');
+		}
+		if ((int) $metadata['user_id'] !== (int) $user_id) {
+			throw new Exception('UPLOAD_ACCESS_DENIED');
+		}
+	}
+
+	private function normalize_upload_metadata($metadata)
+	{
+		if (isset($metadata['filename'])) {
+			$metadata['filename'] = basename((string) $metadata['filename']);
+		}
+		if (isset($metadata['original_filename'])) {
+			$metadata['original_filename'] = basename((string) $metadata['original_filename']);
+		}
+		return $metadata;
+	}
+
+	private function resolve_path_under_directory($base_dir, $relative_name)
+	{
+		$relative_name = basename((string) $relative_name);
+		if ($relative_name === '' || $relative_name === '.' || $relative_name === '..') {
+			throw new Exception('INVALID_UPLOAD_FILE_PATH');
+		}
+
+		$base_real = realpath($base_dir);
+		if ($base_real === false || !is_dir($base_real)) {
+			throw new Exception('INVALID_UPLOAD_FILE_PATH');
+		}
+
+		$candidate = unix_path($base_real . '/' . $relative_name);
+		$resolved = realpath($candidate);
+		$prefix = $base_real . '/';
+
+		if ($resolved !== false) {
+			if (strpos($resolved, $prefix) !== 0) {
+				throw new Exception('INVALID_UPLOAD_FILE_PATH');
+			}
+			return $resolved;
+		}
+
+		return $candidate;
 	}
 	
 	/**
@@ -946,6 +1026,7 @@ class Resumable_upload {
 	private function get_assembly_temp_path($upload_id, $filename)
 	{
 		$upload_path = $this->get_upload_path($upload_id);
+		$filename = basename((string) $filename);
 		return unix_path($upload_path . '/' . $filename . '.tmp');
 	}
 	
@@ -981,8 +1062,8 @@ class Resumable_upload {
 			}
 			$filename = $metadata['filename'];
 		}
-		
-		return unix_path($upload_path . '/' . $filename);
+
+		return $this->resolve_path_under_directory($upload_path, $filename);
 	}
 	
 	/**
@@ -995,12 +1076,20 @@ class Resumable_upload {
 	 * @param string $upload_id
 	 * @return array|false Array with full file information, or false if not found/not completed
 	 */
-	public function get_completed_upload($upload_id)
+	public function get_completed_upload($upload_id, $owner_user_id = null)
 	{
 		$metadata = $this->get_upload_metadata($upload_id);
 		
 		if (!$metadata) {
 			return false;
+		}
+
+		if ($owner_user_id !== null) {
+			try {
+				$this->assert_upload_owner($metadata, $owner_user_id);
+			} catch (Exception $e) {
+				return false;
+			}
 		}
 		
 		if ($metadata['status'] != 'completed') {

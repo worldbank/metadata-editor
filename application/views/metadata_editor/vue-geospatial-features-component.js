@@ -132,11 +132,13 @@ Vue.component('geospatial-features', {
         
         pollRefreshStatus: function() {
             const vm = this;
-            const url = CI.base_url + '/api/geospatial_features/metadata_refresh_status/' + this.ProjectID + 
-                       '?job_id=' + this.refresh_dialog.job_id + 
-                       '&feature_id=' + this.refresh_dialog.feature_id;
+            const url = CI.base_url + '/api/geospatial_features/metadata_refresh_status/' + this.ProjectID;
+            const payload = {
+                job_id: this.refresh_dialog.job_id,
+                feature_id: this.refresh_dialog.feature_id
+            };
             
-            axios.get(url)
+            axios.post(url, payload)
             .then(function (response) {
                 if (response.data.status === 'success') {
                     // Refresh completed successfully

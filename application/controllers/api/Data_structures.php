@@ -846,6 +846,7 @@ class Data_structures extends MY_REST_Controller {
                 throw new Exception('Provide either a file upload or upload_id, not both.');
             }
             $this->load->library('Resumable_upload', null, 'resumable_upload');
+            $this->resumable_upload->assert_upload_access($upload_id, $this->get_api_user_id());
             $upload = $this->resumable_upload->get_completed_upload($upload_id);
             if (!$upload || empty($upload['file_path'])) {
                 throw new Exception('Completed upload not found for upload_id.');

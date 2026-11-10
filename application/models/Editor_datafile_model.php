@@ -119,6 +119,9 @@ class Editor_datafile_model extends CI_Model {
 
 		if ($upload_id !== '') {
 			$this->load->library('Resumable_upload', null, 'uploader');
+			if ($user_id) {
+				$this->uploader->assert_upload_access($upload_id, $user_id);
+			}
 			$upload_info = $this->uploader->get_completed_upload($upload_id);
 			if (!$upload_info) {
 				throw new Exception("Resumable upload not found or not complete. Upload all chunks before registering the data file.");
@@ -399,14 +402,18 @@ class Editor_datafile_model extends CI_Model {
 		}
 
 		$project_folder_path=$this->Editor_model->get_project_folder($sid).'/data/';
-		$filepath=$project_folder_path.$filename;
+		try {
+			$filepath = $this->resolve_data_folder_file_path($sid, $filename, false);
+		} catch (Exception $e) {
+			$filepath = null;
+		}
 
-		if (file_exists($filepath)){
+		if ($filepath && file_exists($filepath)){
 			return $filepath;
 		}
 
 		// Resolve CSV path (tries .csv and .CSV for case-sensitive filesystems)
-		$filepath_csv=$this->resolve_csv_path($project_folder_path,$this->filename_part($filename));
+		$filepath_csv=$this->resolve_csv_path($project_folder_path,$this->filename_part(basename($filename)));
 		if ($filepath_csv){
 			return $filepath_csv;
 		}
@@ -571,8 +578,9 @@ class Editor_datafile_model extends CI_Model {
 			];
 		}
 
+		$filename = basename($filename);
 		$project_folder_path=$this->Editor_model->get_project_folder($sid).'/data/';
-		$original_path=$project_folder_path.$filename;
+		$original_path = $this->resolve_data_folder_file_path($sid, $filename, false);
 
 		// CSV path: if uploaded file is already CSV (any case), use its exact path so case-sensitive filesystems find it
 		$is_original_csv=(strtolower($this->get_file_extension($filename))==='csv');
@@ -697,6 +705,76 @@ class Editor_datafile_model extends CI_Model {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Real path to project data/ directory, or false.
+	 *
+	 * @param int $sid
+	 * @return string|false
+	 */
+	private function get_data_folder_realpath($sid)
+	{
+		$project_folder = $this->Editor_model->get_project_folder($sid);
+		$project_real = $project_folder ? realpath($project_folder) : false;
+		if ($project_real === false) {
+			return false;
+		}
+		$data_dir = $project_real . DIRECTORY_SEPARATOR . 'data';
+		return realpath($data_dir) ?: (is_dir($data_dir) ? $data_dir : false);
+	}
+
+	/**
+	 * Resolve a file name to a path under project/data/ (basename only).
+	 *
+	 * @param int $sid
+	 * @param string $filename
+	 * @param bool $must_exist
+	 * @return string
+	 */
+	private function resolve_data_folder_file_path($sid, $filename, $must_exist = false)
+	{
+		$name = basename((string) $filename);
+		if ($name === '' || $name === '.' || $name === '..') {
+			throw new Exception('Invalid file name');
+		}
+
+		$data_real = $this->get_data_folder_realpath($sid);
+		if ($data_real === false) {
+			if ($must_exist) {
+				throw new Exception('Data folder not found');
+			}
+			$project_folder = $this->Editor_model->get_project_folder($sid);
+			$project_real = $project_folder ? realpath($project_folder) : false;
+			if ($project_real === false) {
+				throw new Exception('Project folder not found');
+			}
+			$data_dir = $project_real . DIRECTORY_SEPARATOR . 'data';
+			if (!is_dir($data_dir) && !@mkdir($data_dir, 0755, true)) {
+				throw new Exception('Data folder not found');
+			}
+			$data_real = realpath($data_dir) ?: $data_dir;
+		}
+
+		$candidate = $data_real . DIRECTORY_SEPARATOR . $name;
+		$prefix = $data_real . DIRECTORY_SEPARATOR;
+		$resolved = realpath($candidate);
+
+		if ($resolved !== false) {
+			if (strpos($resolved, $prefix) !== 0) {
+				throw new Exception('Invalid file path');
+			}
+			if ($must_exist && !is_file($resolved)) {
+				throw new Exception('File not found');
+			}
+			return $resolved;
+		}
+
+		if ($must_exist) {
+			throw new Exception('File not found');
+		}
+
+		return $candidate;
 	}
 
 	/**
@@ -1147,30 +1225,44 @@ class Editor_datafile_model extends CI_Model {
 		}
 
 		$project_folder = $this->Editor_model->get_project_folder($sid);
-		$data_folder = rtrim($project_folder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+		$data_real = $this->get_data_folder_realpath($sid);
+		if ($data_real === false) {
+			return false;
+		}
+		$data_prefix = $data_real . DIRECTORY_SEPARATOR;
 
 		$paths = array();
 		if (!empty($datafile['file_physical_name'])) {
-			$paths[] = $data_folder . $datafile['file_physical_name'];
+			try {
+				$paths[] = $this->resolve_data_folder_file_path($sid, $datafile['file_physical_name'], false);
+			} catch (Exception $e) {
+				// skip unsafe path
+			}
 		}
 		$csv_path = $this->get_file_csv_path($sid, $file_id);
 		if ($csv_path) {
 			$paths[] = $csv_path;
 		} elseif (!empty($datafile['file_name'])) {
-			$paths[] = $data_folder . $datafile['file_name'] . '.csv';
+			$paths[] = $this->resolve_data_folder_file_path($sid, $datafile['file_name'] . '.csv', false);
 		}
 
 		$deleted_any = false;
 		$seen = array();
 		foreach ($paths as $path) {
 			$real = realpath($path);
-			$key = $real !== false ? $real : $path;
+			if ($real === false) {
+				continue;
+			}
+			if (strpos($real, $data_prefix) !== 0) {
+				continue;
+			}
+			$key = $real;
 			if (isset($seen[$key])) {
 				continue;
 			}
 			$seen[$key] = true;
-			if (file_exists($path) && is_file($path)) {
-				if (@unlink($path)) {
+			if (is_file($real)) {
+				if (@unlink($real)) {
 					$deleted_any = true;
 				}
 			}
@@ -1742,6 +1834,11 @@ class Editor_datafile_model extends CI_Model {
 		}
 
 		$data['changed']=date("U");
+
+		if (isset($data['file_physical_name'])) {
+			validate_filename($data['file_physical_name'], 200);
+			$data['file_physical_name'] = basename($data['file_physical_name']);
+		}
 
 		// Handle file name change - rename physical files
 		if (isset($data['file_name'])){

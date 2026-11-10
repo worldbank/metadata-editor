@@ -238,9 +238,12 @@ class Versions extends MY_REST_Controller
 				}
 			}
 
-			$version = $this->project_versions->get_version_by_version($options['id'], $options['version']);
+			$main_sid = $this->get_sid($options['id']);
+			$this->editor_acl->user_has_project_access($main_sid, $permission='admin', $this->user);
 
-			if ($version['pid']!=$options['id']){
+			$version = $this->project_versions->get_version_by_version($main_sid, $options['version']);
+
+			if ($version['pid'] != $main_sid){
 				throw new Exception("Provide ID for the main project");
 			}
 

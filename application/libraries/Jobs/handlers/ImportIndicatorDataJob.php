@@ -96,6 +96,8 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         }
 
         $this->ci->load->library('Resumable_upload', null, 'uploader');
+        $owner_id = isset($job['user_id']) ? (int) $job['user_id'] : 0;
+        $this->ci->uploader->assert_upload_access($upload_id, $owner_id);
         $completed = $this->ci->uploader->get_completed_upload($upload_id);
         if (!$completed) {
             throw new Exception('Resumable upload not found or not yet complete: ' . $upload_id);

@@ -137,7 +137,7 @@ class Publish extends MY_REST_Controller
 	function index_post($sid=null,$catalog_connection_id=null,$options=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -173,7 +173,7 @@ class Publish extends MY_REST_Controller
 	function indicator_post($sid = null, $catalog_connection_id = null)
 	{
 		try {
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view');
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit');
 
 			$user_id = $this->get_api_user_id();
 			if (!$user_id) {
@@ -223,7 +223,7 @@ class Publish extends MY_REST_Controller
 			if ($project_id === null || $project_id === '') {
 				throw new Exception('project_id is required');
 			}
-			$this->editor_acl->user_has_project_access($project_id, $permission = 'view');
+			$this->editor_acl->user_has_project_access($project_id, $permission = 'edit');
 
 			$response = $this->Editor_publish_model->nada_upload_limits($user_id, $catalog_connection_id);
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -261,7 +261,7 @@ class Publish extends MY_REST_Controller
 				throw new Exception('project_id is required');
 			}
 
-			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'view');
+			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'edit');
 
 			$response = $this->Editor_publish_model->nada_upload_init(
 				$user_id,
@@ -306,7 +306,7 @@ class Publish extends MY_REST_Controller
 			if ($project_id === null || $project_id === '') {
 				throw new Exception('project_id is required');
 			}
-			$this->editor_acl->user_has_project_access($project_id, $permission = 'view');
+			$this->editor_acl->user_has_project_access($project_id, $permission = 'edit');
 
 			$chunk_number = $this->input->get_request_header('X-Upload-Chunk-Number', true);
 			if ($chunk_number === null || $chunk_number === '') {
@@ -392,7 +392,7 @@ class Publish extends MY_REST_Controller
 			if ($upload_id === null || $upload_id === '') {
 				throw new Exception('upload_id is required');
 			}
-			$this->editor_acl->user_has_project_access($project_id, $permission = 'view');
+			$this->editor_acl->user_has_project_access($project_id, $permission = 'edit');
 
 			$response = $this->Editor_publish_model->nada_upload_status(
 				$user_id,
@@ -417,7 +417,7 @@ class Publish extends MY_REST_Controller
 	function thumbnail_post($sid=null,$catalog_connection_id=null,$options=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -456,7 +456,7 @@ class Publish extends MY_REST_Controller
 	function nada_resources_delete_all_post($sid = null, $catalog_connection_id = null)
 	{
 		try {
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view');
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit');
 
 			$user_id = $this->get_api_user_id();
 			if (!$user_id) {
@@ -490,7 +490,7 @@ class Publish extends MY_REST_Controller
 	function external_resources_post($sid,$connection_id=null, $options=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -522,7 +522,7 @@ class Publish extends MY_REST_Controller
 	function external_resource_post($sid = null, $catalog_connection_id = null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			if (!is_array($options)) {
@@ -609,7 +609,7 @@ class Publish extends MY_REST_Controller
 				throw new Exception('upload_id is required');
 			}
 
-			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'view');
+			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'edit');
 
 			$server_file_key = isset($input['server_file_key']) ? $input['server_file_key'] : null;
 			$response = $this->Editor_publish_model->nada_upload_cancel(
@@ -658,7 +658,7 @@ class Publish extends MY_REST_Controller
 				throw new Exception('server_file_key is required');
 			}
 
-			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'view');
+			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'edit');
 			$this->Editor_publish_model->release_nada_upload_server_file(
 				$input['project_id'],
 				$input['server_file_key']
@@ -676,13 +676,14 @@ class Publish extends MY_REST_Controller
 	function files_get($sid=null)
 	{		
 		try{
+			$sid = $this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
 
-			//$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid, $permission='view', $this->api_user());
 
 			$result=$this->Editor_resource_model->get_resources_uploaded_files($sid);
 

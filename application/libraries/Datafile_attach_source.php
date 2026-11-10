@@ -144,8 +144,10 @@ class Datafile_attach_source
 			$source_update['source_attached_by'] = (int) $user_id;
 		}
 
+		// Attaching data opts the file back into storage; otherwise store_data=0 cleanup would delete it
 		$update_fields = array_merge(array(
 			'file_physical_name' => $target_basename,
+			'store_data' => 1,
 		), $source_update);
 
 		$this->ci->Editor_datafile_model->update($datafile['id'], $update_fields);

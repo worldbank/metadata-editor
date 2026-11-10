@@ -459,6 +459,10 @@ class Data extends MY_REST_Controller
 
 			$variables_imported = $this->_import_summary_stats_dictionary($sid, $file_id, $job_id, $upstream);
 
+			// Summary stats is the last import step when data is not stored (no CSV export runs),
+			// so purge physical data here for store_data=0 (metadata-only)
+			$this->_cleanup_if_not_stored($sid, $file_id);
+
 			$this->set_response(array(
 				'status' => 'success',
 				'variables_imported' => $variables_imported,
@@ -714,10 +718,7 @@ class Data extends MY_REST_Controller
 			$csv_file_path=$this->Editor_datafile_model->check_csv_exists($sid, $file_id);
 
 			// Keep source file; only purge when store_data=0 (metadata-only)
-			$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
-			if ($datafile && isset($datafile['store_data']) && (int) $datafile['store_data'] === 0) {
-				$this->Editor_datafile_model->cleanup($sid, $file_id);
-			}
+			$this->_cleanup_if_not_stored($sid, $file_id);
 
 			$output=array(
 				'status'=>'success',
@@ -1063,11 +1064,14 @@ class Data extends MY_REST_Controller
 	public function read_csv_get($sid=null,$fileid=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user());
 
 			$project_folder=$this->Editor_model->get_project_folder($sid);			
 		
@@ -1253,6 +1257,17 @@ class Data extends MY_REST_Controller
 	/**
 	 * Import dictionary variables in one request (internal chunked reads + batch DB writes).
 	 */
+	/**
+	 * Remove physical data (source + CSV) for a datafile marked store_data=0.
+	 */
+	private function _cleanup_if_not_stored($sid, $file_id)
+	{
+		$datafile = $this->Editor_datafile_model->data_file_by_id($sid, $file_id);
+		if ($datafile && isset($datafile['store_data']) && (int) $datafile['store_data'] === 0) {
+			$this->Editor_datafile_model->cleanup($sid, $file_id);
+		}
+	}
+
 	private function _import_summary_stats_dictionary($sid, $file_id, $job_id, array $upstream)
 	{
 		$this->_begin_summary_stats_import_limits();

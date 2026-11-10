@@ -560,6 +560,7 @@ class ImportProject extends MY_REST_Controller
 	{
 		if ($upload_id !== '') {
 			$this->load->library('Resumable_upload', null, 'resumable_upload');
+			$this->resumable_upload->assert_upload_access($upload_id, $this->get_api_user_id());
 			$completed = $this->resumable_upload->get_completed_upload($upload_id);
 			if (!$completed) {
 				throw new Exception("Resumable upload not found or not yet complete.");

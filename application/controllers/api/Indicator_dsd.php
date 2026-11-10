@@ -1357,6 +1357,7 @@ class Indicator_dsd extends MY_REST_Controller
 
 		if ($upload_id !== '') {
 			$this->load->library('Resumable_upload', null, 'uploader');
+			$this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
 			$completed = $this->uploader->get_completed_upload($upload_id);
 			if (!$completed) {
 				throw new Exception('Resumable upload not found or not yet complete');

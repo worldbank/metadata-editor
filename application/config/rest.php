@@ -184,8 +184,7 @@ $config['auth_library_function'] = '';
 // $config['auth_override_class_method']['accounts']['user'] = 'basic';
 // $config['auth_override_class_method']['dashboard']['*'] = 'basic';
 
-//no authentication required
-$config['auth_override_class_method']['auth']['*'] = 'none';
+// REST password login removed (use web auth/login + profile API keys).
 
 
 // ---Uncomment list line for the wildard unit test

@@ -323,7 +323,6 @@ class Publish_requests extends MY_REST_Controller
 	public function resolve_post($publication_id = null)
 	{
 		try {
-			$this->require_publish_queue_access();
 			$user_id = $this->require_user_id();
 			$this->require_publications_table();
 
@@ -331,6 +330,12 @@ class Publish_requests extends MY_REST_Controller
 			if ($publication_id < 1) {
 				throw new Exception('Publication id is required');
 			}
+
+			$placement = $this->Project_publications_model->get_by_id($publication_id);
+			if (!$placement) {
+				throw new Exception('Publication placement not found');
+			}
+			$this->assert_can_resolve_publication($placement, $user_id);
 
 			$payload = $this->raw_json_input();
 			if (!is_array($payload)) {
@@ -359,7 +364,6 @@ class Publish_requests extends MY_REST_Controller
 	public function resolve_batch_post()
 	{
 		try {
-			$this->require_publish_queue_access();
 			$user_id = $this->require_user_id();
 			$this->require_publications_table();
 
@@ -371,6 +375,18 @@ class Publish_requests extends MY_REST_Controller
 			$publication_ids = isset($payload['publication_ids']) ? $payload['publication_ids'] : array();
 			if (!is_array($publication_ids)) {
 				throw new Exception('publication_ids must be an array');
+			}
+
+			foreach ($publication_ids as $publication_id) {
+				$publication_id = (int) $publication_id;
+				if ($publication_id < 1) {
+					throw new Exception('Invalid publication id in publication_ids');
+				}
+				$placement = $this->Project_publications_model->get_by_id($publication_id);
+				if (!$placement) {
+					throw new Exception('Publication placement not found: ' . $publication_id);
+				}
+				$this->assert_can_resolve_publication($placement, $user_id);
 			}
 
 			$action = isset($payload['action']) ? $payload['action'] : '';
@@ -488,7 +504,7 @@ class Publish_requests extends MY_REST_Controller
 		if ($this->ion_auth->is_admin($user_id)) {
 			return true;
 		}
-		return $this->editor_acl->user_has_global_project_access($user_id, 'view');
+		return $this->user_is_curator_for_any_catalog($user_id);
 	}
 
 	private function require_publish_queue_access()
@@ -496,6 +512,68 @@ class Publish_requests extends MY_REST_Controller
 		$user_id = $this->require_user_id();
 		if (!$this->user_has_publish_queue_access($user_id)) {
 			throw new Exception('Access denied');
+		}
+	}
+
+	/**
+	 * @param int $user_id
+	 * @return bool
+	 */
+	private function user_is_curator_for_any_catalog($user_id)
+	{
+		$user_id = (int) $user_id;
+		if ($user_id < 1 || !$this->db->table_exists('catalog_curators')) {
+			return false;
+		}
+
+		return $this->db
+			->where('user_id', $user_id)
+			->count_all_results('catalog_curators') > 0;
+	}
+
+	/**
+	 * @param int $catalog_id
+	 * @param int $user_id
+	 * @return bool
+	 */
+	private function user_is_catalog_curator($catalog_id, $user_id)
+	{
+		$catalog_id = (int) $catalog_id;
+		$user_id = (int) $user_id;
+		if ($catalog_id < 1 || $user_id < 1) {
+			return false;
+		}
+
+		$this->load->model('Catalog_connections_model');
+		foreach ($this->Catalog_connections_model->get_curators($catalog_id) as $row) {
+			if (!empty($row['user_id']) && (int) $row['user_id'] === $user_id) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array $placement project_publications row
+	 * @param int $user_id
+	 */
+	private function assert_can_resolve_publication(array $placement, $user_id)
+	{
+		$user_id = (int) $user_id;
+		$catalog_id = isset($placement['catalog_id']) ? (int) $placement['catalog_id'] : 0;
+		if ($catalog_id < 1) {
+			throw new Exception('Publication catalog is missing');
+		}
+
+		$is_admin = $this->ion_auth->is_admin($user_id);
+		if (!$is_admin && !$this->user_is_catalog_curator($catalog_id, $user_id)) {
+			throw new Exception('You are not a curator for this catalog connection');
+		}
+
+		$ready_by = !empty($placement['ready_by']) ? (int) $placement['ready_by'] : 0;
+		if (!$is_admin && $ready_by > 0 && $ready_by === $user_id) {
+			throw new Exception('You cannot resolve your own publish request');
 		}
 	}
 }

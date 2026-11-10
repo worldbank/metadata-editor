@@ -762,9 +762,20 @@ class Editor_template_model extends ci_model {
 			throw new Exception("Template is deleted. Restore it before editing.");
 		}
 
-		$valid_fields=$this->fields;
-		unset($valid_fields['id']);
-		unset($valid_fields['uid']);
+		$valid_fields = array_diff(
+			$this->fields,
+			array(
+				'id',
+				'uid',
+				'template_type',
+				'owner_id',
+				'created',
+				'created_by',
+				'deleted_at',
+				'deleted_by',
+				'is_deleted',
+			)
+		);
 
 		$options['changed']=date("U");	
 		
