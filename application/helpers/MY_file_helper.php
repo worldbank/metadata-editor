@@ -504,6 +504,142 @@ if ( ! function_exists('get_zip_archive_list'))
 }
 
 /**
+ * Sanitize an uploaded data file name for safe storage.
+ *
+ * Shared by chunked uploads (Resumable_upload) and ZIP extraction
+ * (Microdata_zip_processor) so both produce the same names:
+ * accented letters become plain ASCII (é -> e, ß -> ss), other characters
+ * outside [A-Za-z0-9._-] become "_", repeated "_" collapse, dots in the
+ * name part become "_", and leading/trailing "_" are trimmed.
+ * e.g. "7.1 base+_numérica.csv" -> "7_1_base_numerica.csv"
+ *
+ * @param string $filename Client or archive entry file name
+ * @param int    $maxLength Maximum length of the result
+ * @return string
+ * @throws Exception when nothing usable remains of the name (e.g. "+++.csv")
+ */
+function sanitize_data_filename(string $filename, int $maxLength = 255): string
+{
+	$original = $filename;
+	$filename = basename(str_replace('\\', '/', $filename));
+
+	// Remove any null bytes
+	$filename = str_replace("\0", '', $filename);
+
+	// Accented letters -> plain ASCII before non-ASCII is replaced below
+	$filename = filename_to_ascii($filename);
+
+	// CodeIgniter's filename filter (when running inside the framework)
+	if (function_exists('get_instance')) {
+		$CI =& get_instance();
+		if ($CI && isset($CI->security)) {
+			$filename = $CI->security->sanitize_filename($filename);
+		}
+	}
+
+	// Allow only alphanumeric, dots, hyphens, and underscores
+	$filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+	$filename = preg_replace('/_+/', '_', $filename);
+	$filename = trim($filename, '_');
+
+	// Replace dots with underscores in the name part only (consistent with resources model)
+	$extension = pathinfo($filename, PATHINFO_EXTENSION);
+	$name = pathinfo($filename, PATHINFO_FILENAME);
+	$name = str_replace('.', '_', $name);
+	$name = preg_replace('/_+/', '_', $name);
+	$name = trim($name, '_');
+
+	if ($name === '') {
+		throw new Exception(
+			'File name "' . basename(str_replace('\\', '/', $original)) . '" has no usable characters; '
+			. 'rename the file using letters, numbers, hyphens or underscores'
+		);
+	}
+
+	$filename = $extension === '' ? $name : $name . '.' . $extension;
+
+	if (strlen($filename) > $maxLength) {
+		$name = $extension === ''
+			? substr($name, 0, $maxLength)
+			: substr($name, 0, $maxLength - strlen($extension) - 1);
+		$filename = $extension === '' ? $name : $name . '.' . $extension;
+	}
+
+	return $filename;
+}
+
+/**
+ * Convert accented and other Latin letters in a file name to plain ASCII
+ * (é -> e, ñ -> n, ß -> ss, ø -> o). Characters with no ASCII equivalent are
+ * left for the caller to replace.
+ *
+ * Uses intl (Transliterator / Normalizer) when available, with a built-in map
+ * of common Latin letters as fallback. Handles both precomposed (NFC) and
+ * decomposed (NFD, e.g. macOS ZIP entry names) input. Byte strings that are not
+ * valid UTF-8 (e.g. CP437 ZIP names) are returned unchanged.
+ *
+ * @param string $name
+ * @param bool   $use_intl Use the intl extension when available (false: built-in map only; for tests)
+ * @return string
+ */
+function filename_to_ascii(string $name, bool $use_intl = true): string
+{
+	// Pure ASCII or not valid UTF-8: nothing to convert safely
+	if (!preg_match('/[\x80-\xFF]/', $name) || preg_match('//u', $name) !== 1) {
+		return $name;
+	}
+
+	if ($use_intl && class_exists('Transliterator')) {
+		static $transliterator = null;
+		if ($transliterator === null) {
+			$transliterator = Transliterator::create('Any-Latin; Latin-ASCII') ?: false;
+		}
+		if ($transliterator) {
+			$converted = $transliterator->transliterate($name);
+			if (is_string($converted)) {
+				return $converted;
+			}
+		}
+	}
+
+	// Decompose and drop combining marks (é -> e + ́ -> e)
+	if ($use_intl && class_exists('Normalizer')) {
+		$decomposed = Normalizer::normalize($name, Normalizer::FORM_D);
+		if (is_string($decomposed)) {
+			$name = preg_replace('/\p{Mn}+/u', '', $decomposed);
+		}
+	} else {
+		// Without intl, decomposed input still needs its combining marks removed
+		$name = preg_replace('/[\x{0300}-\x{036F}]+/u', '', $name);
+	}
+
+	static $map = array(
+		'À'=>'A','Á'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','Å'=>'A','Ā'=>'A','Ă'=>'A','Ą'=>'A',
+		'à'=>'a','á'=>'a','â'=>'a','ã'=>'a','ä'=>'a','å'=>'a','ā'=>'a','ă'=>'a','ą'=>'a',
+		'Ç'=>'C','Ć'=>'C','Č'=>'C','ç'=>'c','ć'=>'c','č'=>'c',
+		'Ď'=>'D','Đ'=>'D','Ð'=>'D','ď'=>'d','đ'=>'d','ð'=>'d',
+		'È'=>'E','É'=>'E','Ê'=>'E','Ë'=>'E','Ē'=>'E','Ę'=>'E','Ě'=>'E',
+		'è'=>'e','é'=>'e','ê'=>'e','ë'=>'e','ē'=>'e','ę'=>'e','ě'=>'e',
+		'Ğ'=>'G','ğ'=>'g',
+		'Ì'=>'I','Í'=>'I','Î'=>'I','Ï'=>'I','Ī'=>'I','İ'=>'I',
+		'ì'=>'i','í'=>'i','î'=>'i','ï'=>'i','ī'=>'i','ı'=>'i',
+		'Ł'=>'L','ł'=>'l',
+		'Ñ'=>'N','Ń'=>'N','Ň'=>'N','ñ'=>'n','ń'=>'n','ň'=>'n',
+		'Ò'=>'O','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ø'=>'O','Ō'=>'O','Ő'=>'O',
+		'ò'=>'o','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ø'=>'o','ō'=>'o','ő'=>'o',
+		'Ř'=>'R','ř'=>'r',
+		'Ś'=>'S','Š'=>'S','Ş'=>'S','ś'=>'s','š'=>'s','ş'=>'s','ß'=>'ss',
+		'Ť'=>'T','Ţ'=>'T','ť'=>'t','ţ'=>'t','Þ'=>'Th','þ'=>'th',
+		'Ù'=>'U','Ú'=>'U','Û'=>'U','Ü'=>'U','Ū'=>'U','Ů'=>'U','Ű'=>'U',
+		'ù'=>'u','ú'=>'u','û'=>'u','ü'=>'u','ū'=>'u','ů'=>'u','ű'=>'u',
+		'Ý'=>'Y','Ÿ'=>'Y','ý'=>'y','ÿ'=>'y',
+		'Ź'=>'Z','Ż'=>'Z','Ž'=>'Z','ź'=>'z','ż'=>'z','ž'=>'z',
+		'Æ'=>'AE','æ'=>'ae','Œ'=>'OE','œ'=>'oe',
+	);
+	return strtr($name, $map);
+}
+
+/**
  * Validate a file name against security rules.
  *
  * @param string $filename The filename to validate
@@ -514,8 +650,13 @@ if ( ! function_exists('get_zip_archive_list'))
 function validate_filename(string $filename, int $maxLength = 255): bool
 {
     // Must not be empty
-    if ($filename === '.' || $filename === '..') {
+    if ($filename === '' || $filename === '.' || $filename === '..') {
         throw new Exception('File name cannot be empty, "." or ".."');
+    }
+
+    // No hidden files / names without a base name (e.g. ".csv")
+    if ($filename[0] === '.') {
+        throw new Exception('File name cannot start with a dot');
     }
 
     // Remove path info (if filename includes directories, reject)

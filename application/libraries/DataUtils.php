@@ -530,6 +530,48 @@ class DataUtils
 		return $response;
 	}
 
+	/**
+	 * Normalize an uploaded CSV in place to UTF-8, comma-separated (FastAPI /generate-csv).
+	 * Detects delimiter and encoding; no-op when the file is already normalized.
+	 *
+	 * @param string $csv_path Absolute path to the CSV
+	 * @return array csv_normalization info (converted, source_delimiter, source_encoding, warnings, ...)
+	 * @throws Exception with FastAPI's message when the CSV cannot be parsed
+	 */
+	public function normalize_csv($csv_path)
+	{
+		$client = new Client(array_merge(
+			array('base_uri' => $this->DataApiUrl . 'generate-csv'),
+			$this->fastapi_http_client_options(),
+			// Rewrites the whole file; allow time for large uploads
+			array('timeout' => 1800)
+		));
+
+		$api_response = $client->request('POST', '', array(
+			'json' => array('file_path' => realpath($csv_path)),
+		));
+
+		$status_code = $api_response->getStatusCode();
+		$body_raw = $api_response->getBody()->getContents();
+		$response = json_decode($body_raw, true);
+
+		if ($status_code !== 200 || !is_array($response) || (isset($response['status']) && $response['status'] !== 'success')) {
+			$message = is_array($response)
+				? $this->fastapi_error_message_from_body($response, $status_code)
+				: ('Data service returned HTTP ' . (int) $status_code);
+			throw new Exception($message);
+		}
+
+		if (!isset($response['csv_normalization'])) {
+			// Older data service: /generate-csv returns {"error": "file not supported.csv"}
+			throw new Exception("Data service does not support CSV normalization. Update the data service (FastAPI).");
+		}
+
+		return isset($response['csv_normalization']) && is_array($response['csv_normalization'])
+			? $response['csv_normalization']
+			: array();
+	}
+
 	public function export_datafile_queue($sid,$file_id,$format,$export_options=null)
 	{
 		$this->ci->load->library("Datafile_export");

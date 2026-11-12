@@ -457,17 +457,29 @@ class Data extends MY_REST_Controller
 				return;
 			}
 
+			// CSV inputs are normalized (UTF-8, comma) by FastAPI before the dictionary is built
+			$csv_normalization = (isset($upstream['data']['csv_normalization']) && is_array($upstream['data']['csv_normalization']))
+				? $upstream['data']['csv_normalization']
+				: null;
+
 			$variables_imported = $this->_import_summary_stats_dictionary($sid, $file_id, $job_id, $upstream);
 
 			// Summary stats is the last import step when data is not stored (no CSV export runs),
 			// so purge physical data here for store_data=0 (metadata-only)
 			$this->_cleanup_if_not_stored($sid, $file_id);
 
-			$this->set_response(array(
+			$output = array(
 				'status' => 'success',
 				'variables_imported' => $variables_imported,
 				'job_status' => 'done',
-			), REST_Controller::HTTP_OK);
+			);
+			if ($csv_normalization) {
+				$output['csv_normalization'] = $csv_normalization;
+				$output['warnings'] = isset($csv_normalization['warnings']) && is_array($csv_normalization['warnings'])
+					? $csv_normalization['warnings']
+					: array();
+			}
+			$this->set_response($output, REST_Controller::HTTP_OK);
 		}
 		catch(Throwable $e){
 			$this->_summary_stats_import_cache_delete($job_id);

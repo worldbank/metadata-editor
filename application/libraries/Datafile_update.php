@@ -26,7 +26,11 @@ class Datafile_update
 		$names=$this->ci->Editor_variable_model->get_variable_names_by_file($sid,$file_id);
 
 		$var_names_labels=array();
+		$csv_normalization=null;
 		if ($file_ext=='csv'){
+			// Detect delimiter/encoding and rewrite as UTF-8, comma-separated before reading columns
+			$this->ci->load->library('DataUtils');
+			$csv_normalization=$this->ci->datautils->normalize_csv($datafile_path);
 			$var_names_labels['variables']=$this->get_csv_columns($datafile_path);
 			$imported_names=array_column($var_names_labels['variables'],"name");
 			$compared=array_diff($names,$imported_names);
@@ -105,6 +109,7 @@ class Datafile_update
 			'compared'=>isset($compared)?$compared:array(),
 			'comparison'=>isset($comparison)?$comparison:null,
 			'file_info'=>$file_info,
+			'csv_normalization'=>$csv_normalization,
 			'datafile'=>$datafile,
 			'datafile_names'=>$names,
 			'target_filepath'=>$target_filepath,

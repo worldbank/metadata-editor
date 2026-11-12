@@ -259,6 +259,7 @@ Vue.component('datafile-import', {
                 }
 
                 let csvJobs = [];
+                let notes = [];
                 let uploadedNames = (resp.result && resp.result.uploaded && resp.result.uploaded.uploaded_file_names)
                     ? resp.result.uploaded.uploaded_file_names
                     : [];
@@ -270,7 +271,8 @@ Vue.component('datafile-import', {
                         : this.files[fileIdx].name;
 
                     this.update_status=this.$t("Generating summary statistics and frequencies") + " " + statusLabel;
-                    await this.importDataFileSummaryStatistics(fileIdx, fileid);
+                    let statsResult = await this.importDataFileSummaryStatistics(fileIdx, fileid);
+                    notes = notes.concat(this.csvNormalizationNotes(statsResult, fileIds.length > 1 ? (extractedName || statusLabel) : ''));
 
                     if (this.keep_data=='store'){
                         let physicalExt = extractedName
@@ -289,7 +291,8 @@ Vue.component('datafile-import', {
                 this.upload_report.push(
                     {
                         'file_name':this.files[fileIdx].name,
-                        'status': 'success'
+                        'status': 'success',
+                        'notes': notes
                     }
                 );
 
@@ -419,8 +422,31 @@ Vue.component('datafile-import', {
                 return await this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
             }else if (result.data.job_status==='done'){
                 //await this.reloadDataFileVariables();
-                return true;
-            }                
+                return result.data;
+            }
+        },
+        /** Notes for the import report when FastAPI converted a CSV (delimiter/encoding) or found lost characters. */
+        csvNormalizationNotes: function(statsResult, prefix)
+        {
+            let notes = [];
+            let info = statsResult && statsResult.csv_normalization;
+            if (!info) {
+                return notes;
+            }
+            let label = prefix ? prefix + ': ' : '';
+            if (info.converted) {
+                notes.push({
+                    type: 'info',
+                    text: label + this.$t('csv_import_converted', {
+                        delimiter: this.$t('csv_delimiter_' + (info.source_delimiter_label || 'comma')),
+                        encoding: (info.source_encoding || '').toUpperCase()
+                    })
+                });
+            }
+            (statsResult.warnings || []).forEach(function (w) {
+                notes.push({ type: 'warning', text: label + w });
+            });
+            return notes;
         },
         sleep: function(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -731,8 +757,20 @@ Vue.component('datafile-import', {
                                         class="ma-0"
                                         :style="importReportStatusBadgeStyle(report)"
                                     >{{ report.status }}</span>
-                                    <span class="text-body-2">{{ report.file_name }}</span>                                    
+                                    <span class="text-body-2">{{ report.file_name }}</span>
                                 </div>
+                                <template v-if="report.notes && report.notes.length">
+                                    <v-divider class="my-0"></v-divider>
+                                    <div
+                                        v-for="(note, nidx) in report.notes"
+                                        :key="'n-' + ridx + '-' + nidx"
+                                        class="px-2 py-1 text-body-2 d-flex align-start"
+                                        style="column-gap:6px;"
+                                    >
+                                        <v-icon small :color="note.type === 'warning' ? 'warning' : 'info'" class="mt-1">{{ note.type === 'warning' ? 'mdi-alert-outline' : 'mdi-information-outline' }}</v-icon>
+                                        <span>{{ note.text }}</span>
+                                    </div>
+                                </template>
                                 <template v-if="report.status === 'error'">
                                     <v-divider v-if="getReportErrorDetail(report)" class="my-0"></v-divider>
                                     <div class="px-2 py-1 error--text text-body-2" style="color: red;">

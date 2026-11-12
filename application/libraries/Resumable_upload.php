@@ -1132,46 +1132,11 @@ class Resumable_upload {
 	 */
 	private function sanitize_filename($filename)
 	{
-		$CI =& get_instance();
-		
-		$filename = basename($filename);
-		
-		// Remove any null bytes
-		$filename = str_replace("\0", '', $filename);
-		
-		// Sanitize filename
-		$filename = $CI->security->sanitize_filename($filename);
-		
-		// Replace spaces and special characters with underscores
-		// Allow only alphanumeric, dots, hyphens, and underscores
-		$filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-		
-		// Clean up multiple consecutive underscores
-		$filename = preg_replace('/_+/', '_', $filename);
-		
-		// Remove leading/trailing underscores
-		$filename = trim($filename, '_');
-		
-		// Apply additional restrictions (dots to underscores for filename part)
-		$extension = pathinfo($filename, PATHINFO_EXTENSION);
-		$name = pathinfo($filename, PATHINFO_FILENAME);
-		
-		// Replace dots with underscores in filename part only (consistent with resources model)
-		$name = str_replace('.', '_', $name);
-		
-		// Clean up multiple consecutive underscores again after dot replacement
-		$name = preg_replace('/_+/', '_', $name);
-		$name = trim($name, '_');
-		
-		// Rebuild filename
-		$filename = empty($extension) ? $name : $name . '.' . $extension;
-		
-		// Limit length
-		if (strlen($filename) > 255) {
-			$filename = substr($name, 0, 255 - strlen($extension) - 1) . '.' . $extension;
+		// Shared with ZIP extraction (Microdata_zip_processor) so names match
+		if (!function_exists('sanitize_data_filename')) {
+			get_instance()->load->helper('file');
 		}
-		
-		return $filename;
+		return sanitize_data_filename((string) $filename, 255);
 	}
 	
 	/**

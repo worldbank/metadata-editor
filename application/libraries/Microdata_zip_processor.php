@@ -91,12 +91,12 @@ class Microdata_zip_processor
 				continue;
 			}
 
-			$flat_name = $basename;
 			try {
+				$flat_name = $this->flat_name_for_entry($basename);
 				validate_filename($flat_name, 200);
 			} catch (Exception $e) {
 				$zip->close();
-				$result['errors'][] = 'Invalid file name in ZIP: ' . $flat_name;
+				$result['errors'][] = 'Invalid file name in ZIP: ' . $basename . ' (' . $e->getMessage() . ')';
 				return $result;
 			}
 
@@ -257,6 +257,30 @@ class Microdata_zip_processor
 				@unlink($path);
 			}
 		}
+	}
+
+	/**
+	 * Name to extract an entry as.
+	 *
+	 * Names that already pass validate_filename are kept unchanged (so re-importing
+	 * an existing ZIP still matches its data files for overwrite). Other names are
+	 * sanitized like direct uploads (sanitize_data_filename): accented letters become
+	 * plain ASCII ("é" -> "e") and other characters such as "+" become "_".
+	 *
+	 * @param string $basename Entry basename from the archive
+	 * @return string
+	 * @throws Exception when nothing usable remains of the name
+	 */
+	private function flat_name_for_entry($basename)
+	{
+		try {
+			validate_filename($basename, 200);
+			return $basename;
+		} catch (Exception $e) {
+			// Sanitize below
+		}
+
+		return sanitize_data_filename($basename, 200);
 	}
 
 	private function should_skip_entry($entry_name, $basename)

@@ -193,7 +193,17 @@ class ImportMicrodataJob implements JobHandlerInterface
             $status_http_code = isset($status_response['status_code']) ? $status_response['status_code'] : 500;
             
             if ($status_http_code != 200) {
-                throw new Exception("Failed to get FastAPI job status: HTTP {$status_http_code}");
+                // Failed FastAPI jobs are returned as HTTP 400 with the reason in the body
+                $body = isset($status_response['response']) && is_array($status_response['response'])
+                    ? $status_response['response'] : array();
+                $reason = isset($body['message']) && is_string($body['message']) && $body['message'] !== ''
+                    ? $body['message']
+                    : (isset($body['detail']) && is_string($body['detail']) ? $body['detail'] : '');
+                // Drop the appended debug dump ("\n\nDetailed Error Information: ...")
+                $reason = trim(strtok($reason, "\n"));
+                throw new Exception($reason !== ''
+                    ? "FastAPI job failed: {$reason}"
+                    : "Failed to get FastAPI job status: HTTP {$status_http_code}");
             }
             
             $fastapi_status = isset($status_response['response']['status']) ? $status_response['response']['status'] : '';
@@ -300,6 +310,9 @@ class ImportMicrodataJob implements JobHandlerInterface
             'variables_imported' => count($variable_import_result),
             'case_count' => isset($fastapi_result['data']['data_dictionary']['rows']) ? $fastapi_result['data']['data_dictionary']['rows'] : null,
             'csv_file' => $csv_basename,
+            'csv_normalization' => isset($fastapi_result['data']['csv_generation']['csv_normalization'])
+                ? $fastapi_result['data']['csv_generation']['csv_normalization']
+                : null,
             'fastapi_status' => $fastapi_status,
             'message' => 'Microdata import completed successfully'
         );
