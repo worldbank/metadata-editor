@@ -1050,88 +1050,30 @@ class Editor_model extends CI_Model {
 		// Try to get core field mappings from schema registry first
 		$schema_field_paths = $this->get_schema_core_field_paths($type, $field);
 		
-		// Fallback to hard-coded mappings if schema doesn't have mappings (core schemas only)
+		$default_path = $this->get_default_core_field_path($type, $field, $data);
+
 		if ($schema_field_paths === false || empty($schema_field_paths)) {
-			//set image core title field - DCMI or IPTC
-			if ($type=='image'){
-				if (isset($data['image_description']['dcmi']['title'])){
-					$image_title_field='image_description.dcmi.title';
-				}else{
-					$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
-				}
-			}else{
-				$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
-			}
-
-			$core_fields=array(
-				'survey'=>array(
-					'idno'=>'study_desc.title_statement.idno',
-					'title'=>'study_desc.title_statement.title'				
-				),
-				'custom'=>array(
-					'metadata_type'=>'description.identification.metadata_type',
-					'idno'=>'description.identification.idno',
-					'title'=>'description.identification.title'
-				),
-				'document'=>array(
-					'idno'=>'document_description.title_statement.idno',
-					'title'=>'document_description.title_statement.title'
-				),
-				'table'=>array(
-					'idno'=>'table_description.title_statement.idno',
-					'title'=>'table_description.title_statement.title'
-				),
-				'script'=>array(
-					'idno'=>'project_desc.title_statement.idno',
-					'title'=>'project_desc.title_statement.title'
-				),
-				'video'=>array(
-					'idno'=>'video_description.idno',
-					'title'=>'video_description.title'
-				),
-				'timeseries'=>array(
-					'idno'=>'series_description.idno',
-					'title'=>'series_description.name',
-				),
-				'timeseries-db'=>array(
-					'idno'=>'database_description.title_statement.idno',
-					'title'=>'database_description.title_statement.title'
-				),
-				'geospatial'=>array(
-					'idno'=>'description.idno',
-					'title'=>'description.identificationInfo.citation.title'
-				),
-				'image'=>array(
-					'idno'=>'image_description.idno',
-					'title'=>$image_title_field
-				),
-			);
-
-			if(!array_key_exists($type,$core_fields)){
+			if ($default_path === false) {
 				return false;
 			}
-
-			if (!isset($core_fields[$type][$field])) {
-				return false;
+			$schema_field_paths = array($default_path);
+		} else {
+			if (!is_array($schema_field_paths)) {
+				$schema_field_paths = array($schema_field_paths);
 			}
-
-			$field_path=$core_fields[$type][$field];
-			$schema_field_paths = $field_path;
-		}
-
-		// Normalize to array
-		if (!is_array($schema_field_paths)) {
-			$schema_field_paths = array($schema_field_paths);
+			// Built-in default as a last resort, so a stale or wrong registry
+			// mapping on a core schema does not leave the core column empty
+			if ($default_path !== false) {
+				$schema_field_paths[] = $default_path;
+			}
 		}
 
 		// Return first non-empty value; try every mapped path before giving up
 		foreach ($schema_field_paths as $path) {
-			// Convert JSON Pointer format (/path/to/field) to dot notation (path.to.field)
-			// for array_data_get which expects dot notation
-			if (is_string($path) && strpos($path, '/') === 0) {
-				// Remove leading slash and convert slashes to dots
-				$path = ltrim($path, '/');
-				$path = str_replace('/', '.', $path);
+			// Accept JSON Pointer (/path/to/field), slash paths without the leading
+			// slash, and dot notation; array_data_get expects dot notation
+			if (is_string($path) && strpos($path, '/') !== false) {
+				$path = str_replace('/', '.', trim($path, '/'));
 			}
 
 			$value = array_data_get($data, $path);
@@ -1143,6 +1085,78 @@ class Editor_model extends CI_Model {
 
 		// Field is mapped but every path is empty: null clears the core column
 		return null;
+	}
+
+	/**
+	 * Built-in core field path (dot notation) for bundled schemas.
+	 * Returns false when no default exists for the type/field.
+	 */
+	private function get_default_core_field_path($type, $field, $data)
+	{
+		//set image core title field - DCMI or IPTC
+		if ($type=='image'){
+			if (isset($data['image_description']['dcmi']['title'])){
+				$image_title_field='image_description.dcmi.title';
+			}else{
+				$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
+			}
+		}else{
+			$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
+		}
+
+		$core_fields=array(
+			'survey'=>array(
+				'idno'=>'study_desc.title_statement.idno',
+				'title'=>'study_desc.title_statement.title'				
+			),
+			'custom'=>array(
+				'metadata_type'=>'description.identification.metadata_type',
+				'idno'=>'description.identification.idno',
+				'title'=>'description.identification.title'
+			),
+			'document'=>array(
+				'idno'=>'document_description.title_statement.idno',
+				'title'=>'document_description.title_statement.title'
+			),
+			'table'=>array(
+				'idno'=>'table_description.title_statement.idno',
+				'title'=>'table_description.title_statement.title'
+			),
+			'script'=>array(
+				'idno'=>'project_desc.title_statement.idno',
+				'title'=>'project_desc.title_statement.title'
+			),
+			'video'=>array(
+				'idno'=>'video_description.idno',
+				'title'=>'video_description.title'
+			),
+			'timeseries'=>array(
+				'idno'=>'series_description.idno',
+				'title'=>'series_description.name',
+			),
+			'timeseries-db'=>array(
+				'idno'=>'database_description.title_statement.idno',
+				'title'=>'database_description.title_statement.title'
+			),
+			'geospatial'=>array(
+				'idno'=>'description.idno',
+				'title'=>'description.identificationInfo.citation.title'
+			),
+			'image'=>array(
+				'idno'=>'image_description.idno',
+				'title'=>$image_title_field
+			),
+		);
+
+		if(!array_key_exists($type,$core_fields)){
+			return false;
+		}
+
+		if (!isset($core_fields[$type][$field])) {
+			return false;
+		}
+
+		return $core_fields[$type][$field];
 	}
 	
 	/**
