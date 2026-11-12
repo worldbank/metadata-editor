@@ -136,8 +136,8 @@ class Schema_registry
             'schema_files' => array(),
             'metadata_options' => array(
                 'core_fields' => array(
-                    'idno' => '/identification/idno',
-                    'title' => '/identification/title'
+                    'idno' => '/description/identification/idno',
+                    'title' => '/description/identification/title'
                 )
             ),
             'alias' => ''

@@ -326,7 +326,11 @@
               }
             }
           }
-          return (this.$store.state.project_info && this.$store.state.project_info.title) || this.$te && this.$te('untitled') ? this.$t('untitled') : 'Untitled';
+          const storedTitle = this.$store.state.project_info && this.$store.state.project_info.title;
+          if (storedTitle) {
+            return storedTitle;
+          }
+          return (this.$te && this.$te('untitled')) ? this.$t('untitled') : 'Untitled';
 
         },
         StudyIDNO(){          

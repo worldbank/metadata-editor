@@ -1124,7 +1124,7 @@ class Editor_model extends CI_Model {
 			$schema_field_paths = array($schema_field_paths);
 		}
 
-		// Return first non-empty value
+		// Return first non-empty value; try every mapped path before giving up
 		foreach ($schema_field_paths as $path) {
 			// Convert JSON Pointer format (/path/to/field) to dot notation (path.to.field)
 			// for array_data_get which expects dot notation
@@ -1133,19 +1133,16 @@ class Editor_model extends CI_Model {
 				$path = ltrim($path, '/');
 				$path = str_replace('/', '.', $path);
 			}
-			
+
 			$value = array_data_get($data, $path);
 
-			if (empty($value)){
-				return null;
-			}
-
-			if ($value !== null && $value !== '' && $value !== false) {
+			if (!empty($value)) {
 				return $value;
 			}
 		}
 
-		return false;
+		// Field is mapped but every path is empty: null clears the core column
+		return null;
 	}
 	
 	/**
