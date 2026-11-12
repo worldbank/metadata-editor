@@ -497,6 +497,13 @@ class Schemas extends MY_REST_Controller
             $schema['reserved_root_properties'] = $this->schema_registry
                 ->get_custom_schema_reserved_root_properties($schema);
 
+            // Read-only: paths the save path actually tries (registry + built-in default)
+            $this->load->model('Editor_model');
+            $schema['effective_core_fields'] = array(
+                'idno' => $this->Editor_model->get_effective_core_field_paths($schema['uid'], 'idno'),
+                'title' => $this->Editor_model->get_effective_core_field_paths($schema['uid'], 'title'),
+            );
+
             $response = array(
                 'status' => 'success',
                 'schema' => $schema

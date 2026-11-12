@@ -627,7 +627,9 @@
             .then((resp)=>{
               const schema = resp.data && resp.data.schema ? resp.data.schema : null;
               const options = schema && schema.metadata_options ? schema.metadata_options : {};
-              const core = options.core_fields || {};
+              // Prefer server-resolved paths (registry + built-in defaults) so the
+              // header matches what the save path stores in the title column
+              const core = (schema && schema.effective_core_fields) || options.core_fields || {};
               // Support both string and array formats - normalize to arrays
               const normalizeField = (field) => {
                 if (!field) return [];

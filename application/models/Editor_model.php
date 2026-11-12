@@ -1088,6 +1088,30 @@ class Editor_model extends CI_Model {
 	}
 
 	/**
+	 * Paths the server tries, in order, for a simple core field (idno, title):
+	 * registry mapping first, then the built-in default. Used by the editor UI
+	 * so its header resolves the same value the save path stores.
+	 */
+	public function get_effective_core_field_paths($type, $field)
+	{
+		$type = $this->resolve_canonical_type($type) ?: $type;
+
+		$paths = $this->get_schema_core_field_paths($type, $field);
+		$paths = ($paths === false) ? array() : (array)$paths;
+
+		if ($type === 'image' && $field === 'title') {
+			$paths[] = 'image_description.dcmi.title';
+		}
+
+		$default_path = $this->get_default_core_field_path($type, $field, array());
+		if ($default_path !== false) {
+			$paths[] = $default_path;
+		}
+
+		return array_values(array_unique(array_filter($paths, 'is_string')));
+	}
+
+	/**
 	 * Built-in core field path (dot notation) for bundled schemas.
 	 * Returns false when no default exists for the type/field.
 	 */
