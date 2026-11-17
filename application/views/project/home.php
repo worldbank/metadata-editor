@@ -2061,6 +2061,9 @@
     })
   </script>
 
+  <?php /* Server assistant on the Projects list: no project here, so it answers from the editor's help. */ ?>
+  <?php echo $this->load->view("metadata_editor/assistant_panel.php", array("sid" => ""), true); ?>
+
   <?php $this->load->view('common/analytics'); ?>
 </body>
 

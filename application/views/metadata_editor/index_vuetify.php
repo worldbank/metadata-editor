@@ -97,6 +97,9 @@
   <div id="app" data-app>
     <?php echo $this->load->view("metadata_editor/layout.php",null,true); ?>
   </div>
+  <?php /* Server assistant; renders nothing unless enabled. CI gives each view its own scope, so the
+           project id is passed down. */ ?>
+  <?php echo $this->load->view("metadata_editor/assistant_panel.php", array("sid" => $sid), true); ?>
 
   <script src="<?php echo base_url();?>vue-app/assets/vue.min.js"></script>
   <script src="<?php echo base_url(); ?>vue-app/assets/vue-router.min.js"></script>

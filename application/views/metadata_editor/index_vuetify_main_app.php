@@ -613,6 +613,35 @@
             next();
         })
 
+        // Tell the server assistant what the user is looking at (the app's own declaration: the
+        // assistant never reads the screen). The panel shows it as "Current view" and sends the
+        // section and open data file with each turn.
+        router.afterEach((to) => {
+            var panels = document.querySelectorAll('[data-server-assistant]');
+            if (!panels.length) return;
+            var path = to.path || '/';
+            var m = path.match(/^\/(datafile|variables|variables-validation|data-explorer)\/([^/]+)$/);
+            var fileId = m ? decodeURIComponent(m[2]) : '';
+            var section;
+            if (m) {
+                var sectionNames = { datafile: 'Data file form', variables: 'Variables',
+                    'variables-validation': 'Variable validation', 'data-explorer': 'Data explorer (data values — not read by the assistant)' };
+                section = sectionNames[m[1]] + (fileId ? ' of data file ' + fileId : '');
+            } else {
+                var first = path.split('/').filter(Boolean)[0] || '';
+                var labels = { study: 'Study description', datafiles: 'Data files', publish: 'Publishing',
+                    'project-package': 'Project package', 'external-resources': 'External resources',
+                    'change-log': 'Change log', issues: 'Issues', import: 'Import options',
+                    'validation-report': 'Validation report', 'page-preview': 'Page preview', files: 'File manager' };
+                section = labels[first] || (first ? first.charAt(0).toUpperCase() + first.slice(1) : 'Project overview');
+            }
+            panels.forEach(function (panel) {
+                panel.dataset.section = section;
+                panel.dataset.dataFileId = fileId;
+                panel.dispatchEvent(new CustomEvent('pslm-route-change', { detail: { section: section, fileId: fileId }, bubbles: true }));
+            });
+        })
+
         var store = new Vuex.Store({
             state: {
                 user_has_edit_access:user_has_edit_access,
