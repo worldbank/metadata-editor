@@ -16,6 +16,8 @@ Vue.component('variables-validation', {
             actionLoading: false,
             actionError: '',
             confirmRemove: false,
+            removePreview: null,
+            removePreviewLoading: false,
             batchPrefix: 'V',
             renameLoading: false,
             activeTab: 0,
@@ -46,6 +48,10 @@ Vue.component('variables-validation', {
         },
         columnsInDbNotInCsvCount: function() {
             return this.columnsInDbNotInCsv.length;
+        },
+        removableCount: function() {
+            var p = this.removePreview;
+            return (p && p.status === 'ok' && p.removed) ? p.removed.length : 0;
         },
         hasSyncMismatch: function() {
             return this.columns_diff && !this.columns_diff.in_sync;
@@ -397,50 +403,58 @@ Vue.component('variables-validation', {
             }
             return name;
         },
+        removeUnmatchedRequest: function(dryRun) {
+            var url = CI.base_url + '/api/datafiles/remove_unmatched_variables/' + this.projectId;
+            return axios.post(url, { file_ids: [this.fid], dry_run: dryRun }).then(function(response) {
+                var results = (response.data && response.data.results) || [];
+                var r = results[0];
+                if (!r) throw new Error('No result');
+                if (r.status === 'failed') throw new Error(r.message || 'Failed');
+                return r;
+            });
+        },
+        errorMessage: function(err) {
+            if (err && err.response && err.response.data && err.response.data.message) return err.response.data.message;
+            if (err && err.message) return err.message;
+            return this.$t('failed') || 'Failed';
+        },
         removeFromMetadata: function() {
-            if (this.columnsInDbNotInCsvCount === 0) return;
-            this.confirmRemove = true;
+            var vm = this;
+            if (vm.columnsInDbNotInCsvCount === 0) return;
+            vm.confirmRemove = true;
+            vm.actionError = '';
+            vm.removePreview = null;
+            vm.removePreviewLoading = true;
+            vm.removeUnmatchedRequest(true)
+                .then(function(r) {
+                    vm.removePreview = r;
+                })
+                .catch(function(err) {
+                    vm.actionError = vm.errorMessage(err);
+                })
+                .then(function() {
+                    vm.removePreviewLoading = false;
+                });
         },
         confirmRemoveSubmit: function() {
             var vm = this;
             vm.actionLoading = true;
             vm.actionError = '';
-            vm.$store.dispatch('loadVariables', { dataset_id: vm.projectId, fid: vm.fid })
-                .then(function() {
-                    var vars = vm.$store.getters.getVariablesByFid(vm.fid);
-                    if (!Array.isArray(vars)) {
-                        vm.actionError = vm.$t('variables_not_loaded') || 'Variables not loaded';
-                        vm.actionLoading = false;
-                        return;
-                    }
-                    var namesToRemove = vm.columnsInDbNotInCsv;
-                    var uids = [];
-                    vars.forEach(function(v) {
-                        if (v.name && namesToRemove.indexOf(v.name) !== -1) {
-                            uids.push(v.uid);
-                        }
-                    });
-                    if (uids.length === 0) {
-                        vm.actionError = vm.$t('no_variables_to_remove') || 'No matching variables found';
-                        vm.actionLoading = false;
-                        return;
-                    }
-                    var url = CI.base_url + '/api/variables/delete/' + vm.projectId;
-                    return axios.post(url, { uid: uids });
-                })
-                .then(function(response) {
+            vm.removeUnmatchedRequest(false)
+                .then(function(r) {
                     vm.actionLoading = false;
                     vm.confirmRemove = false;
+                    vm.removePreview = null;
                     vm.$store.dispatch('loadVariables', { dataset_id: vm.projectId, fid: vm.fid }).then(function() {
                         vm.fetchValidation();
                     });
                     if (typeof EventBus !== 'undefined') {
-                        EventBus.$emit('onSuccess', (vm.$t('variables_removed') || 'Variables removed from metadata.'));
+                        EventBus.$emit('onSuccess', vm.$t('remove_unmatched_variables_done', { count: r.removed.length }));
                     }
                 })
                 .catch(function(err) {
                     vm.actionLoading = false;
-                    vm.actionError = (err.response && err.response.data && err.response.data.message) ? err.response.data.message : (vm.$t('failed') || 'Failed');
+                    vm.actionError = vm.errorMessage(err);
                     if (typeof EventBus !== 'undefined') {
                         EventBus.$emit('onFail', vm.actionError);
                     }
@@ -449,6 +463,7 @@ Vue.component('variables-validation', {
         cancelRemove: function() {
             this.confirmRemove = false;
             this.actionError = '';
+            this.removePreview = null;
         },
         reasonLabel: function(reason) {
             var labels = {
@@ -636,17 +651,42 @@ Vue.component('variables-validation', {
             </v-card>
 
             <!-- Confirm remove from metadata -->
-            <v-dialog v-model="confirmRemove" max-width="400" persistent>
+            <v-dialog v-model="confirmRemove" max-width="560" persistent scrollable>
                 <v-card>
-                    <v-card-title class="text-subtitle-1">{{ $t('remove') }}</v-card-title>
+                    <v-card-title class="text-subtitle-1">{{ $t('remove_unmatched_variables') }}</v-card-title>
                     <v-card-text>
-                        <p class="text-body-2">{{ $t('confirm_remove_variables', {count: columnsInDbNotInCsvCount}) || 'Remove ' + columnsInDbNotInCsvCount + ' variable(s) from metadata?' }}</p>
+                        <div v-if="removePreviewLoading" class="d-flex align-center py-3">
+                            <v-progress-circular indeterminate color="primary" size="24"></v-progress-circular>
+                            <span class="ml-3">{{ $t('loading') }}...</span>
+                        </div>
+                        <template v-else-if="removePreview">
+                            <p class="text-body-2">{{ $t('remove_unmatched_variables_help') }}</p>
+                            <div v-if="removePreview.status === 'skipped'" class="text-body-2 grey--text">
+                                {{ removePreview.message === 'no_csv' ? $t('unmatched_no_csv') : $t('unmatched_csv_unreadable') }}
+                            </div>
+                            <template v-else>
+                                <div v-if="removePreview.removed.length" class="text-body-2 mb-2">
+                                    <div class="font-weight-medium mb-1">{{ $t('variables_to_remove') }} ({{ removePreview.removed.length }})</div>
+                                    <code v-for="v in removePreview.removed" :key="'rm-' + v.uid" class="mr-1">{{ v.name }}</code>
+                                </div>
+                                <p v-else class="text-body-2">{{ $t('remove_unmatched_variables_none') }}</p>
+                                <div v-if="removePreview.skipped_case.length" class="text-caption warning--text mt-2">
+                                    {{ $t('unmatched_skipped_case') }}:
+                                    <span v-for="v in removePreview.skipped_case" :key="'sc-' + v.name" class="mr-2"><code>{{ v.name }}</code> ≈ <code>{{ v.csv_column }}</code></span>
+                                </div>
+                                <div v-if="removePreview.skipped_weight.length" class="text-caption warning--text mt-2">
+                                    {{ $t('unmatched_skipped_weight') }}:
+                                    <code v-for="v in removePreview.skipped_weight" :key="'sw-' + v.uid" class="mr-1">{{ v.name }}</code>
+                                </div>
+                            </template>
+                        </template>
                         <div v-if="actionError" class="alert alert-danger mt-2">{{ actionError }}</div>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn text @click="cancelRemove">{{ $t('cancel') || 'Cancel' }}</v-btn>
-                        <v-btn color="error" dark depressed :loading="actionLoading" @click="confirmRemoveSubmit">{{ $t('Remove') || 'Remove' }}</v-btn>
+                        <v-btn text @click="cancelRemove" :disabled="actionLoading">{{ removableCount > 0 ? ($t('cancel') || 'Cancel') : ($t('close') || 'Close') }}</v-btn>
+                        <v-btn v-if="!removePreviewLoading && removableCount > 0" color="error" dark depressed
+                            :loading="actionLoading" @click="confirmRemoveSubmit">{{ $t('remove_n_variables', { count: removableCount }) }}</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>

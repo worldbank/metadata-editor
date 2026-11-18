@@ -999,5 +999,35 @@ $lang['overlay_import_help']='Upload a translation overlay JSON file (format: ov
 $lang['overlay_help']='An overlay is a file of translated fields only: export the source overlay to translate offline, then import it as a language.';
 $lang['overlay_imported']='Overlay imported.';
 
+// Data files: variables not found in data
+$lang['variables_not_in_data_count']='{count} variable(s) not found in the data';
+$lang['data_file_csv_unreadable']='The data file could not be read';
+$lang['remove_unmatched_variables']='Remove variables not in data';
+$lang['remove_unmatched_variables_help']='These variables are documented in the metadata but no longer exist in the data file. Removing them deletes their metadata permanently.';
+$lang['remove_unmatched_variables_none']='None of the selected files have variables to remove.';
+$lang['remove_unmatched_variables_done']='{count} variable(s) removed.';
+$lang['unmatched_skipped_case']='Kept: name differs from a data column only by letter case (possible rename)';
+$lang['unmatched_skipped_weight']='Kept: used as a weight by another variable';
+$lang['unmatched_no_csv']='No data file';
+$lang['unmatched_csv_unreadable']='Data file could not be read';
+$lang['variables_to_remove']='Variables to remove';
+$lang['remove_n_variables']='Remove {count} variable(s)';
+$lang['unmatched_summary_remove']='{count} variable(s) will be removed from {files} file(s)';
+$lang['unmatched_summary_removed']='{count} variable(s) removed from {files} file(s)';
+$lang['unmatched_summary_kept']='{count} kept: {renames} possible rename(s), {weights} weight variable(s)';
+$lang['unmatched_failed_files']='Failed ({count})';
+$lang['unmatched_skipped_files']='Skipped ({count})';
+$lang['unmatched_filter_files']='Filter files';
+$lang['unmatched_only_kept']='Only files with kept variables';
+$lang['unmatched_col_remove']='Remove';
+$lang['unmatched_col_removed']='Removed';
+$lang['unmatched_col_kept']='Kept';
+$lang['unmatched_to_remove']='To remove';
+$lang['unmatched_possible_rename']='Kept, possible rename';
+$lang['unmatched_weight_variable']='Kept, used as a weight';
+$lang['unmatched_no_files_match_filter']='No files match the filter.';
+$lang['show_all_n']='Show all {count}';
+$lang['show_less']='Show less';
+
 /* End of file project_lang.php */
 /* Location: ./application/language/english/project_lang.php */

@@ -139,6 +139,89 @@ class Datafiles extends MY_REST_Controller
 	}
 
 	/**
+	 * Variables-vs-CSV status for every data file in a project (reads each CSV header row).
+	 *
+	 * GET api/datafiles/columns_sync/{sid}
+	 * Returns { columns_sync: { F1: {csv_exists, csv_readable, missing_count, extra_count, case_only_count}, ... } }
+	 */
+	function columns_sync_get($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, 'view', $this->api_user);
+
+			$output = array();
+			foreach ($this->Editor_datafile_model->list($sid) as $file_id) {
+				try {
+					$output[$file_id] = $this->Editor_datafile_model->get_columns_sync_summary($sid, $file_id);
+				} catch (Exception $e) {
+					$output[$file_id] = null;
+				}
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'columns_sync' => (object) $output
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage()
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Remove variables that are no longer in the data (CSV) for one or more data files.
+	 *
+	 * POST api/datafiles/remove_unmatched_variables/{sid}
+	 * Body: { "file_ids": ["F1","F2"], "dry_run": true|false }
+	 *
+	 * Variables whose name matches an unmatched CSV column ignoring case, and
+	 * variables still used as weights, are skipped and reported.
+	 */
+	function remove_unmatched_variables_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$options = (array) $this->raw_json_input();
+			$dry_run = !isset($options['dry_run']) || !empty($options['dry_run']);
+			$this->editor_acl->user_has_project_access($sid, $dry_run ? 'view' : 'edit', $this->api_user);
+
+			if (empty($options['file_ids']) || !is_array($options['file_ids'])) {
+				throw new Exception("`file_ids` is required and must be an array");
+			}
+
+			$results = array();
+			foreach (array_unique($options['file_ids']) as $file_id) {
+				$file_id = (string) $file_id;
+				try {
+					if (!$this->Editor_datafile_model->data_file_by_id($sid, $file_id)) {
+						$results[] = array('file_id' => $file_id, 'status' => 'failed', 'message' => 'Data file not found',
+							'removed' => array(), 'skipped_case' => array(), 'skipped_weight' => array());
+						continue;
+					}
+					$results[] = $this->Editor_datafile_model->remove_variables_not_in_csv($sid, $file_id, $dry_run);
+				} catch (Exception $e) {
+					$results[] = array('file_id' => $file_id, 'status' => 'failed', 'message' => $e->getMessage(),
+						'removed' => array(), 'skipped_case' => array(), 'skipped_weight' => array());
+				}
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'dry_run' => $dry_run,
+				'results' => $results
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage()
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Get invalid variable names (Stata/SPSS rules) for a data file.
 	 * GET api/datafiles/invalid_variable_names/{sid}/{file_id}
 	 */

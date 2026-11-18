@@ -535,7 +535,7 @@ class DataUtils
 	 * Detects delimiter and encoding; no-op when the file is already normalized.
 	 *
 	 * @param string $csv_path Absolute path to the CSV
-	 * @return array csv_normalization info (converted, source_delimiter, source_encoding, warnings, ...)
+	 * @return array|null csv_normalization info (converted, source_delimiter, source_encoding, warnings, ...); null if the data service does not support it
 	 * @throws Exception with FastAPI's message when the CSV cannot be parsed
 	 */
 	public function normalize_csv($csv_path)
@@ -562,14 +562,15 @@ class DataUtils
 			throw new Exception($message);
 		}
 
-		if (!isset($response['csv_normalization'])) {
-			// Older data service: /generate-csv returns {"error": "file not supported.csv"}
-			throw new Exception("Data service does not support CSV normalization. Update the data service (FastAPI).");
+		if (!isset($response['csv_normalization']) || !is_array($response['csv_normalization'])) {
+			// Older data service: /generate-csv returns {"error": "file not supported.csv"}.
+			// Continue without normalization (CSV is read as uploaded).
+			log_message('error', 'DataUtils::normalize_csv: data service does not support CSV normalization; '
+				. 'CSV used as uploaded. Update the data service (FastAPI). Response: ' . substr($body_raw, 0, 200));
+			return null;
 		}
 
-		return isset($response['csv_normalization']) && is_array($response['csv_normalization'])
-			? $response['csv_normalization']
-			: array();
+		return $response['csv_normalization'];
 	}
 
 	public function export_datafile_queue($sid,$file_id,$format,$export_options=null)

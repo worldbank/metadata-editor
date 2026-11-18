@@ -32,6 +32,24 @@ Vue.component('datafiles', {
                 file_physical_name:''
             },
             batch_export_dialog_show: false,
+            // Variables-vs-CSV status per file_id; kept here (not in the store) so
+            // other data file reloads can't overwrite it
+            columns_sync: {},
+            columns_sync_request: 0,
+            dialog_unmatched: {
+                show: false,
+                loading: false,
+                applying: false,
+                done: false,
+                results: [],
+                removed_count: 0,
+                error: '',
+                filter: '',
+                only_kept: false,
+                expanded: {},   // file_id => true
+                show_all: {},   // file_id => true (uncapped name list)
+                show_skipped: false
+            },
             dialog_sum_stats_options: {
                 show: false,
                 files: []  // [{file_id, file_name}] - 1 or more
@@ -512,6 +530,20 @@ Vue.component('datafiles', {
         },
         reloadDataFiles: async function(){
             await store.dispatch('loadDataFiles',{dataset_id:this.dataset_id});
+            await this.loadColumnsSync();
+        },
+        loadColumnsSync: async function(){
+            // Ignore responses from older requests if reloads overlap
+            let request_id = ++this.columns_sync_request;
+            try {
+                let response = await axios.get(CI.base_url + '/api/datafiles/columns_sync/' + this.dataset_id);
+                if (request_id !== this.columns_sync_request) return;
+                this.columns_sync = (response.data && response.data.columns_sync) || {};
+            } catch (e) {
+                if (request_id !== this.columns_sync_request) return;
+                console.error('Failed to load data file columns status', e);
+                this.columns_sync = {};
+            }
         },
         sleep: function(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -595,6 +627,100 @@ Vue.component('datafiles', {
             this.export_dialog.file_name = data_file.file_name;
             this.export_dialog.file_physical_name = data_file.file_physical_name || '';
             this.export_dialog.show = true;
+        },
+        // Warning text for a file whose variables don't all exist in the data ('' if none)
+        columnsSyncWarning: function(data_file){
+            let sync = data_file ? this.columns_sync[data_file.file_id] : null;
+            if (!sync || !sync.csv_exists) return '';
+            if (sync.csv_readable === false) return this.$t('data_file_csv_unreadable');
+            if (sync.missing_count > 0) return this.$t('variables_not_in_data_count', {count: sync.missing_count});
+            return '';
+        },
+        hasUnmatchedVariables: function(data_file){
+            let sync = data_file ? this.columns_sync[data_file.file_id] : null;
+            return !!(sync && sync.csv_exists && sync.csv_readable !== false && sync.missing_count > 0);
+        },
+        removeUnmatchedRequest: async function(dry_run){
+            let url = CI.base_url + '/api/datafiles/remove_unmatched_variables/' + this.dataset_id;
+            let response = await axios.post(url, {file_ids: this.unmatchedSelectedFiles, dry_run: dry_run});
+            return (response.data && response.data.results) || [];
+        },
+        unmatchedErrorMessage: function(e){
+            return (e.response && e.response.data && e.response.data.message) ? e.response.data.message : this.$t('failed');
+        },
+        openRemoveUnmatchedDialog: async function(){
+            let d = this.dialog_unmatched;
+            d.show = true;
+            d.loading = true;
+            d.applying = false;
+            d.done = false;
+            d.results = [];
+            d.removed_count = 0;
+            d.error = '';
+            d.filter = '';
+            d.only_kept = false;
+            d.expanded = {};
+            d.show_all = {};
+            d.show_skipped = false;
+            try {
+                d.results = await this.removeUnmatchedRequest(true);
+                this.expandUnmatchedDefaults();
+            } catch (e) {
+                d.error = this.unmatchedErrorMessage(e);
+            }
+            d.loading = false;
+        },
+        confirmRemoveUnmatched: async function(){
+            let d = this.dialog_unmatched;
+            d.applying = true;
+            d.error = '';
+            try {
+                d.results = await this.removeUnmatchedRequest(false);
+                this.expandUnmatchedDefaults();
+                d.removed_count = d.results.reduce((n, r) => n + (r.status === 'ok' ? r.removed.length : 0), 0);
+                d.done = true;
+                for (let r of d.results) {
+                    if (r.status === 'ok' && r.removed.length > 0) {
+                        await this.reloadDataFileVariables(r.file_id);
+                    }
+                }
+                await this.reloadDataFiles();
+                this.selected_files = [];
+                this.select_all_files = false;
+                if (typeof EventBus !== 'undefined') {
+                    EventBus.$emit('onSuccess', this.$t('remove_unmatched_variables_done', {count: d.removed_count}));
+                }
+            } catch (e) {
+                d.error = this.unmatchedErrorMessage(e);
+            }
+            d.applying = false;
+        },
+        // Expand files that need attention (kept variables); everything else stays collapsed
+        expandUnmatchedDefaults: function(){
+            let d = this.dialog_unmatched;
+            let expanded = {};
+            d.results.forEach(r => {
+                if (r.status === 'ok' && this.unmatchedKeptCount(r) > 0) expanded[r.file_id] = true;
+            });
+            d.expanded = expanded;
+        },
+        unmatchedKeptCount: function(r){
+            return (r.skipped_case ? r.skipped_case.length : 0) + (r.skipped_weight ? r.skipped_weight.length : 0);
+        },
+        toggleUnmatchedRow: function(file_id){
+            this.$set(this.dialog_unmatched.expanded, file_id, !this.dialog_unmatched.expanded[file_id]);
+        },
+        toggleUnmatchedShowAll: function(file_id){
+            this.$set(this.dialog_unmatched.show_all, file_id, !this.dialog_unmatched.show_all[file_id]);
+        },
+        unmatchedVisibleNames: function(r){
+            let names = r.removed.map(v => v.name);
+            if (this.dialog_unmatched.show_all[r.file_id]) return names;
+            return names.slice(0, this.unmatchedNameCap);
+        },
+        unmatchedFileName: function(file_id){
+            let f = this.data_files.find(x => x.file_id === file_id);
+            return f ? f.file_name : file_id;
         },
         openBatchExportDialog: function(){
             this.batch_export_dialog_show = true;
@@ -694,6 +820,62 @@ Vue.component('datafiles', {
                 .filter(f => this.selected_files.indexOf(f.file_id) !== -1 && (this.hasCsvFile(f.file_id) || f.store_data === 1))
                 .map(f => ({ file_id: f.file_id, file_name: f.file_name, file_physical_name: f.file_physical_name || '' }));
         },        
+        unmatchedSelectedFiles(){
+            if (!this.data_files.length || !this.selected_files.length) return [];
+            return this.data_files
+                .filter(f => this.selected_files.indexOf(f.file_id) !== -1 && this.hasUnmatchedVariables(f))
+                .map(f => f.file_id);
+        },
+        unmatchedRemoveCount(){
+            return this.dialog_unmatched.results.reduce((n, r) => n + (r.status === 'ok' ? r.removed.length : 0), 0);
+        },
+        unmatchedNameCap(){
+            return 30;
+        },
+        // Files with something to remove or keep; kept-first, then by file order
+        unmatchedActiveRows(){
+            let order = {};
+            this.data_files.forEach((f, i) => { order[f.file_id] = i; });
+            return this.dialog_unmatched.results
+                .filter(r => r.status === 'ok' && (r.removed.length > 0 || this.unmatchedKeptCount(r) > 0))
+                .slice()
+                .sort((a, b) => {
+                    let ka = this.unmatchedKeptCount(a) > 0 ? 0 : 1;
+                    let kb = this.unmatchedKeptCount(b) > 0 ? 0 : 1;
+                    if (ka !== kb) return ka - kb;
+                    return (order[a.file_id] || 0) - (order[b.file_id] || 0);
+                });
+        },
+        unmatchedFilteredRows(){
+            let d = this.dialog_unmatched;
+            let q = (d.filter || '').trim().toLowerCase();
+            return this.unmatchedActiveRows.filter(r => {
+                if (d.only_kept && this.unmatchedKeptCount(r) === 0) return false;
+                if (!q) return true;
+                return (r.file_id + ' ' + this.unmatchedFileName(r.file_id)).toLowerCase().indexOf(q) !== -1;
+            });
+        },
+        unmatchedSkippedRows(){
+            return this.dialog_unmatched.results.filter(r => r.status === 'skipped' || (r.status === 'ok' && r.removed.length === 0 && this.unmatchedKeptCount(r) === 0));
+        },
+        unmatchedFailedRows(){
+            return this.dialog_unmatched.results.filter(r => r.status === 'failed');
+        },
+        unmatchedSummary(){
+            let s = {files: 0, removed: 0, renames: 0, weights: 0};
+            this.dialog_unmatched.results.forEach(r => {
+                if (r.status !== 'ok') return;
+                if (r.removed.length > 0) s.files++;
+                s.removed += r.removed.length;
+                s.renames += r.skipped_case.length;
+                s.weights += r.skipped_weight.length;
+            });
+            s.kept = s.renames + s.weights;
+            return s;
+        },
+        unmatchedShowTools(){
+            return this.unmatchedActiveRows.length > 10;
+        },
         sumStatsBatchSelectedFiles(){
             if (!this.data_files.length || !this.selected_files.length) return [];
             return this.data_files
@@ -722,7 +904,8 @@ Vue.component('datafiles', {
                     <v-col md="8">
                     <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-danger mr-2" @click="batchDelete">{{$t("Delete")}} {{selected_files.length}} {{$t("selected")}}</button>
                     <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary mr-2" @click="openBatchExportDialog">{{$t("batch_export")}} ({{selected_files.length}})</button>
-                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary" :disabled="sumStatsBatchSelectedFiles.length===0" @click="openBatchSumStatsOptionsDialog">{{$t("summary_stats_options")}} ({{sumStatsBatchSelectedFiles.length}})</button>
+                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-primary mr-2" :disabled="sumStatsBatchSelectedFiles.length===0" @click="openBatchSumStatsOptionsDialog">{{$t("summary_stats_options")}} ({{sumStatsBatchSelectedFiles.length}})</button>
+                    <button v-if="unmatchedSelectedFiles.length>0" type="button" class="btn btn-sm btn-outline-warning" @click="openRemoveUnmatchedDialog">{{$t("remove_unmatched_variables")}} ({{unmatchedSelectedFiles.length}})</button>
 
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
@@ -751,8 +934,18 @@ Vue.component('datafiles', {
                         <td><v-icon class="handle" :disabled="sort_column !== null" :color="sort_column ? 'grey lighten-2' : ''">mdi-drag</v-icon></td>
                         <td><v-icon color="primary" >mdi-file-document</v-icon> {{row.file.file_id}}</td>
                         <td>
-                            <div style="cursor:pointer;color:#0D47A1;font-weight:500" @click="editFile(row.originalIndex)">
-                                {{row.file.file_name}}
+                            <div class="d-flex align-center">
+                                <div style="cursor:pointer;color:#0D47A1;font-weight:500" @click="editFile(row.originalIndex)">
+                                    {{row.file.file_name}}
+                                </div>
+                                <v-tooltip bottom v-if="columnsSyncWarning(row.file)">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-icon small color="warning" class="ml-2" v-bind="attrs" v-on="on"
+                                            style="cursor:pointer;"
+                                            @click="$router.push('/variables-validation/' + row.file.file_id)">mdi-alert</v-icon>
+                                    </template>
+                                    <span>{{columnsSyncWarning(row.file)}}</span>
+                                </v-tooltip>
                             </div>
                         </td>
                         <td class="text-secondary">{{dataFileSizeDisplay(row.file)}}</td>
@@ -1009,6 +1202,129 @@ Vue.component('datafiles', {
                 v-model="batch_export_dialog_show"
                 :selected-files="batchExportSelectedFiles">
             </dialog-batch-export>
+
+            <!-- Remove variables not in data (multi-file batch) -->
+            <v-dialog v-model="dialog_unmatched.show" max-width="760" persistent scrollable>
+                <v-card>
+                    <v-card-title class="text-h6 grey lighten-2">{{$t("remove_unmatched_variables")}}</v-card-title>
+                    <v-card-text class="pt-4" style="max-height:70vh;">
+                        <div v-if="dialog_unmatched.loading" class="d-flex align-center py-4">
+                            <v-progress-circular indeterminate color="primary" size="28"></v-progress-circular>
+                            <span class="ml-3">{{$t("loading")}}...</span>
+                        </div>
+                        <template v-else>
+                            <div v-if="dialog_unmatched.error" class="alert alert-danger">{{dialog_unmatched.error}}</div>
+                            <p v-if="!dialog_unmatched.done" class="text-body-2">{{$t("remove_unmatched_variables_help")}}</p>
+
+                            <!-- Summary -->
+                            <v-alert v-if="dialog_unmatched.results.length" dense outlined
+                                :type="dialog_unmatched.done ? 'success' : (unmatchedSummary.removed > 0 ? 'info' : 'warning')" class="mb-3">
+                                <div class="font-weight-medium">
+                                    <template v-if="dialog_unmatched.done">{{$t("unmatched_summary_removed", {count: unmatchedSummary.removed, files: unmatchedSummary.files})}}</template>
+                                    <template v-else-if="unmatchedSummary.removed > 0">{{$t("unmatched_summary_remove", {count: unmatchedSummary.removed, files: unmatchedSummary.files})}}</template>
+                                    <template v-else>{{$t("remove_unmatched_variables_none")}}</template>
+                                </div>
+                                <div v-if="unmatchedSummary.kept > 0" class="warning--text text--darken-2 mt-1">
+                                    <v-icon small color="warning">mdi-alert</v-icon>
+                                    {{$t("unmatched_summary_kept", {count: unmatchedSummary.kept, renames: unmatchedSummary.renames, weights: unmatchedSummary.weights})}}
+                                </div>
+                            </v-alert>
+
+                            <!-- Failed files -->
+                            <div v-if="unmatchedFailedRows.length" class="alert alert-danger py-2">
+                                <div class="font-weight-medium mb-1">{{$t("unmatched_failed_files", {count: unmatchedFailedRows.length})}}</div>
+                                <div v-for="r in unmatchedFailedRows" :key="'unf-' + r.file_id" class="text-body-2">
+                                    {{r.file_id}} — {{unmatchedFileName(r.file_id)}}: {{r.message}}
+                                </div>
+                            </div>
+
+                            <!-- Filter (many files only) -->
+                            <div v-if="unmatchedShowTools" class="d-flex align-center flex-wrap mb-2">
+                                <input type="text" v-model="dialog_unmatched.filter" class="form-control form-control-sm mr-3 mb-1" style="max-width:260px;" :placeholder="$t('unmatched_filter_files')">
+                                <label class="mb-1 text-body-2" style="cursor:pointer;" v-if="unmatchedSummary.kept > 0">
+                                    <input type="checkbox" v-model="dialog_unmatched.only_kept" class="mr-1"> {{$t("unmatched_only_kept")}}
+                                </label>
+                            </div>
+
+                            <!-- Per-file table -->
+                            <table v-if="unmatchedActiveRows.length" class="table table-sm mb-2">
+                                <thead>
+                                    <tr>
+                                        <th style="width:28px;"></th>
+                                        <th>{{$t("file")}}</th>
+                                        <th class="text-right" style="width:90px;">{{ dialog_unmatched.done ? $t("unmatched_col_removed") : $t("unmatched_col_remove") }}</th>
+                                        <th class="text-right" style="width:70px;">{{$t("unmatched_col_kept")}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="r in unmatchedFilteredRows">
+                                        <tr :key="'unr-' + r.file_id" style="cursor:pointer;" @click="toggleUnmatchedRow(r.file_id)">
+                                            <td><v-icon small>{{ dialog_unmatched.expanded[r.file_id] ? 'mdi-chevron-down' : 'mdi-chevron-right' }}</v-icon></td>
+                                            <td>
+                                                <span class="grey--text text--darken-1 mr-1">{{r.file_id}}</span>
+                                                <span style="word-break:break-all;">{{unmatchedFileName(r.file_id)}}</span>
+                                            </td>
+                                            <td class="text-right">{{r.removed.length}}</td>
+                                            <td class="text-right">
+                                                <span v-if="unmatchedKeptCount(r) > 0" class="warning--text text--darken-2">
+                                                    <v-icon x-small color="warning">mdi-alert</v-icon> {{unmatchedKeptCount(r)}}
+                                                </span>
+                                                <span v-else class="grey--text">—</span>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="dialog_unmatched.expanded[r.file_id]" :key="'und-' + r.file_id">
+                                            <td></td>
+                                            <td colspan="3" class="pt-0 pb-3" style="border-top:0;">
+                                                <div v-if="r.skipped_case.length" class="text-body-2 warning--text text--darken-2 mb-1">
+                                                    {{$t("unmatched_possible_rename")}}:
+                                                    <span v-for="v in r.skipped_case" :key="'sc-' + v.name" class="mr-2"><code>{{v.name}}</code> ≈ <code>{{v.csv_column}}</code></span>
+                                                </div>
+                                                <div v-if="r.skipped_weight.length" class="text-body-2 warning--text text--darken-2 mb-1">
+                                                    {{$t("unmatched_weight_variable")}}:
+                                                    <code v-for="v in r.skipped_weight" :key="'sw-' + v.uid" class="mr-1">{{v.name}}</code>
+                                                </div>
+                                                <div v-if="r.removed.length" class="text-body-2">
+                                                    <span class="grey--text text--darken-1">{{ dialog_unmatched.done ? $t("unmatched_col_removed") : $t("unmatched_to_remove") }}:</span>
+                                                    <code v-for="name in unmatchedVisibleNames(r)" :key="'rm-' + r.file_id + '-' + name" class="mr-1">{{name}}</code>
+                                                    <a v-if="r.removed.length > unmatchedNameCap" href="#" class="text-caption" @click.prevent.stop="toggleUnmatchedShowAll(r.file_id)">
+                                                        {{ dialog_unmatched.show_all[r.file_id] ? $t("show_less") : $t("show_all_n", {count: r.removed.length}) }}
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr v-if="unmatchedFilteredRows.length === 0">
+                                        <td colspan="4" class="text-body-2 grey--text">{{$t("unmatched_no_files_match_filter")}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Skipped files (no CSV, unreadable, nothing to do) -->
+                            <div v-if="unmatchedSkippedRows.length" class="text-body-2">
+                                <a href="#" class="grey--text text--darken-1" @click.prevent="dialog_unmatched.show_skipped = !dialog_unmatched.show_skipped">
+                                    <v-icon small>{{ dialog_unmatched.show_skipped ? 'mdi-chevron-down' : 'mdi-chevron-right' }}</v-icon>
+                                    {{$t("unmatched_skipped_files", {count: unmatchedSkippedRows.length})}}
+                                </a>
+                                <div v-if="dialog_unmatched.show_skipped" class="pl-5 pt-1">
+                                    <div v-for="r in unmatchedSkippedRows" :key="'uns-' + r.file_id" class="grey--text text--darken-1">
+                                        {{r.file_id}} — {{unmatchedFileName(r.file_id)}}:
+                                        {{ r.message==='no_csv' ? $t('unmatched_no_csv') : (r.message==='csv_unreadable' ? $t('unmatched_csv_unreadable') : $t('remove_unmatched_variables_none')) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click="dialog_unmatched.show=false" :disabled="dialog_unmatched.applying">{{ (dialog_unmatched.done || unmatchedRemoveCount===0) ? $t("close") : $t("cancel") }}</v-btn>
+                        <v-btn v-if="!dialog_unmatched.done && !dialog_unmatched.loading && unmatchedRemoveCount > 0"
+                            color="error" dark depressed
+                            :loading="dialog_unmatched.applying"
+                            @click="confirmRemoveUnmatched">{{$t("remove_n_variables", {count: unmatchedRemoveCount})}}</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
 
             <!-- Summary Stats Options Dialog (row action or multi-file batch) -->
             <dialog-datafiles-sum-stats-options

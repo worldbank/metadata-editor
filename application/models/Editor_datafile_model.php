@@ -480,6 +480,7 @@ class Editor_datafile_model extends CI_Model {
 			'columns_in_db_not_in_csv' => array(),
 			'in_sync' => true,
 			'csv_exists' => false,
+			'csv_readable' => true,
 		);
 
 		$csv_path = $this->get_file_csv_path($sid, $file_id);
@@ -501,6 +502,7 @@ class Editor_datafile_model extends CI_Model {
 			$empty_result['db_variable_names'] = $db_names;
 			$empty_result['csv_column_names'] = array();
 			$empty_result['in_sync'] = false;
+			$empty_result['csv_readable'] = false;
 			return $empty_result;
 		}
 
@@ -521,9 +523,110 @@ class Editor_datafile_model extends CI_Model {
 			'columns_in_db_not_in_csv' => $columns_in_db_not_in_csv,
 			'in_sync' => $in_sync,
 			'csv_exists' => true,
+			'csv_readable' => true,
 		));
 
 		return $result;
+	}
+
+	/**
+	 * Compact columns-vs-variables status for the data files listing.
+	 *
+	 * @return array csv_exists, csv_readable, missing_count, extra_count, case_only_count
+	 */
+	function get_columns_sync_summary($sid, $file_id)
+	{
+		$this->load->library('Datafile_columns_sync');
+		$diff = $this->get_columns_out_of_sync($sid, $file_id);
+		return Datafile_columns_sync::summarize($diff);
+	}
+
+	/**
+	 * Remove variables that are no longer in the data file's CSV.
+	 *
+	 * Skips variables whose name matches an unmatched CSV column ignoring case
+	 * (likely a rename), and variables used as weights by variables that are kept.
+	 *
+	 * @param int $sid Project ID
+	 * @param string $file_id Data file ID
+	 * @param bool $dry_run Only report what would be removed
+	 * @return array status, removed [{uid,name}], skipped_case, skipped_weight, message
+	 */
+	function remove_variables_not_in_csv($sid, $file_id, $dry_run = true)
+	{
+		$this->load->library('Datafile_columns_sync');
+		$this->load->model('Editor_variable_model');
+
+		$diff = $this->get_columns_out_of_sync($sid, $file_id);
+
+		$output = array(
+			'file_id' => $file_id,
+			'status' => 'ok',
+			'removed' => array(),
+			'skipped_case' => array(),
+			'skipped_weight' => array(),
+			'message' => '',
+		);
+
+		if (empty($diff['csv_exists'])) {
+			$output['status'] = 'skipped';
+			$output['message'] = 'no_csv';
+			return $output;
+		}
+		if (isset($diff['csv_readable']) && !$diff['csv_readable']) {
+			$output['status'] = 'skipped';
+			$output['message'] = 'csv_unreadable';
+			return $output;
+		}
+
+		$missing = $diff['columns_in_db_not_in_csv'];
+		if (empty($missing)) {
+			return $output;
+		}
+
+		$this->db->select('uid,name,var_wgt_id');
+		$this->db->where('sid', $sid);
+		$this->db->where('fid', $file_id);
+		$this->db->where_in('name', $missing);
+		$variables = $this->db->get('editor_variables')->result_array();
+
+		$weight_refs = array();
+		$uids = array_map('intval', array_column($variables, 'uid'));
+		if (!empty($uids)) {
+			$this->db->select('uid,var_wgt_id');
+			$this->db->where('sid', $sid);
+			$this->db->where_in('var_wgt_id', $uids);
+			foreach ($this->db->get('editor_variables')->result_array() as $row) {
+				$weight_refs[(int) $row['var_wgt_id']][] = (int) $row['uid'];
+			}
+		}
+
+		$plan = Datafile_columns_sync::plan_removal($variables, $missing, $diff['columns_to_remove_from_csv'], $weight_refs);
+		$output['removed'] = $plan['remove'];
+		$output['skipped_case'] = $plan['skipped_case'];
+		$output['skipped_weight'] = $plan['skipped_weight'];
+
+		if ($dry_run || empty($plan['remove'])) {
+			return $output;
+		}
+
+		$remove_uids = array_column($plan['remove'], 'uid');
+
+		$this->db->trans_start();
+		$this->db->where('sid', $sid);
+		$this->db->where('fid', $file_id);
+		$this->db->where_in('uid', $remove_uids);
+		$this->db->delete('editor_variables');
+
+		$this->load->model('Editor_variable_groups_model');
+		$this->Editor_variable_groups_model->remove_variable_uids($sid, $remove_uids);
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === false) {
+			throw new Exception('Failed to remove variables for file ' . $file_id);
+		}
+
+		return $output;
 	}
 
 	function get_tmp_file_info($sid,$fid,$type)
