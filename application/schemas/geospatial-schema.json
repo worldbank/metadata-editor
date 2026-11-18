@@ -979,6 +979,9 @@
 							"title": "Status",
 							"description": "Status of the dataset resource. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode) Progress codelist. Suggested values: {`completed`, `historicalArchive`, `obsolete`, `onGoing`, `planned`, `required`, `underDevelopment`, `final`, `pending`, `retired`, `superseded`, `tentative`, `valid`, `accepted`, `notAccepted`, `withdrawn`, `proposed`, `deprecated`}",
 							"type": "array",
+							"items": {
+								"type": "string"
+							},
 							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:status/gmd:MD_ProgressCode"
 						},
 						"pointOfContact": {
@@ -2089,7 +2092,7 @@
 									"isAbstract": {
 										"title": "Is abstract",
 										"description": "indicates if the feature type is abstract or not",
-										"type": "boolean"
+										"type": ["boolean", "string"]
 									},
 									"aliases": {
 										"title": "Alias(es)",

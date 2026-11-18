@@ -28,6 +28,13 @@ class ImportJsonMetadata
 
     private $import_stats = array();
 
+    /**
+     * Weight-variable references (VID) waiting to be resolved to UIDs. Kept across
+     * variable batches so a weight variable imported in a later batch still resolves.
+     * Each entry: ['sid' => int, 'uid' => int, 'fid' => string, 'vid_ref' => string, 'metadata' => array]
+     */
+    private $pending_weight_refs = array();
+
 	/**
 	 * Constructor
 	 */
@@ -63,6 +70,7 @@ class ImportJsonMetadata
             'variable_groups' => false,
             'geospatial' => null,
         );
+        $this->pending_weight_refs = array();
     }
 
     public function get_import_stats()
@@ -1372,19 +1380,109 @@ class ImportJsonMetadata
                 if (isset($variable[$field])){
                     unset($variable[$field]);
                 }
-            }            
-            
+            }
+
+            // Weight variable reference arrives as a VID; it is resolved to a UID after insert
+            $weight_vid_ref = $this->extract_weight_vid_reference($variable);
+
             $variable['metadata']=$variable;
 
             if ($variable_info){
                 $this->ci->Editor_variable_model->update($sid, $variable_info['uid'],$variable);
+                $saved_uid = $variable_info['uid'];
             }
             else{
                 //if not exists, insert
-                $this->ci->Editor_variable_model->insert($sid,$variable);
+                $saved_uid = $this->ci->Editor_variable_model->insert($sid,$variable);
+            }
+
+            if ($weight_vid_ref !== null && $saved_uid) {
+                $this->pending_weight_refs[] = array(
+                    'sid' => $sid,
+                    'uid' => $saved_uid,
+                    'fid' => $fid,
+                    'vid_ref' => $weight_vid_ref,
+                    'metadata' => $variable['metadata'],
+                );
             }
             $this->import_stats['variables_imported']++;
         }
+
+        $this->resolve_pending_weight_refs($sid);
+    }
+
+    /**
+     * Take the weight-variable reference (VID) out of an imported variable.
+     *
+     * Exported JSON carries var_wgt_id as the weight variable's VID. Legacy NADA data
+     * stored that VID in var_wgt instead (with var_is_wgt holding the DDI wgt flag);
+     * that form is converted so var_wgt is always the 0/1 "is a weight" flag.
+     *
+     * @param array $variable Variable metadata (modified: var_wgt_id removed, legacy var_wgt fixed)
+     * @return string|null Weight variable VID, or null when none
+     */
+    private function extract_weight_vid_reference(&$variable)
+    {
+        $vid_ref = null;
+
+        if (isset($variable['var_wgt']) && is_string($variable['var_wgt'])
+            && trim($variable['var_wgt']) !== '' && !is_numeric($variable['var_wgt'])) {
+            $vid_ref = trim($variable['var_wgt']);
+            $variable['var_wgt'] = (isset($variable['var_is_wgt']) && $variable['var_is_wgt'] === 'wgt') ? 1 : 0;
+        }
+
+        if (array_key_exists('var_wgt_id', $variable)) {
+            $raw = $variable['var_wgt_id'];
+            if (is_scalar($raw) && trim((string)$raw) !== '' && (string)$raw !== '0') {
+                $vid_ref = trim((string)$raw);
+            }
+            unset($variable['var_wgt_id']);
+        }
+
+        return $vid_ref;
+    }
+
+    /**
+     * Resolve pending weight references (VID -> UID within the same data file) for variables
+     * whose weight variable now exists. Unresolved entries stay pending for later batches.
+     */
+    private function resolve_pending_weight_refs($sid)
+    {
+        if (empty($this->pending_weight_refs)) {
+            return;
+        }
+
+        $vid_uid_by_fid = array(); // fid => [VID(upper) => uid]
+        $still_pending = array();
+
+        foreach ($this->pending_weight_refs as $p) {
+            if ((string)$p['sid'] !== (string)$sid) {
+                continue; // stale entry from another project
+            }
+
+            if (!isset($vid_uid_by_fid[$p['fid']])) {
+                $this->ci->db->select('vid, uid');
+                $this->ci->db->where('sid', $sid);
+                $this->ci->db->where('fid', $p['fid']);
+                $map = array();
+                foreach ($this->ci->db->get('editor_variables')->result_array() as $row) {
+                    $map[strtoupper(trim($row['vid']))] = (int)$row['uid'];
+                }
+                $vid_uid_by_fid[$p['fid']] = $map;
+            }
+
+            $key = strtoupper($p['vid_ref']);
+            if (!isset($vid_uid_by_fid[$p['fid']][$key])) {
+                $still_pending[] = $p;
+                continue;
+            }
+
+            $metadata = $p['metadata'];
+            $metadata['var_wgt_id'] = $vid_uid_by_fid[$p['fid']][$key];
+            $this->ci->Editor_variable_model->update($sid, $p['uid'], array('metadata' => $metadata));
+        }
+
+        $this->pending_weight_refs = $still_pending;
     }
 
     /**

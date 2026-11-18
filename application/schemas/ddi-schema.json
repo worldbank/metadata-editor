@@ -2,8 +2,8 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://ihsn.org/schemas/ddi2-codebook",
   "version": "0.0",
-  "title": "Survey Microdata Schema Draft",
-  "description": "Schema for Survey data type based on DDI 2.5",
+  "title": "Microdata schema",
+  "description": "Schema for Microdata based on DDI Codebook 2.5",
   "definitions": {
     "doc_desc": {
       "type": "object",
@@ -87,11 +87,6 @@
               "_ddi_xpath": "docDscr/citation/verStmt/notes"
             }
           }
-        },
-        "checksum": {
-          "title": "Checksum",
-          "description": "Checksum value for the document using SHA-256",
-          "type": "string"
         }
       }
     },

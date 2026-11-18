@@ -45,6 +45,11 @@
 			"description": "indicates whether the variable is a weight",
 			"default": 0
 		},
+		"var_wgt_id": {
+			"type": ["string", "integer"],
+			"title": "Weight variable",
+			"description": "Variable ID (vid) of the weight variable applied to this variable (DDI wgt-var), within the same data file. The editor stores an internal numeric ID and exports the vid."
+		},
 		"is_key": {
 			"type": "integer",
 			"title": "Is key variable",
