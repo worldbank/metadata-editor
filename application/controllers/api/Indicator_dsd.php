@@ -683,6 +683,17 @@ class Indicator_dsd extends MY_REST_Controller
 			$sid = $this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
 
+			// Finish a data import that completed after the user left the page (editors only).
+			$pending_import_job_id = null;
+			try {
+				$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+				$this->load->library('Indicator_csv_import');
+				$this->indicator_csv_import->finalize_pending($sid, $this->get_api_user_id());
+				$pending_import_job_id = $this->indicator_csv_import->pending_job_id($sid);
+			} catch (Throwable $e) {
+				$pending_import_job_id = null;
+			}
+
 			$this->load->model('Editor_project_dsd_model');
 			$this->load->library('Data_structure_util');
 			$this->load->model('Data_structure_model');
@@ -761,6 +772,7 @@ class Indicator_dsd extends MY_REST_Controller
 				'published_row_count' => $published_row_count !== null ? (int) $published_row_count : null,
 				'data_imported_at' => $data_imported_at !== null ? (int) $data_imported_at : null,
 				'import_ready' => count($import_blocked_reasons) === 0,
+				'pending_import_job_id' => $pending_import_job_id,
 				'import_blocked_reasons' => $import_blocked_reasons,
 				'structure_validation' => array(
 					'valid' => !empty($structure_validation['valid']),
@@ -784,6 +796,7 @@ class Indicator_dsd extends MY_REST_Controller
 	 * POST /api/indicator_dsd/data_upload_prepare/{sid}
 	 * multipart: file or upload_id; optional delimiter.
 	 * Does not require indicator_id_value or implied_freq_code (those are enforced on import).
+	 * The CSV is not rewritten: header names are normalized when FastAPI reads the file.
 	 */
 	function data_upload_prepare_post($sid = null)
 	{
@@ -791,25 +804,33 @@ class Indicator_dsd extends MY_REST_Controller
 			$sid = $this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
 
-			$ready = $this->Indicator_dsd_model->assert_ready_for_data_upload($sid, false, false);
-			$real_path = $this->save_indicator_csv_upload($sid);
-
 			$delimiter = $this->input->post('delimiter');
 			if ($delimiter === null || $delimiter === '' || strlen($delimiter) !== 1) {
 				$delimiter = ',';
 			}
-
 			$keep_extra = $this->parse_bool_request_flag($this->input->post('keep_extra_csv_columns'), false);
 
-			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
-			$this->load->library('Indicator_data_notes');
-			$generatable = Indicator_data_notes::generatable_footnote_columns(
-				$this->indicator_data_notes->get_footnote_columns($sid),
-				$this->Indicator_dsd_model->read_csv_header_names($real_path)
-			);
-			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected, $generatable);
+			$source = $this->resolve_indicator_csv_source();
+			$distinct_limit = 2000;
 
-			if (empty($validation['valid'])) {
+			$this->load->library('Indicator_csv_import');
+			$prep = $this->indicator_csv_import->prepare(
+				$sid,
+				$source['path'],
+				$source['is_php_upload'],
+				$delimiter,
+				$distinct_limit,
+				$this->get_api_user_id()
+			);
+			if ($source['upload_id'] !== '') {
+				$this->uploader->delete_upload($source['upload_id']);
+			}
+
+			$validation = $prep['validation'];
+			$expected = $prep['expected_columns'];
+			$ready = $prep['ready'];
+
+			if (empty($prep['valid'])) {
 				$this->set_response(array(
 					'status' => 'failed',
 					'headers_valid' => false,
@@ -822,20 +843,7 @@ class Indicator_dsd extends MY_REST_Controller
 				return;
 			}
 
-			$this->load->library('indicator_duckdb_service');
-			$distinct_limit = 2000;
-			$distinct = $this->indicator_duckdb_service->csv_distinct(
-				$sid,
-				$real_path,
-				$ready['indicator_column'],
-				$delimiter,
-				$distinct_limit
-			);
-
-			if (is_array($distinct) && !empty($distinct['error'])) {
-				throw new Exception(isset($distinct['message']) ? $distinct['message'] : 'Could not read indicator values from CSV');
-			}
-
+			$distinct = $prep['distinct'];
 			$indicator_values = array();
 			if (!empty($distinct['items']) && is_array($distinct['items'])) {
 				foreach ($distinct['items'] as $item) {
@@ -876,7 +884,9 @@ class Indicator_dsd extends MY_REST_Controller
 				}
 			}
 
-			$import_columns = $this->Indicator_dsd_model->build_csv_import_column_names($expected, $validation, $keep_extra);
+			$import_columns = array_map(function ($c) {
+				return $c['name'];
+			}, $this->Indicator_dsd_model->build_csv_select_columns($expected, $validation, $keep_extra));
 
 			$this->set_response(array(
 				'status' => 'success',
@@ -893,7 +903,7 @@ class Indicator_dsd extends MY_REST_Controller
 				'series_idno_in_csv' => $series_idno_in_csv,
 				'ignored_columns' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
 				'extra_in_csv' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
-				'csv_row_count' => isset($distinct['row_count']) ? (int) $distinct['row_count'] : null,
+				'csv_row_count' => isset($distinct['csv_row_count']) ? (int) $distinct['csv_row_count'] : null,
 			), REST_Controller::HTTP_OK);
 		} catch (Throwable $e) {
 			$this->set_response(array(
@@ -904,10 +914,13 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Replace project timeseries from prepared CSV for one indicator_id value.
+	 * Queue the import of the prepared CSV for the bound indicator_id value (FastAPI job).
 	 *
 	 * POST /api/indicator_dsd/data_upload_import/{sid}
-	 * JSON: optional { "wait": true|false (default true) } — uses bound indicator_id_value
+	 * JSON: optional { "wait": true|false (default true), "keep_extra_csv_columns", "implied_freq_code" }
+	 * wait=false returns job_id at once: poll GET /api/indicator_dsd/job/{sid}?job_id=, then
+	 * POST /api/indicator_dsd/data_upload_finalize/{sid} { job_id }. The editor UI uses wait=false.
+	 * wait=true polls and finalizes in this request (kept for API clients; avoid for very large files).
 	 */
 	function data_upload_import_post($sid = null)
 	{
@@ -924,113 +937,83 @@ class Indicator_dsd extends MY_REST_Controller
 					$this->get_api_user_id()
 				);
 			}
-			$ready = $this->Indicator_dsd_model->assert_ready_for_data_upload($sid);
-			$indicator_value = $ready['indicator_id_value'];
 
 			$wait = !isset($body['wait']) || filter_var($body['wait'], FILTER_VALIDATE_BOOLEAN);
-
-			$real_path = $this->indicator_staging_upload_realpath($sid);
-			if (!$real_path) {
-				throw new Exception('No prepared CSV found. Upload and validate a CSV first.');
-			}
-
 			$keep_extra = $this->parse_bool_request_flag(
 				isset($body['keep_extra_csv_columns']) ? $body['keep_extra_csv_columns'] : null,
 				false
 			);
-
-			// Fill missing note IDs from note text columns (may add the footnote column) before validation.
-			$this->load->library('Indicator_data_notes');
-			$generated_ids = $this->indicator_data_notes->generate_missing_ids(
-				$sid, $real_path, $ready['indicator_column'], $indicator_value
-			);
-
-			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
-			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
-			if (empty($validation['valid'])) {
-				$msg = isset($validation['message']) ? $validation['message'] : 'CSV is missing required data structure columns';
-				if (!empty($validation['missing_in_csv'])) {
-					$msg .= ' Missing: ' . implode(', ', $validation['missing_in_csv']);
-				}
-				throw new Exception($msg);
-			}
-
-			$import_columns = $this->Indicator_dsd_model->build_csv_import_column_names($expected, $validation, $keep_extra);
-
-			$csv_for_import = $this->Indicator_dsd_model->resolve_csv_path_for_fastapi_import(
-				$real_path,
-				$expected,
-				$keep_extra
-			);
-			$import_csv_path = $csv_for_import['path'];
-
 			$overrides = array();
 			if (!empty($body['implied_freq_code'])) {
 				$overrides['implied_freq_code'] = trim((string) $body['implied_freq_code']);
 			}
-			$time_spec = $this->Indicator_dsd_model->build_duckdb_promote_time_spec($sid, $overrides);
 
-			$this->load->library('indicator_duckdb_service');
-			$queue = $this->indicator_duckdb_service->timeseries_replace_from_csv_queue(
-				$sid,
-				$import_csv_path,
-				$import_columns,
-				$ready['indicator_column'],
-				$indicator_value,
-				$time_spec,
-				','
-			);
+			$user_id = $this->get_api_user_id();
+			$this->load->library('Indicator_csv_import');
+			$queued = $this->indicator_csv_import->queue_import($sid, $user_id, $keep_extra, $overrides);
 
-			if (is_array($queue) && !empty($queue['error'])) {
-				throw new Exception($this->format_fastapi_error_message(
-					$queue,
-					'FastAPI replace-from-csv request failed'
-				));
-			}
-			if (empty($queue['job_id'])) {
-				throw new Exception('FastAPI did not return job_id');
+			if (!$wait) {
+				$this->set_response(array(
+					'status' => 'success',
+					'job_id' => $queued['job_id'],
+					'indicator_value' => $queued['indicator_value'],
+					'message' => 'Import queued; poll GET /api/indicator_dsd/job/{sid}?job_id=, then POST data_upload_finalize/{sid}',
+				), REST_Controller::HTTP_OK);
+				return;
 			}
 
-			$job_id = $queue['job_id'];
-			$result = array(
-				'status' => 'success',
-				'job_id' => $job_id,
-				'indicator_value' => $indicator_value,
-			);
-
-			if ($wait) {
-				$poll = $this->indicator_duckdb_service->poll_job($job_id, 1800, 3);
-				$result['job'] = $poll;
-				if (!is_array($poll) || ($poll['status'] ?? '') !== 'done') {
-					$err = isset($poll['error']) ? $poll['error'] : 'Import did not complete';
-					throw new Exception($err);
-				}
-
-				$user_id = $this->get_api_user_id();
-				$row_count = $this->Indicator_dsd_model->extract_row_count_from_import_job($poll);
-				$finalize = $this->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
-				if (!empty($finalize['export_warning'])) {
-					$result['export_warning'] = $finalize['export_warning'];
-				}
-				$this->load->library('Indicator_data_notes');
-				$notes_report = $this->indicator_data_notes->process_after_data_import(
-					$sid, $real_path, $ready['indicator_column'], $indicator_value, $user_id, $generated_ids
-				);
-				if ($notes_report !== null) {
-					$result['data_notes'] = $notes_report;
-				}
-				$result['message'] = 'Timeseries data imported successfully';
-			} else {
-				$result['message'] = 'Replace-from-csv queued; poll GET /api/indicator_dsd/job/{sid}?job_id=';
-			}
-
-			$this->set_response($result, REST_Controller::HTTP_OK);
+			$result = $this->indicator_csv_import->wait_and_finalize($sid, $queued['job_id'], $user_id);
+			$this->respond_import_result($result);
 		} catch (Throwable $e) {
 			$this->set_response(array(
 				'status' => 'failed',
 				'message' => $e->getMessage(),
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * Finish an import job once FastAPI reports it done: publish state, archive data file, data notes.
+	 * Safe to call more than once.
+	 *
+	 * POST /api/indicator_dsd/data_upload_finalize/{sid}
+	 * JSON: { "job_id": "..." }
+	 * Returns status success (with row_count, export_warning?, data_notes?), running, or failed.
+	 */
+	function data_upload_finalize_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$body = (array) $this->raw_json_input();
+			$job_id = isset($body['job_id']) ? trim((string) $body['job_id']) : '';
+			if ($job_id === '') {
+				throw new Exception('job_id is required');
+			}
+
+			$this->load->library('Indicator_csv_import');
+			$result = $this->indicator_csv_import->finalize($sid, $job_id, $this->get_api_user_id());
+			$this->respond_import_result($result);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * @param array $result Indicator_csv_import::finalize() result
+	 */
+	protected function respond_import_result(array $result)
+	{
+		$status = isset($result['status']) ? $result['status'] : 'failed';
+		if ($status === 'failed') {
+			$this->set_response($result, REST_Controller::HTTP_BAD_REQUEST);
+			return;
+		}
+		$this->set_response($result, REST_Controller::HTTP_OK);
 	}
 
 	/**
@@ -1060,7 +1043,7 @@ class Indicator_dsd extends MY_REST_Controller
 			$indicator_id_value = $binding && isset($binding['indicator_id_value']) && trim((string) $binding['indicator_id_value']) !== ''
 				? trim((string) $binding['indicator_id_value']) : null;
 
-			$path = $this->save_indicator_csv_upload($sid, 'data/indicator_notes_upload.csv', false);
+			$path = $this->save_indicator_csv_upload($sid, 'data/indicator_notes_upload.csv');
 
 			$this->load->library('Indicator_data_notes');
 			$parsed = Indicator_data_notes::parse_notes_csv($path, $indicator_id_value, $delimiter);
@@ -1290,28 +1273,6 @@ class Indicator_dsd extends MY_REST_Controller
 
 
 	/**
-	 * @param array  $queue Result from indicator_duckdb_service (error branch)
-	 * @param string $fallback
-	 * @return string
-	 */
-	protected function format_fastapi_error_message(array $queue, $fallback = 'FastAPI request failed')
-	{
-		$raw = isset($queue['message']) ? trim((string) $queue['message']) : '';
-		if ($raw !== '' && $raw[0] === '{') {
-			$decoded = json_decode($raw, true);
-			if (is_array($decoded) && isset($decoded['detail'])) {
-				$detail = $decoded['detail'];
-				return is_string($detail) ? $detail : json_encode($detail);
-			}
-		}
-		if ($raw !== '') {
-			return $raw;
-		}
-
-		return $fallback;
-	}
-
-	/**
 	 * Parse boolean request flag (POST field or JSON body).
 	 *
 	 * @param mixed $value
@@ -1328,13 +1289,14 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Save uploaded CSV to project data/indicator_staging_upload.csv (rewrite headers for DuckDB).
+	 * Save an uploaded CSV (upload_id or multipart file) to a project path, unchanged. Used by notes import.
 	 *
-	 * @param int $sid
+	 * @param int    $sid
+	 * @param string $relative_path e.g. data/indicator_notes_upload.csv
 	 * @return string Absolute path
 	 * @throws Exception
 	 */
-	protected function save_indicator_csv_upload($sid, $relative_path = 'data/indicator_staging_upload.csv', $rewrite_headers = true)
+	protected function save_indicator_csv_upload($sid, $relative_path)
 	{
 		$upload_id_raw = $this->input->post('upload_id');
 		$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
@@ -1387,25 +1349,46 @@ class Indicator_dsd extends MY_REST_Controller
 			throw new Exception('Could not resolve CSV path');
 		}
 
-		if ($rewrite_headers) {
-			$this->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
-		}
-
 		return $real_path;
 	}
 
 	/**
-	 * @param int $sid
-	 * @return string|null Absolute path to data/indicator_staging_upload.csv when readable
+	 * CSV for data_upload_prepare: a completed resumable upload (upload_id) or a multipart file.
+	 * The file is moved (not copied) into the project by Indicator_csv_import::prepare().
+	 *
+	 * @return array path, is_php_upload, upload_id
+	 * @throws Exception
 	 */
-	protected function indicator_staging_upload_realpath($sid)
+	protected function resolve_indicator_csv_source()
 	{
-		$this->Editor_model->create_project_folder($sid);
-		$dest = $this->Editor_model->resolve_project_file_path($sid, 'data/indicator_staging_upload.csv');
-		if (!$dest || !is_file($dest) || !is_readable($dest)) {
-			return null;
+		$upload_id_raw = $this->input->post('upload_id');
+		$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
+		$has_file = isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name']);
+
+		if ($upload_id !== '' && $has_file) {
+			throw new Exception('Provide either a file upload or upload_id, not both');
 		}
 
-		return $this->Editor_model->resolve_absolute_file_path($dest);
+		if ($upload_id !== '') {
+			$this->load->library('Resumable_upload', null, 'uploader');
+			$this->uploader->assert_upload_access($upload_id, $this->get_api_user_id());
+			$completed = $this->uploader->get_completed_upload($upload_id);
+			if (!$completed) {
+				throw new Exception('Resumable upload not found or not yet complete');
+			}
+			if (strtolower(pathinfo($completed['filename'], PATHINFO_EXTENSION)) !== 'csv') {
+				throw new Exception('Only CSV files are supported');
+			}
+			return array('path' => $completed['file_path'], 'is_php_upload' => false, 'upload_id' => $upload_id);
+		}
+
+		if ($has_file) {
+			if (strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
+				throw new Exception('Only CSV files are supported');
+			}
+			return array('path' => $_FILES['file']['tmp_name'], 'is_php_upload' => true, 'upload_id' => '');
+		}
+
+		throw new Exception('CSV file is required');
 	}
 }

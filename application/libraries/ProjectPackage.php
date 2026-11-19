@@ -568,6 +568,13 @@ class ProjectPackage
 			return true;
 		}
 
+		// Indicator import working files: per-upload staging CSVs and import state.
+		if (preg_match('/^indicator_staging_[0-9a-f]+\.csv$/', $basename_only)
+			|| $basename_only === 'indicator_import_state.json'
+			|| $basename_only === 'indicator_import_state.lock') {
+			return true;
+		}
+
 		if ($basename_only === '.DS_Store' || $basename_only === 'Thumbs.db') {
 			return true;
 		}

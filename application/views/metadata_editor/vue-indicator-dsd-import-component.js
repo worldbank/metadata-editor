@@ -208,6 +208,9 @@ Vue.component('indicator-dsd-import', {
                 .then(function(res) {
                     vm.binding = res.data || {};
                     vm.applyBindingContext(vm.binding);
+                    if (vm.binding.pending_import_job_id) {
+                        vm.resumePendingImport(vm.binding.pending_import_job_id);
+                    }
                 })
                 .catch(function() {
                     vm.binding = { bound: false, column_count: 0 };
@@ -423,6 +426,103 @@ Vue.component('indicator-dsd-import', {
                     }
                 });
         },
+        /**
+         * Poll the FastAPI import job (via the editor proxy), then finalize it.
+         * Resolves with the finalize result (status success); rejects on failure.
+         */
+        waitForImportJob: function(jobId) {
+            var vm = this;
+            var started = Date.now();
+            var base = CI.base_url + '/api/indicator_dsd/';
+            return new Promise(function(resolve, reject) {
+                function later(fn) {
+                    if (vm._isDestroyed) {
+                        return;
+                    }
+                    setTimeout(fn, 3000);
+                }
+                function finalize() {
+                    vm.importStatus = 'Finishing import…';
+                    vm.importProgress = 90;
+                    axios.post(base + 'data_upload_finalize/' + vm.dataset_id, { job_id: jobId })
+                        .then(function(res) {
+                            var d = res.data || {};
+                            if (d.status === 'running') {
+                                later(poll);
+                                return;
+                            }
+                            if (d.status !== 'success') {
+                                reject(new Error(d.message || 'Import failed'));
+                                return;
+                            }
+                            resolve(d);
+                        })
+                        .catch(reject);
+                }
+                function poll() {
+                    axios.get(base + 'job/' + vm.dataset_id, { params: { job_id: jobId } })
+                        .then(function(res) {
+                            var job = (res.data && res.data.job) || {};
+                            if (job.status === 'queued' || job.status === 'processing') {
+                                var secs = Math.round((Date.now() - started) / 1000);
+                                var elapsed = secs >= 60 ? Math.floor(secs / 60) + 'm ' + (secs % 60) + 's' : secs + 's';
+                                vm.importStatus = (job.status === 'queued' ? 'Waiting to start import… ' : 'Importing data… ') + '(' + elapsed + ')';
+                                vm.importProgress = Math.min(85, 30 + Math.floor(secs / 6));
+                                later(poll);
+                                return;
+                            }
+                            // Done, failed or not found: finalize reports the outcome.
+                            finalize();
+                        })
+                        .catch(function() {
+                            later(poll);
+                        });
+                }
+                poll();
+            });
+        },
+        onImportFinished: function(d) {
+            this.importProgress = 100;
+            this.importStatus = 'Import complete.';
+            if (typeof EventBus !== 'undefined') {
+                var successMsg = 'Indicator data imported successfully';
+                if (d.export_warning) {
+                    successMsg += ' (archive CSV export: ' + d.export_warning + ')';
+                }
+                EventBus.$emit('onSuccess', successMsg);
+            }
+            this.onImportComplete(d);
+        },
+        /** An import started earlier is still running (page reopened): keep waiting for it. */
+        resumePendingImport: function(jobId) {
+            var vm = this;
+            if (!jobId || vm.loading) {
+                return;
+            }
+            vm.loading = true;
+            vm.errors = [];
+            vm.importStatus = 'Importing data…';
+            vm.importProgress = 30;
+            vm.waitForImportJob(jobId)
+                .then(function(d) {
+                    vm.onImportFinished(d);
+                })
+                .catch(function(err) {
+                    var d = err.response && err.response.data ? err.response.data : {};
+                    var msg = d.message || err.message || 'Import failed';
+                    vm.errors = [msg];
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onFail', msg);
+                    }
+                })
+                .then(function() {
+                    vm.loading = false;
+                    if (vm.importProgress < 100) {
+                        vm.importStatus = '';
+                        vm.importProgress = 0;
+                    }
+                });
+        },
         importData: function() {
             var vm = this;
             if (!vm.csvValidated) {
@@ -441,10 +541,10 @@ Vue.component('indicator-dsd-import', {
 
             vm.ensureIndicatorIdSaved()
                 .then(function() {
-                    vm.importStatus = 'Importing data…';
-                    vm.importProgress = 60;
+                    vm.importStatus = 'Starting import…';
+                    vm.importProgress = 20;
                     var importBody = {
-                        wait: true,
+                        wait: false,
                         keep_extra_csv_columns: !!vm.keepExtraCsvColumns
                     };
                     if (vm.needsImpliedFreq && vm.impliedFreqCode) {
@@ -454,19 +554,13 @@ Vue.component('indicator-dsd-import', {
                 })
                 .then(function(res) {
                     var d = res.data || {};
-                    if (d.status !== 'success') {
+                    if (d.status !== 'success' || !d.job_id) {
                         throw new Error(d.message || 'Import failed');
                     }
-                    vm.importProgress = 100;
-                    vm.importStatus = 'Import complete.';
-                    if (typeof EventBus !== 'undefined') {
-                        var successMsg = 'Indicator data imported successfully';
-                        if (d.export_warning) {
-                            successMsg += ' (archive CSV export: ' + d.export_warning + ')';
-                        }
-                        EventBus.$emit('onSuccess', successMsg);
-                    }
-                    vm.onImportComplete(d);
+                    return vm.waitForImportJob(d.job_id);
+                })
+                .then(function(d) {
+                    vm.onImportFinished(d);
                 })
                 .catch(function(err) {
                     if (err && err.message === 'empty') {

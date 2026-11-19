@@ -482,6 +482,33 @@ class Indicator_data_notes {
 	public static function generate_ids_in_csv($csv_path, array $footnote_columns, $indicator_column, $indicator_id_value, array $existing_notes, $delimiter = ',')
 	{
 		$out = array('generated' => array(), 'reused' => 0, 'added_columns' => array());
+
+		// Check the header first: without note text columns there is nothing to generate, so skip reading the rows.
+		$fh = @fopen($csv_path, 'r');
+		if (!$fh) {
+			throw new Exception('Could not read data CSV');
+		}
+		$first = fgetcsv($fh, 0, $delimiter, '"', '\\');
+		fclose($fh);
+		if (!$first) {
+			return $out;
+		}
+		$first[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $first[0]);
+		$first_idx = array();
+		foreach ($first as $i => $h) {
+			$first_idx[strtoupper(trim((string) $h))] = $i;
+		}
+		$has_text = false;
+		foreach ($footnote_columns as $fc) {
+			if (self::text_columns_for($first_idx, strtoupper($fc)) !== null) {
+				$has_text = true;
+				break;
+			}
+		}
+		if (!$has_text) {
+			return $out;
+		}
+
 		$rows = self::read_csv_rows($csv_path, $delimiter);
 		if (empty($rows)) {
 			return $out;
@@ -600,6 +627,176 @@ class Indicator_data_notes {
 	}
 
 	/**
+	 * Footnote columns of a header list with their note text columns (for the FastAPI import job).
+	 *
+	 * @param string[] $footnote_columns DSD footnote column names
+	 * @param string[] $csv_headers normalized CSV header names
+	 * @return array [ { column, text_columns: string[], positions: int[] } ] (text columns in position order)
+	 */
+	public static function note_column_specs(array $footnote_columns, array $csv_headers)
+	{
+		$idx = array();
+		foreach ($csv_headers as $i => $h) {
+			$idx[strtoupper(trim((string) $h))] = $i;
+		}
+		$out = array();
+		foreach ($footnote_columns as $fc) {
+			$tc = self::text_columns_for($idx, strtoupper($fc));
+			if ($tc === null) {
+				continue;
+			}
+			$names = array();
+			$positions = array();
+			foreach ($tc['columns'] as $pos => $i) {
+				$names[] = (string) $csv_headers[$i];
+				$positions[] = (int) $pos;
+			}
+			$out[] = array('column' => (string) $fc, 'text_columns' => $names, 'positions' => $positions);
+		}
+		return $out;
+	}
+
+	/**
+	 * Notes from distinct (note ID cell, note text cells) tuples returned by the import job.
+	 * Same rules as extract_notes_from_data_csv(); also lists note texts that have no ID.
+	 *
+	 * @param array $note_tuples job result note_tuples: [ { column, text_columns[], rows: [ {id, texts[], count} ], truncated } ]
+	 * @param array $specs note_column_specs() for the same header (gives text positions)
+	 * @return array { notes[], text_columns{}, skipped_multi_id, conflicts[], missing_ids: [ {column, note, rows} ], truncated[] }
+	 */
+	public static function extract_notes_from_tuples(array $note_tuples, array $specs)
+	{
+		$out = array('notes' => array(), 'text_columns' => array(), 'skipped_multi_id' => 0, 'conflicts' => array(),
+			'missing_ids' => array(), 'truncated' => array());
+		$positions_by_column = array();
+		foreach ($specs as $spec) {
+			$positions_by_column[strtoupper($spec['column'])] = $spec;
+		}
+
+		$by_id = array();
+		$missing = array();
+		foreach ($note_tuples as $group) {
+			$column = isset($group['column']) ? (string) $group['column'] : '';
+			$spec = isset($positions_by_column[strtoupper($column)]) ? $positions_by_column[strtoupper($column)] : null;
+			if ($spec === null) {
+				continue;
+			}
+			$out['text_columns'][$column] = implode(', ', $spec['text_columns']);
+			if (!empty($group['truncated'])) {
+				$out['truncated'][] = $column;
+			}
+			foreach ((isset($group['rows']) && is_array($group['rows']) ? $group['rows'] : array()) as $row) {
+				$count = isset($row['count']) ? max(1, (int) $row['count']) : 1;
+				$texts = array();
+				$values = isset($row['texts']) && is_array($row['texts']) ? array_values($row['texts']) : array();
+				foreach ($spec['positions'] as $k => $pos) {
+					$texts[$pos] = isset($values[$k]) ? (string) $values[$k] : '';
+				}
+				$ids = self::split_ids_positional(isset($row['id']) ? $row['id'] : '');
+				$paired = self::pair_cell($ids, $texts);
+				if (!empty($ids) && $paired['skipped']) {
+					$out['skipped_multi_id'] += $count;
+					continue;
+				}
+				foreach ($paired['pairs'] as $pair) {
+					if ($pair['id'] !== null) {
+						self::collect_note($by_id, $out['conflicts'], array('id' => $pair['id'], 'note' => $pair['note'], 'column' => $column));
+						continue;
+					}
+					$key = $column . "\n" . self::normalize_text($pair['note']);
+					if (!isset($missing[$key])) {
+						$missing[$key] = array('column' => $column, 'note' => self::normalize_text($pair['note']), 'rows' => 0);
+					}
+					$missing[$key]['rows'] += $count;
+				}
+			}
+		}
+		$out['notes'] = array_values($by_id);
+		$out['missing_ids'] = array_values($missing);
+		return $out;
+	}
+
+	/**
+	 * After a FastAPI import: save notes read from the data and check references, using the job's note tuples.
+	 * Note IDs are not generated during import; texts without an ID are reported as a warning.
+	 * Never throws: problems are returned as warnings so the data import result is not affected.
+	 *
+	 * @param int        $sid
+	 * @param array|null $note_tuples job result note_tuples (null when no footnote column had text columns)
+	 * @param array      $specs note_column_specs() used for the import
+	 * @param int|null   $user_id
+	 * @return array|null
+	 */
+	public function process_after_import_tuples($sid, $note_tuples, array $specs, $user_id = null)
+	{
+		try {
+			$columns = $this->get_footnote_columns($sid);
+			$existing = $this->get_notes($sid);
+			if (empty($columns) && empty($existing)) {
+				return null;
+			}
+
+			$report = array('from_data_csv' => null);
+			$notes = $existing;
+			if (!empty($columns) && is_array($note_tuples) && !empty($specs)) {
+				$extracted = self::extract_notes_from_tuples($note_tuples, $specs);
+				$merge = array('added' => array(), 'updated' => array(), 'unchanged' => array());
+				if (!empty($extracted['notes'])) {
+					$merge = self::merge_notes($existing, $extracted['notes'], false);
+					if (!empty($merge['added']) || !empty($merge['updated'])) {
+						$this->save_notes($sid, $merge['notes'], $user_id);
+					}
+					$notes = $merge['notes'];
+				}
+				if (!empty($extracted['text_columns'])) {
+					$report['from_data_csv'] = array(
+						'text_columns' => $extracted['text_columns'],
+						'added' => $merge['added'],
+						'updated' => $merge['updated'],
+						'unchanged' => $merge['unchanged'],
+						'skipped_multi_id' => $extracted['skipped_multi_id'],
+						'conflicts' => $extracted['conflicts'],
+					);
+				}
+
+				$warnings = array();
+				if (!empty($extracted['missing_ids'])) {
+					$rows = 0;
+					$texts = array();
+					foreach ($extracted['missing_ids'] as $m) {
+						$rows += $m['rows'];
+						if (count($texts) < 10) {
+							$texts[] = '"' . $m['note'] . '"';
+						}
+					}
+					$warnings[] = $rows . ' row(s) have note text but no note ID, so the note is not linked to those cells: '
+						. implode(', ', $texts) . (count($extracted['missing_ids']) > 10 ? ', …' : '')
+						. '. Add the note IDs to the data file and import it again.';
+				}
+				if (!empty($extracted['truncated'])) {
+					$warnings[] = 'Too many different note values in column(s) ' . implode(', ', $extracted['truncated'])
+						. '; notes were read only partly.';
+				}
+				if (!empty($warnings)) {
+					$report['generated_ids'] = array(
+						'generated' => array(),
+						'reused' => 0,
+						'added_columns' => array(),
+						'warning' => implode(' ', $warnings),
+					);
+				}
+			}
+
+			$report['checks'] = $this->check_references($sid, $notes);
+			$report['notes_count'] = count($notes);
+			return $report;
+		} catch (Throwable $e) {
+			log_message('error', 'Data notes processing failed sid=' . (int) $sid . ': ' . $e->getMessage());
+			return array('warning' => 'Data notes could not be processed: ' . $e->getMessage());
+		}
+	}
+
+	/**
 	 * Footnote columns that may be absent from a data CSV because their IDs will be generated from a text column.
 	 *
 	 * @param string[] $footnote_columns
@@ -619,29 +816,6 @@ class Indicator_data_notes {
 			}
 		}
 		return $out;
-	}
-
-	/**
-	 * Instance wrapper: generate missing IDs in a staging CSV for a bound project. Never throws.
-	 *
-	 * @return array|null report, or null when the DSD has no footnote columns with text columns in the file
-	 */
-	public function generate_missing_ids($sid, $csv_path, $indicator_column, $indicator_id_value)
-	{
-		try {
-			$columns = $this->get_footnote_columns($sid);
-			if (empty($columns)) {
-				return null;
-			}
-			$report = self::generate_ids_in_csv($csv_path, $columns, $indicator_column, $indicator_id_value, $this->get_notes($sid));
-			if (empty($report['generated']) && empty($report['reused']) && empty($report['added_columns'])) {
-				return null;
-			}
-			return $report;
-		} catch (Throwable $e) {
-			log_message('error', 'Note ID generation failed sid=' . (int) $sid . ': ' . $e->getMessage());
-			return array('warning' => 'Note IDs could not be generated: ' . $e->getMessage());
-		}
 	}
 
 	/**
@@ -743,62 +917,6 @@ class Indicator_data_notes {
 		}
 
 		return array('errors' => $errors, 'warnings' => $warnings, 'unknown' => $unknown, 'unused' => $unused, 'wrong_column' => $wrong);
-	}
-
-	/**
-	 * Load notes from the data CSV after a data import, save new/changed notes and check references.
-	 * Never throws: problems are returned as warnings so the data import result is not affected.
-	 *
-	 * @param int    $sid
-	 * @param string $csv_path staging CSV (all columns)
-	 * @param string $indicator_column
-	 * @param string $indicator_id_value
-	 * @param int|null $user_id
-	 * @return array|null null when the DSD has no footnote columns and the project has no notes
-	 */
-	public function process_after_data_import($sid, $csv_path, $indicator_column, $indicator_id_value, $user_id = null, $generated = null)
-	{
-		try {
-			$columns = $this->get_footnote_columns($sid);
-			$existing = $this->get_notes($sid);
-			if (empty($columns) && empty($existing)) {
-				return null;
-			}
-
-			$report = array('from_data_csv' => null);
-			$notes = $existing;
-			if (!empty($columns) && $csv_path) {
-				$extracted = self::extract_notes_from_data_csv($csv_path, $columns, $indicator_column, $indicator_id_value);
-				if (!empty($extracted['notes'])) {
-					$merge = self::merge_notes($existing, $extracted['notes'], false);
-					if (!empty($merge['added']) || !empty($merge['updated'])) {
-						$this->save_notes($sid, $merge['notes'], $user_id);
-					}
-					$notes = $merge['notes'];
-					$report['from_data_csv'] = array(
-						'text_columns' => $extracted['text_columns'],
-						'added' => $merge['added'],
-						'updated' => $merge['updated'],
-						'unchanged' => $merge['unchanged'],
-						'skipped_multi_id' => $extracted['skipped_multi_id'],
-						'conflicts' => $extracted['conflicts'],
-					);
-				} elseif (!empty($extracted['text_columns'])) {
-					$report['from_data_csv'] = array('text_columns' => $extracted['text_columns'], 'added' => array(), 'updated' => array(),
-						'unchanged' => array(), 'skipped_multi_id' => $extracted['skipped_multi_id'], 'conflicts' => array());
-				}
-			}
-
-			if ($generated !== null) {
-				$report['generated_ids'] = $generated;
-			}
-			$report['checks'] = $this->check_references($sid, $notes);
-			$report['notes_count'] = count($notes);
-			return $report;
-		} catch (Throwable $e) {
-			log_message('error', 'Data notes processing failed sid=' . (int) $sid . ': ' . $e->getMessage());
-			return array('warning' => 'Data notes could not be processed: ' . $e->getMessage());
-		}
 	}
 
 	/** 'table' or 'cell' (default) for a data_notes entry. */

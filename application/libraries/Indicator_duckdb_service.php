@@ -565,108 +565,52 @@ class Indicator_duckdb_service {
 	 * @param int $limit
 	 * @return array
 	 */
-	public function csv_distinct($sid, $csv_path, $column, $delimiter = ',', $limit = 3000)
+	public function csv_distinct($sid, $csv_path, $column, $delimiter = ',', $limit = 3000, $column_names = null)
 	{
 		$url = $this->base_url . 'timeseries/indicators/csv/distinct';
-		$client = new Client(array('timeout' => 120));
+		// One DuckDB scan of the file; large CSVs can take a few minutes on slow disks.
+		$client = new Client(array('timeout' => 600));
 
-		try {
-			$response = $client->request('GET', $url, array(
-				'query' => array(
-					'project_id' => (string) (int) $sid,
-					'csv_path' => $csv_path,
-					'column' => $column,
-					'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
-					'limit' => (int) $limit,
-				),
-			));
-
-			return json_decode($response->getBody()->getContents(), true);
-		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
-
-			return array(
-				'error' => true,
-				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
-			);
-		}
-	}
-
-	/**
-	 * Validate CSV header set matches expected DSD column names exactly (case-insensitive).
-	 * Prefer Indicator_dsd_model::validate_csv_headers_for_dsd() for import (allows extra CSV columns).
-	 *
-	 * @param int $sid
-	 * @param string $csv_path
-	 * @param string[] $expected_column_names
-	 * @param string $delimiter
-	 * @return array
-	 */
-	public function csv_validate_headers($sid, $csv_path, array $expected_column_names, $delimiter = ',')
-	{
-		$url = $this->base_url . 'timeseries/indicators/csv/validate-headers';
-		$client = new Client(array('timeout' => 60));
-
-		try {
-			$response = $client->request('GET', $url, array(
-				'query' => array(
-					'project_id' => (string) (int) $sid,
-					'csv_path' => $csv_path,
-					'expected_columns' => implode(',', array_map('strval', $expected_column_names)),
-					'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
-				),
-			));
-
-			return json_decode($response->getBody()->getContents(), true);
-		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
-
-			return array(
-				'error' => true,
-				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
-			);
-		}
-	}
-
-	/**
-	 * Replace project timeseries from CSV (validate headers, filter by indicator_value). Returns job_id.
-	 *
-	 * @param int $sid
-	 * @param string $csv_path
-	 * @param string[] $expected_column_names
-	 * @param string $indicator_column
-	 * @param string $indicator_value
-	 * @param array|null $time_spec
-	 * @param string $delimiter
-	 * @return array
-	 */
-	public function timeseries_replace_from_csv_queue(
-		$sid,
-		$csv_path,
-		array $expected_column_names,
-		$indicator_column,
-		$indicator_value,
-		$time_spec = null,
-		$delimiter = ','
-	) {
-		$url = $this->base_url . 'timeseries/indicators/timeseries/replace-from-csv-queue';
-		$body = array(
+		$query = array(
 			'project_id' => (string) (int) $sid,
 			'csv_path' => $csv_path,
+			'column' => $column,
 			'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
-			'expected_columns' => array_map(function ($name) {
-				return array('name' => (string) $name);
-			}, $expected_column_names),
-			'indicator_column' => $indicator_column,
-			'indicator_value' => (string) $indicator_value,
+			'limit' => (int) $limit,
 		);
-		if (is_array($time_spec) && !empty($time_spec['time_column'])) {
-			$body['time_spec'] = $time_spec;
+		if (is_array($column_names) && !empty($column_names)) {
+			// Normalized names contain only letters, digits, '_' and '-', so a comma list is safe.
+			$query['column_names'] = implode(',', $column_names);
 		}
+
+		try {
+			$response = $client->request('GET', $url, array(
+				'query' => $query,
+			));
+
+			return json_decode($response->getBody()->getContents(), true);
+		}
+		catch (RequestException $e) {
+			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
+
+			return array(
+				'error' => true,
+				'message' => $raw,
+				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
+			);
+		}
+	}
+
+	/**
+	 * Queue replace-from-csv with the full request body (column renames/selection, note columns,
+	 * archive export, file snapshot). See FastAPI IndicatorReplaceFromCsvRequest.
+	 *
+	 * @param array $body
+	 * @return array job_id or error envelope
+	 */
+	public function timeseries_import_csv_queue(array $body)
+	{
+		$url = $this->base_url . 'timeseries/indicators/timeseries/replace-from-csv-queue';
 
 		return $this->post_json($url, $body);
 	}

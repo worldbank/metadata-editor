@@ -127,6 +127,59 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
+     * Normalize raw CSV header cells to DuckDB-safe, case-insensitively unique names
+     * (same names the old in-place header rewrite produced).
+     *
+     * @param array $raw_names
+     * @return string[]
+     */
+    public function normalize_csv_header_names(array $raw_names)
+    {
+        return $this->normalize_csv_column_names($raw_names);
+    }
+
+    /**
+     * Columns for FastAPI replace-from-csv select_columns: [ {name, source} ].
+     * DSD columns read from their matching CSV column (source null when an optional column is absent);
+     * with $keep_extra_columns, extra CSV columns are appended under their own name.
+     *
+     * @param string[] $expected_column_names Normalized DSD column names
+     * @param array    $validation Result of validate_headers_for_dsd()
+     * @param bool     $keep_extra_columns
+     * @return array
+     */
+    public function build_csv_select_columns(array $expected_column_names, array $validation, $keep_extra_columns = false)
+    {
+        $csv_headers = isset($validation['csv_columns']) && is_array($validation['csv_columns'])
+            ? $validation['csv_columns']
+            : array();
+        $out = array();
+        $matched = array();
+
+        foreach ($expected_column_names as $exp) {
+            $source = null;
+            foreach ($csv_headers as $idx => $hdr) {
+                if (empty($matched[$idx]) && $this->mapping_csv_column_matches_header($exp, $hdr)) {
+                    $source = $hdr;
+                    $matched[$idx] = true;
+                    break;
+                }
+            }
+            $out[] = array('name' => $exp, 'source' => $source);
+        }
+
+        if ($keep_extra_columns) {
+            foreach ($csv_headers as $idx => $hdr) {
+                if (empty($matched[$idx])) {
+                    $out[] = array('name' => $hdr, 'source' => $hdr);
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Whether a mapping csvColumn refers to a physical header after rewrite (exact or same sanitized token).
      *
      * @param string $mapping_csv_col Value from import UI
@@ -148,73 +201,16 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Rewrite first CSV line to FastAPI-safe headers (for staging upload / DuckDB import).
+     * Validate CSV header names (normalized) contain all DSD columns. Extra CSV columns are allowed and
+     * reported as ignored; missing optional columns are reported as generated_columns.
      *
-     * @param string $csv_file_path Absolute path
-     * @return string[] Normalized header names
-     * @throws Exception
+     * @param string[] $csv_headers
+     * @param string[] $expected_column_names
+     * @param string[] $optional_column_names
+     * @return array
      */
-    public function rewrite_indicator_csv_headers_for_duckdb($csv_file_path)
+    public function validate_headers_for_dsd(array $csv_headers, array $expected_column_names, array $optional_column_names = array())
     {
-        if (!is_readable($csv_file_path)) {
-            throw new Exception('CSV file is not readable');
-        }
-
-        return $this->rewrite_csv_with_normalized_headers($csv_file_path);
-    }
-
-    /**
-     * Read normalized header names from the first row of a CSV (after DuckDB rewrite).
-     *
-     * @param string $csv_file_path Absolute path
-     * @return string[]
-     * @throws Exception
-     */
-    public function read_csv_header_names($csv_file_path)
-    {
-        if (!is_readable($csv_file_path)) {
-            throw new Exception('CSV file is not readable');
-        }
-
-        $in = @fopen($csv_file_path, 'rb');
-        if ($in === false) {
-            throw new Exception('Failed to read CSV file');
-        }
-
-        $raw_first_line = fgets($in);
-        fclose($in);
-
-        if ($raw_first_line === false) {
-            throw new Exception('CSV file has no header row');
-        }
-
-        $first_line_stripped = rtrim($raw_first_line, "\r\n");
-        $headers = str_getcsv($first_line_stripped);
-        if (empty($headers)) {
-            throw new Exception('CSV file has no header row');
-        }
-
-        $out = array();
-        foreach ($headers as $header) {
-            $name = trim((string) $header);
-            if ($name !== '') {
-                $out[] = $name;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
-     * Validate CSV contains all DSD columns. Extra CSV columns are allowed and reported as ignored.
-     *
-     * @param string   $csv_path Absolute path (headers should already be rewritten for DuckDB)
-     * @param string[] $expected_column_names Normalized DSD column names
-     * @return array valid, missing_in_csv, ignored_columns, extra_in_csv, csv_columns, expected_columns, message?
-     */
-    public function validate_csv_headers_for_dsd($csv_path, array $expected_column_names, array $optional_column_names = array())
-    {
-        $csv_headers = $this->read_csv_header_names($csv_path);
         $expected = $this->normalize_duckdb_staging_column_names($expected_column_names);
         $optional = array_map('strtoupper', $this->normalize_duckdb_staging_column_names($optional_column_names));
 
@@ -267,137 +263,6 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Rewrite CSV in place keeping only columns defined in the DSD (streaming; safe for large files).
-     *
-     * @param string   $csv_file_path Absolute path (headers should already be rewritten for DuckDB)
-     * @param string[] $expected_column_names Normalized DSD column names
-     * @return array ignored_columns, columns_kept
-     * @throws Exception
-     */
-    public function trim_csv_to_dsd_columns($csv_file_path, array $expected_column_names)
-    {
-        if (!is_readable($csv_file_path)) {
-            throw new Exception('CSV file is not readable');
-        }
-
-        $expected = $this->normalize_duckdb_staging_column_names($expected_column_names);
-        $csv_headers = $this->read_csv_header_names($csv_file_path);
-
-        $column_indices = array();
-        $output_headers = array();
-        foreach ($expected as $exp) {
-            $found_idx = null;
-            foreach ($csv_headers as $idx => $hdr) {
-                if ($this->mapping_csv_column_matches_header($exp, $hdr)) {
-                    $found_idx = $idx;
-                    break;
-                }
-            }
-            if ($found_idx === null) {
-                throw new Exception('CSV is missing required data structure column: ' . $exp);
-            }
-            $column_indices[] = $found_idx;
-            $output_headers[] = $exp;
-        }
-
-        $matched = array();
-        foreach ($column_indices as $idx) {
-            $matched[$idx] = true;
-        }
-        $ignored = array();
-        foreach ($csv_headers as $idx => $hdr) {
-            if (empty($matched[$idx])) {
-                $ignored[] = $hdr;
-            }
-        }
-
-        $in = @fopen($csv_file_path, 'rb');
-        if ($in === false) {
-            throw new Exception('Failed to read CSV file');
-        }
-
-        $raw_first_line = fgets($in);
-        if ($raw_first_line === false) {
-            fclose($in);
-            throw new Exception('CSV file has no header row');
-        }
-
-        $tmp_path = $csv_file_path . '.trim_' . uniqid('', true);
-        $out = @fopen($tmp_path, 'wb');
-        if ($out === false) {
-            fclose($in);
-            throw new Exception('Failed to write trimmed CSV file');
-        }
-
-        fwrite($out, $this->csv_line_from_values($output_headers) . "\n");
-
-        while (($row = fgetcsv($in)) !== false) {
-            if ($row === array(null) || ($row === false)) {
-                continue;
-            }
-            $out_row = array();
-            foreach ($column_indices as $idx) {
-                $out_row[] = isset($row[$idx]) ? $row[$idx] : '';
-            }
-            if (count(array_filter($out_row, function ($v) {
-                return trim((string) $v) !== '';
-            })) === 0) {
-                continue;
-            }
-            fwrite($out, $this->csv_line_from_values($out_row) . "\n");
-        }
-
-        fclose($in);
-        fclose($out);
-
-        if (!@rename($tmp_path, $csv_file_path)) {
-            @unlink($tmp_path);
-            throw new Exception('Failed to replace CSV with trimmed version');
-        }
-
-        return array(
-            'ignored_columns' => $ignored,
-            'columns_kept' => $output_headers,
-        );
-    }
-
-    /**
-     * Path for FastAPI replace-from-csv: full staging file, or a DSD-only copy when extras are omitted.
-     * FastAPI rejects CSV files that contain columns outside expected_columns ("extra in CSV").
-     * indicator_staging_upload.csv is never modified; a sibling indicator_staging_import.csv is trimmed instead
-     * (kept on disk until the next import so async FastAPI jobs can read it).
-     *
-     * @param string   $staging_csv_path Absolute path to indicator_staging_upload.csv
-     * @param string[] $expected_column_names Normalized DSD column names
-     * @param bool     $keep_extra_columns
-     * @return array path (string)
-     * @throws Exception
-     */
-    public function resolve_csv_path_for_fastapi_import($staging_csv_path, array $expected_column_names, $keep_extra_columns = false)
-    {
-        $staging_csv_path = $this->Editor_model->resolve_absolute_file_path($staging_csv_path);
-        if (!$staging_csv_path) {
-            throw new Exception('Could not resolve staging CSV path');
-        }
-
-        if ($keep_extra_columns) {
-            return array('path' => $staging_csv_path);
-        }
-
-        $dir = dirname($staging_csv_path);
-        $import_csv = $dir . '/indicator_staging_import.csv';
-        if (!@copy($staging_csv_path, $import_csv)) {
-            throw new Exception('Could not copy staging CSV for import');
-        }
-
-        $this->trim_csv_to_dsd_columns($import_csv, $expected_column_names);
-
-        $import_path = $this->Editor_model->resolve_absolute_file_path($import_csv);
-
-        return array('path' => $import_path ?: $import_csv);
-    }
-
-    /**
      * Normalize header names for optional dsd_columns passed to draft-queue (same rules as file rewrite).
      *
      * @param string[] $names
@@ -412,141 +277,6 @@ class Indicator_dsd_model extends CI_Model {
 
         return $out;
     }
-
-    /**
-     * Find length of the first CSV line in content (respects quoted fields with commas/newlines).
-     *
-     * @param string $content Full file content
-     * @return array [length of first line including line ending, line ending string]
-     */
-    private function find_first_csv_line_length($content)
-    {
-        $len = strlen($content);
-        $in_quotes = false;
-        $i = 0;
-        while ($i < $len) {
-            $c = $content[$i];
-            if ($c === '"') {
-                if ($in_quotes && $i + 1 < $len && $content[$i + 1] === '"') {
-                    $i += 2;
-                    continue;
-                }
-                $in_quotes = !$in_quotes;
-                $i++;
-                continue;
-            }
-            if (!$in_quotes && ($c === "\n" || $c === "\r")) {
-                $line_end_len = ($c === "\r" && $i + 1 < $len && $content[$i + 1] === "\n") ? 2 : 1;
-                return array($i + $line_end_len, substr($content, $i, $line_end_len));
-            }
-            $i++;
-        }
-        return array($len, "\n");
-    }
-
-    /**
-     * Build a single CSV line from values (quotes values that contain comma, quote, or newline).
-     *
-     * @param array $values
-     * @return string
-     */
-    private function csv_line_from_values($values)
-    {
-        $out = array();
-        foreach ($values as $v) {
-            $v = (string) $v;
-            if (strpbrk($v, ",\"\r\n") !== false) {
-                $v = '"' . str_replace('"', '""', $v) . '"';
-            }
-            $out[] = $v;
-        }
-        return implode(',', $out);
-    }
-
-    /**
-     * Rewrite only the first line of the CSV with FastAPI-safe column names (invalid chars -> underscores).
-     * Rest of the file is unchanged. Faster than re-writing the entire file.
-     *
-     * @param string $csv_file_path Path to the CSV file
-     * @return array Normalized headers (same length as original)
-     */
-    private function rewrite_csv_with_normalized_headers($csv_file_path)
-    {
-        $in = @fopen($csv_file_path, 'rb');
-        if ($in === false) {
-            throw new Exception('Failed to read CSV file');
-        }
-
-        // Read the first line only — keep memory usage O(1) regardless of file size.
-        $raw_first_line = fgets($in);
-        if ($raw_first_line === false) {
-            fclose($in);
-            throw new Exception('CSV file has no header row');
-        }
-
-        // Detect and preserve the original line ending.
-        if (substr($raw_first_line, -2) === "\r\n") {
-            $line_ending = "\r\n";
-        } elseif (substr($raw_first_line, -1) === "\r") {
-            $line_ending = "\r";
-        } else {
-            $line_ending = "\n";
-        }
-        $first_line_stripped = rtrim($raw_first_line, "\r\n");
-
-        $headers = str_getcsv($first_line_stripped);
-        if (empty($headers)) {
-            fclose($in);
-            throw new Exception('CSV file has no header row');
-        }
-
-        $normalized_headers = $this->normalize_csv_column_names($headers);
-        $new_first_line     = $this->csv_line_from_values($normalized_headers);
-
-        // If nothing changed we can skip the rewrite entirely.
-        if ($new_first_line === $first_line_stripped) {
-            fclose($in);
-            return $normalized_headers;
-        }
-
-        // Stream-write to a temp file next to the original, then atomically replace it.
-        $tmp_path = $csv_file_path . '.rewrite_' . uniqid('', true);
-        $out = @fopen($tmp_path, 'wb');
-        if ($out === false) {
-            fclose($in);
-            throw new Exception('Failed to create temp file for CSV header rewrite');
-        }
-
-        fwrite($out, $new_first_line . $line_ending);
-
-        while (!feof($in)) {
-            $chunk = fread($in, 65536);
-            if ($chunk !== false && $chunk !== '') {
-                fwrite($out, $chunk);
-            }
-        }
-
-        fclose($in);
-        fclose($out);
-
-        if (!rename($tmp_path, $csv_file_path)) {
-            @unlink($tmp_path);
-            throw new Exception('Failed to replace CSV with normalised header version');
-        }
-
-        return $normalized_headers;
-    }
-
-    /**
-     * Filter CSV to only rows where indicator_id column matches project IDNO (case-insensitive).
-     * Overwrites the file with header + matching rows only, so the stored CSV stays clean.
-     *
-     * @param string $csv_file_path Path to the CSV file (with normalized headers)
-     * @param string $indicator_id_column CSV column name for indicator_id
-     * @param string $project_idno Project indicator IDNO to keep
-     * @return int Number of rows kept
-     * @throws Exception if no rows match or file cannot be written
-     */
 
     /**
      * Default FREQ code per time_period_format when no user FREQ column (from config indicator_dsd.php).
@@ -1616,41 +1346,6 @@ class Indicator_dsd_model extends CI_Model {
         $result['skipped'] = false;
 
         return $result;
-    }
-
-    /**
-     * After DuckDB import: remove stale archive, export from DuckDB, register datafile.
-     *
-     * @param int $sid
-     * @param int|null $user_id
-     * @param int|null $row_count Optional row count from import job (fallback when export job omits it)
-     * @return array
-     * @throws Exception
-     */
-    public function finalize_indicator_data_import($sid, $user_id = null, $row_count = null)
-    {
-        // DuckDB is the source of truth; record publish state before CSV archive export.
-        $this->record_published_data_import($sid, $row_count);
-
-        try {
-            $export = $this->regenerate_indicator_csv_from_duckdb($sid, $user_id);
-            if ($row_count === null && isset($export['row_count'])) {
-                $this->record_published_data_import($sid, $export['row_count']);
-            }
-
-            return $export;
-        } catch (Exception $e) {
-            log_message(
-                'error',
-                'Indicator CSV archive export failed after DuckDB import sid=' . (int) $sid . ': ' . $e->getMessage()
-            );
-
-            return array(
-                'path' => null,
-                'row_count' => $row_count,
-                'export_warning' => $e->getMessage(),
-            );
-        }
     }
 
     /**
@@ -2929,55 +2624,6 @@ class Indicator_dsd_model extends CI_Model {
         }
 
         return $this->normalize_duckdb_staging_column_names($names);
-    }
-
-    /**
-     * Column names to pass to DuckDB replace-from-csv (staging CSV may still contain extra columns).
-     * When $keep_extra_columns is false (default), returns DSD columns only — FastAPI should not load extras.
-     * When true, appends extra CSV columns (normalized) after DSD columns in CSV header order.
-     *
-     * @param string[] $expected_column_names Normalized DSD column names
-     * @param array    $validation Result from validate_csv_headers_for_dsd()
-     * @param bool     $keep_extra_columns
-     * @return string[]
-     */
-    public function build_csv_import_column_names(array $expected_column_names, array $validation, $keep_extra_columns = false)
-    {
-        if (!$keep_extra_columns) {
-            return $expected_column_names;
-        }
-
-        $csv_headers = isset($validation['csv_columns']) && is_array($validation['csv_columns'])
-            ? $validation['csv_columns']
-            : array();
-        $seen = array();
-        $out = array();
-
-        foreach ($expected_column_names as $exp) {
-            $out[] = $exp;
-            $seen[$exp] = true;
-        }
-
-        foreach ($csv_headers as $hdr) {
-            $matched_dsd = false;
-            foreach ($expected_column_names as $exp) {
-                if ($this->mapping_csv_column_matches_header($exp, $hdr)) {
-                    $matched_dsd = true;
-                    break;
-                }
-            }
-            if ($matched_dsd) {
-                continue;
-            }
-            $norm = $this->normalize_csv_header_token($hdr);
-            if ($norm === '' || isset($seen[$norm])) {
-                continue;
-            }
-            $out[] = $norm;
-            $seen[$norm] = true;
-        }
-
-        return $out;
     }
 
     /**
