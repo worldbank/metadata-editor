@@ -7,37 +7,70 @@
  */
 class Geospatial_processor {
 
-    private $allowed_extensions = array(
-        'shp', 'shx', 'dbf', 'prj', 'xml', 'cpg', 'txt', 'sbn', 'sbx',  // Shapefile components
-        'qmd', 'qpj',               // QGIS metadata and projection files
-        'gpkg',                      // GeoPackage
-        'geojson', 'json',           // GeoJSON
-        'kml', 'kmz',               // KML/KMZ
-        'gpx',                      // GPS Exchange Format
-        'csv',                      // CSV with coordinates
-        'tiff', 'geotiff', 'tif',   // GeoTIFF
-        'nc', 'hdf', 'hdf5',        // NetCDF and HDF
-        'grib', 'grb',              // GRIB (meteorological)
-        'jpg', 'jpeg', 'png',       // Image formats
-        'img', 'ecw', 'sid',        // ERDAS, ECW, MrSID
-        'jp2',                      // JPEG2000
-        'asc', 'dem',               // ASCII Grid, DEM
-        'bil', 'bip', 'bsq',        // Band Interleaved formats
-        'dt0', 'dt1', 'dt2',         // DTED formats
-        'xsl'
+    /**
+     * Raster formats that can be processed standalone (opened with GDAL).
+     */
+    private $raster_extensions = array(
+        'tif', 'tiff', 'geotiff',           // GeoTIFF
+        'jpg', 'jpeg', 'png', 'jp2',        // Image formats, JPEG2000
+        'img', 'ecw', 'sid',                // ERDAS, ECW, MrSID
+        'nc', 'nc4',                        // NetCDF
+        'hdf', 'hdf5', 'h5', 'he5',         // HDF4/HDF5, HDF-EOS5
+        'grib', 'grb',                      // GRIB (meteorological)
+        'asc', 'dem',                       // ASCII Grid, DEM
+        'bil', 'bip', 'bsq',                // Band interleaved (need .hdr)
+        'dt0', 'dt1', 'dt2',                // DTED
+        'vrt',                              // GDAL virtual raster
+    );
+
+    /**
+     * Vector formats that can be processed standalone (opened with OGR/Fiona).
+     */
+    private $vector_extensions = array(
+        'shp',                              // Shapefile
+        'gpkg',                             // GeoPackage
+        'geojson', 'json', 'topojson',      // GeoJSON / TopoJSON
+        'kml', 'kmz',                       // KML/KMZ
+        'gpx',                              // GPS Exchange Format
+        'csv',                              // CSV with coordinates
+        'gml',                              // GML
+        'fgb',                              // FlatGeobuf
+        'tab', 'mif',                       // MapInfo TAB / MIF
+        'dxf',                              // AutoCAD DXF
+        'osm', 'pbf',                       // OpenStreetMap
+    );
+
+    /**
+     * Companion files: kept next to a primary file, never processed on their own.
+     */
+    private $companion_extensions = array(
+        // Shapefile
+        'shx', 'dbf', 'prj', 'cpg', 'cst', 'sbn', 'sbx',
+        'qix', 'fix', 'atx', 'aih', 'ain', 'ixs', 'mxs',
+        // Raster headers, world files, overviews, auxiliary data
+        'hdr', 'tfw', 'tifw', 'tiffw', 'jgw', 'jpgw', 'pgw', 'pngw',
+        'j2w', 'sdw', 'eww', 'wld', 'aux', 'rrd', 'ovr', 'ige',
+        'msk', 'clr', 'stx',
+        // MapInfo
+        'dat', 'map', 'id', 'ind', 'mid',
+        // GML schema
+        'xsd',
+        // Metadata (e.g. .shp.xml, .aux.xml), QGIS metadata/projection
+        'xml', 'qmd', 'qpj',
+        // Styles
+        'sld', 'qml', 'lyr', 'lyrx', 'xsl',
+    );
+
+    /**
+     * Documentation that often ships with geospatial data (readmes, codebooks).
+     * Extracted but never processed. HTML is deliberately excluded because
+     * project files live under the web root.
+     */
+    private $documentation_extensions = array(
+        'txt', 'md', 'pdf', 'rtf', 'doc', 'docx', 'odt', 'xls', 'xlsx', 'ods',
     );
 
     private $required_shapefile_extensions = array('shp', 'shx', 'dbf');
-    
-    private $shapefile_associated_extensions = array('shx', 'dbf', 'prj', 'xml', 'cpg', 'sbn', 'sbx', 'shp.xml', 'txt', 'qmd', 'qpj');
-    
-    // Extensions that are primary geospatial formats (can be processed standalone)
-    private $primary_geospatial_extensions = array(
-        'shp', 'gpkg', 'geojson', 'json', 'kml', 'kmz', 'gpx', 'csv',
-        'tif', 'tiff', 'geotiff', 'jpg', 'jpeg', 'png', 'img', 'hdf',
-        'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem',
-        'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2'
-    );
 
     function __construct()
     {
@@ -45,15 +78,70 @@ class Geospatial_processor {
     }
 
     /**
-     * Check if a file is a shapefile associated file (should be skipped during processing)
-     * 
-     * @param string $file_name File name to check
-     * @return bool True if file should be skipped
+     * Lower-cased last extension of a file name.
      */
-    private function is_shapefile_associated_file($file_name)
+    private function get_extension($file_name)
     {
-        $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        return in_array($extension, $this->shapefile_associated_extensions);
+        return strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+    }
+
+    /**
+     * Whether a file may be extracted from an uploaded archive.
+     * Anything not on this allowlist is skipped (never written to disk).
+     *
+     * @param string $file_name File name to check
+     * @return bool
+     */
+    public function is_allowed_file($file_name)
+    {
+        $extension = $this->get_extension($file_name);
+        return $this->is_primary_geospatial_file($file_name)
+            || in_array($extension, $this->companion_extensions)
+            || in_array($extension, $this->documentation_extensions);
+    }
+
+    /**
+     * Whether a file is a raster format (by extension).
+     *
+     * @param string $file_name File name to check
+     * @return bool
+     */
+    public function is_raster_file($file_name)
+    {
+        return in_array($this->get_extension($file_name), $this->raster_extensions);
+    }
+
+    /**
+     * Archive entry name reduced to a safe flat file name: folders removed
+     * (both / and \ separators), empty and dot names rejected.
+     *
+     * @param string $entry_name Name as stored in the ZIP
+     * @return string|false Flat file name, or false if unusable
+     */
+    private function flat_entry_name($entry_name)
+    {
+        $name = basename(str_replace('\\', '/', $entry_name));
+        if ($name === '' || $name === '.' || $name === '..') {
+            return false;
+        }
+        return $name;
+    }
+
+    /**
+     * Whether an archive entry is a directory or OS metadata to ignore silently
+     * (directories, __MACOSX/, AppleDouble ._ files, .DS_Store, Thumbs.db).
+     */
+    private function is_ignored_entry($entry_name)
+    {
+        $normalized = str_replace('\\', '/', $entry_name);
+        if (substr($normalized, -1) === '/') {
+            return true;
+        }
+        $base = basename($normalized);
+        return strpos($normalized, '__MACOSX/') === 0
+            || strpos($base, '._') === 0
+            || $base === '.DS_Store'
+            || strcasecmp($base, 'Thumbs.db') === 0;
     }
 
     /**
@@ -64,14 +152,20 @@ class Geospatial_processor {
      */
     public function is_primary_geospatial_file($file_name)
     {
-        $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        return in_array($extension, $this->primary_geospatial_extensions);
+        $extension = $this->get_extension($file_name);
+        return in_array($extension, $this->raster_extensions)
+            || in_array($extension, $this->vector_extensions);
     }
 
     /**
-     * Validate ZIP file contents against whitelist
-     * Allows any folder structure - files will be extracted flat
-     * 
+     * Validate ZIP file contents against the allowlist.
+     *
+     * Files with extensions not on the allowlist are not an error: they are
+     * listed in 'skipped' and later left out of extraction. The archive is
+     * only invalid when it can't be read, has name conflicts, has an
+     * incomplete shapefile, or contains no processable geospatial file.
+     * Allows any folder structure - files will be extracted flat.
+     *
      * @param string $zip_path Path to ZIP file
      * @return array Result with validation status and details
      */
@@ -80,6 +174,7 @@ class Geospatial_processor {
         $result = array(
             'valid' => false,
             'files' => array(),
+            'skipped' => array(),
             'errors' => array(),
             'has_folders' => false,
             'missing_required' => array(),
@@ -100,54 +195,51 @@ class Geospatial_processor {
         $file_count = $zip->numFiles;
         $shapefile_components = array();
         $seen_basenames = array(); // Track basenames to detect conflicts
+        $has_primary = false;
 
-        // Validate all files
         for ($i = 0; $i < $file_count; $i++) {
             $file_info = $zip->statIndex($i);
             $file_name = $file_info['name'];
-            
-            // Skip macOS metadata files (__MACOSX folder or ._ files)
-            $basename = basename($file_name);
-            if (strpos($file_name, '__MACOSX/') === 0 || strpos($basename, '._') === 0) {
-                continue;
-            }
-            
-            // Check if it's a directory
-            if (substr($file_name, -1) === '/') {
-                $result['has_folders'] = true;
-                continue;
-            }
 
-            // Mark that we have folders if file path contains /
-            if (strpos($file_name, '/') !== false) {
+            if (strpos(str_replace('\\', '/', $file_name), '/') !== false) {
                 $result['has_folders'] = true;
             }
 
-            // Get the base filename (without path) - this is what will be used after flattening
-            $flat_filename = basename($file_name);
-            
-            // Check for filename conflicts after flattening
-            if (isset($seen_basenames[$flat_filename])) {
-                $result['filename_conflicts'][] = "Duplicate filename after flattening: '{$flat_filename}' (from '{$seen_basenames[$flat_filename]}' and '{$file_name}')";
+            if ($this->is_ignored_entry($file_name)) {
+                continue;
+            }
+
+            $flat_filename = $this->flat_entry_name($file_name);
+            if ($flat_filename === false) {
+                $result['skipped'][] = $file_name;
+                continue;
+            }
+
+            // Unknown extension: skip it (it will not be extracted)
+            if (!$this->is_allowed_file($flat_filename)) {
+                $result['skipped'][] = $file_name;
+                continue;
+            }
+
+            // Check for filename conflicts after flattening (allowed files only)
+            $conflict_key = strtolower($flat_filename);
+            if (isset($seen_basenames[$conflict_key])) {
+                $result['filename_conflicts'][] = "Duplicate filename after flattening: '{$flat_filename}' (from '{$seen_basenames[$conflict_key]}' and '{$file_name}')";
             } else {
-                $seen_basenames[$flat_filename] = $file_name;
+                $seen_basenames[$conflict_key] = $file_name;
             }
 
-            // Get file extension
-            $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-            
-            // Check if extension is allowed
-            if (!in_array($extension, $this->allowed_extensions)) {
-                $result['errors'][] = "File '{$file_name}' has disallowed extension '{$extension}'";
-                continue;
-            }
-
+            $extension = $this->get_extension($flat_filename);
             $result['files'][] = array(
                 'name' => $file_name,
                 'flat_name' => $flat_filename,
                 'extension' => $extension,
                 'size' => $file_info['size']
             );
+
+            if ($this->is_primary_geospatial_file($flat_filename)) {
+                $has_primary = true;
+            }
 
             // Track shapefile components (use flat filename for base name)
             if (in_array($extension, $this->required_shapefile_extensions)) {
@@ -170,20 +262,28 @@ class Geospatial_processor {
                 $result['missing_required'][] = "Shapefile '{$base_name}' missing: " . implode(', ', $missing);
             }
         }
+        if (!empty($result['missing_required'])) {
+            $result['errors'] = array_merge($result['errors'], $result['missing_required']);
+        }
 
-        // Determine overall validity
-        // Allow any folder structure as long as extensions are valid and no conflicts
-        $result['valid'] = empty($result['errors']) && 
-                          empty($result['missing_required']) &&
-                          !empty($result['files']);
+        if (!$has_primary) {
+            $message = 'No supported geospatial files found in the archive';
+            if (!empty($result['skipped'])) {
+                $message .= ' (ignored unsupported files: ' . implode(', ', array_map('basename', $result['skipped'])) . ')';
+            }
+            $result['errors'][] = $message;
+        }
+
+        $result['valid'] = empty($result['errors']);
 
         return $result;
     }
 
     /**
-     * Extract ZIP file to destination directory
-     * All files are extracted flat (folder structure is removed)
-     * 
+     * Extract ZIP file to destination directory.
+     * All files are extracted flat (folder structure is removed). Only files
+     * on the allowlist are written; everything else is reported in 'skipped'.
+     *
      * @param string $zip_path Path to ZIP file
      * @param string $destination Destination directory
      * @return array Result with extraction status
@@ -193,6 +293,7 @@ class Geospatial_processor {
         $result = array(
             'success' => false,
             'extracted_files' => array(),
+            'skipped' => array(),
             'errors' => array()
         );
 
@@ -210,57 +311,52 @@ class Geospatial_processor {
             return $result;
         }
 
-        // Extract all files with flattened structure (remove all folder paths)
         $file_count = $zip->numFiles;
         for ($i = 0; $i < $file_count; $i++) {
             $file_info = $zip->statIndex($i);
             $file_name = $file_info['name'];
-            
-            // Skip macOS metadata files (__MACOSX folder or ._ files)
-            $basename = basename($file_name);
-            if (strpos($file_name, '__MACOSX/') === 0 || strpos($basename, '._') === 0) {
+
+            if ($this->is_ignored_entry($file_name)) {
                 continue;
             }
-            
-            // Skip directories
-            if (substr($file_name, -1) === '/') {
+
+            $flat_filename = $this->flat_entry_name($file_name);
+            if ($flat_filename === false || !$this->is_allowed_file($flat_filename)) {
+                $result['skipped'][] = $file_name;
                 continue;
             }
-            
-            // Get just the filename without any path
-            $flat_filename = basename($file_name);
+
             $target_path = $destination . '/' . $flat_filename;
-            
-            // Extract file using streaming to avoid memory issues with large files
-            // Open the file in the ZIP as a stream
+
+            // Stream the entry to avoid memory issues with large files
             $fp_in = $zip->getStream($file_name);
             if ($fp_in === false) {
                 $result['errors'][] = "Failed to open stream for file: {$file_name}";
                 continue;
             }
-            
-            // Open destination file for writing
+
             $fp_out = fopen($target_path, 'wb');
             if ($fp_out === false) {
                 fclose($fp_in);
                 $result['errors'][] = "Failed to create file: {$flat_filename}";
                 continue;
             }
-            
-            // Stream copy to avoid loading entire file into memory
+
             $bytes_written = stream_copy_to_stream($fp_in, $fp_out);
-            
+
             fclose($fp_in);
             fclose($fp_out);
-            
-            if ($bytes_written !== false && $bytes_written > 0) {
-                $result['extracted_files'][] = $flat_filename;
-            } else {
+
+            // Empty files (e.g. a blank .cpg or readme) are valid
+            if ($bytes_written === false || $bytes_written < (int) $file_info['size']) {
                 $result['errors'][] = "Failed to write file: {$flat_filename}";
-                @unlink($target_path); // Clean up failed extraction
+                @unlink($target_path);
+                continue;
             }
+
+            $result['extracted_files'][] = $flat_filename;
         }
-        
+
         $result['success'] = !empty($result['extracted_files']) && empty($result['errors']);
 
         $zip->close();
@@ -281,7 +377,8 @@ class Geospatial_processor {
             'success' => false,
             'processed_files' => array(),
             'errors' => array(),
-            'extracted_files' => array()
+            'extracted_files' => array(),
+            'skipped_files' => array()
         );
 
         foreach ($uploaded_files as $file_info) {
@@ -328,7 +425,15 @@ class Geospatial_processor {
                 }
 
                 // Delete files after extraction                
-                unlink($file_path);                
+                unlink($file_path);
+
+                // Report files left out because their type is not supported
+                foreach ($extraction['skipped'] as $skipped_entry) {
+                    $result['skipped_files'][] = array(
+                        'original_zip' => $file_name,
+                        'file' => $skipped_entry
+                    );
+                }
                 
                 // Add extracted files to result (filter out non-primary geospatial files)
                 foreach ($extraction['extracted_files'] as $extracted_file) {

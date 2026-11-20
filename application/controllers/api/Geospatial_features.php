@@ -602,9 +602,8 @@ class Geospatial_features extends MY_REST_Controller
 			}
 
 			// Determine if this is a raster file based on extension
-			$file_extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
-			$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
-			$is_raster = in_array($file_extension, $raster_extensions);
+			$this->load->library('Geospatial_processor');
+			$is_raster = $this->geospatial_processor->is_raster_file($file_path);
 
 			// Convert layer_name to integer for raster files if it's numeric
 			if ($is_raster && is_numeric($layer_name)) {
@@ -834,9 +833,8 @@ class Geospatial_features extends MY_REST_Controller
 			}
 
 			// Determine if this is a raster file
-			$file_extension = strtolower(pathinfo($feature['file_name'], PATHINFO_EXTENSION));
-			$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
-			$is_raster = in_array($file_extension, $raster_extensions);
+			$this->load->library('Geospatial_processor');
+			$is_raster = $this->geospatial_processor->is_raster_file($feature['file_name']);
 
 			// Get layer name or band index
 			if ($is_raster) {
@@ -1036,9 +1034,9 @@ class Geospatial_features extends MY_REST_Controller
 
 		// Check if file is a raster format - CSV generation not supported for rasters
 		$file_extension = strtolower(pathinfo($feature['file_name'], PATHINFO_EXTENSION));
-		$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
-		
-		if (in_array($file_extension, $raster_extensions)) {
+		$this->load->library('Geospatial_processor');
+
+		if ($this->geospatial_processor->is_raster_file($feature['file_name'])) {
 			throw new Exception("CSV generation is not supported for raster files (." . $file_extension . "). This feature is only available for vector data formats.");
 		}
 
@@ -1481,6 +1479,7 @@ class Geospatial_features extends MY_REST_Controller
 				'uploaded_file_name' => $uploaded_file_name,
 				'processed_files' => $processing_result['processed_files'],
 				'extracted_files' => $processing_result['extracted_files'],
+				'skipped_files' => $processing_result['skipped_files'],
 				'keep_files' => $keep_files,  // Include preference in response
 				'message' => 'Files processed successfully'
 			);

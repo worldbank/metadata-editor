@@ -535,7 +535,7 @@ class Geospatial_features_model extends CI_Model {
             
             // For shapefiles, delete known related components
             if ($file_extension === 'shp') {
-                $related_extensions = array('shx', 'dbf', 'prj', 'cpg', 'sbn', 'sbx', 'shp.xml');
+                $related_extensions = array('shx', 'dbf', 'prj', 'cpg', 'cst', 'sbn', 'sbx', 'qix', 'fix', 'atx', 'shp.xml');
                 
                 foreach ($related_extensions as $ext) {
                     $related_file = $folder_path . '/' . $base_name . '.' . $ext;

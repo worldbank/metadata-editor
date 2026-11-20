@@ -11,6 +11,7 @@ Vue.component('geospatial-feature-import', {
             has_partial_success: false,
             dialog_process: false,
             upload_report: [],
+            skipped_files: [],
             //supported_formats: ['geojson', 'shp', 'tiff', 'geotiff', 'tif', 'kml', 'kmz', 'gpx', 'csv', 'json', 'zip', 'gpkg', 'nc', 'hdf', 'hdf5', 'grib', 'grb', 'jpg', 'jpeg', 'png', 'img', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2'],
             supported_formats: ['geojson', 'shp', 'tiff', 'geotiff', 'tif', 'kml', 'kmz', 'zip', 'gpkg', 'nc', 'hdf', 'hdf5'],
             project_id: null,
@@ -78,7 +79,8 @@ Vue.component('geospatial-feature-import', {
         
         isRasterFile: function(filename) {
             const extension = this.getFileExtension(filename);
-            const rasterExtensions = ['tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2'];
+            // Keep in sync with Geospatial_processor::$raster_extensions
+            const rasterExtensions = ['tif', 'tiff', 'geotiff', 'jpg', 'jpeg', 'png', 'jp2', 'img', 'ecw', 'sid', 'nc', 'nc4', 'hdf', 'hdf5', 'h5', 'he5', 'grib', 'grb', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2', 'vrt'];
             return rasterExtensions.includes(extension);
         },
         
@@ -173,6 +175,7 @@ Vue.component('geospatial-feature-import', {
             this.is_processing = true;
             this.dialog_process = true;
             this.upload_report = [];
+            this.skipped_files = [];
             this.has_errors = false;
             this.has_partial_success = false;
             this.is_cancelled = false; // Reset cancellation flag
@@ -202,6 +205,9 @@ Vue.component('geospatial-feature-import', {
                         if (uploadResult.status === 'success') {
                             fileData.status = 'uploaded';
                             fileData.uploadedFiles = uploadResult.files || [];
+                            (uploadResult.skipped_files || []).forEach(skipped => {
+                                this.skipped_files.push(skipped.original_zip + ': ' + skipped.file);
+                            });
                             return { success: true, fileData, uploadResult };
                         } else {
                             fileData.status = 'failed';
@@ -1341,6 +1347,12 @@ Vue.component('geospatial-feature-import', {
                                 <div class="text-h6">{{has_partial_success ? $t("import_partially_completed") : $t("import_failed")}}</div>
                                 <div class="mt-2">{{update_status}}</div>
                                 <div v-if="errors" class="mt-2" style="white-space: pre-wrap;">{{errors}}</div>
+                            </v-alert>
+
+                            <!-- Files ignored inside uploaded archives -->
+                            <v-alert type="info" outlined dense v-if="skipped_files.length > 0" class="mt-3">
+                                <div>{{$t("unsupported_files_ignored")}} ({{skipped_files.length}})</div>
+                                <div class="mt-1 text-caption" v-for="(skipped, idx) in skipped_files" :key="'skipped-' + idx">{{skipped}}</div>
                             </v-alert>
                             
                             <!-- Processing State -->

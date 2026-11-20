@@ -179,6 +179,7 @@ $lang['editable_fields']="Editable Fields";
 $lang['readonly_fields']="Read-only Fields";
 $lang['file_information']="File Information";
 $lang['layer_metadata']="Layer Metadata";
+$lang['unsupported_files_ignored']="Unsupported files in the archive were ignored";
 
 
 /* End of file geospatial_lang.php */
