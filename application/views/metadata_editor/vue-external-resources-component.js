@@ -367,12 +367,20 @@ const VueExternalResources = Vue.component('external-resources', {
             return this.ExternalResources.map((resource, index) => ({ resource, index }));
         },
         microdataResourceRows() {
+            // Only microdata projects get a separate microdata section;
+            // elsewhere dat/micro resources are listed with the rest.
+            if (!this.isMicrodataProject) {
+                return [];
+            }
             const vm = this;
             return this.resourceRows.filter(function(row) {
                 return vm.isMicrodataDctype(row.resource.dctype);
             });
         },
         otherResourceRows() {
+            if (!this.isMicrodataProject) {
+                return this.resourceRows;
+            }
             const vm = this;
             return this.resourceRows.filter(function(row) {
                 return !vm.isMicrodataDctype(row.resource.dctype);
