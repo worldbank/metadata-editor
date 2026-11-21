@@ -15,7 +15,22 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
                 return "You have unsaved changes. Are you sure you want to leave?";
             }
         }.bind(this);
-        
+
+        // The server assistant's "Fill in form" for this file's Description. It goes through the
+        // form's own model, so unsaved-changes tracking and validation run exactly as on typing;
+        // nothing is saved. The panel shows the outcome (accept/deny) on the proposal card.
+        this._assistantFillHandler = function (event) {
+            var detail = event.detail || {};
+            if (typeof detail.accept !== 'function') return;
+            var panel = document.querySelector('[data-server-assistant]');
+            if (panel && String(panel.dataset.dataFileId || '') !== String(this.ActiveDatafileIndex || '')) {
+                return detail.deny('A different data file is open now.');
+            }
+            this.form_local.description = String(detail.suggestion || '');
+            detail.accept();
+        }.bind(this);
+        document.addEventListener('pslm-datafile-fill', this._assistantFillHandler);
+
         this.loadFile();
     },
     beforeRouteLeave(to, from, next) {
@@ -23,6 +38,9 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
             return false;
         }
         next();
+    },
+    destroyed: function () {
+        document.removeEventListener('pslm-datafile-fill', this._assistantFillHandler);
     },
     beforeRouteUpdate(to, from, next) {
         if (!this.showUnsavedMessage()){

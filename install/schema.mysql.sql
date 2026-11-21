@@ -1270,6 +1270,15 @@ CREATE TABLE `user_notifications` (
   KEY `idx_actor` (`actor_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Server assistant: per-project settings (keep_local = never send this project to a hosted model)
+CREATE TABLE `assistant_project_settings` (
+  `sid` int NOT NULL,
+  `keep_local` tinyint(1) NOT NULL DEFAULT 0,
+  `updated_by` int DEFAULT NULL,
+  `updated_on` int DEFAULT NULL,
+  PRIMARY KEY (`sid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- CodeIgniter migration ledger (fresh installs: schema already includes all migration SQL;
 -- bump version when adding application/migrations/*.php)
 CREATE TABLE `migrations` (

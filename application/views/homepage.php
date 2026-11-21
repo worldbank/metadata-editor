@@ -55,3 +55,5 @@
 
 </div>
 </div>
+
+<?php echo $this->load->view('metadata_editor/assistant_panel.php', array('sid' => ''), true); ?>

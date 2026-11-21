@@ -30,6 +30,11 @@ See [Installation guide](https://worldbank.github.io/metadata-editor-docs/tech_i
 
 See [Documentation](https://worldbank.github.io/metadata-editor-docs)
 
+### Server assistant (optional)
+
+A chat panel that answers questions, drafts field values from a project's documents and reviews
+records, running on the FastAPI data service. Off by default; see [README-assistant.md](README-assistant.md).
+
 ## Contact
 datatools[at]worldbank.org
 
